@@ -1,0 +1,109 @@
+{
+  "source_commit": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "sources": [
+    {
+      "path": "scripts/run-sites-cloud-ocr.mjs",
+      "lines": "1-12",
+      "url": "https://github.com/sharbel0022/Mgeorge/blob/237dd45e7e1b40513d2dd25ccff59bb08f023264/scripts/run-sites-cloud-ocr.mjs#L1-L12",
+      "bytes": 826,
+      "sha256": "c3623242f1b716bc2d70805a2853011bb257bae5ae4af8bc4cead85aea673d5e",
+      "git_blob_sha": "f143aeb6ceed4376c3f3de09a2acc4848586c0f3"
+    },
+    {
+      "path": ".github/workflows/sites-cloud-ocr.yml",
+      "lines": "3-57",
+      "url": "https://github.com/sharbel0022/Mgeorge/blob/237dd45e7e1b40513d2dd25ccff59bb08f023264/.github/workflows/sites-cloud-ocr.yml#L3-L57",
+      "bytes": 2184,
+      "sha256": "bce2b361de0bec0053a0defa460216b5db1e57f6cb639e592b6ccd549c39cfa8",
+      "git_blob_sha": "7a4b3931d69c6250a3a091b52f5a12a211061578"
+    },
+    {
+      "path": "src/sites-ocr-pull.js",
+      "lines": "22-77",
+      "url": "https://github.com/sharbel0022/Mgeorge/blob/237dd45e7e1b40513d2dd25ccff59bb08f023264/src/sites-ocr-pull.js#L22-L77",
+      "bytes": 6052,
+      "sha256": "08614eda1904c02324d02607f00050cbd688d51f42ca2fae3480de031d894eb2",
+      "git_blob_sha": "9bc1990706cb64668c3535b0122cfbcaaf9b9fe5"
+    },
+    {
+      "path": "src/invoice-extraction.js",
+      "lines": "226-239",
+      "url": "https://github.com/sharbel0022/Mgeorge/blob/237dd45e7e1b40513d2dd25ccff59bb08f023264/src/invoice-extraction.js#L226-L239",
+      "bytes": 21922,
+      "sha256": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e",
+      "git_blob_sha": "48048549de7b317f50bdb669effe6aa18d3e65e0"
+    },
+    {
+      "path": "src/invoice-worker.js",
+      "lines": "14-80",
+      "url": "https://github.com/sharbel0022/Mgeorge/blob/237dd45e7e1b40513d2dd25ccff59bb08f023264/src/invoice-worker.js#L14-L80",
+      "bytes": 4687,
+      "sha256": "e14496922f70a62038b0ff24dcc61026d0c11a85192d3abff3a9105114952fef",
+      "git_blob_sha": "8ba91e067188b58d10d77da7eaa026fcacf4107f"
+    },
+    {
+      "path": "src/image-dimensions.js",
+      "lines": "2-14",
+      "url": "https://github.com/sharbel0022/Mgeorge/blob/237dd45e7e1b40513d2dd25ccff59bb08f023264/src/image-dimensions.js#L2-L14",
+      "bytes": 1466,
+      "sha256": "57e1db355914c6f30190f591a1459b4a0ca25acee5a9b88d060cba2213aa9eec",
+      "git_blob_sha": "ca84be11cae82db37f84d8e687beae6e535e59c9"
+    },
+    {
+      "path": "src/ocr-raster-size.js",
+      "lines": "1-5",
+      "url": "https://github.com/sharbel0022/Mgeorge/blob/237dd45e7e1b40513d2dd25ccff59bb08f023264/src/ocr-raster-size.js#L1-L5",
+      "bytes": 361,
+      "sha256": "feeca5b3c51d0607420cbee2a23a6431a938bdf3cefcf580493464a1f32a5b8f",
+      "git_blob_sha": "ed7809226b41eec661703074bd41a13b7cc7d877"
+    },
+    {
+      "path": "sites/lib/document-processing.ts",
+      "lines": "89-119",
+      "url": "https://github.com/sharbel0022/Mgeorge/blob/237dd45e7e1b40513d2dd25ccff59bb08f023264/sites/lib/document-processing.ts#L89-L119",
+      "bytes": 37899,
+      "sha256": "15206fcf6467822de7efa3b4f7a32418f024447d9f42a66e9b064a5cc2a32d9a",
+      "git_blob_sha": "61cf6eb17cf33cf5b66308946404138e1fe4aab2"
+    },
+    {
+      "path": "sites/lib/server-pdf.ts",
+      "lines": "3-23",
+      "url": "https://github.com/sharbel0022/Mgeorge/blob/237dd45e7e1b40513d2dd25ccff59bb08f023264/sites/lib/server-pdf.ts#L3-L23",
+      "bytes": 1690,
+      "sha256": "5a212c15b669969022522dbabda2d04bdc222bc8f1cf61c477c54cf2d3a04167",
+      "git_blob_sha": "a71174cf658b80cb461c13cdb196004f331d20ab"
+    },
+    {
+      "path": "sites/app/api/ocr-worker/[action]/route.ts",
+      "lines": "3-8",
+      "url": "https://github.com/sharbel0022/Mgeorge/blob/237dd45e7e1b40513d2dd25ccff59bb08f023264/sites/app/api/ocr-worker/%5Baction%5D/route.ts#L3-L8",
+      "bytes": 1132,
+      "sha256": "1719f6cdb35f2d94f0991e960ecc4211a9c3bd310d6eb9388881af981e5c3060",
+      "git_blob_sha": "54d6650c26806f29a0670ed495ec0d191e389c7b"
+    },
+    {
+      "path": "test/sites-ocr-pull.test.js",
+      "lines": "60-119",
+      "url": "https://github.com/sharbel0022/Mgeorge/blob/237dd45e7e1b40513d2dd25ccff59bb08f023264/test/sites-ocr-pull.test.js#L60-L119",
+      "bytes": 18348,
+      "sha256": "f9c9ac70a3d7b9c971cb0c1607875148aa0c2248ddafcd8409e28f58ef4eaef9",
+      "git_blob_sha": "7f101e8b6ab1b968db18e1ef9ad7e6dc2342ce87"
+    },
+    {
+      "path": "sites/tests/document-queue-recovery.test.mjs",
+      "lines": "66-158",
+      "url": "https://github.com/sharbel0022/Mgeorge/blob/237dd45e7e1b40513d2dd25ccff59bb08f023264/sites/tests/document-queue-recovery.test.mjs#L66-L158",
+      "bytes": 20503,
+      "sha256": "6ed381797a91fb5d4e02ee71f9d4393e9497cb25505933b3604721411f1180a0",
+      "git_blob_sha": "09bb9d92f560570265bf7c260f23c78387cd4411"
+    },
+    {
+      "path": "sites/tests/cloud-ocr.test.mjs",
+      "lines": "123-174",
+      "url": "https://github.com/sharbel0022/Mgeorge/blob/237dd45e7e1b40513d2dd25ccff59bb08f023264/sites/tests/cloud-ocr.test.mjs#L123-L174",
+      "bytes": 31882,
+      "sha256": "1d48632ff16bf440a8f1b0b02ee42b25eaf44e206064cf8e9ef34d4d91ece60e",
+      "git_blob_sha": "130a02b2b670c3ae11333afafdefc1b8f141a4de"
+    }
+  ]
+}

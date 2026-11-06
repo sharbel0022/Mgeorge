@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "prefix": "docs/quality8/ocr-capacity-diagnosis-20261106",
+  "base_head": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "excludes": [
+    "file-manifest.json",
+    "SHA256SUMS"
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 9465,
+      "sha256": "4d512e4106b6290d962038352434487a4acd45360f1cf1c09f2226d1f331fd47",
+      "git_blob_sha": "a461e1e46fd9df6ee79931da417cd2d823aca706"
+    },
+    {
+      "path": "OBSERVATIONS.json",
+      "bytes": 23519,
+      "sha256": "7fcc56e15ec44dea35d0b0cb170d1690fe11c3e79246a97d795d5cde7d342a0e",
+      "git_blob_sha": "a36340efdc8c38ddb71f44dd4fd8c071dabbf761"
+    },
+    {
+      "path": "SOURCE-REFERENCES.json",
+      "bytes": 5201,
+      "sha256": "7a4b6bcae28927e5b9e35320698d5a5e94404e8186df84be320303927a7b59bb",
+      "git_blob_sha": "3b1f5ab267be899df4ee3586441f26c07589fbae"
+    }
+  ]
+}
