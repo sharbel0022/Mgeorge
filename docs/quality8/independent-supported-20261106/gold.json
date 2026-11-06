@@ -1,0 +1,352 @@
+{
+  "schemaVersion": 1,
+  "fields": [
+    "invoice_number",
+    "party",
+    "organization_number",
+    "issued_at",
+    "due_at",
+    "total_cents",
+    "net_cents",
+    "vat_cents",
+    "currency"
+  ],
+  "samples": [
+    {
+      "id": "normal-sv-01",
+      "cohort": "normal",
+      "language": "sv",
+      "layout": 1,
+      "image": "images/normal-sv-01.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "SV-26001",
+        "party": "Myrglimt Kontor AB",
+        "organization_number": "559871-0019",
+        "issued_at": "2026-09-01",
+        "due_at": "2026-10-01",
+        "total_cents": 600000,
+        "net_cents": 480000,
+        "vat_cents": 120000,
+        "currency": "SEK"
+      },
+      "conditions": "clean ordinary synthetic invoice"
+    },
+    {
+      "id": "normal-sv-02",
+      "cohort": "normal",
+      "language": "sv",
+      "layout": 2,
+      "image": "images/normal-sv-02.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "SV-26002",
+        "party": "Granlyra Service AB",
+        "organization_number": "559871-0027",
+        "issued_at": "2026-09-02",
+        "due_at": "2026-10-02",
+        "total_cents": 156250,
+        "net_cents": 125000,
+        "vat_cents": 31250,
+        "currency": "SEK"
+      },
+      "conditions": "clean ordinary synthetic invoice"
+    },
+    {
+      "id": "normal-sv-03",
+      "cohort": "normal",
+      "language": "sv",
+      "layout": 3,
+      "image": "images/normal-sv-03.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "SV-26003",
+        "party": "Fjällruta Teknik AB",
+        "organization_number": "559871-0035",
+        "issued_at": "2026-09-03",
+        "due_at": "2026-10-03",
+        "total_cents": 920000,
+        "net_cents": 736000,
+        "vat_cents": 184000,
+        "currency": "SEK"
+      },
+      "conditions": "clean ordinary synthetic invoice"
+    },
+    {
+      "id": "normal-sv-04",
+      "cohort": "normal",
+      "language": "sv",
+      "layout": 1,
+      "image": "images/normal-sv-04.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "SV-26004",
+        "party": "Björkkompass Material AB",
+        "organization_number": "559871-0043",
+        "issued_at": "2026-09-04",
+        "due_at": "2026-10-04",
+        "total_cents": 372500,
+        "net_cents": 298000,
+        "vat_cents": 74500,
+        "currency": "SEK"
+      },
+      "conditions": "clean ordinary synthetic invoice"
+    },
+    {
+      "id": "normal-sv-05",
+      "cohort": "normal",
+      "language": "sv",
+      "layout": 2,
+      "image": "images/normal-sv-05.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "SV-26005",
+        "party": "Solmossa Form AB",
+        "organization_number": "559871-0050",
+        "issued_at": "2026-09-05",
+        "due_at": "2026-10-05",
+        "total_cents": 802500,
+        "net_cents": 642000,
+        "vat_cents": 160500,
+        "currency": "SEK"
+      },
+      "conditions": "clean ordinary synthetic invoice"
+    },
+    {
+      "id": "normal-sv-06",
+      "cohort": "normal",
+      "language": "sv",
+      "layout": 3,
+      "image": "images/normal-sv-06.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "SV-26006",
+        "party": "Ängsvåg Konsult AB",
+        "organization_number": "559871-0068",
+        "issued_at": "2026-09-06",
+        "due_at": "2026-10-06",
+        "total_cents": 232500,
+        "net_cents": 186000,
+        "vat_cents": 46500,
+        "currency": "SEK"
+      },
+      "conditions": "clean ordinary synthetic invoice"
+    },
+    {
+      "id": "normal-en-07",
+      "cohort": "normal",
+      "language": "en",
+      "layout": 1,
+      "image": "images/normal-en-07.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "EN-26007",
+        "party": "Ember Quay Services AB",
+        "organization_number": "559871-0076",
+        "issued_at": "2026-09-07",
+        "due_at": "2026-10-07",
+        "total_cents": 405000,
+        "net_cents": 324000,
+        "vat_cents": 81000,
+        "currency": "SEK"
+      },
+      "conditions": "clean ordinary synthetic invoice"
+    },
+    {
+      "id": "normal-en-08",
+      "cohort": "normal",
+      "language": "en",
+      "layout": 2,
+      "image": "images/normal-en-08.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "EN-26008",
+        "party": "Cedar Lantern Design AB",
+        "organization_number": "559871-0084",
+        "issued_at": "2026-09-08",
+        "due_at": "2026-10-08",
+        "total_cents": 585000,
+        "net_cents": 468000,
+        "vat_cents": 117000,
+        "currency": "SEK"
+      },
+      "conditions": "clean ordinary synthetic invoice"
+    },
+    {
+      "id": "normal-en-09",
+      "cohort": "normal",
+      "language": "en",
+      "layout": 3,
+      "image": "images/normal-en-09.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "EN-26009",
+        "party": "Silver Fern Office AB",
+        "organization_number": "559871-0092",
+        "issued_at": "2026-09-09",
+        "due_at": "2026-10-09",
+        "total_cents": 1070000,
+        "net_cents": 856000,
+        "vat_cents": 214000,
+        "currency": "SEK"
+      },
+      "conditions": "clean ordinary synthetic invoice"
+    },
+    {
+      "id": "normal-en-10",
+      "cohort": "normal",
+      "language": "en",
+      "layout": 1,
+      "image": "images/normal-en-10.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "EN-26010",
+        "party": "Amber Brook Systems AB",
+        "organization_number": "559871-0100",
+        "issued_at": "2026-09-10",
+        "due_at": "2026-10-10",
+        "total_cents": 265000,
+        "net_cents": 212000,
+        "vat_cents": 53000,
+        "currency": "SEK"
+      },
+      "conditions": "clean ordinary synthetic invoice"
+    },
+    {
+      "id": "normal-en-11",
+      "cohort": "normal",
+      "language": "en",
+      "layout": 2,
+      "image": "images/normal-en-11.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "EN-26011",
+        "party": "Willow Orbit Supply AB",
+        "organization_number": "559871-0118",
+        "issued_at": "2026-09-11",
+        "due_at": "2026-10-11",
+        "total_cents": 742500,
+        "net_cents": 594000,
+        "vat_cents": 148500,
+        "currency": "SEK"
+      },
+      "conditions": "clean ordinary synthetic invoice"
+    },
+    {
+      "id": "normal-en-12",
+      "cohort": "normal",
+      "language": "en",
+      "layout": 3,
+      "image": "images/normal-en-12.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "EN-26012",
+        "party": "North Velvet Studio AB",
+        "organization_number": "559871-0126",
+        "issued_at": "2026-09-12",
+        "due_at": "2026-10-12",
+        "total_cents": 472500,
+        "net_cents": 378000,
+        "vat_cents": 94500,
+        "currency": "SEK"
+      },
+      "conditions": "clean ordinary synthetic invoice"
+    },
+    {
+      "id": "stress-sv-13",
+      "cohort": "stress",
+      "language": "sv",
+      "layout": 1,
+      "image": "images/stress-sv-13.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "SV-26013",
+        "party": "Mossglöd Verkstad AB",
+        "organization_number": "559871-0134",
+        "issued_at": "2026-09-13",
+        "due_at": "2026-10-13",
+        "total_cents": 320000,
+        "net_cents": 256000,
+        "vat_cents": 64000,
+        "currency": "SEK"
+      },
+      "conditions": "rotation 1.2 degrees plus blur 0.7 px"
+    },
+    {
+      "id": "stress-en-14",
+      "cohort": "stress",
+      "language": "en",
+      "layout": 2,
+      "image": "images/stress-en-14.png",
+      "mimeType": "image/png",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "gold": {
+        "invoice_number": "EN-26014",
+        "party": "Maple Quartz Services AB",
+        "organization_number": "559871-0142",
+        "issued_at": "2026-09-14",
+        "due_at": "2026-10-14",
+        "total_cents": 540000,
+        "net_cents": 432000,
+        "vat_cents": 108000,
+        "currency": "SEK"
+      },
+      "conditions": "downsample to 840px width, light gray background, blur 0.35 px"
+    }
+  ]
+}
