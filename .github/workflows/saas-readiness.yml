@@ -9,6 +9,7 @@ on:
       - 'src/bank.js'
       - 'src/private-key-file.js'
       - 'test/security-*.test.js'
+      - 'test/company-selection-version.test.js'
       - 'src/server.js'
       - 'sites/scripts/lib/recovery-acceptance.mjs'
       - 'sites/tests/recovery-acceptance-provenance.test.mjs'
@@ -77,7 +78,7 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/readiness-boundary-evidence"
           git rev-parse HEAD > "$RUNNER_TEMP/readiness-boundary-evidence/source-commit.txt"
-          node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-reporter=tap --test-concurrency=1 test/security-session-ambiguity.test.js sites/tests/recovery-acceptance-provenance.test.mjs | tee "$RUNNER_TEMP/readiness-boundary-evidence/tests.tap"
+          node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-reporter=tap --test-concurrency=1 test/security-session-ambiguity.test.js test/company-selection-version.test.js sites/tests/recovery-acceptance-provenance.test.mjs | tee "$RUNNER_TEMP/readiness-boundary-evidence/tests.tap"
       - name: Retain boundary results including failures
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
