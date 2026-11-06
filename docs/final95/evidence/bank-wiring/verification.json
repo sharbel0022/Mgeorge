@@ -1,0 +1,565 @@
+{
+  "version": 1,
+  "recordedOn": "2026-11-06",
+  "baseCommit": "2982b6c51cf2891d97b816ea1ce6c82e5f4c71a1",
+  "finalProductCommit": "7fd5af2764ef3387341758601eea2ff45a5d0a18",
+  "scope": "Focused bank/provider/token tests only. Root integration owns complete Node/Sites/CI/build/release receipts.",
+  "environment": {
+    "node": "v24.22.1",
+    "openssl": "OpenSSL 3.5.7 9 Jun 2026 (Library: OpenSSL 3.5.7 9 Jun 2026)",
+    "platform": "Linux",
+    "isolation": "NODE_ENV=test and scripts/saas-test-isolation.mjs for reported test runs"
+  },
+  "networkEvidence": {
+    "endpoint": "loopback only via a native HTTPS test server",
+    "realClientCertificateTransfersInFullSyntheticFlow": 16,
+    "clientCredentialsRequests": 1,
+    "separateAuthorizationCodeRequests": 1,
+    "productionProviderRequests": 0
+  },
+  "sourceSnapshotQualification": "Post-run hash snapshot of committed changed bank source and test files; exact postcommit runs above use these tracked bytes. Generated docs are not asserted to have existed during those runs.",
+  "sourceFiles": [
+    {
+      "path": "sites/lib/banking/openpayments-provider.d.ts",
+      "sha256": "446e283ebe2052f4e34ee06892752758d1c1a78699c918514e9123b93e080409"
+    },
+    {
+      "path": "sites/lib/banking/openpayments-provider.js",
+      "sha256": "3b77306389e1f6a94c760b1d65a467c365fc20489a9a61772f9d6bb230df8203"
+    },
+    {
+      "path": "sites/lib/banking/openpayments/token-cache.d.ts",
+      "sha256": "4dd669eece76c59650a33679fee8f9b1c4e930044775f389b1b57cffde77da0c"
+    },
+    {
+      "path": "sites/lib/banking/openpayments/token-cache.js",
+      "sha256": "11a8d5c5fb4f041aba5c4eba8446574680084eab2c6029fa1062830f1b5b8bb0"
+    },
+    {
+      "path": "sites/lib/banking/openpayments/token.js",
+      "sha256": "8b88495888e011cd33d7415b276293aea1b7ed21c5add07dca179ff6544d2a12"
+    },
+    {
+      "path": "sites/lib/banking/saas-bank-runtime.d.ts",
+      "sha256": "a8f2ead7c58e02741aca43020087141c2d8fe3ff02761816ab6f31ff8642d493"
+    },
+    {
+      "path": "sites/lib/banking/saas-bank-runtime.js",
+      "sha256": "e02f5a1e04572f01de5db949747f5369cb25d561664fd1952c9cf6e2b7fd3fb3"
+    },
+    {
+      "path": "sites/tests/openpayments-token-cache.test.mjs",
+      "sha256": "ea03672045a817e1beefbcff558da7ec266e0842f7fde72371653cc83a2fdb4c"
+    },
+    {
+      "path": "src/banking/openpayments-node-transport.js",
+      "sha256": "a483950085ed33a7cb1e8685d362c613128b1307909e2cc5e13d99a9972c3e8a"
+    },
+    {
+      "path": "src/banking/openpayments-runtime-transport.js",
+      "sha256": "e014990da5d27b415af8d8b89e6ce15b2199be2eeb9426944872a11587cfbfe3"
+    },
+    {
+      "path": "src/openpayments-company-bank-sync.js",
+      "sha256": "c9102fe0445ed7c8c2dab737b440951ee7ad0bf6df6d4ae18c2b3c7c00371235"
+    },
+    {
+      "path": "src/saas-bank-runtime.js",
+      "sha256": "56bd1e5d5db0d3ceff57f747f09d16e7f1702025db437b594c86eac2a7015f2b"
+    },
+    {
+      "path": "test/helpers/openpayments-local-tls.mjs",
+      "sha256": "d757f1742de52978cb6b5fac2a05d2d825b9e4ec3b502deec99172c4e6629363"
+    },
+    {
+      "path": "test/openpayments-runtime-transport.test.js",
+      "sha256": "bbad508d0a1d8d51e1eabafc08a3fd71122866533354f342f379e6a39a73f323"
+    }
+  ],
+  "runs": [
+    {
+      "file": "bank-token-cache-3bcb841-focused.tap.gz",
+      "sha256": "48d4fe07dbe83853deff558d5ffc42537ea6b6d068126535bbca8cd5b71ef854",
+      "uncompressedSha256": "9a02c5a5cd36b32e38a780606c7d22b9a0c389efe5e05a8d96c12e7a21e14b1d",
+      "bytes": 17320,
+      "totals": {
+        "tests": 425,
+        "suites": 0,
+        "pass": 425,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "exactCommit": "3bcb841eee815db4f138fc46c6f8503a5bc12396",
+      "command": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --test --test-reporter=tap --test-concurrency=1 test/openpayments-runtime-transport.test.js test/openpayments-node-transport.test.js test/openpayments-company-bank-sync.test.js test/openpayments-company-bank-sync-normalization.test.js test/consent-reconnect-95.test.js test/bank-consent-api.test.js test/api-account-consent.test.js test/openpayments-bankgiro-ingest.test.js sites/tests/openpayments-*.test.mjs",
+      "durationMs": 18849.165719
+    },
+    {
+      "file": "bank-token-cache-79ea47e-check.log.gz",
+      "sha256": "3f00688522f9b480537267d91c4587018b768020be16c16eb5693775a4ddc3ed",
+      "uncompressedSha256": "a7ebf3199eb583ce5ba63ad60c4383e0d13f79d6998b0072d480264c00ffbc2b",
+      "bytes": 175,
+      "totals": {},
+      "scope": "isolated synthetic tests; not production verification",
+      "exactCommit": "79ea47e9db430ea30e704c8df8850b4783f5dc93",
+      "command": "npm run check"
+    },
+    {
+      "file": "bank-token-cache-79ea47e-focused.tap.gz",
+      "sha256": "5811cdbf769645982ca556b29212db2eefd5fd4bd2a6d7f9b26db77096a95faf",
+      "uncompressedSha256": "c6bd3925fe620f65e99c5fd49393306d3ac82214385f800aef21877a79f6a825",
+      "bytes": 17339,
+      "totals": {
+        "tests": 424,
+        "suites": 0,
+        "pass": 424,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "exactCommit": "79ea47e9db430ea30e704c8df8850b4783f5dc93",
+      "command": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --test --test-reporter=tap --test-concurrency=1 test/openpayments-runtime-transport.test.js test/openpayments-node-transport.test.js test/openpayments-company-bank-sync.test.js test/openpayments-company-bank-sync-normalization.test.js test/consent-reconnect-95.test.js test/bank-consent-api.test.js test/api-account-consent.test.js test/openpayments-bankgiro-ingest.test.js sites/tests/openpayments-*.test.mjs",
+      "durationMs": 22513.57789
+    },
+    {
+      "file": "bank-token-cache-all-green.tap.gz",
+      "sha256": "d129cf43096ce2e9612b79666a18c8eba8a4cd1596261377c5bacb954a0c010b",
+      "uncompressedSha256": "0175f9937ea4d7d4e34a29d3a8d37bae1e021a9de9744f5561650869655a95bc",
+      "bytes": 4286,
+      "totals": {
+        "tests": 85,
+        "suites": 0,
+        "pass": 85,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 2375.265068
+    },
+    {
+      "file": "bank-token-cache-api-green.tap.gz",
+      "sha256": "5e5b3718bd119370dde2a0dfb2300329f986a1a1fddffbb43b530404b436af4b",
+      "uncompressedSha256": "ea6702d0898de0945621236bcde1536209d4d148d2f8947e51451bdec0789ca8",
+      "bytes": 2053,
+      "totals": {
+        "tests": 40,
+        "suites": 0,
+        "pass": 40,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 1306.111653
+    },
+    {
+      "file": "bank-token-cache-api-red.tap.gz",
+      "sha256": "a2b2ca95a26ed867c4c51b4f771e1d27a509ccaf573468de2c961c6228b83b7f",
+      "uncompressedSha256": "7a56945c51a7cc2367247a2a1e4ec3c2156e21c18e52d701a8d5c43155df6626",
+      "bytes": 1721,
+      "totals": {
+        "tests": 23,
+        "suites": 0,
+        "pass": 22,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 1089.803357
+    },
+    {
+      "file": "bank-token-cache-contracts.tap.gz",
+      "sha256": "c3c34bba059dfef348e48d2547e7fc9e47567237c2e5ae7a08ff45819df0cd19",
+      "uncompressedSha256": "0f877a7dd2da9bd2d24e18d0e889e7178e6849c6ad5e466dbc8fd7d994ac7496",
+      "bytes": 3184,
+      "totals": {
+        "tests": 62,
+        "suites": 0,
+        "pass": 62,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 1074.622208
+    },
+    {
+      "file": "bank-token-cache-expiry-green.tap.gz",
+      "sha256": "294720afc59a10647d80d8edcac3c45d4f7c697cfce15c49a0e830967c74802d",
+      "uncompressedSha256": "f3f0e5407cc2881c7c03ea539bafe93da187832d54dd9bb204bd68676d3dd4bd",
+      "bytes": 2996,
+      "totals": {
+        "tests": 61,
+        "suites": 0,
+        "pass": 61,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 1871.225235
+    },
+    {
+      "file": "bank-token-cache-expiry-red.tap.gz",
+      "sha256": "e26f3c039f338032c8304374c804903368f66e5f4c9ea312ed487d909bf8e9ae",
+      "uncompressedSha256": "142e1ce877252dc1224be66a0cd72a2629c9824ce36ab78023f6cd9b6ca14e8c",
+      "bytes": 1957,
+      "totals": {
+        "tests": 24,
+        "suites": 0,
+        "pass": 23,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 1102.275019
+    },
+    {
+      "file": "bank-token-cache-final-focused.tap.gz",
+      "sha256": "760d1fa059051f72bb57131ca27fc8d173d0083389adf4e6009feb2fa3d7a80c",
+      "uncompressedSha256": "b8f65aaf512a47b96e3cf60ff6f41f028ae8473b1be5b861c6b92d4a777008a5",
+      "bytes": 17357,
+      "totals": {
+        "tests": 424,
+        "suites": 0,
+        "pass": 424,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 23967.276191
+    },
+    {
+      "file": "bank-token-cache-final-review-focused.tap.gz",
+      "sha256": "45598f9c7338deb3311f469843b38b8bf820e38e4b8c06ab1f0f654dc5fd2a6e",
+      "uncompressedSha256": "d421cad39587d115f1e395141e0612312866868a3c51c2cdf1c6dee658663d19",
+      "bytes": 17819,
+      "totals": {
+        "tests": 435,
+        "suites": 0,
+        "pass": 435,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "exactCommit": "7fd5af2764ef3387341758601eea2ff45a5d0a18",
+      "command": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --test --test-reporter=tap --test-concurrency=1 test/openpayments-runtime-transport.test.js test/openpayments-node-transport.test.js test/openpayments-company-bank-sync.test.js test/openpayments-company-bank-sync-normalization.test.js test/consent-reconnect-95.test.js test/bank-consent-api.test.js test/api-account-consent.test.js test/openpayments-bankgiro-ingest.test.js sites/tests/openpayments-*.test.mjs",
+      "durationMs": 19783.255409
+    },
+    {
+      "file": "bank-token-cache-first-green.tap.gz",
+      "sha256": "7bcbb266f33c363feb8a5e9ea5277e4b5b06da1e14fc331e55f70c141b9573de",
+      "uncompressedSha256": "b3e7820538c39028cedada169b5acf6828ea37d33053a81042777cfdeefd64cd",
+      "bytes": 1146,
+      "totals": {
+        "tests": 19,
+        "suites": 0,
+        "pass": 19,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 1114.495265
+    },
+    {
+      "file": "bank-token-cache-microtask-red-direct.tap.gz",
+      "sha256": "96da743df1d8b45059b306d24250f6312aecc2f525335b1d1d63e0f6d0c77340",
+      "uncompressedSha256": "e571c0fdf495a4c457e3ec44c8fe40a5e950115da68b47104c4fc3d5866e47f3",
+      "bytes": 1219,
+      "totals": {
+        "tests": 17,
+        "suites": 0,
+        "pass": 16,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 334.341469
+    },
+    {
+      "file": "bank-token-cache-microtask-red.tap.gz",
+      "sha256": "731fbcfa77b90b9dfcd68edb5912e5d4889fd69bbfda5c3610ee33529aec8c2e",
+      "uncompressedSha256": "58f6e3ad7200698be71446d4858623e1423efaec296e0b1b6d53c53ebcd9f8d0",
+      "bytes": 939,
+      "totals": {
+        "tests": 17,
+        "suites": 0,
+        "pass": 17,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 288.226567
+    },
+    {
+      "file": "bank-token-cache-red.tap.gz",
+      "sha256": "60fa2eafc241438a6e7eca24dde822f99e757eee03bc271f37dd88dbead69525",
+      "uncompressedSha256": "9f5ec54fac1a56d11f2eb43dfd55bc310d341e205e65fd62e3a6cb2a98cf6257",
+      "bytes": 1580,
+      "totals": {
+        "tests": 19,
+        "suites": 0,
+        "pass": 17,
+        "fail": 2,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 1081.582658
+    },
+    {
+      "file": "bank-token-cache-review-first-green.tap.gz",
+      "sha256": "7071171e04616b63ab655ff201f76b123d34ec7a81bb1942d9ea7c72fd3d3bc8",
+      "uncompressedSha256": "192c1230d2975e118d191ba30ef21da4862b51e82ddacaf64918e3287ce67137",
+      "bytes": 4357,
+      "totals": {
+        "tests": 87,
+        "suites": 0,
+        "pass": 87,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 1931.665325
+    },
+    {
+      "file": "bank-token-cache-review-green.tap.gz",
+      "sha256": "07f279a66a330a3483cdabe2ef6a3bd02efa5657a1f3fb524190ac4535985cdf",
+      "uncompressedSha256": "441ef6848a3d7a4cfc538af5a3b295c5b0fcc5869f49701b1c4873cb7110fba6",
+      "bytes": 4680,
+      "totals": {
+        "tests": 94,
+        "suites": 0,
+        "pass": 94,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 1902.589471
+    },
+    {
+      "file": "bank-token-cache-review-red.tap.gz",
+      "sha256": "44a37d7c969cef8495d3393056759ebda2e042416c534dee627e2d5031fda0be",
+      "uncompressedSha256": "452dd3a1224313b3e5390a8da39badce830413edeefede8d14f0c4ec25dc45b4",
+      "bytes": 1400,
+      "totals": {
+        "tests": 19,
+        "suites": 0,
+        "pass": 17,
+        "fail": 2,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 306.815991
+    },
+    {
+      "file": "bank-token-cache-rotation-red.tap.gz",
+      "sha256": "562c2c17158b9d198a199c5af6ad8d180fed8d5c00bcf5ef832cdf378fe65895",
+      "uncompressedSha256": "b6d152737ef9ac78df70859289d1e6959bbfeb2c78322eda2b700e859ae955dd",
+      "bytes": 1774,
+      "totals": {
+        "tests": 22,
+        "suites": 0,
+        "pass": 21,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 1394.755468
+    },
+    {
+      "file": "bank-token-cache-types.log.gz",
+      "sha256": "d149581d4a22a5384108f25b6296da65983f1b8c11b6a071d692030c8f22e615",
+      "uncompressedSha256": "99c82b6f4982652244e7040074dd8cda3f3e966644cfe1f4b0ea5d1a77571725",
+      "bytes": 509,
+      "totals": {},
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "classification": "Environmental gate failure: verified dependency runner correctly rejects worktree node_modules symlink; gate was not bypassed."
+    },
+    {
+      "file": "bank-wiring-3cffb30-focused.tap.gz",
+      "sha256": "47691e348b618637ec69073c85eac79fc6d6ad2ece7e415a0903910e9aa6f427",
+      "uncompressedSha256": "a17d3655d2472cbc99dc0de4d8991cfabfdda63f362a2e5eef26ab2daaf79728",
+      "bytes": 5638,
+      "totals": {
+        "tests": 125,
+        "suites": 0,
+        "pass": 125,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "exactCommit": "3cffb30f18212b21992b29c56f7a18969e5dc9c6",
+      "command": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --test --test-reporter=tap --test-concurrency=1 test/openpayments-runtime-transport.test.js test/openpayments-node-transport.test.js test/openpayments-company-bank-sync.test.js test/openpayments-company-bank-sync-normalization.test.js test/consent-reconnect-95.test.js test/bank-consent-api.test.js test/api-account-consent.test.js test/openpayments-bankgiro-ingest.test.js",
+      "durationMs": 7769.377654
+    },
+    {
+      "file": "bank-wiring-baseline.tap.gz",
+      "sha256": "86092b941ac6a467c359ba9487e615a50d6f7d7807bab9cf1d1646ff62b3035f",
+      "uncompressedSha256": "6392a559b8dd4a600a8d5379bec6493a97457a48dcc33eb2a0935797e2e1cb82",
+      "bytes": 1149,
+      "totals": {
+        "tests": 20,
+        "suites": 0,
+        "pass": 20,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "exactCommit": "2982b6c51cf2891d97b816ea1ce6c82e5f4c71a1",
+      "command": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --test --test-reporter=tap --test-concurrency=1 test/openpayments-node-transport.test.js",
+      "durationMs": 401.160862
+    },
+    {
+      "file": "bank-wiring-check.log.gz",
+      "sha256": "3f00688522f9b480537267d91c4587018b768020be16c16eb5693775a4ddc3ed",
+      "uncompressedSha256": "a7ebf3199eb583ce5ba63ad60c4383e0d13f79d6998b0072d480264c00ffbc2b",
+      "bytes": 175,
+      "totals": {},
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency."
+    },
+    {
+      "file": "bank-wiring-first-green.tap.gz",
+      "sha256": "145ec055b11cd9b89eba7f08bfc27c00db17ce81f3d3c6767273ff61e8ba96d4",
+      "uncompressedSha256": "2bd040a829353ee85d43b50cb0c774f3d3889421f52ebac30290e50aaf11024a",
+      "bytes": 2684,
+      "totals": {
+        "tests": 55,
+        "suites": 0,
+        "pass": 55,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 2589.215818
+    },
+    {
+      "file": "bank-wiring-flow-fixed.tap.gz",
+      "sha256": "70e193ed553908a5e85de069987d8e77a334d4742ab34aa612227509c768cd68",
+      "uncompressedSha256": "faa2db59b24631d6d5ef95432226c6b8f2051eab8ab0f95c714d2b785803f030",
+      "bytes": 926,
+      "totals": {
+        "tests": 16,
+        "suites": 0,
+        "pass": 16,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 1173.761432
+    },
+    {
+      "file": "bank-wiring-flow.tap.gz",
+      "sha256": "67f8da164cc4ab0e596d15fa1fb80b766c6460ab68fcae2714cf1648f9c12010",
+      "uncompressedSha256": "f357d1d567d2360ca6d6233a9c470e4357ec48127670233d745fc81a9b54e79e",
+      "bytes": 1380,
+      "totals": {
+        "tests": 16,
+        "suites": 0,
+        "pass": 15,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 564.780034
+    },
+    {
+      "file": "bank-wiring-focused-final.tap.gz",
+      "sha256": "ee15c2548f5244ea2b1756a747532c08d3eaf3dbe75b4180722b7695f309b65b",
+      "uncompressedSha256": "5191df499f6c7e743fb16d73e01f34d937ec22e4ac73d26c6d3437ec22a0be18",
+      "bytes": 5645,
+      "totals": {
+        "tests": 125,
+        "suites": 0,
+        "pass": 125,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 9129.08982
+    },
+    {
+      "file": "bank-wiring-red.tap.gz",
+      "sha256": "9155c3d53b0fdbb75e5d2213d8e369297722127f90cb9549e3f742f0fff939f9",
+      "uncompressedSha256": "bfcedd1eed144f89a84f2226e7e35131a6437d0f4df8677516a4c7889760d16d",
+      "bytes": 1811,
+      "totals": {
+        "tests": 14,
+        "suites": 0,
+        "pass": 2,
+        "fail": 12,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "scope": "isolated synthetic tests; not production verification",
+      "revisionQualification": "Intermediate working-tree run; no exact committed-tree claim. Retained for RED/GREEN and failure transparency.",
+      "durationMs": 476.403738
+    }
+  ]
+}
