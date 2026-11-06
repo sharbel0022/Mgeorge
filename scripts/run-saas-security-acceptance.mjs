@@ -27,6 +27,7 @@ const suites = [
       'test/security-session-allocation.test.js', 'test/security-login-rate-limit.test.js', 'test/session-mutation-fence.test.js',
       'test/bank-api.test.js', 'test/integration-job-api.test.js',
       'test/backup-disaster-recovery.test.js',
+      'test/openpayments-token-backup.test.js',
     ],
   },
   {
@@ -44,6 +45,7 @@ const suites = [
       'tests/openpayments-provider.test.mjs', 'tests/openpayments-policy.test.mjs', 'tests/openpayments-http.test.mjs',
       'tests/openpayments-workers-transport.test.mjs', 'tests/openpayments-workers-runtime.test.mjs',
       'tests/openpayments-token-cache.test.mjs',
+      'tests/openpayments-token-coordinator.test.mjs',
       'tests/saas-owner-isolation.test.mjs', 'tests/saas-transport-privacy.test.mjs', 'tests/saas-upload-boundary.test.mjs',
       'tests/security-request-budget.test.mjs',
       'tests/banking-security.test.mjs', 'tests/banking-provider.test.mjs',

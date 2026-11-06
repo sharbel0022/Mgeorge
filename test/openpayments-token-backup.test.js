@@ -6,6 +6,8 @@ import {existsSync,mkdtempSync,readFileSync,rmSync,writeFileSync} from 'node:fs'
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {createBackup,restoreBackup,verifyBackup} from '../src/backup.js';
+import {createCompanySyncDatabase} from '../src/company-sync-database.js';
+import {createOpenPaymentsTokenCoordinator} from '../sites/lib/banking/openpayments/token-coordinator.js';
 
 const key='4'.repeat(64),header=Buffer.from('MGBAK001');
 const control='company_application_token_control',tokens='company_application_tokens';
@@ -74,4 +76,31 @@ for(const reserved of [tokens,control])test('archive rejects a noncanonical case
  assert.throws(()=>verifyBackup(f.archive,key),{code:'backup_application_token_state_invalid'});
  assert.throws(()=>restoreBackup(f.archive,f.target,key),{code:'backup_application_token_state_invalid'});
  assert.equal(existsSync(f.target),false);assert.deepEqual(sourceBytes(f),before);
+});
+
+test('restored archive remains blocked after a real coordinator migration until an exact operator recovery decision',async t=>{
+ const f=fixture(t);createBackup(f.source,f.archive,key);restoreBackup(f.archive,f.target,key);
+ const restored=new DatabaseSync(f.target);
+ try{
+  const gate=assertGate(restored),financial={...restored.prepare('SELECT * FROM invoices').get()};
+  // This is the actual runtime migration, including INSERT OR IGNORE. It may
+  // create the empty state table, but must preserve the authenticated barrier.
+  restored.exec(readFileSync(new URL('../sites/lib/banking/openpayments/token-coordinator.schema.sql',import.meta.url),'utf8'));
+  assert.deepEqual({...restored.prepare(`SELECT * FROM ${control}`).get()},gate);
+  let issuerCalls=0,codecCalls=0;
+  const coordinator=createOpenPaymentsTokenCoordinator({database:createCompanySyncDatabase(restored),configuration:{environment:'SANDBOX',clientId:'synthetic-restored-app',clientSecret:'synthetic-secret',credentialGeneration:'g1',features:['bank_discovery']},transportIdentity:'a'.repeat(64),assertCurrent:()=>{},codec:{async seal(){codecCalls++;throw Error('unexpected codec access');},async unseal(){codecCalls++;throw Error('unexpected codec access');}}});
+  const issue=async()=>{issuerCalls++;throw Error('unexpected issuer access');};
+  await assert.rejects(coordinator.assertCurrent(),{code:'APPLICATION_TOKEN_RECOVERY_REQUIRED'});
+  await assert.rejects(coordinator.access(issue),{code:'APPLICATION_TOKEN_RECOVERY_REQUIRED'});
+  await assert.rejects(coordinator.ensureRegistered(),{code:'APPLICATION_TOKEN_RECOVERY_REQUIRED'});
+  await assert.rejects(coordinator.releaseRecovery({expectedRevision:gate.revision+1,expectedMarker:gate.restore_marker,evidenceId:'synthetic-reviewed-isolated-recovery'}),{code:'APPLICATION_TOKEN_RECOVERY_REQUIRED'});
+  assert.equal(restored.prepare(`SELECT COUNT(*) n FROM ${tokens}`).get().n,0);
+  await coordinator.releaseRecovery({expectedRevision:gate.revision,expectedMarker:gate.restore_marker,evidenceId:'synthetic-reviewed-isolated-recovery'});
+  await coordinator.ensureRegistered();await coordinator.assertCurrent();
+  const after={...restored.prepare(`SELECT * FROM ${control}`).get()};
+  assert.deepEqual(after,{...gate,revision:gate.revision+1,recovery_required:0,recovery_evidence:'synthetic-reviewed-isolated-recovery'});
+  assert.equal(issuerCalls,0);assert.equal(codecCalls,0);
+  assert.equal(restored.prepare(`SELECT token_ciphertext FROM ${tokens}`).get().token_ciphertext,'');
+  assert.deepEqual({...restored.prepare('SELECT * FROM invoices').get()},financial);assertFinancial(restored,f);
+ }finally{restored.close();}
 });
