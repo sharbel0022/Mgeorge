@@ -9,6 +9,9 @@ import {positionedInvoicePdf} from '../../test/helpers/pdf-layout-ocr.mjs';
 import {openDatabase,storeDocument} from '../../src/db.js';
 import {interpretInvoice} from '../../src/invoice-extraction.js';
 import {enrichNodeInvoice} from '../../src/openai-invoice-integration.js';
+import {createCompanyRuntime} from '../../src/company-runtime.js';
+import {createCompanyDatabase,provisionCompany,resolveCompanyScope} from '../lib/company-storage.js';
+import {enrichSitesInvoice} from '../lib/openai-invoices/sites.js';
 import {createBackup,restoreBackup} from '../../src/backup.js';
 import {extractOpenAiInvoice} from '../lib/openai-invoices/adapter.js';
 import {invoiceAiPolicy} from '../lib/openai-invoices/integration.js';
@@ -209,4 +212,99 @@ test('an older restored Node snapshot cannot reissue an AI request under recover
   assert.equal(result.ai.status,'blocked');
   assert.equal(result.ai.code,'AI_RECOVERY_REQUIRED');
   assert.equal(database.prepare('SELECT recovery_required FROM company_application_token_control WHERE id=1').get().recovery_required,1);
+});
+
+test('Node company recovery status blocks AI without granting control-table access',async t=>{
+  const f=nodeFixture(t),runtime=createCompanyRuntime({
+    controlDb:f.database,legacyDatabasePath:f.path,companyDirectory:join(f.folder,'companies'),
+  });
+  t.after(()=>runtime.close());
+  const context=runtime.bindLegacyCompany({
+    companyId:'synthetic-review-company',name:'Synthetic review company',actorId:'local-admin',
+    storageOwner:'local-admin',
+    verification:{status:'verified',evidenceId:'synthetic-reviewed-binding',verifiedBy:'local-admin'},
+  });
+  let calls=0;
+  const input={environment:environment('local-admin'),adapter:async()=>{calls++;return{status:'fallback',code:'SYNTHETIC_UNAVAILABLE'};}};
+  await runtime.run(context,()=>enrichNodeInvoice(runtime.db,f.row,f.baseline,input));
+  assert.equal(calls,1,'a fresh authorized company remains usable');
+  runtime.run(context,()=>assert.throws(
+    ()=>runtime.db.prepare('SELECT * FROM company_application_token_control').all(),
+    {code:'company_control_plane_access_denied'},
+  ));
+  f.database.prepare("UPDATE company_application_token_control SET recovery_required=1,restore_marker='synthetic-restored-snapshot' WHERE id=1").run();
+  const before=JSON.stringify(f.database.prepare('SELECT * FROM company_application_token_control').all());
+  calls=0;
+  const blocked=await runtime.run(context,()=>enrichNodeInvoice(runtime.db,f.row,f.baseline,input));
+  assert.equal(calls,0);assert.equal(blocked.ai.status,'blocked');assert.equal(blocked.ai.code,'AI_RECOVERY_REQUIRED');
+  assert.equal(JSON.stringify(f.database.prepare('SELECT * FROM company_application_token_control').all()),before);
+  assert.equal(reserved(f.database),1);
+  const captured=runtime.run(context,()=>runtime.db.invoiceAiRecoveryStatus);
+  assert.throws(()=>captured(),{code:'company_context_mismatch'});
+});
+
+test('Sites company recovery status blocks AI while ordinary control SQL stays denied',async t=>{
+  const f=await documentOcrFixture(t,positionedInvoicePdf());
+  await f.api.enqueueDocuments(f.owner);
+  f.sql.prepare("UPDATE document_jobs SET state='processing',lease='synthetic-lease',lease_until=? WHERE owner=? AND document_id=?")
+    .run(new Date(Date.now()+180000).toISOString(),f.owner,f.id);
+  const job=f.sql.prepare('SELECT j.*,d.mime,d.size,d.sha256 FROM document_jobs j JOIN documents d ON d.owner=j.owner AND d.id=j.document_id WHERE j.owner=? AND j.document_id=?').get(f.owner,f.id);
+  await provisionCompany(f.db,{id:'synthetic-review-company',name:'Synthetic review company',actorId:f.owner,
+    legacyOwner:f.owner,verifiedLegacyOwner:f.owner,verifiedBy:f.owner,verificationEvidence:'Synthetic reviewed existing ownership.'});
+  let scope=await resolveCompanyScope(f.db,f.owner,{companyId:'synthetic-review-company',contextVersion:1});
+  const wrapped=createCompanyDatabase(f.db,()=>scope);
+  assert.throws(()=>wrapped.prepare('SELECT * FROM company_application_token_control'),{code:'COMPANY_SQL_DENIED'});
+  let calls=0;
+  const input={database:wrapped,owner:f.owner,job,baseline:interpretInvoice('',{direction:'supplier'}),
+    environment:environment(f.owner),loadBytes:async()=>new Uint8Array(f.bytes),
+    adapter:async()=>{calls++;return{status:'fallback',code:'SYNTHETIC_UNAVAILABLE'};}};
+  await enrichSitesInvoice(input);assert.equal(calls,1,'a fresh authorized company remains usable');
+  f.sql.prepare("UPDATE company_application_token_control SET recovery_required=1,restore_marker='synthetic-restored-snapshot' WHERE id=1").run();
+  const before=JSON.stringify(f.sql.prepare('SELECT * FROM company_application_token_control').all());
+  calls=0;
+  const blocked=await enrichSitesInvoice(input);
+  assert.equal(calls,0);assert.equal(blocked.ai.status,'blocked');assert.equal(blocked.ai.code,'AI_RECOVERY_REQUIRED');
+  assert.equal(JSON.stringify(f.sql.prepare('SELECT * FROM company_application_token_control').all()),before);
+  assert.equal(reserved(f.sql),1);
+  scope={...scope,owner:'different-owner'};
+  await assert.rejects(()=>wrapped.invoiceAiRecoveryStatus(),{code:'COMPANY_BOUNDARY_MISMATCH'});
+});
+
+test('clearing bank recovery does not authorize AI against a rolled-back spending ledger',async t=>{
+  const f=nodeFixture(t),runtime=createCompanyRuntime({controlDb:f.database,legacyDatabasePath:f.path});
+  t.after(()=>runtime.close());
+  f.database.prepare("UPDATE company_application_token_control SET recovery_required=0,restore_marker='synthetic-restored-snapshot',recovery_evidence='bank-only-reviewed' WHERE id=1").run();
+  let calls=0;
+  const result=await runtime.run(null,()=>enrichNodeInvoice(runtime.db,f.row,f.baseline,{
+    environment:environment('node:legacy'),adapter:async()=>{calls++;return{status:'fallback',code:'SYNTHETIC_UNAVAILABLE'};},
+  }));
+  assert.equal(calls,0);assert.equal(reserved(f.database),0);
+  assert.equal(result.ai.status,'blocked');assert.equal(result.ai.code,'AI_RECOVERY_REQUIRED');
+});
+
+test('acceptance during token counting prevents a further Sites generation request',async t=>{
+  const f=await documentOcrFixture(t,positionedInvoicePdf());
+  await f.api.enqueueDocuments(f.owner);
+  f.sql.prepare("UPDATE document_jobs SET state='processing',lease='synthetic-lease',lease_until=? WHERE owner=? AND document_id=?")
+    .run(new Date(Date.now()+180000).toISOString(),f.owner,f.id);
+  const job=f.sql.prepare('SELECT j.*,d.mime,d.size,d.sha256 FROM document_jobs j JOIN documents d ON d.owner=j.owner AND d.id=j.document_id WHERE j.owner=? AND j.document_id=?').get(f.owner,f.id);
+  const runId=createHash('sha256').update(JSON.stringify(['document-job-v1',f.owner,f.id,'synthetic-lease'])).digest('base64url');
+  const accepted=JSON.stringify({processing:{run_id:runId,sha256:f.sha}});
+  let generations=0;
+  const adapter=args=>extractOpenAiInvoice(args,{fetchImpl:async url=>{
+    if(url===endpoint+'/input_tokens'){
+      await f.db.batch([
+        f.db.prepare('INSERT INTO document_extractions(id,owner,document_id,result,created_at) VALUES(?,?,?,?,?)').bind('synthetic-accepted',f.owner,f.id,accepted,new Date().toISOString()),
+        f.db.prepare('UPDATE document_jobs SET extraction=? WHERE owner=? AND document_id=?').bind(accepted,f.owner,f.id),
+      ]);
+      return counted();
+    }
+    assert.equal(url,endpoint);generations++;return quota();
+  }});
+  await assert.rejects(()=>enrichSitesInvoice({database:f.db,owner:f.owner,job,
+    baseline:interpretInvoice('',{direction:'supplier'}),environment:environment(f.owner),
+    loadBytes:async()=>new Uint8Array(f.bytes),adapter}),/AI_DOCUMENT_CHANGED/);
+  assert.equal(generations,0);
+  assert.equal(reserved(f.sql),1);
+  assert.equal(f.sql.prepare('SELECT extraction FROM document_jobs WHERE owner=? AND document_id=?').get(f.owner,f.id).extraction,accepted);
 });
