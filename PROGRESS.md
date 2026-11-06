@@ -1,3 +1,15 @@
+## 2026-11-06 — Agent 5: säkerhet, återställning och releasegrindar
+
+[PR 66](https://github.com/sharbel0022/Mgeorge/pull/66), `feature/95-saas-readiness`, utgår från verifierad main `f3c80629d4856c2f8ecbb1ed81be391a13ac6be8`. [Leveransrapport](docs/saas-readiness/README.md), [frysta verifieringsresultat](docs/saas-readiness/verification-results.md) och [riskregister](docs/saas-readiness/risk-register.md) beskriver den avgränsade säkerhetsleveransen.
+
+Reproducerade brister är rättade i privat nyckelfil, dubbla sessionscookies, företagsbyte utan förväntad version och återställningens proveniens. Ny separat verifierare binder sparade releasekvitton till källa, scope, hashvärden och fullständigt resultat; åtta ytterligare kvittomotprov upptäcktes genom oberoende granskning och går från RED till GREEN.
+
+Fryst kandidat `d2cad86a`, faktiskt testad PR-merge `bad0a67b`, har 112/112 fokusfall, 14/14 nyckelfilsfall på vardera Node 22/24, samlad säkerhetsacceptans 481/481 Node + 1 244/1 244 Sites samt full Node-kvalitet 3 113/3 113 i båda versionerna. Dessa sviter överlappar. Full slutstatus för aktuell PR-head ska läsas i PR:ns egna kvalitets-/säkerhetsjobb.
+
+[Återställningsövningen](docs/saas-readiness/backup-recovery.md) verifierade 430 syntetiska original/185 567 855 byte, 27 tabeller och 22 negativa kontroller; isolerad restore och acceptans tog 3 080,262 ms. Ett separat prov återställde parsebara syntetiska PDF/PNG/CSV/XML/XLSX byteidentiskt. Simulerad RPO är 15 minuter och motsvarar inte en verifierad produktionskadens. Migrationstest bevarar ekonomisk data och originalmetadata efter upgrade/adoption/omstart och avvisar äldre obundna skrivningar.
+
+Det tidigare produktionsbetyget ändras inte. Publik Node-drift med en enda administratörsidentitet får inte marknadsföras som fleranvändar-SaaS. Verklig identitetsingress, branch enforcement, nyckelhantering, backup/RPO/RTO, dataskydd och kommersiella bankavtal behöver separat acceptans. [Integrationsöverlämningen](docs/saas-readiness/integration-handoff.md) anger de två serverhunkarna och övriga gemensamma gränser. Ingen produktionsrelease eller verklig dataändring ingår i denna PR.
+
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 
 PR 61 är normalt mergad till `24390ef7e8cf6b2274c57804dc9c2d74d362ab12`. Full PR-kvalitet, separat säkerhetsacceptans och separat main-CI är gröna för samma källträd. Site **68** publicerades från exakt motsvarande Sites-träd och är avgränsat kontrollerad efter release. [Releasekvitto](docs/completion/release-site68.md).

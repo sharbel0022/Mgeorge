@@ -23,7 +23,12 @@ test('the synthetic drill measures a resumed, authenticated full recovery agains
  assert.equal(result.authorizationAndTransientRowsAbsent,true);
  assert.equal(result.applicationTokenRecoveryBlocked,true);
  assert.equal(result.workerLeasesInvalidated,true);
- assert.deepEqual(result.rejectionChecks.map(check=>check.case),['wrong_key','wrong_owner','wrong_company','corrupt_original','missing_original','altered_ledger','altered_plaintext_original','foreign_owner_row','reactivated_application_issuer','retained_application_token']);
+ assert.equal(result.sourceProvenanceVerified,true);
+ assert.match(result.provenance.backupId,/^[a-f0-9-]{36}$/);
+ for(const field of ['snapshotSha256','tableCensusSha256','originalCensusSha256'])assert.match(result.provenance[field],/^[a-f0-9]{64}$/);
+ assert.deepEqual(Object.keys(result.provenance.sourceFiles).sort(),['bundle.json','manifest.bin','snapshot.bin']);
+ for(const checksum of Object.values(result.provenance.sourceFiles))assert.match(checksum,/^[a-f0-9]{64}$/);
+ assert.deepEqual(result.rejectionChecks.map(check=>check.case),['wrong_key','wrong_owner','wrong_company','corrupt_original','missing_original','altered_ledger','altered_plaintext_original','foreign_owner_row','reactivated_application_issuer','retained_application_token','altered_receipt_backup_id','altered_receipt_company','altered_receipt_snapshot_hash','altered_receipt_format','altered_receipt_transforms','altered_source_header','altered_source_manifest','altered_source_snapshot','missing_source_snapshot','extra_source_file','altered_financial_reference','altered_revoked_bankgiro_reference']);
  assert.ok(result.rejectionChecks.every(check=>check.rejected));
  assert.ok(result.rejectionChecks.filter(check=>check.stage==='restore').every(check=>check.outputCreated===false));
 });

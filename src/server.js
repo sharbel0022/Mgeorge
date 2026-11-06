@@ -113,7 +113,14 @@ async function readBody(req,{authenticated=true,maxBytes=22_000_000}={}){
   if(authenticated&&!req.allowCompanySelection&&body&&typeof body==='object'&&['companyId','company_id','tenantId','storageOwner'].some(key=>Object.hasOwn(body,key)))throw bad(400,'Företagskontext väljs i företagsväljaren, inte i affärsdata.');
   return body;
 }
-function cookies(req){return Object.fromEntries((req.headers.cookie||'').split(';').filter(x=>x.includes('=')).map(x=>{const i=x.indexOf('=');let value='';try{value=decodeURIComponent(x.slice(i+1).trim());}catch{}return [x.slice(0,i).trim(),value];}));}
+function cookies(req){
+ const pairs=(req.headers.cookie||'').split(';').filter(x=>x.includes('=')).map(x=>{const i=x.indexOf('=');let value='';try{value=decodeURIComponent(x.slice(i+1).trim());}catch{}return [x.slice(0,i).trim(),value];});
+ const parsed=Object.fromEntries(pairs);
+ // Cookie headers carry no path/domain. Multiple session cookies are ambiguous,
+ // including repeated or differently encoded copies of the same credential.
+ if(pairs.filter(([name])=>name==='mg_session').length!==1)delete parsed.mg_session;
+ return parsed;
+}
 // Local OS access represents one company administrator. HTTPS requires login.
 // HTTPS sessions are persisted only after successful administrator login.
 /** Skapar eller återanvänder webbläsarsessionen som binder OAuth- och bankreturer till rätt användare. Detta är inte samma sak som bankens egen inloggning. */
@@ -669,7 +676,7 @@ async function route(req,res){
   if(path==='/api/companies'&&req.method==='GET'){assertSessionIdentity(req);return json(res,200,companyRuntime.listCompanies(req.actorId));}
   if(path==='/api/companies/active'&&req.method==='POST'){
    req.allowCompanySelection=true;const body=await readBody(req);
-   if(!body||Array.isArray(body)||typeof body!=='object'||Object.keys(body).some(key=>!['companyId','contextVersion'].includes(key)))throw bad(400,'Ogiltigt företagsval.');
+   if(!body||Array.isArray(body)||typeof body!=='object'||Object.keys(body).some(key=>!['companyId','contextVersion'].includes(key))||!Number.isSafeInteger(body.contextVersion)||body.contextVersion<1)throw bad(400,'Ogiltigt företagsval.');
    const context=companyRuntime.selectActiveCompany({actorId:req.actorId,companyId:body.companyId,contextVersion:body.contextVersion});
    return json(res,200,{context});
   }

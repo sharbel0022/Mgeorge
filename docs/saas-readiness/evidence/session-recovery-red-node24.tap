@@ -1,0 +1,530 @@
+TAP version 13
+# Subtest: independent acceptance accepts the authentic small fixture before any mutation
+ok 1 - independent acceptance accepts the authentic small fixture before any mutation
+  ---
+  duration_ms: 446.053252
+  type: 'test'
+  ...
+# Subtest: independent acceptance requires provenance captured before restore
+not ok 2 - independent acceptance requires provenance captured before restore
+  ---
+  duration_ms: 234.423666
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:58:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    code: 'ERR_ASSERTION'
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:61:9)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: independent acceptance rejects changed backup identity with unchanged ledger and originals
+not ok 3 - independent acceptance rejects changed backup identity with unchanged ledger and originals
+  ---
+  duration_ms: 230.251746
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:70:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    code: 'ERR_ASSERTION'
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:73:9)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: independent acceptance rejects changed company binding with unchanged ledger and originals
+not ok 4 - independent acceptance rejects changed company binding with unchanged ledger and originals
+  ---
+  duration_ms: 227.52593
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:70:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    code: 'ERR_ASSERTION'
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:73:9)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: independent acceptance rejects changed snapshot checksum with unchanged ledger and originals
+not ok 5 - independent acceptance rejects changed snapshot checksum with unchanged ledger and originals
+  ---
+  duration_ms: 227.918466
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:70:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    code: 'ERR_ASSERTION'
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:73:9)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: independent acceptance rejects changed restore format with unchanged ledger and originals
+not ok 6 - independent acceptance rejects changed restore format with unchanged ledger and originals
+  ---
+  duration_ms: 231.205303
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:70:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    code: 'ERR_ASSERTION'
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:73:9)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: independent acceptance rejects changed claimed worker transform with unchanged ledger and originals
+not ok 7 - independent acceptance rejects changed claimed worker transform with unchanged ledger and originals
+  ---
+  duration_ms: 230.98307
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:70:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    code: 'ERR_ASSERTION'
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:73:9)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: independent acceptance rejects changed retained source bundle.json
+not ok 8 - independent acceptance rejects changed retained source bundle.json
+  ---
+  duration_ms: 224.949126
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:76:69'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    code: 'ERR_ASSERTION'
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:79:9)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: independent acceptance rejects changed retained source manifest.bin
+not ok 9 - independent acceptance rejects changed retained source manifest.bin
+  ---
+  duration_ms: 245.789954
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:76:69'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    code: 'ERR_ASSERTION'
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:79:9)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: independent acceptance rejects changed retained source snapshot.bin
+not ok 10 - independent acceptance rejects changed retained source snapshot.bin
+  ---
+  duration_ms: 225.683285
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:76:69'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    code: 'ERR_ASSERTION'
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:79:9)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: independent acceptance rejects a missing retained snapshot
+not ok 11 - independent acceptance rejects a missing retained snapshot
+  ---
+  duration_ms: 242.455327
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:82:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    code: 'ERR_ASSERTION'
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:84:9)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: independent acceptance rejects an unlisted retained source file
+not ok 12 - independent acceptance rejects an unlisted retained source file
+  ---
+  duration_ms: 225.573931
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:87:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    code: 'ERR_ASSERTION'
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/sites/tests/recovery-acceptance-provenance.test.mjs:89:9)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: independent acceptance rejects changed allocation transaction reference even with identical totals and refreshed receipt checksum
+ok 13 - independent acceptance rejects changed allocation transaction reference even with identical totals and refreshed receipt checksum
+  ---
+  duration_ms: 226.998862
+  type: 'test'
+  ...
+# Subtest: independent acceptance rejects changed revoked Bankgiro original reference even with identical totals and refreshed receipt checksum
+ok 14 - independent acceptance rejects changed revoked Bankgiro original reference even with identical totals and refreshed receipt checksum
+  ---
+  duration_ms: 230.534599
+  type: 'test'
+  ...
+# Subtest: single session cookies keep simultaneous company reads isolated
+ok 15 - single session cookies keep simultaneous company reads isolated
+  ---
+  duration_ms: 34.369499
+  type: 'test'
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: unknown before valid
+not ok 16 - ambiguous session cookies cannot read a tenant or revoke a session: unknown before valid
+  ---
+  duration_ms: 12.496939
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:108:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    An ambiguous browser token must never select either authenticated principal
+    + actual - expected
+    
+      [
+    -   401,
+    -   401,
+        200,
+    +   200,
+    +   200,
+    +   200
+    -   401
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 401
+    1: 401
+    2: 200
+    3: 401
+  actual:
+    0: 200
+    1: 200
+    2: 200
+    3: 200
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:114:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: valid before unknown
+ok 17 - ambiguous session cookies cannot read a tenant or revoke a session: valid before unknown
+  ---
+  duration_ms: 5.549849
+  type: 'test'
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: two valid principals
+not ok 18 - ambiguous session cookies cannot read a tenant or revoke a session: two valid principals
+  ---
+  duration_ms: 10.018462
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:108:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    An ambiguous browser token must never select either authenticated principal
+    + actual - expected
+    
+      [
+    -   401,
+    -   401,
+        200,
+    +   200,
+    +   200,
+    +   200
+    -   401
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 401
+    1: 401
+    2: 200
+    3: 401
+  actual:
+    0: 200
+    1: 200
+    2: 200
+    3: 200
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:114:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: two valid principals reversed
+not ok 19 - ambiguous session cookies cannot read a tenant or revoke a session: two valid principals reversed
+  ---
+  duration_ms: 24.923533
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:108:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    An ambiguous browser token must never select either authenticated principal
+    + actual - expected
+    
+      [
+    -   401,
+    -   401,
+        200,
+    +   200,
+    +   200,
+    +   200
+    -   401
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 401
+    1: 401
+    2: 200
+    3: 401
+  actual:
+    0: 200
+    1: 200
+    2: 200
+    3: 200
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:114:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: the same valid token twice
+not ok 20 - ambiguous session cookies cannot read a tenant or revoke a session: the same valid token twice
+  ---
+  duration_ms: 10.873801
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:108:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    An ambiguous browser token must never select either authenticated principal
+    + actual - expected
+    
+      [
+    -   401,
+    -   401,
+        200,
+    +   200,
+    +   200,
+    +   200
+    -   401
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 401
+    1: 401
+    2: 200
+    3: 401
+  actual:
+    0: 200
+    1: 200
+    2: 200
+    3: 200
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:114:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: empty before valid
+not ok 21 - ambiguous session cookies cannot read a tenant or revoke a session: empty before valid
+  ---
+  duration_ms: 12.775956
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:108:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    An ambiguous browser token must never select either authenticated principal
+    + actual - expected
+    
+      [
+    -   401,
+    -   401,
+        200,
+    +   200,
+    +   200,
+    +   200
+    -   401
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 401
+    1: 401
+    2: 200
+    3: 401
+  actual:
+    0: 200
+    1: 200
+    2: 200
+    3: 200
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:114:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: malformed encoding before valid
+not ok 22 - ambiguous session cookies cannot read a tenant or revoke a session: malformed encoding before valid
+  ---
+  duration_ms: 11.507629
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:108:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    An ambiguous browser token must never select either authenticated principal
+    + actual - expected
+    
+      [
+    -   401,
+    -   401,
+        200,
+    +   200,
+    +   200,
+    +   200
+    -   401
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 401
+    1: 401
+    2: 200
+    3: 401
+  actual:
+    0: 200
+    1: 200
+    2: 200
+    3: 200
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:114:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: encoded alias of the same token
+not ok 23 - ambiguous session cookies cannot read a tenant or revoke a session: encoded alias of the same token
+  ---
+  duration_ms: 10.298992
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:108:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    An ambiguous browser token must never select either authenticated principal
+    + actual - expected
+    
+      [
+    -   401,
+    -   401,
+        200,
+    +   200,
+    +   200,
+    +   200
+    -   401
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 401
+    1: 401
+    2: 200
+    3: 401
+  actual:
+    0: 200
+    1: 200
+    2: 200
+    3: 200
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-session-ambiguity.test.js:114:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: a single encoded session cookie still resolves the authenticated principal
+ok 24 - a single encoded session cookie still resolves the authenticated principal
+  ---
+  duration_ms: 7.589861
+  type: 'test'
+  ...
+# Subtest: unambiguous logout revokes only its session and replay stays unauthorized
+ok 25 - unambiguous logout revokes only its session and replay stays unauthorized
+  ---
+  duration_ms: 8.175566
+  type: 'test'
+  ...
+1..25
+# tests 25
+# suites 0
+# pass 7
+# fail 18
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4102.971304

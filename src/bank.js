@@ -5,9 +5,9 @@
  * LÄS VIDARE: docs/KODGUIDE.md för genomgång av moduler och funktioner.
  */
 
-import { readFileSync, realpathSync } from 'node:fs';
+import { realpathSync } from 'node:fs';
 import { createPrivateKey, createPublicKey, createHash, createSign } from 'node:crypto';
-import { isAbsolute, relative, sep } from 'node:path';
+import { readPrivateKeyFile } from './private-key-file.js';
 import { fileURLToPath } from 'node:url';
 
 // AIS only. Both environments use the same host; /application confirms which
@@ -36,11 +36,7 @@ function configuration(){
   if(environment==='PRODUCTION')validatedOrigin(process.env.APP_ORIGIN,environment);
   let key;
   try{
-    if(keyFile){
-      const target=realpathSync(keyFile),rel=relative(projectRoot,target);
-      if(rel!=='..'&&!rel.startsWith('..'+sep)&&!isAbsolute(rel))throw new Error('key inside repository');
-    }
-    key=createPrivateKey(privateKey?privateKey.replace(/\\n/g,'\n'):readFileSync(keyFile,'utf8'));
+    key=createPrivateKey(privateKey?privateKey.replace(/\\n/g,'\n'):readPrivateKeyFile(keyFile,projectRoot));
     if(key.asymmetricKeyType!=='rsa'||(key.asymmetricKeyDetails?.modulusLength||0)<2048)throw new Error('RSA key required');
   }catch{throw bankError('invalid_private_key','Banktjänstens privata RSA-nyckel är ogiltig eller otillgänglig. Nyckelfiler ska ligga utanför repositoryt.');}
   return {applicationId,key,environment};
