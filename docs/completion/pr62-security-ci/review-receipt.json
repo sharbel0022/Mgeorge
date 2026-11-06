@@ -1,0 +1,120 @@
+{
+  "format": "MG-PR62-independent-security-CI-review-1",
+  "reviewedAt": "2026-11-06T16:26:52.477833+00:00",
+  "repository": "sharbel0022/Mgeorge",
+  "runId": 42251628601,
+  "runUrl": "https://github.com/sharbel0022/Mgeorge/actions/runs/42251628601",
+  "jobId": 128007940368,
+  "jobUrl": "https://github.com/sharbel0022/Mgeorge/actions/runs/42251628601/job/128007940368",
+  "workflow": "SaaS security acceptance",
+  "conclusion": "success",
+  "steps": {
+    "total": 10,
+    "success": 10,
+    "failure": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "testedCheckoutCommit": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+  "headCommit": "70dd9c5dca6981e440bec0486e43788d2ef3f6a1",
+  "fullTree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+  "sitesTree": "c2feb372a4c0ef121ffe594784684957c14ddac1",
+  "sourceManifest": "source-manifest.json",
+  "workingTreeDirtyAsRecordedByCI": false,
+  "node": "v22.23.4",
+  "startedAt": "2026-11-06T16:22:05.423Z",
+  "finishedAt": "2026-11-06T16:24:12.452Z",
+  "elapsedMs": 127029.0,
+  "suites": [
+    {
+      "name": "node-security",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "tests": 377,
+      "pass": 377,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "verifiedTapTotals": {
+        "tests": 377,
+        "pass": 377,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "durationMs": 30084.786096
+      }
+    },
+    {
+      "name": "sites-security",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "tests": 1225,
+      "pass": 1225,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "verifiedTapTotals": {
+        "tests": 1225,
+        "pass": 1225,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "durationMs": 96888.386041
+      }
+    }
+  ],
+  "totalTests": 1602,
+  "totalPassed": 1602,
+  "artifact": {
+    "id": 13520996883,
+    "name": "saas-security-795decf5b1601de2d1738e0a311dbc53e0840c72",
+    "size_in_bytes": 65462,
+    "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13520996883",
+    "archive_download_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13520996883/zip",
+    "expired": false,
+    "created_at": "2026-11-06T16:24:13Z",
+    "expires_at": "2026-11-20T16:24:12Z",
+    "updated_at": "2026-11-06T16:24:13Z",
+    "digest": "sha256:1689a1f3b9225028424562a822febe4240682b42d5fe5a954c02484437a1658f",
+    "workflow_run": {
+      "id": 42251628601,
+      "repository_id": 1434733412,
+      "head_repository_id": 1434733412,
+      "head_branch": "feature/final-95-completion",
+      "head_sha": "70dd9c5dca6981e440bec0486e43788d2ef3f6a1"
+    }
+  },
+  "archive": {
+    "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/pr62-security-42251628601.zip",
+    "bytes": 65462,
+    "sha256": "1689a1f3b9225028424562a822febe4240682b42d5fe5a954c02484437a1658f"
+  },
+  "files": {
+    "report.json": "61580b0b85ee898246d438f2adba253761dd63aa4d5565a541fcc25d45aa9de7",
+    "node-security.tap": "9bdc13bf349658bfc7d91436745183d09d6dc58e6ad3507e729af12f4a9fe295",
+    "sites-security.tap": "afe2ff9ef3b7fdd5eb55fc42c7a65f149169bb6e05f7dec86fb7db8d42039380",
+    "observations.json": "876df782d2f78f4d4f38ca18b69cb5d5878696ff63d587c3f813a95f6cc3f6f7",
+    "source-manifest.json": "0360ee2ace542c04bc69495a89e8b561d59d127ec5e27d0b7767339472c9b5ba",
+    "job.log.gz": "b42ff20012181fe2e610679eeb6b095ef7892ddb9599d2370429aeaf6fe73844"
+  },
+  "rawTapVerification": {
+    "summaryMatchesReport": true,
+    "noFailedAssertions": true,
+    "noSkipOrTodoDirectives": true
+  },
+  "decision": "NO_BLOCKER_IDENTIFIED_IN_THIS_SECURITY_CI_RUN",
+  "limits": {
+    "productionAcceptance": "NOT_VERIFIED",
+    "commercialLaunch": "NOT_APPROVED",
+    "multiCompanyAcceptance": "INTERNAL_BOUNDARIES_PASSED",
+    "fullQualityWorkflow": "Parent owns separate run 42251628527; this receipt makes no claim about its status.",
+    "reviewerActions": "Read-only CI/API/log/artifact retrieval and Git object/source identity verification; no restarts, product edits, provider calls, merge or deployment.",
+    "polling": "Initial in-progress check and one completed poll after at least 60 seconds; no run restarts."
+  }
+}

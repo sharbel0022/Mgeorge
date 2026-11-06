@@ -1,0 +1,54 @@
+{
+  "format": "MG-security-CI-source-binding-1",
+  "recordedAt": "2026-11-06T16:26:52.430010+00:00",
+  "pullRequest": 62,
+  "headCommit": "70dd9c5dca6981e440bec0486e43788d2ef3f6a1",
+  "testedCheckoutCommit": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+  "testedCheckoutParents": [
+    "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+    "70dd9c5dca6981e440bec0486e43788d2ef3f6a1"
+  ],
+  "headWholeTree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+  "testedCheckoutWholeTree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+  "sitesTree": "c2feb372a4c0ef121ffe594784684957c14ddac1",
+  "headToTestedCheckoutChangedFiles": [],
+  "fullTreeEqualityVerified": true,
+  "verification": "Git commit/tree objects fetched read-only; rev-parse for whole tree/Sites tree and git diff --name-only head checkout. This is a reviewer source-binding manifest, not an artifact produced by CI.",
+  "files": [
+    {
+      "path": ".github/workflows/saas-security-acceptance.yml",
+      "sha256": "b5b8ee5c98ccd7c21c483c1e0f790d875308d35a7dec009fb77ad773b563a111",
+      "gitBlob": "317adc2a2bda11b2068ffc977e8472ce10724346"
+    },
+    {
+      "path": "scripts/run-saas-security-acceptance.mjs",
+      "sha256": "3869a47c27f3c02a1b8e17adab3631a9bd86f8d33a350e3cab6a93d512e4700d",
+      "gitBlob": "f346a912c161f95ab12cb6fc1b772edc4846bcda"
+    },
+    {
+      "path": "scripts/saas-test-isolation.mjs",
+      "sha256": "9f40b9159a1ad9f4d21c7ecdc76db31fd55d6a0efe793f3f32e7548809affb80",
+      "gitBlob": "66e63a8696c69e3e0f9116af6371b8cef8bb4e62"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d",
+      "gitBlob": "37952e5226e223208e74d365e94e53c8cd06e8a7"
+    },
+    {
+      "path": "sites/package-lock.json",
+      "sha256": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0",
+      "gitBlob": "7da0600e6249272e2f31d057ee8d497d6bf7781f"
+    },
+    {
+      "path": "sites/scripts/install-ci.mjs",
+      "sha256": "589d381cf396f61e6b9045cac7e08bdc3c277cb73f0dd32aa86e99c7c184646b",
+      "gitBlob": "ca4e0ca47f90f833c1337a324168ed527c26b92a"
+    },
+    {
+      "path": "sites/scripts/minimatch-backport.mjs",
+      "sha256": "81a3102ef2cdf77044afea3459636647c6d04724bcac6ee529d1eb5fcd280c17",
+      "gitBlob": "ff5405dc1718bcf7d83b55a7b0e9bfe98d7b9848"
+    }
+  ]
+}
