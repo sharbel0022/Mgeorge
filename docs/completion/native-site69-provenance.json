@@ -1,0 +1,26 @@
+{
+  "schema": "mgeorge-native-site69-provenance-v1",
+  "github_main": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "github_sites_tree": "c2feb372a4c0ef121ffe594784684957c14ddac1",
+  "native_commit": "1df8cb96eda374f2506c81aa776263388ddb666a",
+  "native_root_tree": "c2feb372a4c0ef121ffe594784684957c14ddac1",
+  "exact_sites_tree_equality": true,
+  "official_build_and_package_exit": 0,
+  "source_worktree_clean_after_package": true,
+  "archive": {
+    "filename": "mgeorge-final-reviewed-site.tar.gz",
+    "bytes": 18706037,
+    "sha256": "557ce1a2b50dcd05d23d1ed7fa54d5f3b05a6571a5d7a67b8f4ef0e55240c5be"
+  },
+  "server_archive": {
+    "archive_format": "tar",
+    "sediment_file_id": "file_00000000b6dc8246919e11a710555548",
+    "content_hash": "sha256:a67486cfa036e63a9873486377823bd81c81b62a41bdf043314676992d37b0af",
+    "size_bytes": 48609280,
+    "file_count": 441
+  },
+  "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_0d6484fc83648191b5acdcac9ca3bf9d",
+  "version_number": 69,
+  "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+  "publication_status": "SEE release69-postpublication.json; saving a version is not publication"
+}

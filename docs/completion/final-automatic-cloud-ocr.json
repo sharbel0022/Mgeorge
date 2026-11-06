@@ -1,0 +1,26 @@
+{
+  "schema": "mgeorge-final-automatic-cloud-ocr-v1",
+  "run_id": 42254783237,
+  "job_id": 128018971435,
+  "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42254783237",
+  "event": "workflow_run",
+  "source": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "reviewed_main_checks": true,
+  "source_checkout_logged": true,
+  "result": {
+    "status": "complete",
+    "processed": 6,
+    "failed": 0
+  },
+  "logged_result_at": "2026-11-06T16:43:41.3917033Z",
+  "application_completed_at": "2026-11-06T16:43:40.861Z",
+  "counts_after": {
+    "needs_review": 415,
+    "registered": 2,
+    "waiting_ocr": 57
+  },
+  "field_correctness_verified": false,
+  "periodic_cron_verified_by_this_run": false,
+  "per_document_sites_version_bound": false,
+  "limits": "Ordinary CI-triggered worker execution, not Gmail hourly dispatch or periodic cron proof. The run overlapped the Site69 publication; per-document serving-version identity was not recorded."
+}

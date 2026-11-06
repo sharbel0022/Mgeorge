@@ -1,0 +1,773 @@
+[
+  {
+    "profile": "node22",
+    "status": "PASSED",
+    "source": {
+      "commit": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+      "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+      "branch": "",
+      "workingTreeDirty": false,
+      "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+      "fileCount": 2666
+    },
+    "steps": [
+      {
+        "name": "install-node",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 1465.037
+      },
+      {
+        "name": "syntax",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 7136.866
+      },
+      {
+        "name": "audit-production",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 359.969
+      },
+      {
+        "name": "audit-all",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 358.146
+      },
+      {
+        "name": "node-tests",
+        "kind": "test-suite",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 228597.646,
+        "totals": {
+          "tests": 3012,
+          "pass": 3012,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "sourceChangedDuringRun": false
+      }
+    ],
+    "audit-production": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "audit-all": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    }
+  },
+  {
+    "profile": "node24",
+    "status": "PASSED",
+    "source": {
+      "commit": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+      "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+      "branch": "",
+      "workingTreeDirty": false,
+      "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+      "fileCount": 2666
+    },
+    "steps": [
+      {
+        "name": "install-node",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 1362.899
+      },
+      {
+        "name": "syntax",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 7047.741
+      },
+      {
+        "name": "audit-production",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 384.583
+      },
+      {
+        "name": "audit-all",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 448.228
+      },
+      {
+        "name": "node-tests",
+        "kind": "test-suite",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 229371.726,
+        "totals": {
+          "tests": 3012,
+          "pass": 3012,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "sourceChangedDuringRun": false
+      }
+    ],
+    "audit-production": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "audit-all": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    }
+  },
+  {
+    "profile": "sites",
+    "status": "PASSED",
+    "source": {
+      "commit": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+      "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+      "branch": "",
+      "workingTreeDirty": false,
+      "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+      "fileCount": 2666
+    },
+    "steps": [
+      {
+        "name": "install-node",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 844.799
+      },
+      {
+        "name": "install-sites",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 12065.252
+      },
+      {
+        "name": "install-bridge",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 242.686
+      },
+      {
+        "name": "minimatch-mitigation",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 202.076
+      },
+      {
+        "name": "typecheck",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 6676.862
+      },
+      {
+        "name": "audit-production",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 412.204
+      },
+      {
+        "name": "audit-all",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 2903.46
+      },
+      {
+        "name": "sites-tests",
+        "kind": "test-suite",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 404458.295,
+        "totals": {
+          "tests": 5820,
+          "pass": 5820,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "sourceChangedDuringRun": false
+      },
+      {
+        "name": "production-build",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 9224.069
+      }
+    ],
+    "audit-production": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "audit-all": {
+      "info": 0,
+      "low": 0,
+      "moderate": 8,
+      "high": 0,
+      "critical": 0,
+      "total": 8
+    }
+  },
+  {
+    "profile": "bridge",
+    "status": "PASSED",
+    "source": {
+      "commit": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+      "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+      "branch": "",
+      "workingTreeDirty": false,
+      "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+      "fileCount": 2666
+    },
+    "steps": [
+      {
+        "name": "install-bridge",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 499.897
+      },
+      {
+        "name": "syntax",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 216.998
+      },
+      {
+        "name": "audit-production",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 392.875
+      },
+      {
+        "name": "audit-all",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 365.892
+      },
+      {
+        "name": "bridge-tests",
+        "kind": "test-suite",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 9151.263,
+        "totals": {
+          "tests": 47,
+          "pass": 47,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "sourceChangedDuringRun": false
+      }
+    ],
+    "audit-production": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "audit-all": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    }
+  },
+  {
+    "profile": "browser",
+    "status": "PASSED",
+    "source": {
+      "commit": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+      "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+      "branch": "",
+      "workingTreeDirty": false,
+      "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+      "fileCount": 2666
+    },
+    "steps": [
+      {
+        "name": "install-sites",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 17519.8
+      },
+      {
+        "name": "install-browser-tooling",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 435.574
+      },
+      {
+        "name": "install-chromium",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 21887.834
+      },
+      {
+        "name": "audit-all",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 399.158
+      },
+      {
+        "name": "browser-acceptance",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 35976.444
+      }
+    ],
+    "audit-all": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "browser": {
+      "totals": {
+        "tests": 77,
+        "pass": 77,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "externalRequests": 0,
+      "browserErrors": 0,
+      "sourceChangedDuringRun": false,
+      "scope": "Actual bundled onboarding, company workspace and Dashboard UI in Chromium; APIs use isolated synthetic fixtures. Backend, authentication and provider end-to-end coverage is not claimed."
+    }
+  },
+  {
+    "profile": "performance",
+    "status": "PASSED",
+    "source": {
+      "commit": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+      "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+      "branch": "",
+      "workingTreeDirty": false,
+      "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+      "fileCount": 2666
+    },
+    "steps": [
+      {
+        "name": "install-node",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 861.206
+      },
+      {
+        "name": "company-benchmark",
+        "kind": "command",
+        "passed": true,
+        "exitCode": 0,
+        "signal": null,
+        "durationMs": 27286.815
+      }
+    ],
+    "performance": {
+      "parameters": {
+        "companies": [
+          1,
+          10,
+          100
+        ],
+        "transactions": 10,
+        "concurrency": 4,
+        "replayRounds": 1,
+        "seed": 95
+      },
+      "batches": [
+        {
+          "companies": 1,
+          "verification": {
+            "isolation": true,
+            "replay": true,
+            "competingClaims": true,
+            "persistedTransactions": 10
+          },
+          "metrics": {
+            "elapsedMs": 190.607957,
+            "attempts": 4,
+            "successes": 3,
+            "expectedBusy": 1,
+            "errors": 0,
+            "imported": 10,
+            "duplicate": 20,
+            "latencyMs": {
+              "unit": "one company sync attempt, including provider scheduling yield",
+              "p50": 41.925993000000005,
+              "p95": 90.555906,
+              "max": 90.555906
+            },
+            "successfulLatencyMs": {
+              "p50": 57.82413500000001,
+              "p95": 90.555906
+            },
+            "successfulSyncsPerSecond": 15.739112087539976,
+            "importedTransactionsPerSecond": 52.46370695846659
+          },
+          "phases": [
+            {
+              "name": "initial",
+              "elapsedMs": 90.722916,
+              "attempts": 1,
+              "successes": 1,
+              "expectedBusy": 0,
+              "errors": 0,
+              "imported": 10,
+              "duplicate": 0,
+              "latencyMs": {
+                "unit": "one company sync attempt, including provider scheduling yield",
+                "p50": 90.555906,
+                "p95": 90.555906,
+                "max": 90.555906
+              },
+              "successfulLatencyMs": {
+                "p50": 90.555906,
+                "p95": 90.555906
+              },
+              "successfulSyncsPerSecond": 11.022573392592452,
+              "importedTransactionsPerSecond": 110.22573392592452
+            },
+            {
+              "name": "replay-1",
+              "elapsedMs": 57.873860000000036,
+              "attempts": 1,
+              "successes": 1,
+              "expectedBusy": 0,
+              "errors": 0,
+              "imported": 0,
+              "duplicate": 10,
+              "latencyMs": {
+                "unit": "one company sync attempt, including provider scheduling yield",
+                "p50": 57.82413500000001,
+                "p95": 57.82413500000001,
+                "max": 57.82413500000001
+              },
+              "successfulLatencyMs": {
+                "p50": 57.82413500000001,
+                "p95": 57.82413500000001
+              },
+              "successfulSyncsPerSecond": 17.278958065005504,
+              "importedTransactionsPerSecond": 0
+            },
+            {
+              "name": "competing-claims",
+              "elapsedMs": 42.011180999999965,
+              "attempts": 2,
+              "successes": 1,
+              "expectedBusy": 1,
+              "errors": 0,
+              "imported": 0,
+              "duplicate": 10,
+              "latencyMs": {
+                "unit": "one company sync attempt, including provider scheduling yield",
+                "p50": 1.118395000000021,
+                "p95": 41.925993000000005,
+                "max": 41.925993000000005
+              },
+              "successfulLatencyMs": {
+                "p50": 41.925993000000005,
+                "p95": 41.925993000000005
+              },
+              "successfulSyncsPerSecond": 23.80318706108264,
+              "importedTransactionsPerSecond": 0
+            }
+          ]
+        },
+        {
+          "companies": 10,
+          "verification": {
+            "isolation": true,
+            "replay": true,
+            "competingClaims": true,
+            "persistedTransactions": 100
+          },
+          "metrics": {
+            "elapsedMs": 2056.521174,
+            "attempts": 40,
+            "successes": 30,
+            "expectedBusy": 10,
+            "errors": 0,
+            "imported": 100,
+            "duplicate": 200,
+            "latencyMs": {
+              "unit": "one company sync attempt, including provider scheduling yield",
+              "p50": 176.04331899999988,
+              "p95": 361.41054600000007,
+              "max": 398.3441630000002
+            },
+            "successfulLatencyMs": {
+              "p50": 204.78733499999998,
+              "p95": 362.0324679999999
+            },
+            "successfulSyncsPerSecond": 14.587741852250922,
+            "importedTransactionsPerSecond": 48.62580617416974
+          },
+          "phases": [
+            {
+              "name": "initial",
+              "elapsedMs": 639.603073,
+              "attempts": 10,
+              "successes": 10,
+              "expectedBusy": 0,
+              "errors": 0,
+              "imported": 100,
+              "duplicate": 0,
+              "latencyMs": {
+                "unit": "one company sync attempt, including provider scheduling yield",
+                "p50": 234.79764799999998,
+                "p95": 277.5367920000001,
+                "max": 277.5367920000001
+              },
+              "successfulLatencyMs": {
+                "p50": 234.79764799999998,
+                "p95": 277.5367920000001
+              },
+              "successfulSyncsPerSecond": 15.634696614411045,
+              "importedTransactionsPerSecond": 156.34696614411044
+            },
+            {
+              "name": "replay-1",
+              "elapsedMs": 918.3811630000002,
+              "attempts": 10,
+              "successes": 10,
+              "expectedBusy": 0,
+              "errors": 0,
+              "imported": 0,
+              "duplicate": 100,
+              "latencyMs": {
+                "unit": "one company sync attempt, including provider scheduling yield",
+                "p50": 222.6548049999999,
+                "p95": 398.3441630000002,
+                "max": 398.3441630000002
+              },
+              "successfulLatencyMs": {
+                "p50": 222.6548049999999,
+                "p95": 398.3441630000002
+              },
+              "successfulSyncsPerSecond": 10.888725077215023,
+              "importedTransactionsPerSecond": 0
+            },
+            {
+              "name": "competing-claims",
+              "elapsedMs": 498.53693799999974,
+              "attempts": 20,
+              "successes": 10,
+              "expectedBusy": 10,
+              "errors": 0,
+              "imported": 0,
+              "duplicate": 100,
+              "latencyMs": {
+                "unit": "one company sync attempt, including provider scheduling yield",
+                "p50": 6.650394000000233,
+                "p95": 204.78733499999998,
+                "max": 206.98801300000014
+              },
+              "successfulLatencyMs": {
+                "p50": 176.04331899999988,
+                "p95": 206.98801300000014
+              },
+              "successfulSyncsPerSecond": 20.058694226585082,
+              "importedTransactionsPerSecond": 0
+            }
+          ]
+        },
+        {
+          "companies": 100,
+          "verification": {
+            "isolation": true,
+            "replay": true,
+            "competingClaims": true,
+            "persistedTransactions": 1000
+          },
+          "metrics": {
+            "elapsedMs": 18407.974119,
+            "attempts": 400,
+            "successes": 300,
+            "expectedBusy": 100,
+            "errors": 0,
+            "imported": 1000,
+            "duplicate": 2000,
+            "latencyMs": {
+              "unit": "one company sync attempt, including provider scheduling yield",
+              "p50": 226.94868900000074,
+              "p95": 302.22772799999984,
+              "max": 881.8598239999992
+            },
+            "successfulLatencyMs": {
+              "p50": 247.73619400000098,
+              "p95": 313.2377610000003
+            },
+            "successfulSyncsPerSecond": 16.2972849733829,
+            "importedTransactionsPerSecond": 54.32428324460967
+          },
+          "phases": [
+            {
+              "name": "initial",
+              "elapsedMs": 7026.490100999999,
+              "attempts": 100,
+              "successes": 100,
+              "expectedBusy": 0,
+              "errors": 0,
+              "imported": 1000,
+              "duplicate": 0,
+              "latencyMs": {
+                "unit": "one company sync attempt, including provider scheduling yield",
+                "p50": 280.8666090000006,
+                "p95": 324.27800299999944,
+                "max": 486.3249909999995
+              },
+              "successfulLatencyMs": {
+                "p50": 280.8666090000006,
+                "p95": 324.27800299999944
+              },
+              "successfulSyncsPerSecond": 14.231856668490595,
+              "importedTransactionsPerSecond": 142.31856668490596
+            },
+            {
+              "name": "replay-1",
+              "elapsedMs": 5851.816063,
+              "attempts": 100,
+              "successes": 100,
+              "expectedBusy": 0,
+              "errors": 0,
+              "imported": 0,
+              "duplicate": 1000,
+              "latencyMs": {
+                "unit": "one company sync attempt, including provider scheduling yield",
+                "p50": 245.9702389999984,
+                "p95": 269.79557399999976,
+                "max": 289.5038289999993
+              },
+              "successfulLatencyMs": {
+                "p50": 245.9702389999984,
+                "p95": 269.79557399999976
+              },
+              "successfulSyncsPerSecond": 17.088712106363413,
+              "importedTransactionsPerSecond": 0
+            },
+            {
+              "name": "competing-claims",
+              "elapsedMs": 5529.667955000001,
+              "attempts": 200,
+              "successes": 100,
+              "expectedBusy": 100,
+              "errors": 0,
+              "imported": 0,
+              "duplicate": 1000,
+              "latencyMs": {
+                "unit": "one company sync attempt, including provider scheduling yield",
+                "p50": 6.322808000000805,
+                "p95": 299.05007599999954,
+                "max": 881.8598239999992
+              },
+              "successfulLatencyMs": {
+                "p50": 155.21967099999893,
+                "p95": 330.08723100000134
+              },
+              "successfulSyncsPerSecond": 18.08426849745628,
+              "importedTransactionsPerSecond": 0
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "Synthetic fixtures only. No customer data, real bank credentials, provider requests, browser activity, or production capacity claims.",
+        "Fresh local SQLite files per batch; setup is reported separately. No warm-up, repeated statistical trials, artificial network latency, or distributed workers.",
+        "Concurrency is asynchronous overlap in one Node process using the production scheduler and real persisted sync leases. It does not measure cross-process locking.",
+        "Provider authorization and rate-policy evidence are explicit synthetic fixtures. This does not verify any bank integration or regulatory permission.",
+        "Timing depends on host contention and filesystem caching; percentile observations and throughput are informational, never pass/fail thresholds."
+      ],
+      "totalMs": 27173.462933
+    }
+  }
+]

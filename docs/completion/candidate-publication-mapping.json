@@ -1,0 +1,197 @@
+{
+  "schema": "mgeorge-final-candidate-publication-map-v1",
+  "base": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+  "final_local": "1ec29532f8a13c50a0af54f397216ca763d15ea6",
+  "final_remote": "70dd9c5dca6981e440bec0486e43788d2ef3f6a1",
+  "same_full_tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+  "commits": [
+    {
+      "local": "3cb6433de1700e2ed4eee544c7e0c56142dd660d",
+      "remote": "7b13d62bfb44f2540c39d5602ac2846237418dcc",
+      "tree": "e33d6e5073d89eabaf2522b33b6c07313a25074e",
+      "message": "docs(review): verify bank status metadata fix independently"
+    },
+    {
+      "local": "795ef46d1e77396bf03d0a4ec4c07096c50cffbd",
+      "remote": "fef2c82adbe9a0e1a6d73d2704899ff72a527ee5",
+      "tree": "54ab8aaa4ce7521ec6178ee706f5f601f4c8f61b",
+      "message": "docs: record final merged-source encrypted restore acceptance"
+    },
+    {
+      "local": "bcc5a01c3d56c3ce4ac4cdff632ef4d6be87d57d",
+      "remote": "c77f0716be9185685ca7a9c62e4a427a356622fe",
+      "tree": "70aa48f530fef277c74276cc7a3870ec37995d21",
+      "message": "docs: propose evidence-bound assessment of all 33 criteria"
+    },
+    {
+      "local": "cfbb48f7e76a824ff81d39e7b85b7637908c9e27",
+      "remote": "e079cbe36a55bf4577131a6482d4202498421ac7",
+      "tree": "75d8337dd2ed2ef81c438de1bfb4f6f88e0ba0c0",
+      "message": "docs: record bounded OCR worker IPC diagnosis"
+    },
+    {
+      "local": "750a1eb491a0dbd8d9764d04aef11bfbcd408a56",
+      "remote": "e81c71fe9962ebcc44dced333c78d5b21bdd7dee",
+      "tree": "e2892f3d183b1426564b3d352d37928988bc5d22",
+      "message": "docs: preserve independent synthetic OCR first-pass evidence"
+    },
+    {
+      "local": "9e87b5d48588966d8c1d000d89e5c9957acb115f",
+      "remote": "4e7c7207940b9c28e95b94247394134dd46bfa33",
+      "tree": "2d70af52fff6e8b488b36f21ef515fa7e13ca2f3",
+      "message": "test: freeze document worker lifecycle boundary regressions"
+    },
+    {
+      "local": "4520ca2f2c9ce1e72e77f37ce41766640580bcc3",
+      "remote": "c581a1b58cfe146586226d9fcfcf9da20484d62a",
+      "tree": "f4959740591245be79c42c22a17da2475e3723d2",
+      "message": "fix(ocr): preserve worker receipts and classify process failures"
+    },
+    {
+      "local": "c4eb3f0ea2e45e54929f87d29159750d63e91240",
+      "remote": "a6a29375398fcefa9e0da00bf0404a81c7168e4d",
+      "tree": "a201cf98443b48d0ad5b9e374d1abe137902bb38",
+      "message": "docs: bind worker lifecycle RED GREEN and integration evidence"
+    },
+    {
+      "local": "801efaeba69bf6450f924b573685fbfa71eb9fb7",
+      "remote": "79b6a6dffd7a56dae8633c2ecf10a2d647e8748c",
+      "tree": "f2d379c733aa03909530952ceed74fc690a3dffc",
+      "message": "docs: record independent worker IPC boundary review"
+    },
+    {
+      "local": "852551480a7160de06a860ff23cd58f91a3afb02",
+      "remote": "6064373fe6a99819ea5d84136e0ed0084738d76a",
+      "tree": "b038c14f7eb07f92e42ad3e57045db2198932d94",
+      "message": "docs: retain exact CI and successful Site 68 release evidence"
+    },
+    {
+      "local": "5bc2627c8889a6252bbc205ec43edea7f8ff1390",
+      "remote": "0d20eb1a8a2ab66345b857be8c45d2e77b9b6da9",
+      "tree": "6ad2895e046018d1e8f47844a1694c03b8ca81d8",
+      "message": "docs(review): clarify load concurrency and token observation scope"
+    },
+    {
+      "local": "ce3d5ed33ed355e405e1111b27a575611c30786f",
+      "remote": "ade517bf19c702877003e382d2f993d9f6119597",
+      "tree": "1465bc0c66ff9ce878a41d09ddd3c70c81031def",
+      "message": "docs: explain Sites development audit advisory and mitigation"
+    },
+    {
+      "local": "504d5c08bcbc72d70e9f1a38d98597b4de512a34",
+      "remote": "93dda7bb1ec89ed3f3f4957cb3b4ecb310968055",
+      "tree": "8fd3babfd5c733e525bfbd6d9623133e7857d610",
+      "message": "docs: assess published Site 68 against all 33 criteria"
+    },
+    {
+      "local": "41020d447040e9e87f6f5b3cd31a4b93478ec0d2",
+      "remote": "9f19e5f8cec46619c1465fffce3680448a1f436c",
+      "tree": "67ab865c7298a23ddfb05b80d8bcab70ac09b2c8",
+      "message": "docs(quality): preregister independent supported OCR cohort"
+    },
+    {
+      "local": "effca7cb93d50356e59a03d8366809b5ca3d5f55",
+      "remote": "08b852fef695aaa47a49bfd3d49289009021b576",
+      "tree": "0ac0ed46bdd874d7c08e91720d99701927fd4f1a",
+      "message": "docs(quality): preserve independent supported OCR first-pass results"
+    },
+    {
+      "local": "2e8ba77f4d3f312996ce0336465a150ff2a1c7e6",
+      "remote": "f518740de265707ceec4869a6e875e08dd3fb47a",
+      "tree": "a3f4a35a405e98f2385b79afe8cbf4dd29e89266",
+      "message": "docs: record independent supported OCR method review"
+    },
+    {
+      "local": "033160218995bbd3647836f920fc4073df83dc82",
+      "remote": "6fff997138df5815e99a855d1e20e9b5e49c19ae",
+      "tree": "7993163f2160fb747f5dcdb1928212b89e714994",
+      "message": "docs: record bounded availability check for sealed OCR V3"
+    },
+    {
+      "local": "4b0f6c199817bb2b0c5453de323c7ce5c0a0143c",
+      "remote": "10c3596093468af6bf45417aae1e3c06d9c3700b",
+      "tree": "2fe3cb58e9446fc9af0f62e0293c124e756c9243",
+      "message": "test(ocr): freeze standard field alias census regressions in RED"
+    },
+    {
+      "local": "4bfb033e5423d02ac31cf9ffa99574b8f6ce3693",
+      "remote": "350567c19b758f6647a16bf30f05bfe32da6f2cf",
+      "tree": "c26331078be7b610c72c4cef46253a43fea5d4eb",
+      "message": "fix(ocr): align standard date and party label census"
+    },
+    {
+      "local": "bbe47e63399c9dbda18212f91711e46a1dce9a3c",
+      "remote": "bcd25a0b193740696e27616bbedf9d9da7ff6403",
+      "tree": "6f6927c6ae883bf7e3f0411178a207b29756d642",
+      "message": "test(ocr): preserve separate recipient headings before alias joining"
+    },
+    {
+      "local": "166e1b040e5815cf19324393d6f7bdc1e1aace6c",
+      "remote": "62a85894950a28627146dacd46d23a6f13871bf6",
+      "tree": "96905d0e8b467f94d2aa889d4b4c7fb6b56041b9",
+      "message": "fix(ocr): retain printed colon for recipient cell aliases"
+    },
+    {
+      "local": "d82af707976c4a0524337c4fcfdcf976ec9f18a8",
+      "remote": "b2f793fed3be90cb1b0b3a63c0c91023e834e5c5",
+      "tree": "f1003df3c7302c9bf4cf535e36d27d78c188bd4f",
+      "message": "test(ocr): freeze explicit recipient scalar boundary cases"
+    },
+    {
+      "local": "47c303379f9f227597ce644ce8c3a84c4dae588e",
+      "remote": "157382903a003e6e1d5cdceba7776c1ba580d526",
+      "tree": "caac2b4aa1df1e3a1d3af1113d8cec7dee0e8d5b",
+      "message": "fix(ocr): bound scalars by existing explicit recipient labels"
+    },
+    {
+      "local": "bf1d40da684e00009922032cf6c3abf775de8553",
+      "remote": "143a03c6cf90bfa55b400eb98c5413c507514a9b",
+      "tree": "dc43a73ce521abd3a7738a05acacca5fa2581791",
+      "message": "docs: freeze independent standard alias boundary probes"
+    },
+    {
+      "local": "0ef6934bb7d02c78e4f05a46af0fce54bd6b8668",
+      "remote": "b0d4a23708a3731595fb39a8b7739b3c640e4a83",
+      "tree": "63ff67c9a71b103fdc9c685626ef3bc8a3c16bc2",
+      "message": "docs: freeze supplementary alias ownership and colon probes"
+    },
+    {
+      "local": "f632a82e19b3c259009816c6f898e2f9b1038d42",
+      "remote": "23866a33e7326a7a5a63df09362d3dd5b6a6705b",
+      "tree": "b8357e290991080b72cd756953cfc9440a27c198",
+      "message": "docs: correct explicit alias review ownership oracle with original evidence"
+    },
+    {
+      "local": "42ac3889d18534f624ce463f12e6f915c62f37ef",
+      "remote": "5bf545bbf1ba85c5b92fdd9ef8cccd8b14f8ae5f",
+      "tree": "1b2029326d1842aad935f950ea47f5591d85a1c5",
+      "message": "docs: record independent final alias safety review and exact results"
+    },
+    {
+      "local": "7ea57e269a24bc992e8f7f1e630a18a92050a991",
+      "remote": "085e06ff1ea63b96077da5ee8757daf9c68c83e6",
+      "tree": "d73866af3d33bc89d0f3c086cd2b9238a4202b47",
+      "message": "docs(ocr): preserve alias RED GREEN and consumed-text replay evidence"
+    },
+    {
+      "local": "f76cd4c527e225a0087c035986e65225057c77a5",
+      "remote": "b82370c0c5728e4e2a1043dcfafda9daafbd248a",
+      "tree": "f777ca67ac8ea7ed4cb8603d55cccc79a092cc79",
+      "message": "docs(ocr): store raw alias receipts as byte-exact compressed logs"
+    },
+    {
+      "local": "e88088181134daf4dd5142cb0084073d49fe37c0",
+      "remote": "9b1dc5e43e7f32cb6c17313d8026a08c2219181f",
+      "tree": "6691967ac6c251f8ab7790445f41a1573edeed3d",
+      "message": "docs: bind reviewed final candidate and preserve complete release evidence"
+    },
+    {
+      "local": "1ec29532f8a13c50a0af54f397216ca763d15ea6",
+      "remote": "70dd9c5dca6981e440bec0486e43788d2ef3f6a1",
+      "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+      "message": "docs: clarify diagnostic scope and backup verification timestamp"
+    }
+  ],
+  "normal_merge_main": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "note": "GitHub object API retained each individual tree exactly; commit metadata changes commit SHAs. Normal fast-forward updates used an expected current branch SHA, no force. Postrelease evidence commits are separately bound to the final main."
+}

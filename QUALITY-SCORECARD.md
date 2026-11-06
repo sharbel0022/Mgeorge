@@ -1,3 +1,15 @@
+## 2026-11-06 17:04 UTC — Site 69 publicerad, slutlig bedömning 258,5/330
+
+PR 61 och PR 62 är normalt mergade. Slutlig produkt-main `f3c80629d4856c2f8ecbb1ed81be391a13ac6be8` har grön full PR-/main-CI och separat säkerhetsacceptans. Node 22/24 vardera 3 012, Sites 5 820, bridge 47, Chromium 77; alla obligatoriska grindar passerar. Samma Sites-träd är publicerat som **version 69**, native `1df8cb96eda374f2506c81aa776263388ddb666a`, miljörevision 10. [Release och källkedja](docs/completion/release-site69.md).
+
+**258,5/330 = 7,83/10; 27/33 minst 8. Målet 314/330 är inte uppnått.** De sista worker-/etikettfixarna ger ingen ny optisk kvalitetskredit. Giltigt oberoende SEK-förstaprov gav 57,41 % recall före sista etikettfixen; känd textreplay 62→66/108 är utvecklingsmätning på mellanversion. Inga normala dokument blev fullständiga eller gröna. [Alla 33 kriterier och skäl](docs/completion/final-33-assessment.md).
+
+Swedbank kräver fortfarande förnyad giltig auktorisation; Bankgiro är SOURCE_NOT_CONFIGURED. Assisterad Gmail-hämtning 16:27 importerade nio nya underlag utan dubbletter. Det automatiska CI-utlösta molnjobbet på slutlig main gav 6 behandlade/0 fel. Vid17:01:46: 415 dokument för granskning,57 väntande OCR,2 registreringar. Ordinarie Gmail-tillfällen 15:00,16:00 och17:00 saknar nytt appdispatchkvitto. Det är en separat kvarstående driftbrist.
+
+Elva tabeller jämfördes före/efter publicering: alla returnerade värden lika, nio tabeller kompletta, två celler trunkerade. UI-totaler och0599/625 behöll korrekta spärrar. Den riktiga backupen har430 verifierade original i sitt frysta manifest. Ny isolerad syntetisk restore på exakt slutlig main accepterade430 original/185567855 byte/27 tabellgrupper och tio negativa avvisningar; restore+acceptans3625,739 ms. Ingen produktionsrestore genomfördes.
+
+[Samlad slutrapport](docs/completion/final-integration-report.md). Efterföljande evidenscommits ligger på den beställda completion-branchen och ändrar ingen produkt- eller testkod; faktisk produkt-main och publiceringsidentitet anges separat. Kommersiell bank-/flerföretagslansering är inte godkänd.
+
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 
 PR 61 är normalt mergad till `24390ef7e8cf6b2274c57804dc9c2d74d362ab12`. Full PR-kvalitet, separat säkerhetsacceptans och separat main-CI är gröna för samma källträd. Site **68** publicerades från exakt motsvarande Sites-träd och är avgränsat kontrollerad efter release. [Releasekvitto](docs/completion/release-site68.md).

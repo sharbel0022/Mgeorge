@@ -1,0 +1,473 @@
+{
+  "schemaVersion": 1,
+  "kind": "quality-job",
+  "profile": "browser",
+  "status": "PASSED",
+  "passed": true,
+  "syntheticOnly": true,
+  "realBankVerification": "NOT_RUN",
+  "productionPerformance": "NOT_MEASURED",
+  "source": {
+    "commit": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+    "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+    "branch": "main",
+    "workingTreeDirty": false,
+    "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+    "fileCount": 2666
+  },
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "release": "7.0.0-1017-azure",
+    "arch": "x64",
+    "logicalCpus": 4,
+    "cpu": "AMD EPYC 9V74 80-Core Processor"
+  },
+  "github": {
+    "runId": "42253201335",
+    "runAttempt": "1",
+    "event": "push",
+    "checkoutSha": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+    "pullRequestHeadSha": "",
+    "pullRequestBaseSha": ""
+  },
+  "installExecuted": true,
+  "startedAt": "2026-11-06T16:32:02.673Z",
+  "steps": [
+    {
+      "name": "install-sites",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+          "run",
+          "install:ci"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/sites"
+      },
+      "startedAt": "2026-11-06T16:32:02.681Z",
+      "finishedAt": "2026-11-06T16:32:18.635Z",
+      "durationMs": 15954.156,
+      "artifacts": [
+        {
+          "path": "install-sites.stdout.log",
+          "bytes": 327,
+          "sha256": "eae93daccc79272c65784ee5d25a07f1b2532e2f2b96f573ec5f01e455fa57cd"
+        },
+        {
+          "path": "install-sites.stderr.log",
+          "bytes": 898,
+          "sha256": "2a26cd0f5b146200b9b06d5d8f0e0f79df7380b7f5789d4eb752a157e042f77b"
+        }
+      ]
+    },
+    {
+      "name": "install-browser-tooling",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+          "ci",
+          "--ignore-scripts",
+          "--no-audit",
+          "--no-fund"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/qa/browser"
+      },
+      "startedAt": "2026-11-06T16:32:18.637Z",
+      "finishedAt": "2026-11-06T16:32:18.997Z",
+      "durationMs": 360.421,
+      "artifacts": [
+        {
+          "path": "install-browser-tooling.stdout.log",
+          "bytes": 27,
+          "sha256": "87d6fca66d0c8e85d1bb27afe14ae6ab0ba5dce93fdb26d81534194d9b3b636f"
+        },
+        {
+          "path": "install-browser-tooling.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "install-chromium",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+          "run",
+          "install:chromium"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/qa/browser"
+      },
+      "startedAt": "2026-11-06T16:32:19.014Z",
+      "finishedAt": "2026-11-06T16:32:42.994Z",
+      "durationMs": 23979.963,
+      "artifacts": [
+        {
+          "path": "install-chromium.stdout.log",
+          "bytes": 16450,
+          "sha256": "7fa2960bc368fcb5efd5f497a898e7187cadf9bf167cfa568b415a1fd3dff33b"
+        },
+        {
+          "path": "install-chromium.stderr.log",
+          "bytes": 237,
+          "sha256": "3b419c69ff321ee6851fa5489a2bb0c9a2ef093815a709dbd05391f89767267f"
+        }
+      ]
+    },
+    {
+      "name": "audit-all",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+          "audit",
+          "--json",
+          "--audit-level=high"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/qa/browser"
+      },
+      "startedAt": "2026-11-06T16:32:42.995Z",
+      "finishedAt": "2026-11-06T16:32:43.369Z",
+      "durationMs": 374.393,
+      "artifacts": [
+        {
+          "path": "audit-all.stdout.log",
+          "bytes": 358,
+          "sha256": "a01267e7d3023badd5d4b64f1d798707912523aeba3545b611eaaa83ee261353"
+        },
+        {
+          "path": "audit-all.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "audit": {
+        "measured": true,
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        }
+      }
+    },
+    {
+      "name": "browser-acceptance",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "scripts/quality/browser.mjs",
+          "/home/runner/work/_temp/quality-browser/browser"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+      },
+      "startedAt": "2026-11-06T16:32:43.371Z",
+      "finishedAt": "2026-11-06T16:33:14.272Z",
+      "durationMs": 30900.964,
+      "artifacts": [
+        {
+          "path": "browser-acceptance.stdout.log",
+          "bytes": 125,
+          "sha256": "c43fe292be134d2007b6e1a121384646146e8e2841f5b0a73ed552d7cde9e850"
+        },
+        {
+          "path": "browser-acceptance.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "browser": {
+        "schemaVersion": 1,
+        "kind": "browser-acceptance",
+        "passed": true,
+        "status": "PASSED",
+        "syntheticOnly": true,
+        "realBankVerification": "NOT_RUN",
+        "scope": "Actual bundled onboarding, company workspace and Dashboard UI in Chromium; APIs use isolated synthetic fixtures. Backend, authentication and provider end-to-end coverage is not claimed.",
+        "source": {
+          "commit": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+          "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+          "branch": "main",
+          "workingTreeDirty": false,
+          "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+          "fileCount": 2666
+        },
+        "runtime": {
+          "node": "v24.22.1",
+          "platform": "linux",
+          "release": "7.0.0-1017-azure",
+          "arch": "x64",
+          "logicalCpus": 4,
+          "cpu": "AMD EPYC 9V74 80-Core Processor"
+        },
+        "startedAt": "2026-11-06T16:32:43.574Z",
+        "steps": [
+          {
+            "name": "bundle",
+            "kind": "command",
+            "passed": true,
+            "exitCode": 0,
+            "signal": null,
+            "errorCode": null,
+            "command": {
+              "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+              "args": [
+                "docs/integration/saas-onboarding-browser/build-harness.mjs"
+              ],
+              "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+            },
+            "startedAt": "2026-11-06T16:32:43.578Z",
+            "finishedAt": "2026-11-06T16:32:44.228Z",
+            "durationMs": 650.062,
+            "artifacts": [
+              {
+                "path": "bundle.stdout.log",
+                "bytes": 94,
+                "sha256": "395bc47a92be60371e04f3344edc59a627525991714b5b166a206b166d9c421e"
+              },
+              {
+                "path": "bundle.stderr.log",
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              }
+            ]
+          },
+          {
+            "name": "chromium",
+            "kind": "command",
+            "passed": true,
+            "exitCode": 0,
+            "signal": null,
+            "errorCode": null,
+            "command": {
+              "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+              "args": [
+                "docs/integration/saas-onboarding-browser/browser-suite.mjs"
+              ],
+              "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+            },
+            "startedAt": "2026-11-06T16:32:44.229Z",
+            "finishedAt": "2026-11-06T16:32:54.295Z",
+            "durationMs": 10066.176,
+            "artifacts": [
+              {
+                "path": "chromium.stdout.log",
+                "bytes": 2605,
+                "sha256": "1031c6ded4f223cb08c49bc5f0990a93bd8a97226b86ef91028d763f7f1c98a6"
+              },
+              {
+                "path": "chromium.stderr.log",
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              }
+            ]
+          },
+          {
+            "name": "workspace-bundle",
+            "kind": "command",
+            "passed": true,
+            "exitCode": 0,
+            "signal": null,
+            "errorCode": null,
+            "command": {
+              "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+              "args": [
+                "docs/integration/saas-onboarding-browser/build-harness.mjs"
+              ],
+              "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+            },
+            "startedAt": "2026-11-06T16:32:54.296Z",
+            "finishedAt": "2026-11-06T16:32:54.965Z",
+            "durationMs": 668.95,
+            "artifacts": [
+              {
+                "path": "workspace-bundle.stdout.log",
+                "bytes": 96,
+                "sha256": "45e197552ef85f90f8f80821efd73db4f90d17f727a722d643256eadd973cdcf"
+              },
+              {
+                "path": "workspace-bundle.stderr.log",
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              }
+            ]
+          },
+          {
+            "name": "workspace-chromium",
+            "kind": "command",
+            "passed": true,
+            "exitCode": 0,
+            "signal": null,
+            "errorCode": null,
+            "command": {
+              "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+              "args": [
+                "scripts/quality/workspace-browser.mjs"
+              ],
+              "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+            },
+            "startedAt": "2026-11-06T16:32:54.965Z",
+            "finishedAt": "2026-11-06T16:32:57.019Z",
+            "durationMs": 2054.123,
+            "artifacts": [
+              {
+                "path": "workspace-chromium.stdout.log",
+                "bytes": 413,
+                "sha256": "f822d5fabc3752b967d51d869f4bebb496c71327c671ed4f5f7d9292cc358a11"
+              },
+              {
+                "path": "workspace-chromium.stderr.log",
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              }
+            ]
+          },
+          {
+            "name": "dashboard-bundle",
+            "kind": "command",
+            "passed": true,
+            "exitCode": 0,
+            "signal": null,
+            "errorCode": null,
+            "command": {
+              "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+              "args": [
+                "docs/integration/95-ui-browser/build-harness.mjs"
+              ],
+              "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+            },
+            "startedAt": "2026-11-06T16:32:57.020Z",
+            "finishedAt": "2026-11-06T16:32:57.901Z",
+            "durationMs": 880.703,
+            "artifacts": [
+              {
+                "path": "dashboard-bundle.stdout.log",
+                "bytes": 209,
+                "sha256": "675fcfd04190a6822390b0d8235b9489694c3422a33c912f24af8e03494a1d8c"
+              },
+              {
+                "path": "dashboard-bundle.stderr.log",
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              }
+            ]
+          },
+          {
+            "name": "dashboard-chromium",
+            "kind": "command",
+            "passed": true,
+            "exitCode": 0,
+            "signal": null,
+            "errorCode": null,
+            "command": {
+              "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+              "args": [
+                "scripts/quality/dashboard-browser.mjs"
+              ],
+              "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+            },
+            "startedAt": "2026-11-06T16:32:57.902Z",
+            "finishedAt": "2026-11-06T16:33:14.109Z",
+            "durationMs": 16207.556,
+            "artifacts": [
+              {
+                "path": "dashboard-chromium.stdout.log",
+                "bytes": 1483,
+                "sha256": "f6696ff4224113f72140231a60d066e9ef7a68f4e7c9b7580438eb3a3e10abc5"
+              },
+              {
+                "path": "dashboard-chromium.stderr.log",
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              }
+            ]
+          }
+        ],
+        "playwrightVersion": "1.62.1",
+        "totals": {
+          "tests": 77,
+          "pass": 77,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "browserVersion": "151.0.7922.34",
+        "externalRequests": 0,
+        "browserErrors": 0,
+        "failures": [],
+        "workspace": {
+          "passed": true,
+          "tests": 5,
+          "failures": []
+        },
+        "dashboard": {
+          "passed": true,
+          "tests": 31,
+          "failures": [],
+          "runnerErrors": []
+        },
+        "sourceAfter": {
+          "commit": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+          "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+          "branch": "main",
+          "workingTreeDirty": false,
+          "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+          "fileCount": 2666
+        },
+        "sourceChangedDuringRun": false,
+        "finishedAt": "2026-11-06T16:33:14.263Z"
+      },
+      "totals": {
+        "tests": 77,
+        "pass": 77,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "failures": []
+    }
+  ],
+  "sourceAfter": {
+    "commit": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+    "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+    "branch": "main",
+    "workingTreeDirty": false,
+    "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+    "fileCount": 2666
+  },
+  "sourceChangedDuringRun": false,
+  "finishedAt": "2026-11-06T16:33:14.440Z",
+  "durationMs": 71767.964
+}

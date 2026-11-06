@@ -1,0 +1,79 @@
+{
+  "schema": "mgeorge-final-ci-provenance-v1",
+  "recorded_at": "2026-11-06T16:34:09.423755+00:00",
+  "run_id": 42251628527,
+  "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42251628527",
+  "phase": "pr",
+  "checkout_commit": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+  "pr_head": "70dd9c5dca6981e440bec0486e43788d2ef3f6a1",
+  "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+  "sites_tree": "c2feb372a4c0ef121ffe594784684957c14ddac1",
+  "source_content_sha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+  "working_tree_dirty": false,
+  "profiles_all_passed": true,
+  "artifacts": [
+    {
+      "profile": "node22",
+      "label": "completion-pr62-node22",
+      "artifact_id": 13520597654,
+      "file": "completion-pr62-node22.zip",
+      "bytes": 611274,
+      "sha256": "271785cea1781403289410f7dd9bbe85100ca3823edd96b936e5e8b6fc11cc2b",
+      "download_digest_verified": true
+    },
+    {
+      "profile": "node24",
+      "label": "completion-pr62-node24",
+      "artifact_id": 13521057201,
+      "file": "completion-pr62-node24.zip",
+      "bytes": 617297,
+      "sha256": "a8b4fc35066b991e211c1fb0909ae0da1e678f750a42585eb8ea12dc23c840c6",
+      "download_digest_verified": true
+    },
+    {
+      "profile": "sites",
+      "label": "completion-pr62-sites",
+      "artifact_id": 13519879138,
+      "file": "completion-pr62-sites.zip",
+      "bytes": 750635,
+      "sha256": "1b9455b1770cbea4f31ba2aa26a6d4f55d76f91347279a4b5bb03f5f8c1a36d0",
+      "download_digest_verified": true
+    },
+    {
+      "profile": "bridge",
+      "label": "completion-pr62-bridge",
+      "artifact_id": 13521176525,
+      "file": "completion-pr62-bridge.zip",
+      "bytes": 268374,
+      "sha256": "2be0df89bac91204edfef71c54a6785b6699542f153fecb6e81f18d5dd7bc98d",
+      "download_digest_verified": true
+    },
+    {
+      "profile": "browser",
+      "label": "completion-pr62-browser",
+      "artifact_id": 13521116804,
+      "file": "completion-pr62-browser.zip",
+      "bytes": 5338594,
+      "sha256": "745d3cbc2540e754f453f60c95b80e1a9146d5e87f8ec762a29bf7cec0267ceb",
+      "download_digest_verified": true
+    },
+    {
+      "profile": "performance",
+      "label": "completion-pr62-performance",
+      "artifact_id": 13521645495,
+      "file": "completion-pr62-performance.zip",
+      "bytes": 135421,
+      "sha256": "49b09cf09b0538aaba558c0042b798a56c29d36e128c5838506bb9dee121aa76",
+      "download_digest_verified": true
+    }
+  ],
+  "retained_files_index": "retained-files.json",
+  "summary": "summary.json",
+  "limits": [
+    "Node22/24 exercise the same logical suite. Security subsets and repeated PR/main runs are not added as independent cases.",
+    "All provider and browser fixtures in these CI jobs are synthetic. They do not verify real bank or commercial SaaS acceptance.",
+    "The company benchmark uses one Node process, four concurrent company jobs and at most eight competing attempts; it does not measure distributed capacity.",
+    "Source manifests and raw TAP/JUnit/LCOV/logs are retained byte-exact with deterministic gzip; screenshot files are indexed but not duplicated.",
+    "Coverage describes loaded files; transformed source mappings were not independently verified."
+  ]
+}

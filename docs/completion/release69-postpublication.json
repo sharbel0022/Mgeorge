@@ -1,0 +1,393 @@
+{
+  "schema": "mgeorge-site69-postpublication-v1",
+  "observed_at": "2026-11-06 16:46:27 UTC",
+  "github": {
+    "main": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+    "pr_head": "70dd9c5dca6981e440bec0486e43788d2ef3f6a1",
+    "pr_checkout": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+    "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+    "pr_quality": 42251628527,
+    "pr_security": 42251628601,
+    "main_quality": 42253201335
+  },
+  "deployment": {
+    "id": "appgdep_6aee03a49f648191a7997849a60af9c5",
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "title": "MG Fakturakoll",
+    "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_0d6484fc83648191b5acdcac9ca3bf9d",
+    "type": "publish",
+    "status": "succeeded",
+    "url": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site",
+    "has_mcp": true,
+    "screenshot_asset_pointer": null,
+    "provider_deployment_id": "site---6adf2f7f7e848191b64192161886b528",
+    "failure_message": null,
+    "env_set_revision": 10,
+    "updated_at": "2026-11-06T16:43:40.451077+00:00"
+  },
+  "site": {
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "access_mode": "public",
+    "current_user_role": "owner",
+    "version": 69,
+    "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_0d6484fc83648191b5acdcac9ca3bf9d",
+    "native_commit": "1df8cb96eda374f2506c81aa776263388ddb666a",
+    "sites_tree": "c2feb372a4c0ef121ffe594784684957c14ddac1"
+  },
+  "environment": {
+    "revision": 10,
+    "key_count": 18,
+    "revision_unchanged": true,
+    "key_metadata_unchanged": true,
+    "missing_openpayments": [
+      "SAAS_BANK_ENABLED",
+      "SAAS_OPENPAYMENTS_CONFIG",
+      "SAAS_OPENPAYMENTS_REGISTRATIONS",
+      "SAAS_OPENPAYMENTS_MTLS_BINDING_CONFIG"
+    ]
+  },
+  "migrations": {
+    "new_in_pr62": 0,
+    "token_control_rows": 1,
+    "token_rows": 0,
+    "control_row_returned_values_unchanged": true,
+    "recovery_barrier_reset": false
+  },
+  "bounded_database_comparison": [
+    {
+      "table": "workspaces",
+      "rows_before": 1,
+      "rows_after": 1,
+      "returned_values_identical": true,
+      "columns_identical": true,
+      "truncated_values_before": 1,
+      "truncated_values_after": 1,
+      "complete_rows_and_values": false
+    },
+    {
+      "table": "bank_connections",
+      "rows_before": 1,
+      "rows_after": 1,
+      "returned_values_identical": true,
+      "columns_identical": true,
+      "truncated_values_before": 1,
+      "truncated_values_after": 1,
+      "complete_rows_and_values": false
+    },
+    {
+      "table": "companies",
+      "rows_before": 0,
+      "rows_after": 0,
+      "returned_values_identical": true,
+      "columns_identical": true,
+      "truncated_values_before": 0,
+      "truncated_values_after": 0,
+      "complete_rows_and_values": true
+    },
+    {
+      "table": "company_memberships",
+      "rows_before": 0,
+      "rows_after": 0,
+      "returned_values_identical": true,
+      "columns_identical": true,
+      "truncated_values_before": 0,
+      "truncated_values_after": 0,
+      "complete_rows_and_values": true
+    },
+    {
+      "table": "company_roles",
+      "rows_before": 4,
+      "rows_after": 4,
+      "returned_values_identical": true,
+      "columns_identical": true,
+      "truncated_values_before": 0,
+      "truncated_values_after": 0,
+      "complete_rows_and_values": true
+    },
+    {
+      "table": "invoice_counterparties",
+      "rows_before": 2,
+      "rows_after": 2,
+      "returned_values_identical": true,
+      "columns_identical": true,
+      "truncated_values_before": 0,
+      "truncated_values_after": 0,
+      "complete_rows_and_values": true
+    },
+    {
+      "table": "document_registrations",
+      "rows_before": 2,
+      "rows_after": 2,
+      "returned_values_identical": true,
+      "columns_identical": true,
+      "truncated_values_before": 0,
+      "truncated_values_after": 0,
+      "complete_rows_and_values": true
+    },
+    {
+      "table": "bankgiro_ingest_sources",
+      "rows_before": 0,
+      "rows_after": 0,
+      "returned_values_identical": true,
+      "columns_identical": true,
+      "truncated_values_before": 0,
+      "truncated_values_after": 0,
+      "complete_rows_and_values": true
+    },
+    {
+      "table": "saas_bank_state",
+      "rows_before": 0,
+      "rows_after": 0,
+      "returned_values_identical": true,
+      "columns_identical": true,
+      "truncated_values_before": 0,
+      "truncated_values_after": 0,
+      "complete_rows_and_values": true
+    },
+    {
+      "table": "company_application_token_control",
+      "rows_before": 1,
+      "rows_after": 1,
+      "returned_values_identical": true,
+      "columns_identical": true,
+      "truncated_values_before": 0,
+      "truncated_values_after": 0,
+      "complete_rows_and_values": true
+    },
+    {
+      "table": "company_application_tokens",
+      "rows_before": 0,
+      "rows_after": 0,
+      "returned_values_identical": true,
+      "columns_identical": true,
+      "truncated_values_before": 0,
+      "truncated_values_after": 0,
+      "complete_rows_and_values": true
+    }
+  ],
+  "database_claim_limits": {
+    "tables": 11,
+    "complete_tables": 9,
+    "truncated_values": 2,
+    "truncated_fields": [
+      "workspaces.payload",
+      "bank_connections.encrypted_accounts"
+    ],
+    "full_database_or_original_byte_hash_proof": false,
+    "raw_customer_rows_persisted": false
+  },
+  "bank": {
+    "enabled": true,
+    "connected": false,
+    "intervalHours": 6,
+    "connectionStatus": "reauth_required",
+    "requiresReauthentication": true,
+    "statusEvidence": "stored_connection",
+    "syncAllowed": false,
+    "blockedReason": "BANK_RECONNECT_REQUIRED",
+    "nextAction": "reconnect",
+    "diagnostic": null,
+    "lastSyncedAt": "2026-11-05T08:05:14.646Z",
+    "lastAttemptAt": "2026-11-05T14:04:35.832Z",
+    "nextAttemptAt": null,
+    "lastError": "Bankhändelserna kunde inte hämtas. Försök igen.",
+    "blocked": false,
+    "failures": 1,
+    "postprocessWarning": null,
+    "metadataWarning": null
+  },
+  "bankgiro": {
+    "enabled": false,
+    "sourceId": null,
+    "mode": null,
+    "state": "DISABLED",
+    "reason": "SOURCE_NOT_CONFIGURED",
+    "nextPollAt": null,
+    "missingReportIds": [],
+    "lastError": null,
+    "authorization": {
+      "status": "UNKNOWN",
+      "verifiedAt": null,
+      "validUntil": null
+    },
+    "lastSuccessAt": null,
+    "lastFailureAt": null,
+    "lastFailureCode": null,
+    "counts": {
+      "PENDING": 0,
+      "RETRY": 0,
+      "IMPORTED": 0,
+      "REVIEW": 0,
+      "DUPLICATE": 0,
+      "BLOCKED": 0
+    },
+    "jobs": []
+  },
+  "gmail": {
+    "configured": true,
+    "last_successful_fetch": "2026-11-06T16:27:10.457Z",
+    "sync_eligibility": {
+      "eligible": true,
+      "reason": "eligible",
+      "next_eligible_at": "2026-11-06T16:46:26.779Z"
+    },
+    "schedule_observation": {
+      "last_invoked_at": "2026-11-06T16:26:56.945Z",
+      "last_completed_at": "2026-11-06T16:27:14.016Z",
+      "last_outcome": "completed",
+      "source": "system_entrypoint",
+      "external_schedule_verified": false
+    },
+    "counts": {
+      "needs_review": 415,
+      "registered": 2,
+      "waiting_ocr": 57
+    },
+    "queue_health": {
+      "basis": "current_jobs",
+      "observed_at": "2026-11-06T16:46:26.205Z",
+      "pending": 57,
+      "ready_pdf": 0,
+      "ready_ocr": 57,
+      "deferred": 0,
+      "active": 0,
+      "expired_leases": 0,
+      "exhausted": 0,
+      "failed": 0,
+      "oldest_pending_at": "2026-10-27T23:57:23.782Z",
+      "next_retry_at": null,
+      "ocr_worker_unavailable": false
+    },
+    "cloud_recent": true,
+    "cloud_last_completed": "2026-11-06T16:43:40.861Z"
+  },
+  "backup": {
+    "enabled": true,
+    "latest": {
+      "id": "768fde9a-27a2-4b85-b85a-278239ec4aea",
+      "day": "2026-11-06",
+      "status": "complete",
+      "files": 430,
+      "copied": 430,
+      "bytes": 185567855,
+      "created_at": "2026-11-05T23:03:21.104Z",
+      "verified_at": "2026-11-06T00:48:58.086Z",
+      "verified_files": 430,
+      "verified_bytes": 185567855,
+      "verification_started_at": "2026-11-06T00:45:07.487Z",
+      "verification_scope": "manifest_pass",
+      "api_evidence": {
+        "version": "retained-api-receipts-v1",
+        "scope": "retained_json_checksums",
+        "records_checked": 19,
+        "records_without_receipt": 112
+      },
+      "error": null,
+      "attempts": 0
+    },
+    "last_verified": {
+      "id": "768fde9a-27a2-4b85-b85a-278239ec4aea",
+      "day": "2026-11-06",
+      "status": "complete",
+      "files": 430,
+      "copied": 430,
+      "bytes": 185567855,
+      "created_at": "2026-11-05T23:03:21.104Z",
+      "verified_at": "2026-11-06T00:48:58.086Z",
+      "verified_files": 430,
+      "verified_bytes": 185567855,
+      "verification_started_at": "2026-11-06T00:45:07.487Z",
+      "verification_scope": "manifest_pass",
+      "api_evidence": {
+        "version": "retained-api-receipts-v1",
+        "scope": "retained_json_checksums",
+        "records_checked": 19,
+        "records_without_receipt": 112
+      },
+      "error": null,
+      "attempts": 0
+    }
+  },
+  "automatic_cloud_ocr": {
+    "schema": "mgeorge-final-automatic-cloud-ocr-v1",
+    "run_id": 42254783237,
+    "job_id": 128018971435,
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42254783237",
+    "event": "workflow_run",
+    "source": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+    "reviewed_main_checks": true,
+    "source_checkout_logged": true,
+    "result": {
+      "status": "complete",
+      "processed": 6,
+      "failed": 0
+    },
+    "logged_result_at": "2026-11-06T16:43:41.3917033Z",
+    "application_completed_at": "2026-11-06T16:43:40.861Z",
+    "counts_after": {
+      "needs_review": 415,
+      "registered": 2,
+      "waiting_ocr": 57
+    },
+    "field_correctness_verified": false,
+    "periodic_cron_verified_by_this_run": false,
+    "per_document_sites_version_bound": false,
+    "limits": "Ordinary CI-triggered worker execution, not Gmail hourly dispatch or periodic cron proof. The run overlapped the Site69 publication; per-document serving-version identity was not recorded."
+  },
+  "ui": {
+    "surface": "authenticated normal Chrome browser, public Site URL without bypass",
+    "observed_at": "2026-11-06T16:51:39Z",
+    "desktop_passed": true,
+    "mobile_production_verified": false,
+    "mobile_synthetic_ci_verified": true,
+    "financial_totals_sek": {
+      "received": 0,
+      "outstanding": 16000,
+      "overdue": 7250,
+      "payable": 0,
+      "verified_payments": 0
+    },
+    "documents_needing_review": 415,
+    "all_review_items_in_ui": 527,
+    "missing_payment_specifications": 44,
+    "reference_0599": {
+      "amount_sek": 625,
+      "leading_zeroes_preserved": true,
+      "bank_ocr": "missing",
+      "intended_reference": "not_established",
+      "state": "blocked",
+      "unambiguous_registered_invoice": false,
+      "receiving_account_verified": false,
+      "payment_created": false
+    },
+    "keyboard": {
+      "search": "0599",
+      "arrowdown_focus": "BUTTON",
+      "enter_opened_dialog": true,
+      "escape_closed_dialog": true,
+      "escape_focus": "INPUT / Sök i arbetsytan",
+      "search_cleared": true
+    },
+    "bank_ui": {
+      "saas_companies": 0,
+      "company_selector_disabled": true,
+      "legacy_swedbank": "requires_renewal",
+      "corporate_permission_verified": false,
+      "bankgiro_source": "not_configured"
+    },
+    "final_route": "/",
+    "notes": [
+      "The prior claimed browser tab was no longer in the session; a fresh normal tab was opened successfully.",
+      "One exact-label wait timed out during return navigation; the following fresh DOM snapshot confirmed the expected financial totals. No latency guarantee is inferred.",
+      "The historical payment-control card keeps its earlier OCR count58 with its timestamp; the current queue is57. They are different observation times."
+    ],
+    "private_screenshot_or_raw_customer_dom_persisted": false
+  },
+  "release_decision": {
+    "technical_publication": "SUCCEEDED_WITH_BOUNDED_POSTCHECK",
+    "commercial_bank_saas": "NOT_APPROVED",
+    "real_bank_acceptance": "NOT_VERIFIED",
+    "quality_target": "NOT_MET",
+    "rollback_required": false
+  }
+}

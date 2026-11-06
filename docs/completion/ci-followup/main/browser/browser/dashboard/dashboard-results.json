@@ -1,0 +1,1606 @@
+{
+  "syntheticOnly": true,
+  "realBankVerification": "NOT_RUN",
+  "realAuthentication": "NOT_RUN",
+  "scope": "Actual Dashboard and CompanyWorkspace in Chromium with isolated synthetic HTTP fixtures; no production backend or provider.",
+  "results": [
+    {
+      "name": "merged overview layout at 320px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 320,
+      "durationMs": 470.036341
+    },
+    {
+      "name": "merged receivable layout at 320px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 320,
+      "durationMs": 409.51977799999986
+    },
+    {
+      "name": "merged bank layout at 320px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 320,
+      "durationMs": 447.2998460000001
+    },
+    {
+      "name": "merged review layout at 320px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 320,
+      "durationMs": 430.7304099999999
+    },
+    {
+      "name": "merged overview layout at 390px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 390,
+      "durationMs": 416.29756199999974
+    },
+    {
+      "name": "merged receivable layout at 390px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 390,
+      "durationMs": 428.29137400000036
+    },
+    {
+      "name": "merged bank layout at 390px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 390,
+      "durationMs": 498.86851400000023
+    },
+    {
+      "name": "merged review layout at 390px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 390,
+      "durationMs": 429.6204419999999
+    },
+    {
+      "name": "merged overview layout at 768px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 768,
+      "durationMs": 440.1848460000001
+    },
+    {
+      "name": "merged receivable layout at 768px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 768,
+      "durationMs": 471.946226
+    },
+    {
+      "name": "merged bank layout at 768px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 768,
+      "durationMs": 521.3563290000002
+    },
+    {
+      "name": "merged review layout at 768px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 768,
+      "durationMs": 446.17808200000036
+    },
+    {
+      "name": "merged overview layout at 1024px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 1024,
+      "durationMs": 435.78806799999984
+    },
+    {
+      "name": "merged receivable layout at 1024px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 1024,
+      "durationMs": 446.0647509999999
+    },
+    {
+      "name": "merged bank layout at 1024px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 1024,
+      "durationMs": 465.7090530000005
+    },
+    {
+      "name": "merged review layout at 1024px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 1024,
+      "durationMs": 484.48648200000025
+    },
+    {
+      "name": "merged overview layout at 1440px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 1440,
+      "durationMs": 450.7205580000009
+    },
+    {
+      "name": "merged receivable layout at 1440px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 1440,
+      "durationMs": 481.3906500000012
+    },
+    {
+      "name": "merged bank layout at 1440px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 1440,
+      "durationMs": 486.33588099999906
+    },
+    {
+      "name": "merged review layout at 1440px",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 1440,
+      "durationMs": 489.6273459999993
+    },
+    {
+      "name": "global reference search uses native keyboard and restores stable focus",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 1440,
+      "durationMs": 636.4994650000008
+    },
+    {
+      "name": "invoice search preserves zeroes, reset focus and payable navigation",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 390,
+      "durationMs": 811.5548260000014
+    },
+    {
+      "name": "bank payer and generic reference remain separate from invoice payment proof",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 1440,
+      "durationMs": 1239.5574049999996
+    },
+    {
+      "name": "mobile review selection and Back preserve keyboard focus",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 320,
+      "durationMs": 554.0058760000011
+    },
+    {
+      "name": "initial loading cannot invent zero financial totals",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 390,
+      "durationMs": 396.2821380000005
+    },
+    {
+      "name": "initial error cannot invent zero financial totals",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 390,
+      "durationMs": 396.605544
+    },
+    {
+      "name": "loaded empty invoices have a truthful next action",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 768,
+      "durationMs": 456.12052799999947
+    },
+    {
+      "name": "overview 503 and explicit retry restore real saved fixture values",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 390,
+      "durationMs": 539.5342049999999
+    },
+    {
+      "name": "mobile menu supports touch, Escape and focus return",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 390,
+      "durationMs": 480.29883100000006
+    },
+    {
+      "name": "legacy-unknown-expiry never claims a confirmed active consent",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 390,
+      "durationMs": 416.9785069999998
+    },
+    {
+      "name": "legacy-expired never claims a confirmed active consent",
+      "passed": true,
+      "assetsVerified": true,
+      "width": 390,
+      "durationMs": 372.08713999999964
+    }
+  ],
+  "externalRequests": [],
+  "forbiddenRequests": [],
+  "browserErrors": [],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bankgiro/source/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/verification"
+    },
+    {
+      "method": "GET",
+      "path": "/api/reconciliation/preview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bankgiro/source/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/verification"
+    },
+    {
+      "method": "GET",
+      "path": "/api/reconciliation/preview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bankgiro/source/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/verification"
+    },
+    {
+      "method": "GET",
+      "path": "/api/reconciliation/preview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bankgiro/source/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/verification"
+    },
+    {
+      "method": "GET",
+      "path": "/api/reconciliation/preview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bankgiro/source/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/verification"
+    },
+    {
+      "method": "GET",
+      "path": "/api/reconciliation/preview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/customer-messages/list"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/customer-messages/list"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bankgiro/source/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/verification"
+    },
+    {
+      "method": "GET",
+      "path": "/api/reconciliation/preview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/verification"
+    },
+    {
+      "method": "GET",
+      "path": "/api/reconciliation/preview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/verification"
+    },
+    {
+      "method": "GET",
+      "path": "/api/reconciliation/preview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/invoice-candidates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment-control/overview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/onboarding/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bankgiro/source/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/onboarding/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bankgiro/source/status"
+    }
+  ],
+  "assetChecks": [
+    {
+      "scenario": "merged overview layout at 320px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 320px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 320px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 320px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 320px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 320px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 320px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 320px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 320px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 320px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 320px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 320px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 320px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 320px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 320px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 320px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 320px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 320px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 320px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 320px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 390px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 390px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 390px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 390px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 390px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 390px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 390px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 390px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 390px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 390px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 390px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 390px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 390px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 390px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 390px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 390px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 390px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 390px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 390px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 390px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 768px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 768px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 768px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 768px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 768px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 768px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 768px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 768px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 768px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 768px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 768px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 768px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 768px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 768px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 768px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 768px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 768px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 768px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 768px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 768px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 1024px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 1024px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 1024px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 1024px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 1024px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 1024px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 1024px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 1024px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 1024px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 1024px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 1024px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 1024px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 1024px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 1024px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 1024px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 1024px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 1024px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 1024px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 1024px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 1024px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 1440px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 1440px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 1440px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 1440px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged overview layout at 1440px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 1440px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 1440px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 1440px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 1440px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged receivable layout at 1440px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 1440px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 1440px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 1440px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 1440px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged bank layout at 1440px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 1440px",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 1440px",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 1440px",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 1440px",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "merged review layout at 1440px",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "global reference search uses native keyboard and restores stable focus",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "global reference search uses native keyboard and restores stable focus",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "global reference search uses native keyboard and restores stable focus",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "global reference search uses native keyboard and restores stable focus",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "global reference search uses native keyboard and restores stable focus",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "invoice search preserves zeroes, reset focus and payable navigation",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "invoice search preserves zeroes, reset focus and payable navigation",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "invoice search preserves zeroes, reset focus and payable navigation",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "invoice search preserves zeroes, reset focus and payable navigation",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "invoice search preserves zeroes, reset focus and payable navigation",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "bank payer and generic reference remain separate from invoice payment proof",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "bank payer and generic reference remain separate from invoice payment proof",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "bank payer and generic reference remain separate from invoice payment proof",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "bank payer and generic reference remain separate from invoice payment proof",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "bank payer and generic reference remain separate from invoice payment proof",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "mobile review selection and Back preserve keyboard focus",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "mobile review selection and Back preserve keyboard focus",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "mobile review selection and Back preserve keyboard focus",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "mobile review selection and Back preserve keyboard focus",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "mobile review selection and Back preserve keyboard focus",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "initial loading cannot invent zero financial totals",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "initial loading cannot invent zero financial totals",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "initial loading cannot invent zero financial totals",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "initial loading cannot invent zero financial totals",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "initial loading cannot invent zero financial totals",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "initial error cannot invent zero financial totals",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "initial error cannot invent zero financial totals",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "initial error cannot invent zero financial totals",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "initial error cannot invent zero financial totals",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "initial error cannot invent zero financial totals",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "loaded empty invoices have a truthful next action",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "loaded empty invoices have a truthful next action",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "loaded empty invoices have a truthful next action",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "loaded empty invoices have a truthful next action",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "loaded empty invoices have a truthful next action",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "overview 503 and explicit retry restore real saved fixture values",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "overview 503 and explicit retry restore real saved fixture values",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "overview 503 and explicit retry restore real saved fixture values",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "overview 503 and explicit retry restore real saved fixture values",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "overview 503 and explicit retry restore real saved fixture values",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "mobile menu supports touch, Escape and focus return",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "mobile menu supports touch, Escape and focus return",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "mobile menu supports touch, Escape and focus return",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "mobile menu supports touch, Escape and focus return",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "mobile menu supports touch, Escape and focus return",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "legacy-unknown-expiry never claims a confirmed active consent",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "legacy-unknown-expiry never claims a confirmed active consent",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "legacy-unknown-expiry never claims a confirmed active consent",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "legacy-unknown-expiry never claims a confirmed active consent",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "legacy-unknown-expiry never claims a confirmed active consent",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    },
+    {
+      "scenario": "legacy-expired never claims a confirmed active consent",
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "scenario": "legacy-expired never claims a confirmed active consent",
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "scenario": "legacy-expired never claims a confirmed active consent",
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "scenario": "legacy-expired never claims a confirmed active consent",
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "match": true
+    },
+    {
+      "scenario": "legacy-expired never claims a confirmed active consent",
+      "path": "chunks/chunk-2T7SWXZ2.js",
+      "match": true
+    }
+  ],
+  "runnerErrors": [],
+  "browserVersion": "151.0.7922.34",
+  "passed": true
+}

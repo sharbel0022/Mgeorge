@@ -1,0 +1,209 @@
+{
+  "syntheticOnly": true,
+  "scope": "Actual CompanyWorkspace plus BankPage; synthetic intercepted API contract",
+  "realBankVerification": "NOT_RUN",
+  "results": [
+    {
+      "name": "integrated workspace preserves typed form across context revalidation at 320px",
+      "passed": true,
+      "durationMs": 384.616629
+    },
+    {
+      "name": "integrated workspace preserves typed form across context revalidation at 390px",
+      "passed": true,
+      "durationMs": 311.5323420000001
+    },
+    {
+      "name": "integrated workspace preserves typed form across context revalidation at 1440px",
+      "passed": true,
+      "durationMs": 316.750092
+    },
+    {
+      "name": "integrated company switch uses previous context then reloads only the new company",
+      "passed": true,
+      "durationMs": 299.67030699999987
+    },
+    {
+      "name": "integrated membership revocation clears the whole private workspace",
+      "passed": true,
+      "durationMs": 223.2897069999999
+    }
+  ],
+  "externalRequests": [],
+  "browserErrors": [],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/onboarding/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/onboarding/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/onboarding/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/onboarding/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies/active"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/onboarding/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-beta/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/onboarding/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    }
+  ],
+  "assetChecks": [
+    {
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "path": "app.js",
+      "match": true
+    },
+    {
+      "path": "index.html",
+      "match": true
+    },
+    {
+      "path": "app.css",
+      "match": true
+    },
+    {
+      "path": "app.js",
+      "match": true
+    }
+  ],
+  "runnerErrors": [],
+  "browserVersion": "151.0.7922.34",
+  "passed": true
+}

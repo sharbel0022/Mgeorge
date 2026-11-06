@@ -1,0 +1,339 @@
+{
+  "schemaVersion": 1,
+  "kind": "quality-job",
+  "profile": "bridge",
+  "status": "PASSED",
+  "passed": true,
+  "syntheticOnly": true,
+  "realBankVerification": "NOT_RUN",
+  "productionPerformance": "NOT_MEASURED",
+  "source": {
+    "commit": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+    "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+    "branch": "",
+    "workingTreeDirty": false,
+    "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+    "fileCount": 2666
+  },
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "release": "7.0.0-1017-azure",
+    "arch": "x64",
+    "logicalCpus": 4,
+    "cpu": "AMD EPYC 9V74 80-Core Processor"
+  },
+  "github": {
+    "runId": "42251628527",
+    "runAttempt": "1",
+    "event": "pull_request",
+    "checkoutSha": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+    "pullRequestHeadSha": "70dd9c5dca6981e440bec0486e43788d2ef3f6a1",
+    "pullRequestBaseSha": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12"
+  },
+  "installExecuted": true,
+  "startedAt": "2026-11-06T16:21:56.666Z",
+  "steps": [
+    {
+      "name": "install-bridge",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+          "ci",
+          "--ignore-scripts",
+          "--no-audit",
+          "--no-fund"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/bridge/bankgiro"
+      },
+      "startedAt": "2026-11-06T16:21:56.673Z",
+      "finishedAt": "2026-11-06T16:21:57.173Z",
+      "durationMs": 499.897,
+      "artifacts": [
+        {
+          "path": "install-bridge.stdout.log",
+          "bytes": 27,
+          "sha256": "02af52227fa3d7a0fa2299641454ad7b483356641c579fd1d40b0c65a1f9ab11"
+        },
+        {
+          "path": "install-bridge.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "syntax",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+          "run",
+          "check"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/bridge/bankgiro"
+      },
+      "startedAt": "2026-11-06T16:21:57.174Z",
+      "finishedAt": "2026-11-06T16:21:57.391Z",
+      "durationMs": 216.998,
+      "artifacts": [
+        {
+          "path": "syntax.stdout.log",
+          "bytes": 255,
+          "sha256": "e795c43ec03e7487aab408cd3c0efdd37df0d691297af89b42d6c093b448e6f2"
+        },
+        {
+          "path": "syntax.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "audit-production",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+          "audit",
+          "--json",
+          "--audit-level=high",
+          "--omit=dev"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/bridge/bankgiro"
+      },
+      "startedAt": "2026-11-06T16:21:57.392Z",
+      "finishedAt": "2026-11-06T16:21:57.785Z",
+      "durationMs": 392.875,
+      "artifacts": [
+        {
+          "path": "audit-production.stdout.log",
+          "bytes": 358,
+          "sha256": "74b9f06500613f856683fe87b372f7b3592c019e4cffdf8c3c63069a75dc0ec1"
+        },
+        {
+          "path": "audit-production.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "audit": {
+        "measured": true,
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        }
+      }
+    },
+    {
+      "name": "audit-all",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+          "audit",
+          "--json",
+          "--audit-level=high"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/bridge/bankgiro"
+      },
+      "startedAt": "2026-11-06T16:21:57.877Z",
+      "finishedAt": "2026-11-06T16:21:58.243Z",
+      "durationMs": 365.892,
+      "artifacts": [
+        {
+          "path": "audit-all.stdout.log",
+          "bytes": 358,
+          "sha256": "74b9f06500613f856683fe87b372f7b3592c019e4cffdf8c3c63069a75dc0ec1"
+        },
+        {
+          "path": "audit-all.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "audit": {
+        "measured": true,
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "kind": "test-suite",
+      "name": "bridge-tests",
+      "syntheticOnly": true,
+      "realBankVerification": "NOT_RUN",
+      "network": "loopback-only accidental-egress guard; synthetic provider fixtures; not a malicious-code sandbox",
+      "source": {
+        "commit": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+        "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+        "fileCount": 2666
+      },
+      "sourceAfter": {
+        "commit": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+        "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+        "fileCount": 2666
+      },
+      "sourceChangedDuringRun": false,
+      "runtime": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "release": "7.0.0-1017-azure",
+        "arch": "x64",
+        "logicalCpus": 4,
+        "cpu": "AMD EPYC 9V74 80-Core Processor"
+      },
+      "startedAt": "2026-11-06T16:21:58.408Z",
+      "finishedAt": "2026-11-06T16:22:07.559Z",
+      "durationMs": 9151.263,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "--import",
+          "/home/runner/work/Mgeorge/Mgeorge/scripts/saas-test-isolation.mjs",
+          "--experimental-strip-types",
+          "--test",
+          "--test-concurrency=1",
+          "--test-timeout=180000",
+          "--test-reporter=tap",
+          "--test-reporter-destination=stdout",
+          "--test-reporter=junit",
+          "--test-reporter-destination=/home/runner/work/_temp/quality-bridge/tests/tests.junit.xml",
+          "--experimental-test-coverage",
+          "--test-reporter=lcov",
+          "--test-reporter-destination=/home/runner/work/_temp/quality-bridge/tests/coverage.lcov",
+          "--test-coverage-include=src/**",
+          "--test-coverage-exclude=**/node_modules/**",
+          "--test-coverage-exclude=**/test/**",
+          "--test-coverage-exclude=**/tests/**",
+          "test/adapter-contract.test.js",
+          "test/bridge.test.js",
+          "test/main.test.js"
+        ],
+        "cwd": "bridge/bankgiro"
+      },
+      "files": [
+        "test/adapter-contract.test.js",
+        "test/bridge.test.js",
+        "test/main.test.js"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "totals": {
+        "tests": 47,
+        "pass": 47,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "complete": true,
+      "passed": true,
+      "failures": [],
+      "coverage": {
+        "requested": true,
+        "measured": true,
+        "scope": "loaded production files only; unimported files are not measured",
+        "aggregation": "per-lcov-record",
+        "files": 2,
+        "records": 2,
+        "lines": {
+          "covered": 412,
+          "total": 421,
+          "percent": 97.86
+        },
+        "functions": {
+          "covered": 69,
+          "total": 76,
+          "percent": 90.79
+        },
+        "branches": {
+          "covered": 268,
+          "total": 289,
+          "percent": 92.73
+        },
+        "sourceLines": {
+          "measured": true,
+          "aggregation": "union-by-source-path-and-line",
+          "scope": "loaded LCOV source paths and line numbers only; transformed source mappings are not verified",
+          "covered": 412,
+          "total": 421,
+          "percent": 97.86
+        }
+      },
+      "artifacts": [
+        {
+          "path": "tests.tap",
+          "bytes": 11765,
+          "sha256": "b6319868f4a6d404b1925639a65bea8346b041991e0cd0963ec4094030bb48d2"
+        },
+        {
+          "path": "tests.junit.xml",
+          "bytes": 10078,
+          "sha256": "b6f351f6fcca61f94c3261c4bb1c95899a6e9928abcf1cd519d09535c59c18b3"
+        },
+        {
+          "path": "coverage.lcov",
+          "bytes": 11613,
+          "sha256": "109216630272e8126a3aa59b67891599053ed263f7a5ed49e673455071b8dd32"
+        },
+        {
+          "path": "source-manifest.json",
+          "bytes": 511596,
+          "sha256": "25969d60a357880a4f10efbc756cf14bc77bc15cc4c83937f3014d02a6ff7f5a"
+        }
+      ],
+      "artifactDirectory": "tests"
+    }
+  ],
+  "sourceAfter": {
+    "commit": "795decf5b1601de2d1738e0a311dbc53e0840c72",
+    "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+    "branch": "",
+    "workingTreeDirty": false,
+    "contentSha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+    "fileCount": 2666
+  },
+  "sourceChangedDuringRun": false,
+  "finishedAt": "2026-11-06T16:22:07.721Z",
+  "durationMs": 11055.28
+}
