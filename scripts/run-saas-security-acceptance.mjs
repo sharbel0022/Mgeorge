@@ -17,10 +17,10 @@ const suites = [
     files: [
       'test/saas-login-boundary.test.js', 'test/saas-test-isolation.test.js', 'test/saas-security-runner.test.js', 'test/saas-company-acceptance.test.js',
       'test/company-api.test.js', 'test/company-boundary.test.js', 'test/company-client.test.js',
-      'test/bank-consent-api.test.js',
+      'test/bank-consent-api.test.js', 'test/consent-reconnect-95.test.js',
       'test/openpayments-company-bank-sync.test.js', 'test/openpayments-company-bank-sync-normalization.test.js',
       'test/openpayments-bankgiro-ingest.test.js', 'test/openpayments-node-transport.test.js',
-      'test/openpayments-runtime-transport.test.js',
+      'test/openpayments-runtime-transport.test.js', 'test/openpayments-runtime-disable.test.js',
       'test/openpayments-node-token-coordinator.test.js',
       'test/company-bank-sync.test.js', 'test/company-bank-sync-store.test.js',
       'test/company-bank-sync-scheduler.test.js', 'test/company-bank-sync-fairness.test.js',
