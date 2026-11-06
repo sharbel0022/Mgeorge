@@ -1,3 +1,11 @@
+## 2026-11-06 — Agent 4: Bankgirooriginal och avstämning, PR 68
+
+På `feature/95-bankgiro-reconciliation` från verifierad main `f3c80629`. [Leveransrapport och exakta kvarstående beroenden](docs/integration/bankgiro-reconciliation-2026-11-06.md), [sanerat läskvitto](docs/integration/evidence/bankgiro-reconciliation-2026-11-06.json), [PR 68](https://github.com/sharbel0022/Mgeorge/pull/68).
+
+Kandidaten härdar exakta CAMT-kontoscheman, bevarar uttryckliga Node-Bankgirofält, kontrollerar mottagaren före import/återanvändning, begränsar hashreplay till samma källbehörighet och binder Sites slutliga finansiella skrivning till aktuella registreringsfält och utgångstid. Första negativa CI: båda Node-versionerna 3015/3019 och Sites 5823/5831; installations-/typ-/byggrindar passerade. Nyare tester och slutlig produkt-CI återstår i PR:en; inga äldre gröna resultat används för ny kod.
+
+Läsande källa 22:59:29 UTC: **DISABLED / SOURCE_NOT_CONFIGURED**, inga källkvitton eller köjobb. Verklig0599/625,00SEK: intakt rapportoriginal och namn/referens finns, men kontobehörighet, samma insättning och registrerad fakturarelation är otillräckliga; automaticEligible=false och 0 allokeringar. Syntetiska testresultat intygar inte bankbevis. Inga produktionsallokeringar, original-/fakturamutationer, bankaktivering, schemabyte, merge eller deployment utförs här.
+
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 
 PR 61 är normalt mergad till `24390ef7e8cf6b2274c57804dc9c2d74d362ab12`. Full PR-kvalitet, separat säkerhetsacceptans och separat main-CI är gröna för samma källträd. Site **68** publicerades från exakt motsvarande Sites-träd och är avgränsat kontrollerad efter release. [Releasekvitto](docs/completion/release-site68.md).

@@ -5,7 +5,7 @@ import {digest} from './security.js';
 import {parseBankFile} from './importers.js';
 import {audit,getSettings,recordImport,storeTransactions} from './db.js';
 import {readOpenPaymentsBankgiroCapture,assertOpenPaymentsBankgiroAuthority} from '../sites/lib/bankgiro-openpayments-capture.js';
-import {publicBankgiroStatus} from '../sites/lib/bankgiro-source.js';
+import {publicBankgiroStatus,assertBankgiroReportRecipient} from '../sites/lib/bankgiro-source.js';
 
 const captureMime='application/vnd.mgeorge.openpayments-bankgiro+json';
 const mimeFor=name=>/\.opbg\.json$/i.test(name)?captureMime:/\.xlsx$/i.test(name)?'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':/\.xml$/i.test(name)?'application/xml':'text/csv';
@@ -107,6 +107,10 @@ export function createNodeBankgiroSink(db,{now=Date.now,companyGuard}={}){
      return {status:'REVIEW',importId,paymentCount,reasonCode};
     },authorization,assertCapture);
    }
+   const encoded=Buffer.from(document.content).toString('base64');
+   let rows=parseOriginal(document.name,encoded,'');
+   assertBankgiroReportRecipient(authorization,rows.map(row=>row.bankgiro));
+   // Replay must recheck the current recipient scope before returning a receipt.
    // Manual imports belong to this standalone application's single administrator.
    // Never adopt an explicitly owned import from a different administrator.
    const prior=db.prepare("SELECT * FROM import_jobs WHERE source='bank_file' AND content_sha256=? AND (owner=? OR owner='') ORDER BY rowid LIMIT 1").get(job.sha256,owner);
@@ -114,8 +118,6 @@ export function createNodeBankgiroSink(db,{now=Date.now,companyGuard}={}){
     if(!prior.content||digest(prior.content)!==job.sha256||!['completed','needs_review'].includes(prior.status))throw blocked();
     return write(owner,lease,()=>{db.prepare("UPDATE import_jobs SET owner=? WHERE id=? AND owner=''").run(owner,prior.id);return {status:prior.status==='needs_review'||db.prepare('SELECT 1 FROM bank_transactions WHERE import_id=? AND is_aggregate=1').get(prior.id)?'REVIEW':'DUPLICATE',importId:prior.id,paymentCount:db.prepare('SELECT COUNT(*) n FROM bank_transactions WHERE import_id=? AND is_aggregate=0').get(prior.id).n};},authorization,assertOriginal);
    }
-   const encoded=Buffer.from(document.content).toString('base64');
-   let rows=parseOriginal(document.name,encoded,'');
    const accounts=new Set(rows.map(row=>row.account_evidence?.reported_account).filter(Boolean));
    const account=accounts.size===1?[...accounts][0]:'';
    // Only an actual complete IBAN in every original row can identify an automatic account.

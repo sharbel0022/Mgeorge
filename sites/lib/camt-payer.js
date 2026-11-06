@@ -14,3 +14,12 @@ export function camtPayerEvidence(tx,incoming=true){
  const postal=path(node,'PstlAdr'),address=postal?{fields:leaves(postal)}:null;
  return normalizePayerEvidence({role:incoming?'debtor':'creditor',name:field(path(node,'Nm')),identifiers,address,namespace:tx.namespace});
 }
+
+// Account schemes identify the account itself; transaction codes are not aliases.
+export function camtBankgiroAccount(account){
+ const other=path(account,'Id','Othr'),scheme=path(other,'SchmeNm');
+ if(!scheme)return '';
+ const choices=scheme.children;
+ if(choices.length!==1||!['Cd','Prtry'].includes(choices[0].name)||choices[0].children.length||!choices[0].text.trim())throw Error('Tvetydigt kontoschema i XML. Granska bankoriginalet.');
+ return /^(BGNR|BANKGIRO)$/i.test(choices[0].text.trim())?value(other,'Id'):'';
+}

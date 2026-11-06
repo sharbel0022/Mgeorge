@@ -1,3 +1,9 @@
+## 2026-11-06 — Bankgirokandidat, oförändrad produktionsbedömning
+
+[PR 68](https://github.com/sharbel0022/Mgeorge/pull/68) dokumenterar och härdar originalproveniens, exakta bankfält, behörighetsbunden replay och kontroll före finansiell skrivning i Node/Sites. [Full omfattning och testkvitton](docs/integration/bankgiro-reconciliation-2026-11-06.md). Första negativa CI bekräftade 4 Node- och 8 Sites-fel i de nya testerna; slutlig kandidatverifiering återstår.
+
+Berörda områden är Bankgirointegration, betalningsmatchning, originalintegritet, åtkomstkontroll, idempotens, revisionsspår och manuell granskning. Samtliga tidigare kriteriepoäng och totalen **258,5/330 = 7,83/10** lämnas oförändrade. Den verkliga källan är `SOURCE_NOT_CONFIGURED`; 0599/625,00 SEK är inte bankverifierad och har inga allokeringar. Ingen aktiv källa, leverantörscertifiering eller produktionsberoende 9,5-nivå kan härledas ur tester.
+
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 
 PR 61 är normalt mergad till `24390ef7e8cf6b2274c57804dc9c2d74d362ab12`. Full PR-kvalitet, separat säkerhetsacceptans och separat main-CI är gröna för samma källträd. Site **68** publicerades från exakt motsvarande Sites-träd och är avgränsat kontrollerad efter release. [Releasekvitto](docs/completion/release-site68.md).

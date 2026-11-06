@@ -6,6 +6,19 @@ export function validateAuthorization(auth,owner,sourceId,now,expected){
  if(expected&&(auth.scopeId!==expected.scopeId||auth.generation!==expected.generation||auth.owner!==expected.owner||auth.sourceId!==expected.sourceId))throw ingestError('AUTHORIZATION_CHANGED');
  return {...auth};
 }
+
+/** An explicit recipient in the retained original must agree with current scope.
+ * Legacy authorization without a Bankgiro number supplies no recipient claim. */
+export function assertBankgiroReportRecipient(authorization,recipients){
+ if(authorization.bankgiro===undefined)return;
+ const expected=authorization.bankgiro;
+ if(typeof expected!=='string'||!/^\d{4,10}$/.test(expected))throw ingestError('AUTHORIZATION_BLOCKED');
+ for(const recipient of recipients){
+  if(recipient===undefined||recipient===null||recipient==='')continue;
+  if(typeof recipient!=='string'||!/^\d[\d\s-]*$/.test(recipient)||recipient.replace(/[\s-]/g,'')!==expected)throw ingestError('ACCOUNT_MISMATCH');
+ }
+}
+
 export function validateReportPage(page,limit){
  if(!page||!Array.isArray(page.reports)||page.reports.length>limit||!(page.nextCursor===null||text(page.nextCursor,2000)))throw ingestError('INVALID_PAGE');
  if(page.nextPollAt!==undefined&&!Number.isFinite(Date.parse(page.nextPollAt)))throw ingestError('INVALID_PAGE');
