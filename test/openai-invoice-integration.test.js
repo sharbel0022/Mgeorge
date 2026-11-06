@@ -68,3 +68,128 @@ test('conflicting original total does not combine with AI tax/net amounts',()=>{
  assert.equal(result.fields.total_cents.value,130000);assert.equal(result.fields.net_cents.value,null);assert.equal(result.fields.vat_cents.value,null);
  assert.ok(result.ai.conflicts.includes('total_cents'));assert.equal(result.ai.economicRisk,true);
 });
+
+
+// These source details use the parser's raw party/row values; AI claims use
+// normalized field wrappers. Keep header amounts absent to expose unsafe fills.
+const ownCompany='5560160680',otherCompany='5560125790',counterpartyCompany='5566778899';
+function nestedFactsFixture({direction='supplier',parsedCompany=ownCompany,parsedNet=100000}={}){
+ const before=baseline(),proposed=candidate(),companyRole=direction==='customer'?'supplier':'recipient';
+ before.fields.direction.value=direction;
+ proposed.supplierOrgNumber.value=companyRole==='supplier'?ownCompany:counterpartyCompany;
+ proposed.recipientOrgNumber.value=companyRole==='recipient'?ownCompany:counterpartyCompany;
+ for(const role of ['supplier','recipient']){
+  const claim=proposed[role+'OrgNumber'];
+  claim.evidence={page:1,quote:role+' org: '+claim.value};
+ }
+ const party=(role,line)=>({
+  name:proposed[role+'Name'].value,
+  organization_number:role===companyRole?parsedCompany:counterpartyCompany,
+  evidence:[{page:1,line,text:role+' org: '+(role===companyRole?parsedCompany:counterpartyCompany)}],
+ });
+ const rowText='Synthetic service | 1 | '+(parsedNet/100).toFixed(2)+' | '+(parsedNet/100).toFixed(2)+' | 25 | '+(parsedNet/400).toFixed(2)+' | '+(parsedNet*1.25/100).toFixed(2);
+ before.details={
+  version:1,supplier:party('supplier',2),recipient:party('recipient',3),
+  reference:{kind:null,value:null,checksum_valid:null,formal_verified:false,evidence:[]},
+  line_items:[{description:'Synthetic service',quantity:1,unit_price_cents:parsedNet,net_cents:parsedNet,vat_rate:25,vat_cents:parsedNet/4,total_cents:parsedNet+parsedNet/4,evidence:{page:1,line:6,text:rowText}}],
+  vat_rates:[25],table_status:'complete',
+ };
+ const counterpartyRole=direction==='customer'?'recipient':'supplier';
+ before.fields.party.value=before.details[counterpartyRole].name;
+ before.fields.organization_number.value=before.details[counterpartyRole].organization_number;
+ const claim=value=>({value,evidence:{page:1,quote:'Synthetic service | 1 | 1000.00 | 1000.00 | 25 | 250.00 | 1250.00'}});
+ proposed.lineItems=[{description:claim('Synthetic service'),quantity:claim('1'),unitPrice:claim(100000),netAmount:claim(100000),vatAmount:claim(25000),totalAmount:claim(125000)}];
+ return {before,proposed,companyRole};
+}
+async function enrichNestedFacts(t,scenario){
+ const store=fixture(t),invocations=[],sourceSnapshot=structuredClone(scenario.before);
+ const input={
+  baseline:scenario.before,owner,documentId:'nested-document-a',sha256:sha,mime:'image/png',
+  environment:environment(),store,
+  loadOriginal:async()=>({bytes:new Uint8Array([1,2]),pageCount:1}),
+  adapter:async args=>{invocations.push(args);return ready({candidate:scenario.proposed});},
+ };
+ const policy=invoiceAiPolicy(input.environment,owner);
+ assert.equal(policy.status,'enabled');
+ assert.equal(policy.expectedCompanyOrganization,ownCompany);
+ const initial=await enrichInvoiceForReview(input);
+ const replay=await enrichInvoiceForReview({...input,documentId:'nested-document-b'});
+ assert.equal(invocations.length,1);
+ assert.equal(invocations[0].policy.expectedCompanyOrganization,ownCompany);
+ assert.equal(invocations[0].companyRole,scenario.companyRole);
+ assert.equal(replay.ai.replayed,true);
+ assert.deepEqual(scenario.before,sourceSnapshot,'the baseline must remain unchanged');
+ for(const result of [initial,replay]){
+  assert.equal(result.ai.status,'review');
+  assert.equal(result.ai.requiresHumanReview,true);
+  assert.equal(result.ai.bankEvidence,false);
+  assert.notEqual(result.level,'green');
+  assert.deepEqual(result.details,sourceSnapshot.details,'parser parties, rows and reference evidence must be preserved');
+  assert.deepEqual(result.ai.candidate,scenario.proposed,'keep the conflicting proposal available for human review');
+ }
+ return [initial,replay];
+}
+function assertNestedConflict(results,keyPrefix){
+ for(const result of results){
+  assert.ok(result.ai.conflicts.some(key=>key.startsWith(keyPrefix)),'missing explicit conflict for '+keyPrefix);
+  assert.equal(result.ai.economicRisk,true);
+  for(const key of ['net_cents','vat_cents','total_cents','reference']){
+   assert.equal(result.fields[key].value,null,key+' must not be filled from a contradictory proposal');
+  }
+  assert.deepEqual(result.ai.filledFields,[],'a nested source conflict must block all prefilling');
+ }
+}
+
+test('parsed supplier-invoice recipient B conflicts with configured/model company A on enrichment and replay',async t=>{
+ const scenario=nestedFactsFixture({direction:'supplier',parsedCompany:otherCompany});
+ assert.equal(scenario.before.details.recipient.organization_number,otherCompany);
+ assert.equal(scenario.proposed.recipientOrgNumber.value,ownCompany);
+ const results=await enrichNestedFacts(t,scenario);
+ assertNestedConflict(results,'details.recipient.organization_number');
+});
+test('parsed customer-invoice supplier B conflicts with configured/model company A on enrichment and replay',async t=>{
+ const scenario=nestedFactsFixture({direction:'customer',parsedCompany:otherCompany});
+ assert.equal(scenario.before.details.supplier.organization_number,otherCompany);
+ assert.equal(scenario.proposed.supplierOrgNumber.value,ownCompany);
+ const results=await enrichNestedFacts(t,scenario);
+ assertNestedConflict(results,'details.supplier.organization_number');
+});
+test('internally balanced AI line amounts cannot fill missing totals or reference over different parsed lines',async t=>{
+ const scenario=nestedFactsFixture({parsedNet:200000}),line=scenario.proposed.lineItems[0];
+ assert.equal(scenario.before.details.table_status,'complete');
+ assert.equal(line.netAmount.value+line.vatAmount.value,line.totalAmount.value);
+ assert.equal(scenario.proposed.netAmount.value+scenario.proposed.vatAmount.value,scenario.proposed.totalAmount.value);
+ assert.equal(line.totalAmount.value,scenario.proposed.totalAmount.value);
+ assert.notEqual(scenario.before.details.line_items[0].total_cents,line.totalAmount.value);
+ const results=await enrichNestedFacts(t,scenario);
+ assertNestedConflict(results,'details.line_items');
+});
+test('consistent parsed company and line facts still allow review-only filling on enrichment and replay',async t=>{
+ const results=await enrichNestedFacts(t,nestedFactsFixture());
+ for(const result of results){
+  assert.deepEqual(result.ai.conflicts,[]);
+  assert.equal(result.ai.economicRisk,false);
+  for(const [key,value] of Object.entries({net_cents:100000,vat_cents:25000,total_cents:125000,reference:'00000599'})){
+   assert.equal(result.fields[key].value,value);
+   assert.ok(result.ai.filledFields.includes(key));
+   assert.equal(result.fields[key].provenance.kind,'openai_document_claim');
+   assert.equal(result.fields[key].provenance.verified,false);
+  }
+ }
+});
+
+for(const direction of ['supplier','customer']){
+ test('configured company blocks matching wrong-company parser and AI facts: '+direction,async t=>{
+  const scenario=nestedFactsFixture({direction,parsedCompany:otherCompany});
+  scenario.proposed[scenario.companyRole+'OrgNumber']={value:otherCompany,evidence:{page:1,quote:'Organization: '+otherCompany}};
+  const results=await enrichNestedFacts(t,scenario);
+  assertNestedConflict(results,'details.'+scenario.companyRole+'.organization_number');
+ });
+}
+test('parsed VAT rate conflicts with AI row tax even when original tax and gross columns are absent',async t=>{
+ const scenario=nestedFactsFixture(),row=scenario.before.details.line_items[0];
+ row.vat_rate=12;row.vat_cents=null;row.total_cents=null;
+ scenario.before.details.vat_rates=[12];
+ const results=await enrichNestedFacts(t,scenario);
+ assertNestedConflict(results,'details.line_items');
+});

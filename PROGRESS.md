@@ -6,7 +6,7 @@ AI är **avstängd som standard**. Sekretess-, säkerhets- och kostnadsgodkänna
 
 Ingen projekt-API-nyckel hittades i den tillgängliga lokala miljön eller Sites-konfigurationen. Projektets modellåtkomst, krediter och verkliga modelljämförelse är därför **NOT_VERIFIED / NOT_MEASURED**. Officiella modell-ID:n och priser är dokumenterade separat; de bevisar inte tillgång eller precision. Målen 85 % recall / 98 % precision är inte verifierade. Poängen höjs inte. Inga kundoriginal har skickats, ingen AI-aktivering eller produktionspublicering har gjorts.
 
-Fullständiga CI-kvitton och aktuellt granskningsläge finns på PR:n. Lokal körmiljö blev otillgänglig under arbetet; sådana avbrutna körningar räknas inte som godkända tester. [Plan](docs/openai-invoices/PLAN.md) · [Drift och begränsningar](docs/openai-invoices/OPERATIONS.md).
+Verklig full CI på `76f4c182` gav 3 094/3 094 Node-tester på vardera versionen och 5 827/5 827 Sites-tester samt gröna bygg-/säkerhetskontroller. En efterföljande granskningsrättning stoppar AI-ifyllnad vid motstridiga parter och rader; dess fokuserade prov gick från 16/22 till 22/22. Senaste källans fulla CI och granskningsläge finns på PR:n. Det körda optiska utvecklingsprovet gav 46/52 korrekta förväntade fält, 0 felvärden, 1/4 kompletta dokument och 4/4 granskningar. AI-armarna är inte mätta. [Verifiering och bevarade rådata](docs/openai-invoices/VERIFICATION.md). Lokal körmiljö blev otillgänglig under arbetet; sådana avbrutna körningar räknas inte som godkända tester. [Plan](docs/openai-invoices/PLAN.md) · [Drift och begränsningar](docs/openai-invoices/OPERATIONS.md).
 
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 

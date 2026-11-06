@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "base": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "verifiedSourceCommit": "76f4c18254c47210708b662fd78d1916ec5fd597",
+  "ciCheckoutCommit": "8fef8862072076555019998115ba8fd57622ce75",
+  "note": "This receipt records this exact earlier source commit. The subsequent nested-fact correction requires its own PR checks.",
+  "checks": [
+    {
+      "name": "Node 24.22.1",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T23:19:16Z",
+      "completedAt": "2026-11-06T23:23:35Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42311074866/job/128212377872"
+    },
+    {
+      "name": "Bankgiro SFTP integration",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T23:19:13Z",
+      "completedAt": "2026-11-06T23:19:33Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42311074866/job/128212377804"
+    },
+    {
+      "name": "Node 22.23.4",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T23:19:12Z",
+      "completedAt": "2026-11-06T23:23:39Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42311074866/job/128212377785"
+    },
+    {
+      "name": "Sites types, tests and production build",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T23:19:12Z",
+      "completedAt": "2026-11-06T23:26:38Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42311074866/job/128212377733"
+    },
+    {
+      "name": "Synthetic 1, 10 and 100 company performance",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T23:19:11Z",
+      "completedAt": "2026-11-06T23:19:56Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42311074866/job/128212377719"
+    },
+    {
+      "name": "security_acceptance",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T23:19:12Z",
+      "completedAt": "2026-11-06T23:22:50Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42311074856/job/128212377442"
+    },
+    {
+      "name": "Chromium synthetic onboarding acceptance",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T23:19:12Z",
+      "completedAt": "2026-11-06T23:20:40Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42311074866/job/128212377408"
+    },
+    {
+      "name": "AI invoice adapter and integration (no external API)",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T23:19:12Z",
+      "completedAt": "2026-11-06T23:19:56Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42311074847/job/128212377041"
+    }
+  ],
+  "tests": {
+    "node22": {
+      "tests": 3094,
+      "pass": 3094,
+      "fail": 0,
+      "skipped": 0
+    },
+    "node24": {
+      "tests": 3094,
+      "pass": 3094,
+      "fail": 0,
+      "skipped": 0
+    },
+    "sites": {
+      "tests": 5827,
+      "pass": 5827,
+      "fail": 0,
+      "skipped": 0
+    },
+    "dedicatedAi": {
+      "node": 82,
+      "sites": 7
+    }
+  },
+  "opticalDevelopment": {
+    "manifestId": "sv-en-optical-development-v1",
+    "sourceCommit": "76f4c18254c47210708b662fd78d1916ec5fd597",
+    "startedAt": "2026-11-06T23:19:43.222Z",
+    "finishedAt": "2026-11-06T23:19:50.961Z",
+    "documents": 4,
+    "counts": {
+      "tp": 46,
+      "fp": 0,
+      "fn": 6,
+      "expectedNonNull": 52,
+      "returnedNonNull": 46,
+      "correctNull": 0,
+      "reviewedFields": 52
+    },
+    "fieldPrecision": 1,
+    "fieldRecall": 0.8846153846153846,
+    "completeCorrectDocuments": 1,
+    "manualReviewDocuments": 4,
+    "falseApprovals": 0,
+    "latencyMs": {
+      "measuredDocuments": 4,
+      "total": 7557.13371,
+      "mean": 1889.2834275,
+      "median": 1893.7707169999999,
+      "p95": 1908.717835
+    },
+    "apiCostUsd": 0,
+    "infrastructureCost": "NOT_MEASURED",
+    "aiArms": "UNAVAILABLE",
+    "acceptance": {
+      "eligible": false,
+      "passed": false,
+      "reason": "NOT_INDEPENDENT_OPTICAL",
+      "thresholds": {
+        "fieldRecall": 0.85,
+        "fieldPrecision": 0.98,
+        "maximumFalseApprovals": 0
+      },
+      "allArmsMeasured": false,
+      "arms": {
+        "existing_ocr": {
+          "measured": true,
+          "passed": false
+        },
+        "openai_low": {
+          "measured": false,
+          "passed": false
+        },
+        "openai_strong": {
+          "measured": false,
+          "passed": false
+        },
+        "hybrid": {
+          "measured": false,
+          "passed": false
+        }
+      },
+      "note": "Independence is an externally reviewed provenance attestation; hashes verify immutability, not provenance truth."
+    }
+  }
+}

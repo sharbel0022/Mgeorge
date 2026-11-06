@@ -43,18 +43,79 @@ function safeScalar(key,value){
  if(['issued_at','due_at'].includes(key))return /^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(Date.parse(value+'T00:00:00Z'))&&new Date(value+'T00:00:00Z').toISOString().slice(0,10)===value;
  return true;
 }
+
+// Compare existing parsed facts locally, including when an immutable AI receipt
+// is reused. No nested parser data is added to the provider prompt.
+function nestedDeterministicConflicts(baseline,candidate,context){
+ const conflicts=[],flag=key=>{if(conflicts.length<50&&!conflicts.includes(key))conflicts.push(key);};
+ const details=baseline.details;
+ if(!details||typeof details!=='object')return conflicts;
+ const ownRole=context.companyRole||(baseline.fields?.direction?.value==='customer'?'supplier':'recipient');
+ for(const role of ['supplier','recipient']){
+  const known=details[role]?.organization_number;
+  if(known==null)continue;
+  const proposed=candidate[role+'OrgNumber']?.value,key='details.'+role+'.organization_number';
+  if(!validOrganization(known))flag(key);
+  if(proposed!=null&&(!validOrganization(proposed)||organization(known)!==organization(proposed)))flag(key);
+  if(role===ownRole&&context.expectedCompanyOrganization&&organization(known)!==context.expectedCompanyOrganization)flag(key);
+ }
+ if(['incomplete','conflict'].includes(details.table_status))flag('details.table_status');
+ const rows=details.line_items,proposed=candidate.lineItems;
+ if(rows==null)return conflicts;
+ if(!Array.isArray(rows)||rows.length>500){flag('details.line_items');return conflicts;}
+ if(!rows.length)return conflicts;
+ if(!Array.isArray(proposed)||proposed.length>100||proposed.length!==rows.length){flag('details.line_items');return conflicts;}
+ const money=value=>Number.isSafeInteger(value)&&Math.abs(value)<=100_000_000_000;
+ const amounts={unit_price_cents:'unitPrice',net_cents:'netAmount',vat_cents:'vatAmount',total_cents:'totalAmount'};
+ const netValues=[],taxValues=[],grossValues=[];
+ for(let index=0;index<rows.length;index++){
+  const row=rows[index],claim=proposed[index],prefix='details.line_items['+index+']';
+  if(!row||typeof row!=='object'||!claim||typeof claim!=='object'){flag(prefix);continue;}
+  const compare=(key,known,name)=>{
+   const value=claim[name]?.value;
+   if(known!=null&&(!money(known)||value!=null&&(!money(value)||Math.abs(known-value)>1)))flag(prefix+'.'+key);
+  };
+  for(const [key,name]of Object.entries(amounts))compare(key,row[key],name);
+  if(row.quantity!=null){
+   const value=claim.quantity?.value;
+   if(typeof row.quantity!=='number'||!Number.isFinite(row.quantity)||Math.abs(row.quantity)>1_000_000_000||
+    value!=null&&(typeof value!=='string'||!/^-?\d+(?:\.\d{1,6})?$/.test(value)||Number(value)!==row.quantity))flag(prefix+'.quantity');
+  }
+  // Match the existing parser's one-ore VAT cross-check when omitted VAT/gross
+  // columns can be checked from an explicitly parsed net and VAT rate.
+  let tax=row.vat_cents,gross=row.total_cents;
+  if(money(row.net_cents)&&typeof row.vat_rate==='number'&&Number.isFinite(row.vat_rate)&&row.vat_rate>=0&&row.vat_rate<=100){
+   const calculated=Math.round(row.net_cents*row.vat_rate/100);
+   compare('vat_rate',calculated,'vatAmount');
+   if(tax==null)tax=calculated;
+   if(gross==null)gross=row.net_cents+calculated;
+  }
+  if(money(row.net_cents)&&money(tax)&&gross==null)gross=row.net_cents+tax;
+  compare('total_cents',gross,'totalAmount');
+  netValues.push(row.net_cents);taxValues.push(tax);grossValues.push(gross);
+ }
+ if(details.table_status==='complete'){
+  for(const [key,values,name]of [['net_cents',netValues,'netAmount'],['vat_cents',taxValues,'vatAmount'],['total_cents',grossValues,'totalAmount']]){
+   if(values.length!==rows.length||!values.every(money))continue;
+   const sum=values.reduce((total,value)=>total+value,0),value=candidate[name]?.value;
+   if(value!=null&&(!Number.isSafeInteger(sum)||!money(value)||Math.abs(sum-value)>1))flag('details.line_items.'+key+'_sum');
+  }
+ }
+ return conflicts;
+}
+
 /** Claims retain their model provenance. They never certify a bank reference. */
-export function mergeInvoiceSuggestion(baseline,result){
+export function mergeInvoiceSuggestion(baseline,result,context={}){
  const candidate=result?.candidate,issues=Array.isArray(result?.issues)?result.issues.filter(x=>typeof x==='string').slice(0,50):[];
  if(result?.status!=='review'||!candidate||typeof candidate!=='object'){
   const code=typeof result?.code==='string'&&/^[A-Z_]{1,80}$/.test(result.code)?result.code:issues.find(x=>/^[a-z_]{1,80}$/.test(x))?.toUpperCase()||'AI_UNAVAILABLE';
   const output=note(baseline,code);output.ai={...output.ai,issues,model:result?.model||null,usage:result?.usage||null,costMicroUsd:result?.costMicroUsd??null};return output;
  }
- const output=structuredClone(baseline),conflicts=[],filled=[];
+ const output=structuredClone(baseline),conflicts=nestedDeterministicConflicts(baseline,candidate,context),filled=[];
  const map={...scalarMap};
  if(output.fields?.direction?.value==='supplier'){map.party='supplierName';map.organization_number='supplierOrgNumber';}
  else if(output.fields?.direction?.value==='customer'){map.party='recipientName';map.organization_number='recipientOrgNumber';}
- let economicRisk=issues.some(x=>/MISMATCH|CONFLICT|INVALID|CURRENCY|TAX|RECIPIENT|INJECTION|MULTIPLE|NOT_INVOICE|INCOMPLETE_TABLE|AMBIGUOUS|DO_NOT_RECONCILE|COMPANY_ORGANIZATION_(?:UNKNOWN|MISSING)/.test(x.toUpperCase()));
+ let economicRisk=conflicts.length>0||issues.some(x=>/MISMATCH|CONFLICT|INVALID|CURRENCY|TAX|RECIPIENT|INJECTION|MULTIPLE|NOT_INVOICE|INCOMPLETE_TABLE|AMBIGUOUS|DO_NOT_RECONCILE|COMPANY_ORGANIZATION_(?:UNKNOWN|MISSING)/.test(x.toUpperCase()));
  const c=key=>candidate[key]?.value;
  if(c('currency')&&c('currency')!=='SEK')economicRisk=true;
  if([c('netAmount'),c('vatAmount'),c('totalAmount')].every(Number.isSafeInteger)&&Math.abs(c('netAmount')+c('vatAmount')-c('totalAmount'))>1)economicRisk=true;
@@ -95,11 +156,12 @@ export async function enrichInvoiceForReview({baseline,owner,documentId,sha256,m
  if(typeof documentId!=='string'||!documentId||typeof sha256!=='string'||!/^[a-f0-9]{64}$/.test(sha256)||!store||typeof loadOriginal!=='function')return note(baseline,'AI_CONTEXT_INVALID','blocked');
  await authorize();
  const companyRole=baseline.fields?.direction?.value==='customer'?'supplier':'recipient';
+ const mergeContext={companyRole,expectedCompanyOrganization:policy.expectedCompanyOrganization};
  const key=await hash(JSON.stringify([PROFILE_VERSION,INVOICE_AI_SCHEMA,INVOICE_AI_INSTRUCTIONS,getInvoiceAiProfile(policy.profileId),owner,sha256,mime,policy.expectedCompanyOrganization,companyRole]));
  let previous;
  try{previous=await store.load(key);}catch{return note(baseline,'AI_STORE_UNAVAILABLE');}
  await authorize();
- if(previous){const result=mergeInvoiceSuggestion(baseline,previous);result.ai={...result.ai,replayed:true};return result;}
+ if(previous){const result=mergeInvoiceSuggestion(baseline,previous,mergeContext);result.ai={...result.ai,replayed:true};return result;}
  let original;
  try{original=await loadOriginal();}catch{return note(baseline,'ORIGINAL_PREFLIGHT_FAILED');}
  await authorize();
@@ -111,7 +173,7 @@ export async function enrichInvoiceForReview({baseline,owner,documentId,sha256,m
  if(reserved.status!=='reserved'){
   if(reserved.status==='existing'){
    try{previous=await store.load(key);}catch{}
-   if(previous){const result=mergeInvoiceSuggestion(baseline,previous);result.ai={...result.ai,replayed:true};return result;}
+   if(previous){const result=mergeInvoiceSuggestion(baseline,previous,mergeContext);result.ai={...result.ai,replayed:true};return result;}
   }
   return note(baseline,reserved.status==='budget_exhausted'?'AI_DAILY_BUDGET_EXHAUSTED':'AI_REQUEST_ALREADY_RESERVED');
  }
@@ -124,5 +186,5 @@ export async function enrichInvoiceForReview({baseline,owner,documentId,sha256,m
  try{if(!await store.record(key,result))return note(baseline,'AI_RECEIPT_NOT_SAVED');}
  catch{return note(baseline,'AI_RECEIPT_NOT_SAVED');}
  await authorize();
- return mergeInvoiceSuggestion(baseline,result);
+ return mergeInvoiceSuggestion(baseline,result,mergeContext);
 }

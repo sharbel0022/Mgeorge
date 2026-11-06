@@ -251,7 +251,7 @@ export async function runCorpus({ manifestPath, freezePath, outputPath, live = f
             if (Number.isSafeInteger(result.costMicroUsd) && result.costMicroUsd >= 0) {
               apiCostUsd = result.costMicroUsd / 1_000_000;
             }
-            extraction = mergeInvoiceSuggestion(baseline, result);
+            extraction = mergeInvoiceSuggestion(baseline, result, { companyRole: context.companyRole, expectedCompanyOrganization: context.companyOrganization });
             if ((result.status !== 'review' || !result.candidate) && id !== 'hybrid') errorCode = 'AI_NO_USABLE_RESULT';
           }
         }

@@ -152,7 +152,7 @@ export async function identity(req?:Request){
  const user=holder?.user??await getChatGPTUser();if(!user)throw Error('AUTH_REQUIRED');
  return {...user,userId:scope.owner,actorId:scope.actorId,companyId:scope.context?.companyId};
 }
-export function db(){const holder=requests.getStore();return createCompanyDatabase(rawDatabase(),()=>{if(holder&&requests.getStore()!==holder)throw denied('COMPANY_BOUNDARY_MISMATCH');return requestScope(holder);});}
+export function db():D1Database{const holder=requests.getStore();return createCompanyDatabase(rawDatabase(),()=>{if(holder&&requests.getStore()!==holder)throw denied('COMPANY_BOUNDARY_MISMATCH');return requestScope(holder);});}
 export async function companyBoundaryForOwner(owner:string){return boundaryForScope(rawDatabase(),await requestScope(),owner);}
 export async function companyGmailAccount(owner:string,{required=true}={}){
  const scope=await requestScope();await boundaryForScope(rawDatabase(),scope,owner);

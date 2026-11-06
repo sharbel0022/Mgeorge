@@ -4,7 +4,7 @@
 
 This runner compares the current OCR pipeline with the low model profile, the stronger model profile, and OCR with selective AI assistance. It produces measurements only for executed attempts. Implementation-time status is recorded separately in [benchmark-not-measured.json](./benchmark-not-measured.json).
 
-At implementation time the executor was unavailable and no API key was available. No Node test, optical OCR measurement, paid model call, or improvement estimate was produced in that environment. CI must execute the commands below; its report supersedes that implementation-time status for the particular frozen corpus and implementation.
+The executor was initially unavailable; that initial status did not represent an executed benchmark. Subsequent real CI on source commit `76f4c18254c47210708b662fd78d1916ec5fd597` executed the four-document optical development replay. Its preserved originals, freeze, raw report, exact metrics and limitations are in [VERIFICATION.md](VERIFICATION.md). This supersedes the implementation-time status for that particular frozen corpus and implementation. No paid model call or measured AI improvement has been established.
 
 The generated corpus is a **development replay** of four synthetic documents: Swedish and English invoices, each as a PNG and a raster-only PDF. The PNG/PDF variants share invoice content. They are useful for plumbing and regression checks, but provide neither independent sampling nor representative accuracy evidence. Their familiar labels and values must never be relabeled as independent acceptance data.
 

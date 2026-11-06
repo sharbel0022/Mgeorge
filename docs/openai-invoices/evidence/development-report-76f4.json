@@ -1,0 +1,1454 @@
+{
+  "version": 1,
+  "protocol": "openai-invoices-benchmark.v1",
+  "startedAt": "2026-11-06T23:19:43.222Z",
+  "finishedAt": "2026-11-06T23:19:50.961Z",
+  "manifestId": "sv-en-optical-development-v1",
+  "manifestSha256": "ad89ff64237e57609f88c0729265716c789d7e4db341e0446733fdc4ce611a30",
+  "freezeSha256": "f2c6ba4e89f18e5e4ac80015423bb08d3751acc549e61bbbf1318f5ba7c58bbb",
+  "provenance": {
+    "classification": "development",
+    "synthetic": true,
+    "optimized": true,
+    "previouslyUsed": true,
+    "note": "Generated development replay; not representative or independent; labels have not been independently reviewed."
+  },
+  "context": {
+    "companyRole": "recipient"
+  },
+  "scoredScope": {
+    "supportedCoreScalarFields": 13,
+    "scope": "legacy_register_fields_including_bankgiro",
+    "recipientAndLineItems": "not_established_unless_explicitly_annotated",
+    "fullInvoiceExtractionAcceptance": false
+  },
+  "freezeVerified": true,
+  "sourceVerified": true,
+  "modelInventory": {
+    "status": "NOT_REQUESTED"
+  },
+  "inputValidationLatencyMs": {
+    "sv-clean-png": 18.901103,
+    "sv-clean-pdf": 80.709105,
+    "en-clean-png": 6.6278389999999945,
+    "en-clean-pdf": 1.3825589999999863
+  },
+  "measurement": {
+    "execution": "real",
+    "cache": "none",
+    "sequentialArms": [
+      "existing_ocr",
+      "openai_low",
+      "openai_strong",
+      "hybrid"
+    ],
+    "latency": "extraction_wall_time_including_OCR_for_hybrid_excluding_separately_reported_shared_input_validation",
+    "cost": "API_usage_cost_only_not_billing_invoice",
+    "infrastructureCost": "NOT_MEASURED"
+  },
+  "arms": [
+    {
+      "id": "existing_ocr",
+      "status": "measured",
+      "reason": null,
+      "metrics": {
+        "documents": 4,
+        "counts": {
+          "tp": 46,
+          "fp": 0,
+          "fn": 6,
+          "expectedNonNull": 52,
+          "returnedNonNull": 46,
+          "correctNull": 0,
+          "reviewedFields": 52
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.8846153846153846,
+        "completeCorrectDocuments": 1,
+        "completeCorrectDocumentRate": 0.25,
+        "approvedDocuments": 0,
+        "falseApprovals": 0,
+        "falseApprovalRate": 0,
+        "falseApprovalAmongApproved": null,
+        "manualReviewDocuments": 4,
+        "manualReviewRate": 1,
+        "errorDocuments": 0,
+        "latencyMs": {
+          "measuredDocuments": 4,
+          "total": 7557.13371,
+          "mean": 1889.2834275,
+          "median": 1893.7707169999999,
+          "p95": 1908.717835
+        },
+        "apiCostUsd": 0,
+        "knownApiCostUsd": 0,
+        "costKnownDocuments": 4,
+        "apiCostBasis": "no_external_api_call",
+        "infrastructureCostUsd": null,
+        "byField": {
+          "bankgiro": {
+            "counts": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 2,
+              "expectedNonNull": 4,
+              "returnedNonNull": 2,
+              "correctNull": 0,
+              "reviewedFields": 4
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 0.5
+          },
+          "currency": {
+            "counts": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "expectedNonNull": 4,
+              "returnedNonNull": 4,
+              "correctNull": 0,
+              "reviewedFields": 4
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 1
+          },
+          "direction": {
+            "counts": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "expectedNonNull": 4,
+              "returnedNonNull": 4,
+              "correctNull": 0,
+              "reviewedFields": 4
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 1
+          },
+          "due_at": {
+            "counts": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "expectedNonNull": 4,
+              "returnedNonNull": 4,
+              "correctNull": 0,
+              "reviewedFields": 4
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 1
+          },
+          "invoice_number": {
+            "counts": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "expectedNonNull": 4,
+              "returnedNonNull": 4,
+              "correctNull": 0,
+              "reviewedFields": 4
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 1
+          },
+          "issued_at": {
+            "counts": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "expectedNonNull": 4,
+              "returnedNonNull": 4,
+              "correctNull": 0,
+              "reviewedFields": 4
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 1
+          },
+          "kind": {
+            "counts": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "expectedNonNull": 4,
+              "returnedNonNull": 4,
+              "correctNull": 0,
+              "reviewedFields": 4
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 1
+          },
+          "net_cents": {
+            "counts": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "expectedNonNull": 4,
+              "returnedNonNull": 4,
+              "correctNull": 0,
+              "reviewedFields": 4
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 1
+          },
+          "organization_number": {
+            "counts": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 2,
+              "expectedNonNull": 4,
+              "returnedNonNull": 2,
+              "correctNull": 0,
+              "reviewedFields": 4
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 0.5
+          },
+          "party": {
+            "counts": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "expectedNonNull": 4,
+              "returnedNonNull": 4,
+              "correctNull": 0,
+              "reviewedFields": 4
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 1
+          },
+          "reference": {
+            "counts": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "expectedNonNull": 4,
+              "returnedNonNull": 4,
+              "correctNull": 0,
+              "reviewedFields": 4
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 1
+          },
+          "total_cents": {
+            "counts": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 2,
+              "expectedNonNull": 4,
+              "returnedNonNull": 2,
+              "correctNull": 0,
+              "reviewedFields": 4
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 0.5
+          },
+          "vat_cents": {
+            "counts": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "expectedNonNull": 4,
+              "returnedNonNull": 4,
+              "correctNull": 0,
+              "reviewedFields": 4
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 1
+          }
+        },
+        "byFieldGroup": {
+          "scalar": {
+            "documents": 4,
+            "counts": {
+              "tp": 46,
+              "fp": 0,
+              "fn": 6,
+              "expectedNonNull": 52,
+              "returnedNonNull": 46,
+              "correctNull": 0,
+              "reviewedFields": 52
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 0.8846153846153846,
+            "exactDocuments": 1,
+            "documentCoverage": 0.25,
+            "greenCount": 0,
+            "greenCoverage": 0,
+            "correctGreenCount": 0,
+            "correctGreenCoverage": 0,
+            "falseGreenCount": 0,
+            "falseGreenRate": 0,
+            "falseGreenAmongGreen": null,
+            "greenWrongValueCount": 0,
+            "greenIncompleteCount": 0,
+            "greenUnsafeDecisionCount": 0,
+            "greenProcessingErrorCount": 0,
+            "manualReviewCount": 4,
+            "manualReviewRate": 1,
+            "requireReviewCount": 4,
+            "unnecessaryReviewCount": 0,
+            "errorCount": 0,
+            "timedDocuments": 4,
+            "totalTimeMs": 7557.13371,
+            "averageTimeMs": 1889.2834275,
+            "medianTimeMs": 1893.7707169999999,
+            "p95TimeMs": 1908.717835
+          },
+          "detail": {
+            "documents": 0,
+            "counts": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "expectedNonNull": 0,
+              "returnedNonNull": 0,
+              "correctNull": 0,
+              "reviewedFields": 0
+            },
+            "fieldPrecision": null,
+            "fieldRecall": null,
+            "exactDocuments": 0,
+            "documentCoverage": null,
+            "greenCount": 0,
+            "greenCoverage": null,
+            "correctGreenCount": 0,
+            "correctGreenCoverage": null,
+            "falseGreenCount": 0,
+            "falseGreenRate": null,
+            "falseGreenAmongGreen": null,
+            "greenWrongValueCount": 0,
+            "greenIncompleteCount": 0,
+            "greenUnsafeDecisionCount": 0,
+            "greenProcessingErrorCount": 0,
+            "manualReviewCount": 0,
+            "manualReviewRate": null,
+            "requireReviewCount": 0,
+            "unnecessaryReviewCount": 0,
+            "errorCount": 0,
+            "timedDocuments": 0,
+            "totalTimeMs": 0,
+            "averageTimeMs": null,
+            "medianTimeMs": null,
+            "p95TimeMs": null
+          }
+        },
+        "byFamily": {
+          "synthetic-en": {
+            "documents": 2,
+            "counts": {
+              "tp": 21,
+              "fp": 0,
+              "fn": 5,
+              "expectedNonNull": 26,
+              "returnedNonNull": 21,
+              "correctNull": 0,
+              "reviewedFields": 26
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 0.8076923076923077,
+            "exactDocuments": 0,
+            "documentCoverage": 0,
+            "greenCount": 0,
+            "greenCoverage": 0,
+            "correctGreenCount": 0,
+            "correctGreenCoverage": 0,
+            "falseGreenCount": 0,
+            "falseGreenRate": 0,
+            "falseGreenAmongGreen": null,
+            "greenWrongValueCount": 0,
+            "greenIncompleteCount": 0,
+            "greenUnsafeDecisionCount": 0,
+            "greenProcessingErrorCount": 0,
+            "manualReviewCount": 2,
+            "manualReviewRate": 1,
+            "requireReviewCount": 2,
+            "unnecessaryReviewCount": 0,
+            "errorCount": 0,
+            "timedDocuments": 2,
+            "totalTimeMs": 3810.184036,
+            "averageTimeMs": 1905.092018,
+            "medianTimeMs": 1905.092018,
+            "p95TimeMs": 1908.717835
+          },
+          "synthetic-sv": {
+            "documents": 2,
+            "counts": {
+              "tp": 25,
+              "fp": 0,
+              "fn": 1,
+              "expectedNonNull": 26,
+              "returnedNonNull": 25,
+              "correctNull": 0,
+              "reviewedFields": 26
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 0.9615384615384616,
+            "exactDocuments": 1,
+            "documentCoverage": 0.5,
+            "greenCount": 0,
+            "greenCoverage": 0,
+            "correctGreenCount": 0,
+            "correctGreenCoverage": 0,
+            "falseGreenCount": 0,
+            "falseGreenRate": 0,
+            "falseGreenAmongGreen": null,
+            "greenWrongValueCount": 0,
+            "greenIncompleteCount": 0,
+            "greenUnsafeDecisionCount": 0,
+            "greenProcessingErrorCount": 0,
+            "manualReviewCount": 2,
+            "manualReviewRate": 1,
+            "requireReviewCount": 2,
+            "unnecessaryReviewCount": 0,
+            "errorCount": 0,
+            "timedDocuments": 2,
+            "totalTimeMs": 3746.9496739999995,
+            "averageTimeMs": 1873.4748369999998,
+            "medianTimeMs": 1873.4748369999998,
+            "p95TimeMs": 1886.0752329999998
+          }
+        },
+        "bySubset": {
+          "optical": {
+            "documents": 4,
+            "counts": {
+              "tp": 46,
+              "fp": 0,
+              "fn": 6,
+              "expectedNonNull": 52,
+              "returnedNonNull": 46,
+              "correctNull": 0,
+              "reviewedFields": 52
+            },
+            "fieldPrecision": 1,
+            "fieldRecall": 0.8846153846153846,
+            "exactDocuments": 1,
+            "documentCoverage": 0.25,
+            "greenCount": 0,
+            "greenCoverage": 0,
+            "correctGreenCount": 0,
+            "correctGreenCoverage": 0,
+            "falseGreenCount": 0,
+            "falseGreenRate": 0,
+            "falseGreenAmongGreen": null,
+            "greenWrongValueCount": 0,
+            "greenIncompleteCount": 0,
+            "greenUnsafeDecisionCount": 0,
+            "greenProcessingErrorCount": 0,
+            "manualReviewCount": 4,
+            "manualReviewRate": 1,
+            "requireReviewCount": 4,
+            "unnecessaryReviewCount": 0,
+            "errorCount": 0,
+            "timedDocuments": 4,
+            "totalTimeMs": 7557.13371,
+            "averageTimeMs": 1889.2834275,
+            "medianTimeMs": 1893.7707169999999,
+            "p95TimeMs": 1908.717835
+          }
+        }
+      },
+      "observations": [
+        {
+          "id": "sv-clean-png",
+          "family": "synthetic-sv",
+          "subset": "optical",
+          "level": "yellow",
+          "requireReview": true,
+          "durationMs": 1886.0752329999998,
+          "error": null,
+          "counts": {
+            "tp": 12,
+            "fp": 0,
+            "fn": 1,
+            "expectedNonNull": 13,
+            "returnedNonNull": 12,
+            "correctNull": 0,
+            "reviewedFields": 13
+          },
+          "documentExact": false,
+          "green": false,
+          "falseGreen": false,
+          "manualReview": true,
+          "unnecessaryReview": false,
+          "fields": [
+            {
+              "name": "bankgiro",
+              "group": "scalar",
+              "expected": "123-4567",
+              "actual": null,
+              "correct": false,
+              "counts": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 1,
+                "expectedNonNull": 1,
+                "returnedNonNull": 0,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "currency",
+              "group": "scalar",
+              "expected": "SEK",
+              "actual": "SEK",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "direction",
+              "group": "scalar",
+              "expected": "supplier",
+              "actual": "supplier",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "due_at",
+              "group": "scalar",
+              "expected": "2026-11-07",
+              "actual": "2026-11-07",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "invoice_number",
+              "group": "scalar",
+              "expected": "0606",
+              "actual": "0606",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "issued_at",
+              "group": "scalar",
+              "expected": "2026-10-24",
+              "actual": "2026-10-24",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "kind",
+              "group": "scalar",
+              "expected": "invoice",
+              "actual": "invoice",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "net_cents",
+              "group": "scalar",
+              "expected": 300000,
+              "actual": 300000,
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "organization_number",
+              "group": "scalar",
+              "expected": "5560160680",
+              "actual": "5560160680",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "party",
+              "group": "scalar",
+              "expected": "Testbolaget AB",
+              "actual": "Testbolaget AB",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "reference",
+              "group": "scalar",
+              "expected": "000018",
+              "actual": "000018",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "total_cents",
+              "group": "scalar",
+              "expected": 375000,
+              "actual": 375000,
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "vat_cents",
+              "group": "scalar",
+              "expected": 75000,
+              "actual": 75000,
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            }
+          ],
+          "apiCostUsd": 0,
+          "usage": null,
+          "model": null,
+          "providerStatus": null
+        },
+        {
+          "id": "sv-clean-pdf",
+          "family": "synthetic-sv",
+          "subset": "optical",
+          "level": "yellow",
+          "requireReview": true,
+          "durationMs": 1860.874441,
+          "error": null,
+          "counts": {
+            "tp": 13,
+            "fp": 0,
+            "fn": 0,
+            "expectedNonNull": 13,
+            "returnedNonNull": 13,
+            "correctNull": 0,
+            "reviewedFields": 13
+          },
+          "documentExact": true,
+          "green": false,
+          "falseGreen": false,
+          "manualReview": true,
+          "unnecessaryReview": false,
+          "fields": [
+            {
+              "name": "bankgiro",
+              "group": "scalar",
+              "expected": "123-4567",
+              "actual": "123-4567",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "currency",
+              "group": "scalar",
+              "expected": "SEK",
+              "actual": "SEK",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "direction",
+              "group": "scalar",
+              "expected": "supplier",
+              "actual": "supplier",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "due_at",
+              "group": "scalar",
+              "expected": "2026-11-07",
+              "actual": "2026-11-07",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "invoice_number",
+              "group": "scalar",
+              "expected": "0606",
+              "actual": "0606",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "issued_at",
+              "group": "scalar",
+              "expected": "2026-10-24",
+              "actual": "2026-10-24",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "kind",
+              "group": "scalar",
+              "expected": "invoice",
+              "actual": "invoice",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "net_cents",
+              "group": "scalar",
+              "expected": 300000,
+              "actual": 300000,
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "organization_number",
+              "group": "scalar",
+              "expected": "5560160680",
+              "actual": "5560160680",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "party",
+              "group": "scalar",
+              "expected": "Testbolaget AB",
+              "actual": "Testbolaget AB",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "reference",
+              "group": "scalar",
+              "expected": "000018",
+              "actual": "000018",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "total_cents",
+              "group": "scalar",
+              "expected": 375000,
+              "actual": 375000,
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "vat_cents",
+              "group": "scalar",
+              "expected": 75000,
+              "actual": 75000,
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            }
+          ],
+          "apiCostUsd": 0,
+          "usage": null,
+          "model": null,
+          "providerStatus": null
+        },
+        {
+          "id": "en-clean-png",
+          "family": "synthetic-en",
+          "subset": "optical",
+          "level": "red",
+          "requireReview": true,
+          "durationMs": 1908.717835,
+          "error": null,
+          "counts": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 3,
+            "expectedNonNull": 13,
+            "returnedNonNull": 10,
+            "correctNull": 0,
+            "reviewedFields": 13
+          },
+          "documentExact": false,
+          "green": false,
+          "falseGreen": false,
+          "manualReview": true,
+          "unnecessaryReview": false,
+          "fields": [
+            {
+              "name": "bankgiro",
+              "group": "scalar",
+              "expected": "123-4567",
+              "actual": null,
+              "correct": false,
+              "counts": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 1,
+                "expectedNonNull": 1,
+                "returnedNonNull": 0,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "currency",
+              "group": "scalar",
+              "expected": "SEK",
+              "actual": "SEK",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "direction",
+              "group": "scalar",
+              "expected": "supplier",
+              "actual": "supplier",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "due_at",
+              "group": "scalar",
+              "expected": "2026-11-07",
+              "actual": "2026-11-07",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "invoice_number",
+              "group": "scalar",
+              "expected": "INV-2048",
+              "actual": "INV-2048",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "issued_at",
+              "group": "scalar",
+              "expected": "2026-10-24",
+              "actual": "2026-10-24",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "kind",
+              "group": "scalar",
+              "expected": "invoice",
+              "actual": "invoice",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "net_cents",
+              "group": "scalar",
+              "expected": 200000,
+              "actual": 200000,
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "organization_number",
+              "group": "scalar",
+              "expected": "5560160680",
+              "actual": null,
+              "correct": false,
+              "counts": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 1,
+                "expectedNonNull": 1,
+                "returnedNonNull": 0,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "party",
+              "group": "scalar",
+              "expected": "Example Services AB",
+              "actual": "Example Services AB",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "reference",
+              "group": "scalar",
+              "expected": "000018",
+              "actual": "000018",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "total_cents",
+              "group": "scalar",
+              "expected": 250000,
+              "actual": null,
+              "correct": false,
+              "counts": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 1,
+                "expectedNonNull": 1,
+                "returnedNonNull": 0,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "vat_cents",
+              "group": "scalar",
+              "expected": 50000,
+              "actual": 50000,
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            }
+          ],
+          "apiCostUsd": 0,
+          "usage": null,
+          "model": null,
+          "providerStatus": null
+        },
+        {
+          "id": "en-clean-pdf",
+          "family": "synthetic-en",
+          "subset": "optical",
+          "level": "red",
+          "requireReview": true,
+          "durationMs": 1901.4662010000002,
+          "error": null,
+          "counts": {
+            "tp": 11,
+            "fp": 0,
+            "fn": 2,
+            "expectedNonNull": 13,
+            "returnedNonNull": 11,
+            "correctNull": 0,
+            "reviewedFields": 13
+          },
+          "documentExact": false,
+          "green": false,
+          "falseGreen": false,
+          "manualReview": true,
+          "unnecessaryReview": false,
+          "fields": [
+            {
+              "name": "bankgiro",
+              "group": "scalar",
+              "expected": "123-4567",
+              "actual": "123-4567",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "currency",
+              "group": "scalar",
+              "expected": "SEK",
+              "actual": "SEK",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "direction",
+              "group": "scalar",
+              "expected": "supplier",
+              "actual": "supplier",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "due_at",
+              "group": "scalar",
+              "expected": "2026-11-07",
+              "actual": "2026-11-07",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "invoice_number",
+              "group": "scalar",
+              "expected": "INV-2048",
+              "actual": "INV-2048",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "issued_at",
+              "group": "scalar",
+              "expected": "2026-10-24",
+              "actual": "2026-10-24",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "kind",
+              "group": "scalar",
+              "expected": "invoice",
+              "actual": "invoice",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "net_cents",
+              "group": "scalar",
+              "expected": 200000,
+              "actual": 200000,
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "organization_number",
+              "group": "scalar",
+              "expected": "5560160680",
+              "actual": null,
+              "correct": false,
+              "counts": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 1,
+                "expectedNonNull": 1,
+                "returnedNonNull": 0,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "party",
+              "group": "scalar",
+              "expected": "Example Services AB",
+              "actual": "Example Services AB",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "reference",
+              "group": "scalar",
+              "expected": "000018",
+              "actual": "000018",
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "total_cents",
+              "group": "scalar",
+              "expected": 250000,
+              "actual": null,
+              "correct": false,
+              "counts": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 1,
+                "expectedNonNull": 1,
+                "returnedNonNull": 0,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            },
+            {
+              "name": "vat_cents",
+              "group": "scalar",
+              "expected": 50000,
+              "actual": 50000,
+              "correct": true,
+              "counts": {
+                "tp": 1,
+                "fp": 0,
+                "fn": 0,
+                "expectedNonNull": 1,
+                "returnedNonNull": 1,
+                "correctNull": 0,
+                "reviewedFields": 1
+              }
+            }
+          ],
+          "apiCostUsd": 0,
+          "usage": null,
+          "model": null,
+          "providerStatus": null
+        }
+      ]
+    },
+    {
+      "id": "openai_low",
+      "status": "unavailable",
+      "reason": "LIVE_NOT_REQUESTED",
+      "metrics": null,
+      "observations": []
+    },
+    {
+      "id": "openai_strong",
+      "status": "unavailable",
+      "reason": "LIVE_NOT_REQUESTED",
+      "metrics": null,
+      "observations": []
+    },
+    {
+      "id": "hybrid",
+      "status": "unavailable",
+      "reason": "LIVE_NOT_REQUESTED",
+      "metrics": null,
+      "observations": []
+    }
+  ],
+  "acceptance": {
+    "eligible": false,
+    "passed": false,
+    "reason": "NOT_INDEPENDENT_OPTICAL",
+    "thresholds": {
+      "fieldRecall": 0.85,
+      "fieldPrecision": 0.98,
+      "maximumFalseApprovals": 0
+    },
+    "allArmsMeasured": false,
+    "arms": {
+      "existing_ocr": {
+        "measured": true,
+        "passed": false
+      },
+      "openai_low": {
+        "measured": false,
+        "passed": false
+      },
+      "openai_strong": {
+        "measured": false,
+        "passed": false
+      },
+      "hybrid": {
+        "measured": false,
+        "passed": false
+      }
+    },
+    "note": "Independence is an externally reviewed provenance attestation; hashes verify immutability, not provenance truth."
+  }
+}
