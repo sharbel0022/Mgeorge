@@ -238,7 +238,11 @@ function sqlShape(query){
     const fenceError=/^COMPANY_[A-Z_]+$/.test(value)&&/\bjson\s*\(\s*$/i.test(shape);
     if(!fenceError&&(ownerTables.includes(value.toLowerCase())||/^(?:main|temp|companies|company_[a-z_]+|sqlite_[a-z_]+)$/i.test(value)))fail('COMPANY_SQL_DENIED');
     shape+="''";
-   }else shape+=value;
+   }else{
+    // A quote is also a token boundary: SQLite accepts FROM"workspaces".
+    // Preserve that separation in the inspection shape, without changing SQL.
+    shape+=' '+value+' ';
+   }
    continue;
   }
   statement+=char;shape+=char;index++;
