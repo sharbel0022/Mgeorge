@@ -2,7 +2,7 @@
 
 ## Aktuell bedömning efter Site 66 — 2026-11-06
 
-Uppdaterad drift- och utvecklingsevidens 06:21 UTC: Site 66 är fortfarande publicerad. Huvudgren `237dd45e` underkändes i ett Node-startup-prov; PR 60:s första kandidat har 7606/7606 men stoppades av ett oberoende P2-fynd i testets avbrottsstädning. Version67 är sparad från exakt native-källa som source-only-reservväg efter att arkivuppladdningen stoppats av otillgänglig exekveringsmiljö; den är inte publicerad. Dessa utvecklingsresultat ersätter inte produktionsbetygens källbindning nedan. Se [PR 60](https://github.com/sharbel0022/Mgeorge/pull/60) och [oberoende granskning](https://github.com/sharbel0022/Mgeorge/tree/819bc206f7c21c0f6f8ce0a490c36fbfb4047579/docs/quality8/startup-independent-review-20261106).
+Uppdaterad evidens 2026-11-06 07:19:36 UTC: senaste lyckade publicering är fortsatt Site 66/main 0035ea89. PR 60 är normalt mergad till main cde9178 och första fulla huvudgrens-CI passerade7607/7607 samt16/16 grindar efter faktisk RED/GREEN och oberoende återgranskning. Version 67:s fjärrbyggda publicering misslyckades på avvisad beroendekälla. Naturlig OCR gav 6/0 och kö 64→58, men inget nytt registreringskvitto. Gmail 07 saknar matchande kvitto. Dessa faktiska utvecklings- och driftresultat ersätter inte respektive betygs produktionsbindning. Se [samlad evidens](docs/quality8/release-wave6-20261106/README.md).
 
 **28/33 områden har stöd för minst 8/10. Alla 33 är ännu inte klara.** Summa 257,5/330, medel 7,80. Målet gäller varje rad. Samtliga numeriska betyg är oförändrade i denna leverans.
 
@@ -15,17 +15,17 @@ Site 66 är publicerad från main `0035ea89ef3cd60f0924f901503cad00d1ab1fca` eft
 | 3 | Navigation | 8 | Publicerad sökning→ArrowDown/Enter→Escape återställer sökfokus. |
 | 4 | Mobil | 8 | 25/25 lokala geometrier vid fem bredder; samma CSS/Sites-träd publicerat. |
 | 5 | Sök/filter | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
-| 6 | Minimal manuell hantering | 6,5 | Site 66: ett ägt normalunderlag återköades en gång genom den vanliga spärrade övergången och väntar på OCR. Två fullständigt lästa registreringsrader är oförändrade; inget nytt registreringskvitto. Ekonomiska läsningar behåller revision 52 och noll nya bokningar. |
+| 6 | Minimal manuell hantering | 6,5 | Ordinarie OCR gav6/0 och kö64→58; valt normalunderlag väntar fortsatt och saknar kvitto. |
 | 7 | Kundfakturor | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 8 | Leverantörsfakturor | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 9 | PDF | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
-| 10 | Bild-OCR | 6,5 | Första V2 är fortsatt underkänt. Levererad parser har känd lagrad PSM3-replay 57/100 mandatory, 79/130 All13. Separat opublicerad c5-kandidat fick i en auktoriserad känd optisk utvecklingsrunda 69/100 mandatory och 91/130 All13, 0 FP, 12 worker- och 24 parseranrop utan körfel. Recallkravet 85% nås inte; V3 är fortfarande förseglad. |
+| 10 | Bild-OCR | 6,5 | Känd opublicerad OCR-kandidat69%mandatory/70%All13 räcker inte; V3 förseglad. |
 | 11 | Gmail | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 12 | Automatisk registrering | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 13 | Dubbletter | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 14 | Dokumentgranskning | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
-| 15 | Swedbank | 6,5 | Site 66-revalidering avvisad: sparat null-usage och aktuellt utelämnat usage. Ett detaljförsök gav DETAILS_PROVIDER_UNAVAILABLE utan verifierad usageklass; ingen aktivering. |
-| 16 | Automatisk bankhämtning | 6,5 | Ingen ny lyckad behörig bankhämtning efter 2026-11-05 08:05 UTC. |
+| 15 | Swedbank | 6,5 | Site66 avvisar kontoanvändning. Ny bankdiagnostik på main är opublicerad efter misslyckat Site67-bygge. |
+| 16 | Automatisk bankhämtning | 6,5 | Ingen ny lyckad behörig schemalagd bankhämtning verifierad. |
 | 17 | Bankgiro-import | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 18 | Verklig betalare | 8 | Ägt verkligt rapportoriginal och exakt läsvy bevarar angiven betalare; saknad AIS-betalare förblir okänd. |
 | 19 | Verklig OCR/referens | 8 | Verklig explicit rapportreferens bevaras som generell referens; ingen formell OCR eller AIS-referens hittas på. |
@@ -37,12 +37,12 @@ Site 66 är publicerad från main `0035ea89ef3cd60f0924f901503cad00d1ab1fca` eft
 | 25 | Betalstatus | 8 | Publicerad översikt/detalj behåller registrerat saldo och stoppar falskt verifierad visning. |
 | 26 | Kontrollera alla betalningar | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 27 | Mejlförslag | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
-| 28 | Schemaläggning | 6,5 | Tidigare periodisk OCR-körningen 42153093698 gav 6 behandlade och 0 fel. Gmail-schematillfällena 05:00 och06:00 gav no_update utan ny verifierad appinvokering; senaste lyckade hämtning är 04:06. Ordinarie 07:00-körning har en återläst engångsinstruktion om körkvitto. Backupens nya budget är fortfarande inte prövad automatiskt från ofärdig snapshot. |
+| 28 | Schemaläggning | 6,5 | Tidigare periodisk OCR verifierad; Gmail07 no_update utan kvitto; automatisk full backup från ofärdigt läge återstår. |
 | 29 | Backup | 8 | Snapshot 768fde9a-27a2-4b85-b85a-278239ec4aea: 430/430 original kopierade och kontrollästa, 185 567 855 byte i båda stegen, manifest_pass och verifiering slutförd 2026-11-06 00:48:58 UTC; separat slutstatus 00:49:04 UTC. |
 | 30 | Säkerhet | 8,5 | Exakt full CI/audit och negativa säkerhetsgrindar godkända;8 moderate utvecklingsfynd kvarstår. |
 | 31 | Katastrofåterställning | 8 | Isolerad återställning med riktig kod; lokalRTO 3,417 s och simuleradRPO 15 min, inte produktionsåterställning. |
-| 32 | Kod/tester | 8,5 | Exakt main `0035ea89`ea89: 7569/7569 obligatoriska tester, 0 fail/cancel/skip/TODO; alla 16 grindar och verkligt Sites-bygge passerade. Samma Sites-träd publicerat som Site 66. |
-| 33 | Verklig produktionsverifiering | 8 | Exakt main `0035ea89`ea89 till Site 66; verklig avvisad bankrevalidering med bounded detaljförsök, nio nya Gmail-importer, köprogress till OCR, tidigare periodisk OCR 6/0 och verifierad 430-filssnapshot. Två kompletta ekonomiska före-/efterläsningar efter normal bearbetning behåller revision 52, noll bokningar och alla uppgifter/spärrar utom kontrolltid. |
+| 32 | Kod/tester | 8,5 | Site66 har7569/7569; ny maincde har7607/7607 och16grindar, men Site67 är opublicerad. |
+| 33 | Verklig produktionsverifiering | 8 | Site66 återläst aktiv; två fulla ekonomiska svar oförändrade revision52; Site67-försöket misslyckades. |
 
 Återstående under 8: **6, 10, 15, 16 och 28**. Bankens faktiska usageklass är ännu okänd. Registreringskedjan behöver ett riktigt normalt slutkvitto, OCR behöver ett fryst oberoende förstaprov och de korrigerade schemainstruktionerna behöver faktisk automatisk verifiering. Dagens kompletta backup är ingen provkörning av budgeten från ett ofärdigt läge. Äldre daterade underlag nedan behåller sin historiska omfattning.
 

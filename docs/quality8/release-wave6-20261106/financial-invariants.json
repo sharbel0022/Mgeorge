@@ -1,0 +1,28 @@
+{
+  "beforeAt": "2026-11-06 07:03:27 UTC",
+  "afterAt": "2026-11-06 07:12:46 UTC",
+  "operation": "failed Site67 remote build publication plus independently completed ordinary cloud OCR run",
+  "checkedAtOnlyExcluded": true,
+  "records": [
+    {
+      "record": 1,
+      "revision": 52,
+      "complete": true,
+      "snapshotCurrent": true,
+      "outputLimited": false,
+      "payments": 1,
+      "identicalExceptCheckedAt": true
+    },
+    {
+      "record": 2,
+      "revision": 52,
+      "complete": true,
+      "snapshotCurrent": true,
+      "outputLimited": false,
+      "payments": 1,
+      "identicalExceptCheckedAt": true
+    }
+  ],
+  "allUnchanged": true,
+  "newBankRevalidation": false
+}

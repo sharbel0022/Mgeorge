@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "generated_at": "2026-11-06 07:25:27 UTC",
+  "base_commit": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+  "base_tree": "4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+  "kind": "documentation_only_current_evidence_checkpoint",
+  "goal_met": false,
+  "ratings_and_acceptance_criteria_unchanged": true,
+  "publication_status": "Site67 failed; last successful Site66",
+  "hash_type": "Git content-addressed blob SHA-1 returned by GitHub; full byte-for-byte readback still required",
+  "manifest_excludes_itself": true,
+  "files": [
+    {
+      "path": "PROGRESS.md",
+      "utf8Bytes": 147463,
+      "gitBlobSha1": "c361006a44ec9a345fc6038688844780faabd24c"
+    },
+    {
+      "path": "QUALITY-SCORECARD.md",
+      "utf8Bytes": 236352,
+      "gitBlobSha1": "b6491e5f5b8cb62bd6a7334c87f0c46536c03a27"
+    },
+    {
+      "path": "docs/quality8/current-33-assessment.json",
+      "utf8Bytes": 31976,
+      "gitBlobSha1": "169486dccb0b9118c504fb8032fdd22ebff1b4b7"
+    },
+    {
+      "path": "docs/quality8/release-wave6-20261106/README.md",
+      "utf8Bytes": 10701,
+      "gitBlobSha1": "ee2d33e723efd1675e01b16c320e7c1e29a9d942"
+    },
+    {
+      "path": "docs/quality8/release-wave6-20261106/release-evidence.json",
+      "utf8Bytes": 12702,
+      "gitBlobSha1": "02b476b7843941e96d341a509c19b52e8be95bc9"
+    },
+    {
+      "path": "docs/quality8/release-wave6-20261106/current-33-assessment.json",
+      "utf8Bytes": 31976,
+      "gitBlobSha1": "169486dccb0b9118c504fb8032fdd22ebff1b4b7"
+    },
+    {
+      "path": "docs/quality8/release-wave6-20261106/financial-invariants.json",
+      "utf8Bytes": 699,
+      "gitBlobSha1": "957b09ddb1cb0f4d818ddab009e6ad4276a0c072"
+    },
+    {
+      "path": "docs/quality8/release-wave6-20261106/ocr-workflow-run-42178783601.log",
+      "utf8Bytes": 15394,
+      "gitBlobSha1": "3367e165644e0e27005168736c18d28cb4fb9096"
+    },
+    {
+      "path": "docs/quality8/release-wave6-20261106/handoff.json",
+      "utf8Bytes": 2450,
+      "gitBlobSha1": "5091c0e1d2e998034c7288344853e008c73ef2b1"
+    }
+  ]
+}

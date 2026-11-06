@@ -1,0 +1,351 @@
+{
+  "schema": 1,
+  "observed_at": "2026-11-06 07:19:36 UTC",
+  "goal": "All 33 areas individually at least 8",
+  "goal_met": false,
+  "aggregate": {
+    "sum": 257.5,
+    "maximum": 330,
+    "average": 7.803030303030303,
+    "at_least_8": 28,
+    "area_count": 33,
+    "below_8_ids": [
+      6,
+      10,
+      15,
+      16,
+      28
+    ],
+    "all_33_at_least_8": false
+  },
+  "code": {
+    "pr": 60,
+    "head": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+    "merge": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+    "tree": "4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+    "sites_tree": "4feabc128c5f677103232d1cad1e4406083e8f19",
+    "pr_verified": {
+      "head": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+      "base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "testMerge": "c7a22cbc13c9b1dbed1d825278c91ea369c2c447",
+      "tree": "4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+      "paymentRun": 42176691810,
+      "saasRun": 42176691849,
+      "attempt": 1,
+      "tests": {
+        "node": 2323,
+        "sites": 5237,
+        "bridge": 47,
+        "total": 7607,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "mandatoryCommands": 16,
+      "allMandatoryCommandsPassed": true,
+      "staticReview": "955fcb98333c36e54f7e3e580f7fd70a5ae21292",
+      "meaningfulRed": "42176156539",
+      "productionStill": 66
+    },
+    "main_verified": {
+      "head": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "tree": "4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+      "sitesTree": "4feabc128c5f677103232d1cad1e4406083e8f19",
+      "run": 42177971213,
+      "attempt": 1,
+      "event": "push",
+      "conclusion": "success",
+      "ended": "2026-11-06T07:07:18Z",
+      "jobs": [
+        {
+          "job": 127760756473,
+          "counts": {
+            "tests": 2323,
+            "pass": 2323,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "checkoutCde": true,
+          "audits": [
+            "2026-11-06T07:00:19.1610650Z found 0 vulnerabilities",
+            "2026-11-06T07:00:24.6735648Z found 0 vulnerabilities"
+          ],
+          "build": []
+        },
+        {
+          "job": 127760756672,
+          "counts": {
+            "tests": 5237,
+            "pass": 5237,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "checkoutCde": true,
+          "audits": [
+            "2026-11-06T07:00:35.3834294Z found 0 vulnerabilities",
+            "2026-11-06T07:01:19.8990066Z 8 moderate severity vulnerabilities",
+            "2026-11-06T07:01:20.4253115Z found 0 vulnerabilities"
+          ],
+          "build": [
+            "2026-11-06T07:07:14.5178036Z   Build complete."
+          ]
+        },
+        {
+          "job": 127760756176,
+          "counts": {
+            "tests": 47,
+            "pass": 47,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "checkoutCde": true,
+          "audits": [
+            "2026-11-06T07:00:14.7583905Z found 0 vulnerabilities",
+            "2026-11-06T07:00:15.5140021Z found 0 vulnerabilities"
+          ],
+          "build": []
+        }
+      ],
+      "tests": 7607,
+      "pass": 7607,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "mandatoryCommands": 16,
+      "allPassed": true,
+      "rawLogsReadAndStored": true
+    },
+    "archive_links": {
+      "pr": "https://github.com/sharbel0022/Mgeorge/tree/2bf147fd2688313128e64028ebc4300472100794/docs/quality8/pr60-final-ci-520e2271-20261106",
+      "main": "https://github.com/sharbel0022/Mgeorge/tree/abe08e383a1838c545fba13a4cf367998900ad89/docs/quality8/startup-main-ci-20261106",
+      "red": "https://github.com/sharbel0022/Mgeorge/tree/44c5289383f23d2cc8e9f4d00f1ba2dc1297bb44/docs/quality8/startup-cancellation-red-f0e845bb-20261106",
+      "review": "https://github.com/sharbel0022/Mgeorge/tree/955fcb98333c36e54f7e3e580f7fd70a5ae21292/docs/quality8/startup-independent-rereview-20261106",
+      "gmail": "https://github.com/sharbel0022/Mgeorge/tree/1ec960d9de4f896f7f481bfdc0e0fc9cc47337fa/docs/quality8/gmail-schedule-0700-20261106",
+      "ocrAnalysis": "https://github.com/sharbel0022/Mgeorge/tree/d5e9451ceff439ff7ae60799de58e8ff00971eb8/docs/quality8/ocr-analysis-recovery-20261106",
+      "ocrCapacity": "https://github.com/sharbel0022/Mgeorge/tree/d5ae148f4847e87b30e2e084494e3f44765afc27/docs/quality8/ocr-capacity-diagnosis-20261106"
+    }
+  },
+  "publication": {
+    "last_successful_site_version": 66,
+    "published_main": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+    "last_successful_deployment": {
+      "id": "appgdep_6aed50f31fb48191ab1617fe42756ccb",
+      "status": "succeeded",
+      "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_9f921f1d09d081918a453e34a5d1fb04",
+      "url": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site",
+      "has_mcp": true,
+      "env_set_revision": 10,
+      "failure_message": null,
+      "updated_at": "2026-11-06T04:01:09.703428+00:00"
+    },
+    "candidate": {
+      "id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_463873b71df88191acad4b242c2f8571",
+      "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+      "version_number": 67,
+      "source": {
+        "commit_sha": "d30b1e2518e3765b15fba28cbd306addf142da38"
+      },
+      "archive_storage": null,
+      "screenshot_url": null,
+      "deployment_id": "appgdep_6aed7cf03554819191f58e9eda384478"
+    },
+    "failed_attempt": {
+      "id": "appgdep_6aed7cf03554819191f58e9eda384478",
+      "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_463873b71df88191acad4b242c2f8571",
+      "status": "failed",
+      "failure_message": "A dependency uses a private or unsupported source. Replace it with a dependency available from a supported public registry, update the lockfile, and publish again.",
+      "updated_at": "2026-11-06T07:08:41.858083+00:00",
+      "source_only_remote_build": true
+    },
+    "native_source": "d30b1e2518e3765b15fba28cbd306addf142da38",
+    "local_archive_not_uploaded": {
+      "path": "/tmp/rating8-wave5-site67-bank-diagnostic.tar.gz",
+      "bytes": 18607635,
+      "sha256": "0edf980d1d397decd171164d4d867463486c0e968acd0282a620d28609842e00"
+    },
+    "dependency_source_inventory": {
+      "packages": 905,
+      "resolved": 898,
+      "publicNpm": 897,
+      "others": [
+        {
+          "path": "node_modules/xlsx",
+          "resolved": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
+          "version": "0.20.3",
+          "integrityPresent": true
+        }
+      ],
+      "knownFailureNamesPackage": false,
+      "interpretation": "The single external CDN source is the strongest candidate; the generic native rejection does not identify a package."
+    },
+    "audience": "public",
+    "existing_schedules_unchanged": true,
+    "new_bank_revalidation": false
+  },
+  "financial": {
+    "beforeAt": "2026-11-06 07:03:27 UTC",
+    "afterAt": "2026-11-06 07:12:46 UTC",
+    "operation": "failed Site67 remote build publication plus independently completed ordinary cloud OCR run",
+    "checkedAtOnlyExcluded": true,
+    "records": [
+      {
+        "record": 1,
+        "revision": 52,
+        "complete": true,
+        "snapshotCurrent": true,
+        "outputLimited": false,
+        "payments": 1,
+        "identicalExceptCheckedAt": true
+      },
+      {
+        "record": 2,
+        "revision": 52,
+        "complete": true,
+        "snapshotCurrent": true,
+        "outputLimited": false,
+        "payments": 1,
+        "identicalExceptCheckedAt": true
+      }
+    ],
+    "allUnchanged": true,
+    "newBankRevalidation": false
+  },
+  "natural_ocr": {
+    "run": 42178783601,
+    "event": "workflow_run",
+    "head": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+    "job": 127763285413,
+    "created_at": "2026-11-06T07:07:21Z",
+    "completed_at": "2026-11-06T07:09:12Z",
+    "conclusion": "success",
+    "processed": 6,
+    "failed": 0,
+    "manual_invocation": false,
+    "raw_log": "ocr-workflow-run-42178783601.log",
+    "after_status": {
+      "configured": true,
+      "send_enabled": true,
+      "last_successful_fetch": "2026-11-06T04:06:01.714Z",
+      "schedule_observation": {
+        "last_invoked_at": "2026-11-06T04:05:48.841Z",
+        "last_completed_at": "2026-11-06T04:06:04.143Z",
+        "last_outcome": "completed",
+        "source": "system_entrypoint",
+        "external_schedule_verified": false
+      },
+      "sync_health": {
+        "state": "stale",
+        "reason": "Ingen färsk lyckad hämtning. Kontrollera det externa schemat och anslutningen.",
+        "interval_minutes": 60,
+        "stale_after_minutes": 120,
+        "schedule_verified": false
+      },
+      "processing": {
+        "enabled": true,
+        "auto_register": true,
+        "cloud_ocr_configured": true,
+        "cloud_worker_last_seen": "2026-11-06T07:09:03.689Z",
+        "cloud_worker_recent": true,
+        "cloud_last_completed": "2026-11-06T07:09:08.592Z",
+        "last_processed": "2026-11-06T07:07:36.122Z",
+        "counts": {
+          "needs_review": 391,
+          "registered": 2,
+          "waiting_ocr": 58
+        },
+        "registered": 5,
+        "aftercheck_pending": 0
+      }
+    },
+    "target_after": {
+      "found": true,
+      "observedAt": "2026-11-06 07:13:47 UTC",
+      "offset": 42,
+      "rowsRead": 7,
+      "pageProjection": {
+        "truncated": true,
+        "truncated_values": 5,
+        "omitted_columns": 0,
+        "omitted_rows": 18,
+        "next_offset": 49
+      },
+      "state": "waiting_ocr",
+      "engine": "local",
+      "attempts": 0,
+      "available_at": "2026-11-06T04:52:16.386Z",
+      "leasePresent": false,
+      "lease_until": "",
+      "error_code": "",
+      "invoicePresent": false,
+      "automatic": 0,
+      "updated_at": "2026-11-06T04:52:38.410Z"
+    },
+    "registrations_after": {
+      "rows": 2,
+      "hasMore": false,
+      "pageProjection": {
+        "truncated": false,
+        "truncated_values": 0,
+        "omitted_columns": 0,
+        "omitted_rows": 0,
+        "next_offset": null
+      },
+      "targetReceipt": false
+    },
+    "not_new_schedule_evidence": true
+  },
+  "gmail07": {
+    "run_id": "ee5e3cf2-0e54-832f-b443-b9e24ff2bc29",
+    "scheduled_for": "2026-11-06T07:00:00Z",
+    "started_at": "2026-11-06T06:55:02.233321Z",
+    "completed_at": "2026-11-06T06:55:03.035504Z",
+    "recorded_status": "no_update",
+    "fresh_pre_run_baseline_available": false,
+    "matching_receipt_available": false,
+    "tool_calls": "not_established",
+    "prompt_snapshot_during_execution_available": false,
+    "archive": "https://github.com/sharbel0022/Mgeorge/tree/1ec960d9de4f896f7f481bfdc0e0fc9cc47337fa/docs/quality8/gmail-schedule-0700-20261106",
+    "app_last_invoked": "2026-11-06T04:05:48.841Z",
+    "app_last_successful_fetch": "2026-11-06T04:06:01.714Z"
+  },
+  "backup": {
+    "snapshot": "768fde9a-27a2-4b85-b85a-278239ec4aea",
+    "copied": 430,
+    "verified": 430,
+    "bytes": 185567855,
+    "verified_at": "2026-11-06T00:48:58.086Z",
+    "scope": "Frozen 430-original manifest only; later imports excluded",
+    "corrected_automatic_budget_proven": false,
+    "next_existing_daily_schedule_utc": "2026-11-07T01:15:00Z"
+  },
+  "ocr_qualification": {
+    "published_replay_mandatory": "57/100",
+    "published_replay_all13": "79/130",
+    "unpublished_known_development_source": "c5cdd0fe57d300ba40f6572cbbe39c7fce9397e7",
+    "unpublished_known_development_mandatory": "69/100",
+    "unpublished_known_development_all13": "91/130",
+    "false_positives": 0,
+    "worker_calls": 12,
+    "parser_calls": 24,
+    "errors": 0,
+    "acceptance_pass": false,
+    "blind_acceptance": false,
+    "v3_still_sealed": true,
+    "raw_journal_and_full_original_qualification_not_recovered_externally": true,
+    "analysis_archive": "https://github.com/sharbel0022/Mgeorge/tree/d5e9451ceff439ff7ae60799de58e8ff00971eb8/docs/quality8/ocr-analysis-recovery-20261106"
+  },
+  "limitations": [
+    "Execution environment remains unavailable; no further local code, archive upload, optical replay or V3 run was performed.",
+    "The native dependency rejection is generic and does not name SheetJS; the CDN source is an evidence-based candidate, not a proven per-package diagnostic.",
+    "This is a documentation checkpoint on top of exact merged main. It is not a new product deployment or an additional CI run.",
+    "Ratings and acceptance criteria remain unchanged. No identity, consent, bank usage, invoice, payment or registration fact has been fabricated."
+  ]
+}

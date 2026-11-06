@@ -1,6 +1,6 @@
 {
   "schema": "mgeorge-quality8-current-assessment-v1",
-  "assessed_at": "2026-11-06T06:21:26Z",
+  "assessed_at": "2026-11-06T07:19:36Z",
   "published_site_version": 66,
   "published_main": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
   "status": "current_evidence_assessment_goal_not_yet_met",
@@ -46,7 +46,14 @@
     "https://github.com/sharbel0022/Mgeorge/tree/819bc206f7c21c0f6f8ce0a490c36fbfb4047579/docs/quality8/startup-independent-review-20261106",
     "https://github.com/sharbel0022/Mgeorge/tree/d5e9451ceff439ff7ae60799de58e8ff00971eb8/docs/quality8/ocr-analysis-recovery-20261106",
     "https://github.com/sharbel0022/Mgeorge/tree/5cd67b18792505139234de68533516fc33067ace/docs/quality8/gmail-schedule-0600-20261106",
-    "https://github.com/sharbel0022/Mgeorge/tree/fe7195ae1d6ffeb6ac52c37131c6b062f7c9f24d/docs/quality8/gmail-schedule-diagnostic-20261106"
+    "https://github.com/sharbel0022/Mgeorge/tree/fe7195ae1d6ffeb6ac52c37131c6b062f7c9f24d/docs/quality8/gmail-schedule-diagnostic-20261106",
+    "https://github.com/sharbel0022/Mgeorge/tree/2bf147fd2688313128e64028ebc4300472100794/docs/quality8/pr60-final-ci-520e2271-20261106",
+    "https://github.com/sharbel0022/Mgeorge/tree/abe08e383a1838c545fba13a4cf367998900ad89/docs/quality8/startup-main-ci-20261106",
+    "https://github.com/sharbel0022/Mgeorge/tree/44c5289383f23d2cc8e9f4d00f1ba2dc1297bb44/docs/quality8/startup-cancellation-red-f0e845bb-20261106",
+    "https://github.com/sharbel0022/Mgeorge/tree/955fcb98333c36e54f7e3e580f7fd70a5ae21292/docs/quality8/startup-independent-rereview-20261106",
+    "https://github.com/sharbel0022/Mgeorge/tree/1ec960d9de4f896f7f481bfdc0e0fc9cc47337fa/docs/quality8/gmail-schedule-0700-20261106",
+    "https://github.com/sharbel0022/Mgeorge/tree/d5ae148f4847e87b30e2e084494e3f44765afc27/docs/quality8/ocr-capacity-diagnosis-20261106",
+    "docs/quality8/release-wave6-20261106/README.md"
   ],
   "rows": [
     {
@@ -131,9 +138,9 @@
       "score": 6.5,
       "at_least_8": false,
       "criterion": "Säkra normalfall går igenom den avsedda kön; avvikelser har konkreta granskningsskäl och återupptagning; verklig köprogress observeras.",
-      "evidence": "Site 66: ett ägt normalunderlag återköades en gång genom den vanliga spärrade övergången och väntar på OCR. Två fullständigt lästa registreringsrader är oförändrade; inget nytt registreringskvitto. Ekonomiska läsningar behåller revision 52 och noll nya bokningar.",
+      "evidence": "Ordinarie OCR-workflow_run 42178783601 följde grön exakt-main CI och gav processed=6/failed=0. Väntkön gick 64→58 och needs_review 385→391; registreringsraderna är fortfarande 2. Det en gång normalt återköade ägda underlaget är vid läsning07:13:47 fortfarande waiting_ocr, attempts 0, utan lease/invoice/registreringskvitto. Två kompletta ekonomiska före-/efterläsningar behåller revision 52 och identiskt innehåll utom checkedAt.",
       "remaining_for_8": "Verifiera ett godtagbart normalunderlag genom hela avsedda kedjan, konkret faktisk köprogress och säker återupptagning. Periodicitet bedöms separat i område28.",
-      "scope_and_limitations": "Gmailframgång är inte OCR-/registreringsframgång. Ingen scoreökning enbart av felavstående eller att granskning är säker.",
+      "scope_and_limitations": "Faktisk köprogress är nu åter observerad men det valda normalunderlaget har inte genomgått hela kedjan. Processed i runnern kan inkludera server-PDF; sex är inte här ett bevis på exakt sex OCR-leaser. Ingen prioritet eller omkörning av måldokumentet gjordes.",
       "prior_independent_evidence_refs": [
         "published_release",
         "ocr_v2",
@@ -271,9 +278,9 @@
       "score": 6.5,
       "at_least_8": false,
       "criterion": "Aktuell godkänd anslutning och verifierad läsning av rätt valt konto; utgångna/återkallade medgivanden stoppas.",
-      "evidence": "Site66-revalidering avvisad: sparat null-usage och aktuellt utelämnat usage. Ett detaljförsök gav DETAILS_PROVIDER_UNAVAILABLE utan verifierad usageklass; ingen aktivering.",
+      "evidence": "Senast faktiskt utförda Site 66-revalidering är fortfarande avvisad: sparat null-usage, aktuellt utelämnat usage och ett detaljförsök med DETAILS_PROVIDER_UNAVAILABLE. Den fördjupade säkra felprojektionen finns i grön main cde9178 men Site 67-publiceringen misslyckades. Ingen ny bankrevalidering eller aktivering gjordes efter det misslyckade publiceringsförsöket.",
       "remaining_for_8": "Lös den faktiska kontoanvändningsavvisningen och verifiera bankgodkänt rätt konto.",
-      "scope_and_limitations": "Ett framtida samtyckesdatum, nytt felmeddelande eller grön CI återställer inte bankbehörighet. Ingen bankuppgift antas.",
+      "scope_and_limitations": "Nya felkoden kan inte läsas i drift innan rätt version faktiskt publicerats. Ingen slutsats om behov av nytt BankID eller bankens detaljorsak dras från det generiska äldre felet; befintliga användnings- och ägarspärrar består.",
       "prior_independent_evidence_refs": [
         "published_release",
         "operations",
@@ -287,7 +294,7 @@
       "score": 6.5,
       "at_least_8": false,
       "criterion": "Aktuell genomförd körning med befintligt samtycke, hållbara återförsök och korrekt nästa tid.",
-      "evidence": "Ingen ny lyckad behörig bankhämtning efter 2026-11-05 08:05 UTC.",
+      "evidence": "Ingen ny lyckad behörig bankhämtning är verifierad efter2026-11-05T08:05:14.646Z. Oförändrat schema är fortsatt aktiverat; konfiguration och grön CI räknas inte som utförd hämtning.",
       "remaining_for_8": "Verifiera ny lyckad schemalagd bankhämtning med aktuellt medgivande.",
       "scope_and_limitations": "Syntetiska retry-/jobbkvitton eller säkert avvisad revalidering är ingen lyckad automatisk bankhämtning.",
       "prior_independent_evidence_refs": [
@@ -476,9 +483,9 @@
       "score": 6.5,
       "at_least_8": false,
       "criterion": "Befintliga scheman fungerar och minst en faktisk körning observeras; överlapp, paus och sen körning hanteras; ingen grön status från enbart konfiguration.",
-      "evidence": "Tidigare periodisk OCR-körningen 42153093698 gav 6 behandlade och 0 fel. Gmail-schematillfällena 05:00 och06:00 gav no_update utan ny verifierad appinvokering; senaste lyckade hämtning är 04:06. Ordinarie 07:00-körning har en återläst engångsinstruktion om körkvitto. Backupens nya budget är fortfarande inte prövad automatiskt från ofärdig snapshot.",
+      "evidence": "Tidigare verklig periodisk OCR-run42153093698 gav 6/0. Den nya naturliga OCR-run 42178783601 gav 6/0 med event=workflow_run, vilket inte är nytt periodicitetstest. Gmail-tillfällena05:00,06:00 och07:00 saknar ny verifierad appinvokering;07-körningen rapporterar no_update utan matchande kvitto trots observerat engångskrav. Gmailmarkörerna är kvar04:05–04:06. Backupens korrigerade budget har ännu inte automatiskt slutfört en ofärdig snapshot.",
       "remaining_for_8": "Bekräfta en faktisk Gmail-schemakörning med den korrigerade instruktionen. Observera automatisk backup från ofärdig snapshot till separat bekräftad fullständig verifiering, eller en verklig automatisk återupptagningskedja som når samma slutläge. Periodisk OCR är redan verifierad.",
-      "scope_and_limitations": "Den observerade OCR-körningen har faktiskt event=schedule och behandlar väntande jobb. Ingen generell schema-SLA är uppmätt. Dagens manuellt färdigställda backup och senare complete-no-op provar inte den korrigerade anropsbudgeten.",
+      "scope_and_limitations": "07-körningen har scheduled_for07:00 men registrerad start06:55:02 och avslut06:55:03; tiderna bevaras exakt. Latest_result hör till02-run. Ingen färsk faktisk förebaslinje eller exekveringssnapshot för07 finns, och inga verktygsanrop/stoppskäl antas. Nästa ordinarie nya backupsnapshot är 2026-11-07 kl. 01:15 UTC; dagens complete-no-op uppfyller inte kriteriet.",
       "prior_independent_evidence_refs": [
         "operations",
         "published_release",
@@ -506,9 +513,9 @@
       "score": 8.5,
       "at_least_8": true,
       "criterion": "Ägar-/företagsgränser, sekretess, godkännanden och ekonomisk integritet bevaras; relevanta negativa tester och beroendegranskning.",
-      "evidence": "Exakt full CI/audit och negativa säkerhetsgrindar godkända;8 moderate utvecklingsfynd kvarstår.",
+      "evidence": "Publicerat betyg är fortsatt bundet till Site 66. Därutöver har exakt utvecklings-main cde9178 full CI, negativa säkerhetsgrindar och auditsteg godkända; separat PR-acceptans325 + 929 överlappar totalsviterna. Node och bridge rapporterar 0 sårbarheter; Sites rapporterar 8 moderate och passerar oförändrad high-gräns.",
       "remaining_for_8": null,
-      "scope_and_limitations": "Exakt main-audit: 0 produktionsfynd, 8 moderate utvecklingsfynd, 0 high/critical. Inte en full penetrationstest eller avtalsacceptans.",
+      "scope_and_limitations": "Ingen uppgift om noll Sites-auditfynd görs. Åtta måttliga fynd och separat verifierad minimatch-mitigering redovisas. Detta är inte full penetrationstest eller avtalsacceptans, och den opublicerade version 67 får inte räknas som produktionsbevis.",
       "prior_independent_evidence_refs": [
         "saas",
         "published_release",
@@ -536,9 +543,9 @@
       "score": 8.5,
       "at_least_8": true,
       "criterion": "Berörda regressioner, oberoende granskning och fulla obligatoriska CI-grindar på exakt levererad kod.",
-      "evidence": "Exakt main0035ea89: 7569/7569 obligatoriska tester, 0 fail/cancel/skip/TODO; alla 16 grindar och verkligt Sites-bygge passerade. Samma Sites-träd publicerat som Site66.",
+      "evidence": "Publicerade Site 66/main 0035ea89 har tidigare7569/7569. Ny normalt mergad main cde9178 har i första ordinarie push-CI7607/7607,0fail/cancel/skip/TODO,16/16 grindar och verkligt Sites-bygge. Oberoende P2/P3-återgranskning är READY efter ett faktiskt cancellation-RED och byteidentisk regression i GREEN. Ny Site 67 är ännu inte publicerad.",
       "remaining_for_8": null,
-      "scope_and_limitations": "Betyget avser exakt main0035ea89/Site66. Fokustester och separat överlappande SaaS-acceptans adderas inte dubbelt. Sites audit har kvar 8 moderate-fynd.",
+      "scope_and_limitations": "Betygets produktionsbindning är fortsatt Site 66/main 0035ea89. Nya huvudgrensresultatet är separat utvecklingsbevis; ett misslyckat nativebygge är inte publicerad kod. SaaS överlappande1254fall adderas inte dubbelt. Sites audit har8moderate.",
       "prior_independent_evidence_refs": [
         "published_release",
         "integration_wave2",
@@ -553,9 +560,9 @@
       "score": 8,
       "at_least_8": true,
       "criterion": "Levererad version kopplas till exakt källträd; bank/Gmail/OCR/backup har relevanta aktuella observationer och ekonomiska skydd jämförs före/efter.",
-      "evidence": "Exakt main0035ea89 till Site66; verklig avvisad bankrevalidering med bounded detaljförsök, nio nya Gmail-importer, köprogress till OCR, tidigare periodisk OCR 6/0 och verifierad 430-filssnapshot. Två kompletta ekonomiska före-/efterläsningar efter normal bearbetning behåller revision52, noll bokningar och alla uppgifter/spärrar utom kontrolltid.",
+      "evidence": "Site 66 är fortfarande senaste lyckade publicering och dess deployment återlästes succeeded med MCP och envrevision 10. Site 67:s källa sparades men nativepubliceringen failed 07:08:41. Två kompletta ekonomiska läsningar07:03:27 och07:12:46 är identiska utom checkedAt, revision 52. Ny naturlig OCR-körning6/0 och konkret köprogress är observerade; bank/Gmail/backupkraven kvarstår enligt sina egna områden.",
       "remaining_for_8": null,
-      "scope_and_limitations": "Bankavvisningen är inte giltig anslutning eller lyckad hämtning (15/16). Det äldre faktiskt periodiska OCR-beviset hör till område28; nya manuellt startade Gmail-anrop är inte periodiska bevis. Normalfakturans registrering kvarstår i6. Ingen fysisk mobil, autentiserad full bankresa eller fullständig ekonomirevision påstås.",
+      "scope_and_limitations": "Inget betyg höjs för en sparad eller misslyckad publicering. Bankavvisningen är inte giltig anslutning eller lyckad hämtning(15/16); OCR workflow_run är inte schemabevis(28). Normalfakturans registrering kvarstår(6). Ingen fysisk mobil, full bankresa eller fullständig ekonomirevision påstås.",
       "prior_independent_evidence_refs": [
         "published_release",
         "browser",
@@ -564,5 +571,24 @@
         "recovery"
       ]
     }
-  ]
+  ],
+  "development_main": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+  "development_main_ci": {
+    "run": 42177971213,
+    "attempt": 1,
+    "tests": 7607,
+    "passed": 7607,
+    "failed": 0,
+    "mandatory_steps_passed": 16,
+    "source_tree": "4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+    "sites_tree": "4feabc128c5f677103232d1cad1e4406083e8f19"
+  },
+  "unpublished_candidate": {
+    "site_version": 67,
+    "native_source": "d30b1e2518e3765b15fba28cbd306addf142da38",
+    "deployment_id": "appgdep_6aed7cf03554819191f58e9eda384478",
+    "deployment_status": "failed",
+    "failure": "A dependency uses a private or unsupported source. Replace it with a dependency available from a supported public registry, update the lockfile, and publish again.",
+    "bank_revalidation_after_attempt": false
+  }
 }

@@ -1,3 +1,11 @@
+## 2026-11-06 07:19:36 UTC — full main grön, publicering stoppad, målet fortsatt öppet
+
+**28/33 områden når minst 8.** PR 60 är normalt mergad till main`cde9178c0f8e8e386329ed8feaa4201e87b5a78f`; exakt första main-CI gav 7607/7607 och16/16 grindar efter verkligt cancellation-RED och oberoende återgranskning. Version 67:s ordinarie fjärrbyggda publicering misslyckades på en avvisad beroendekälla; Site 66 är fortsatt senaste lyckade publicering. SheetJS-CDN är lockfilens enda källa utanför npm-registret, men felet namnger inte paketet.
+
+Naturlig OCR-run 42178783601 gav 6/0, kö 64→58, granskning 385→391 och inga nya registreringar. Det tidigare återköade målet är fortfarande waiting_ocr. Gmail 07 gav no_update utan matchande kvitto, och dess markörer är oförändrade04:05–04:06. Två fulla ekonomiska svar07:03/07:12 är identiska utom checkedAt, revision 52. Inget nytt bankförsök gjordes efter misslyckad publicering. Arbetsmiljön och exakta lokala bygg-/OCR-artifakter är fortsatt otillgängliga.
+
+Se [samlat aktuellt kvitto](docs/quality8/release-wave6-20261106/README.md) och [oförändrade 33 betyg](docs/quality8/current-33-assessment.json). Nästa verkliga steg och begränsningar finns där; tidigare misslyckanden och historiska godkännanden nedan bevaras.
+
 ## 2026-11-06 06:21 UTC — miljöavbrott säkrat, publicering fortsatt spärrad
 
 **28/33 områden når minst 8; 6,10,15,16,28 kvarstår under 8.** Site 66/main `0035ea89` är fortsatt produktionskälla. PR 59 mergades normalt till main `237dd45e`, men dess separata huvudgrens-CI gav 7604/7605. Samtliga 7 ursprungliga PR 59/main-jobbloggar är [återhämtade och hashverifierade](https://github.com/sharbel0022/Mgeorge/tree/6848bdc1fdb98c98405caca67fafd2e3a203d752/docs/quality8/remote-recovery-wave5-20261106).

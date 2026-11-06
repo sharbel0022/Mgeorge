@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "status": "authorized_work_completed_to_current_capability_boundary_goal_unmet",
+  "base_main": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+  "published_site_version": 66,
+  "failed_candidate_version": 67,
+  "next_actions_if_environment_returns": [
+    "Verify the existing native archive and pushed source before ordinary artifact publication.",
+    "Revalidate the bank once only after an actually successful publication and preserve the exact failure projection.",
+    "Recover the exact OCR raw journal and source commits; do not replace a spent optical run with another run.",
+    "Continue ordinary queue and schedule observations; no receipt or score may be invented."
+  ],
+  "last_known_unavailable_files": {
+    "native_archive": "/tmp/rating8-wave5-site67-bank-diagnostic.tar.gz",
+    "qualification_worktree": "/workspace/scratch/4d79ab4bea8e/ocr-qualification-wave5",
+    "integration_worktree": "/workspace/scratch/4d79ab4bea8e/ocr-integration-wave5",
+    "holdout_v3": "/workspace/scratch/4d79ab4bea8e/ocr-holdout-v3"
+  },
+  "native_archive_last_known_bytes": 18607635,
+  "native_archive_last_known_sha256": "0edf980d1d397decd171164d4d867463486c0e968acd0282a620d28609842e00",
+  "availability_of_these_paths_now": "unverified because execution environment unavailable",
+  "ocr": {
+    "source": "c5cdd0fe57d300ba40f6572cbbe39c7fce9397e7",
+    "qualification": "2ca47860bd1dc587e0fec0a3dfbcedac8477a6fb",
+    "integration_product": "efb90cdad56ba8e813c1ea8efb4c1aa2df4707f7",
+    "integration_docs": "07a8cdcf9d3224f7e99b47911f276490787e7ddc",
+    "spent_binding_sha256": "d9441eca73dea9fc17456414a993d64350c504ab1e9db76212855f1964837d28",
+    "result_sha256": "8957731b7f0f1ed9fed6bb53683b65cf352138e4b1f3f7fa0ee8f5980dfa2756",
+    "journal_sha256": "bbab42c756a7c456e38f66fd08cb34284a6aea1cd96f7665776c2505f07f7023",
+    "journal_bytes": 68885082,
+    "holdout_v3_freeze": "e2b61ae7504d07f2753e575eeddec8bf5966da84",
+    "holdout_v3_runs": 0
+  },
+  "no_user_permission_request_pending": true,
+  "blocking_constraints": [
+    "Unavailable execution environment and exact local artifacts.",
+    "Native source-only build rejects a dependency source; package-level cause remains inferred.",
+    "Actual bank account usage remains unverified; new diagnostic is not published.",
+    "Gmail scheduled execution lacks a matching receipt.",
+    "Full automatic backup from unfinished state requires a real future run."
+  ]
+}
