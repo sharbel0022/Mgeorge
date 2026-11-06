@@ -1,0 +1,105 @@
+{
+  "schema": "lossless-ci-evidence-storage-v1",
+  "sourceHead": "364232a393fe96257a2579aac77dfb8dcfb87999",
+  "entries": [
+    {
+      "originalPath": "REPORT.md",
+      "originalBytes": 5318,
+      "originalSha256": "c971a65208a302d6aa10c0af4b3a474024e17092bea9519fb42a4cff2acaa911",
+      "storedPath": "REPORT.md",
+      "storedBytes": 5318,
+      "storedSha256": "c971a65208a302d6aa10c0af4b3a474024e17092bea9519fb42a4cff2acaa911",
+      "gzip": false
+    },
+    {
+      "originalPath": "ci-receipt.json",
+      "originalBytes": 31311,
+      "originalSha256": "41470a44fa0b3c6b604b68e31e162fd8aea8de2df6e6eb437163a9337225fef8",
+      "storedPath": "ci-receipt.json",
+      "storedBytes": 31311,
+      "storedSha256": "41470a44fa0b3c6b604b68e31e162fd8aea8de2df6e6eb437163a9337225fef8",
+      "gzip": false
+    },
+    {
+      "originalPath": "logs/bankgiro_bridge-127681065799.log",
+      "originalBytes": 36935,
+      "originalSha256": "25ff848c5b54ce911a8341fd7dfa8756bb90eaa4be76a544217b47886d9ee617",
+      "storedPath": "logs/bankgiro_bridge-127681065799.log.gz",
+      "storedBytes": 8735,
+      "storedSha256": "0a52ff40fb3643dec9144e07de8720bc86c7914e264e9ae5424c5fa1ba64a29a",
+      "gzip": true
+    },
+    {
+      "originalPath": "logs/security_acceptance-127681065605.log",
+      "originalBytes": 19836,
+      "originalSha256": "4f5f877ffaa732637126fbf748565ceae3f393711b072e0bad0359bedd323a82",
+      "storedPath": "logs/security_acceptance-127681065605.log.gz",
+      "storedBytes": 5483,
+      "storedSha256": "0299d57cfff3a193c22f4c17b2be120c80a58450a21112f0d8f5b12598a7a504",
+      "gzip": true
+    },
+    {
+      "originalPath": "logs/sites-127681065709.log",
+      "originalBytes": 2112339,
+      "originalSha256": "51148428127879779802bd4df37354d205b4996e82abc5df90e0a65c84851d5e",
+      "storedPath": "logs/sites-127681065709.log.gz",
+      "storedBytes": 344002,
+      "storedSha256": "eaa1d3fa7a3535b7916932817a6c3ec89104a3534643aa614c6e117288cfcc37",
+      "gzip": true
+    },
+    {
+      "originalPath": "logs/test-127681065581.log",
+      "originalBytes": 990523,
+      "originalSha256": "30e4ef1f6ec03723f37d73a62b0116f2221939bc3e128bc9365cf9d2c33f8554",
+      "storedPath": "logs/test-127681065581.log.gz",
+      "storedBytes": 163722,
+      "storedSha256": "0e6ec86e07376c7e2fdef242a388736bc2e628585d3460d4866ec4e2fa323018",
+      "gzip": true
+    },
+    {
+      "originalPath": "raw-log-receipts.json",
+      "originalBytes": 1764,
+      "originalSha256": "49f6e7903603de402aa1607ebec6759e215173bce256ad3f4ff5976b2ba81098",
+      "storedPath": "raw-log-receipts.json",
+      "storedBytes": 1764,
+      "storedSha256": "49f6e7903603de402aa1607ebec6759e215173bce256ad3f4ff5976b2ba81098",
+      "gzip": false
+    },
+    {
+      "originalPath": "sites-failure-blocks.json",
+      "originalBytes": 25988,
+      "originalSha256": "7df8c523bd1d306ce08927f290d4c69a5f24d99dc0409a53bd5e796cb30034dd",
+      "storedPath": "sites-failure-blocks.json",
+      "storedBytes": 25988,
+      "storedSha256": "7df8c523bd1d306ce08927f290d4c69a5f24d99dc0409a53bd5e796cb30034dd",
+      "gzip": false
+    },
+    {
+      "originalPath": "source-verification.json",
+      "originalBytes": 750,
+      "originalSha256": "97105ccd342863c91d962640e45fb18422f651990edf086c1ef4ff49cfdeb339",
+      "storedPath": "source-verification.json",
+      "storedBytes": 750,
+      "storedSha256": "97105ccd342863c91d962640e45fb18422f651990edf086c1ef4ff49cfdeb339",
+      "gzip": false
+    },
+    {
+      "originalPath": "status-history.json",
+      "originalBytes": 51107,
+      "originalSha256": "5ffb1206d043e4a1b3c2adbfee76e6b652a32eca4099fc9f5fbc1cb6f0e6d99c",
+      "storedPath": "status-history.json",
+      "storedBytes": 51107,
+      "storedSha256": "5ffb1206d043e4a1b3c2adbfee76e6b652a32eca4099fc9f5fbc1cb6f0e6d99c",
+      "gzip": false
+    },
+    {
+      "originalPath": "terminal-status.json",
+      "originalBytes": 17323,
+      "originalSha256": "8830281e4a3d0027180b480c6b496df85182134d617000c31e6706307b24d7b1",
+      "storedPath": "terminal-status.json",
+      "storedBytes": 17323,
+      "storedSha256": "8830281e4a3d0027180b480c6b496df85182134d617000c31e6706307b24d7b1",
+      "gzip": false
+    }
+  ]
+}

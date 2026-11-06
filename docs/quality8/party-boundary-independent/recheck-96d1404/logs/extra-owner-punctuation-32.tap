@@ -1,0 +1,202 @@
+TAP version 13
+# Subtest: Node pdf recheck extra: square bracket before bare role
+ok 1 - Node pdf recheck extra: square bracket before bare role
+  ---
+  duration_ms: 39.879139
+  type: 'test'
+  ...
+# Subtest: Node pdf recheck extra: adjacent parenthesis before bare role
+ok 2 - Node pdf recheck extra: adjacent parenthesis before bare role
+  ---
+  duration_ms: 2.659629
+  type: 'test'
+  ...
+# Subtest: Node pdf recheck extra: period inside closing parenthesis
+ok 3 - Node pdf recheck extra: period inside closing parenthesis
+  ---
+  duration_ms: 1.009044
+  type: 'test'
+  ...
+# Subtest: Node pdf recheck extra: comma following closing bracket
+ok 4 - Node pdf recheck extra: comma following closing bracket
+  ---
+  duration_ms: 0.757402
+  type: 'test'
+  ...
+# Subtest: Node pdf recheck extra: different unowned value remains in census after an explicit owner
+ok 5 - Node pdf recheck extra: different unowned value remains in census after an explicit owner
+  ---
+  duration_ms: 1.04666
+  type: 'test'
+  ...
+# Subtest: Node pdf recheck extra: equal unowned value confirms only an independently explicit owner
+ok 6 - Node pdf recheck extra: equal unowned value confirms only an independently explicit owner
+  ---
+  duration_ms: 1.253256
+  type: 'test'
+  ...
+# Subtest: Node pdf recheck extra: opposite explicit owner does not donate to selected recipient
+ok 7 - Node pdf recheck extra: opposite explicit owner does not donate to selected recipient
+  ---
+  duration_ms: 0.758423
+  type: 'test'
+  ...
+# Subtest: Node pdf recheck extra: literal role word followed by bracketed form stays one name
+ok 8 - Node pdf recheck extra: literal role word followed by bracketed form stays one name
+  ---
+  duration_ms: 2.102413
+  type: 'test'
+  ...
+# Subtest: Node ocr recheck extra: square bracket before bare role
+ok 9 - Node ocr recheck extra: square bracket before bare role
+  ---
+  duration_ms: 1.362818
+  type: 'test'
+  ...
+# Subtest: Node ocr recheck extra: adjacent parenthesis before bare role
+ok 10 - Node ocr recheck extra: adjacent parenthesis before bare role
+  ---
+  duration_ms: 1.494774
+  type: 'test'
+  ...
+# Subtest: Node ocr recheck extra: period inside closing parenthesis
+ok 11 - Node ocr recheck extra: period inside closing parenthesis
+  ---
+  duration_ms: 0.798783
+  type: 'test'
+  ...
+# Subtest: Node ocr recheck extra: comma following closing bracket
+ok 12 - Node ocr recheck extra: comma following closing bracket
+  ---
+  duration_ms: 0.575813
+  type: 'test'
+  ...
+# Subtest: Node ocr recheck extra: different unowned value remains in census after an explicit owner
+ok 13 - Node ocr recheck extra: different unowned value remains in census after an explicit owner
+  ---
+  duration_ms: 0.920683
+  type: 'test'
+  ...
+# Subtest: Node ocr recheck extra: equal unowned value confirms only an independently explicit owner
+ok 14 - Node ocr recheck extra: equal unowned value confirms only an independently explicit owner
+  ---
+  duration_ms: 0.64831
+  type: 'test'
+  ...
+# Subtest: Node ocr recheck extra: opposite explicit owner does not donate to selected recipient
+ok 15 - Node ocr recheck extra: opposite explicit owner does not donate to selected recipient
+  ---
+  duration_ms: 0.491047
+  type: 'test'
+  ...
+# Subtest: Node ocr recheck extra: literal role word followed by bracketed form stays one name
+ok 16 - Node ocr recheck extra: literal role word followed by bracketed form stays one name
+  ---
+  duration_ms: 0.727718
+  type: 'test'
+  ...
+# Subtest: Sites pdf recheck extra: square bracket before bare role
+ok 17 - Sites pdf recheck extra: square bracket before bare role
+  ---
+  duration_ms: 6.091571
+  type: 'test'
+  ...
+# Subtest: Sites pdf recheck extra: adjacent parenthesis before bare role
+ok 18 - Sites pdf recheck extra: adjacent parenthesis before bare role
+  ---
+  duration_ms: 0.977016
+  type: 'test'
+  ...
+# Subtest: Sites pdf recheck extra: period inside closing parenthesis
+ok 19 - Sites pdf recheck extra: period inside closing parenthesis
+  ---
+  duration_ms: 0.81021
+  type: 'test'
+  ...
+# Subtest: Sites pdf recheck extra: comma following closing bracket
+ok 20 - Sites pdf recheck extra: comma following closing bracket
+  ---
+  duration_ms: 0.716551
+  type: 'test'
+  ...
+# Subtest: Sites pdf recheck extra: different unowned value remains in census after an explicit owner
+ok 21 - Sites pdf recheck extra: different unowned value remains in census after an explicit owner
+  ---
+  duration_ms: 1.160198
+  type: 'test'
+  ...
+# Subtest: Sites pdf recheck extra: equal unowned value confirms only an independently explicit owner
+ok 22 - Sites pdf recheck extra: equal unowned value confirms only an independently explicit owner
+  ---
+  duration_ms: 0.896819
+  type: 'test'
+  ...
+# Subtest: Sites pdf recheck extra: opposite explicit owner does not donate to selected recipient
+ok 23 - Sites pdf recheck extra: opposite explicit owner does not donate to selected recipient
+  ---
+  duration_ms: 0.717102
+  type: 'test'
+  ...
+# Subtest: Sites pdf recheck extra: literal role word followed by bracketed form stays one name
+ok 24 - Sites pdf recheck extra: literal role word followed by bracketed form stays one name
+  ---
+  duration_ms: 0.875627
+  type: 'test'
+  ...
+# Subtest: Sites ocr recheck extra: square bracket before bare role
+ok 25 - Sites ocr recheck extra: square bracket before bare role
+  ---
+  duration_ms: 0.731633
+  type: 'test'
+  ...
+# Subtest: Sites ocr recheck extra: adjacent parenthesis before bare role
+ok 26 - Sites ocr recheck extra: adjacent parenthesis before bare role
+  ---
+  duration_ms: 0.767566
+  type: 'test'
+  ...
+# Subtest: Sites ocr recheck extra: period inside closing parenthesis
+ok 27 - Sites ocr recheck extra: period inside closing parenthesis
+  ---
+  duration_ms: 0.655852
+  type: 'test'
+  ...
+# Subtest: Sites ocr recheck extra: comma following closing bracket
+ok 28 - Sites ocr recheck extra: comma following closing bracket
+  ---
+  duration_ms: 0.587209
+  type: 'test'
+  ...
+# Subtest: Sites ocr recheck extra: different unowned value remains in census after an explicit owner
+ok 29 - Sites ocr recheck extra: different unowned value remains in census after an explicit owner
+  ---
+  duration_ms: 0.798703
+  type: 'test'
+  ...
+# Subtest: Sites ocr recheck extra: equal unowned value confirms only an independently explicit owner
+ok 30 - Sites ocr recheck extra: equal unowned value confirms only an independently explicit owner
+  ---
+  duration_ms: 0.650253
+  type: 'test'
+  ...
+# Subtest: Sites ocr recheck extra: opposite explicit owner does not donate to selected recipient
+ok 31 - Sites ocr recheck extra: opposite explicit owner does not donate to selected recipient
+  ---
+  duration_ms: 0.584596
+  type: 'test'
+  ...
+# Subtest: Sites ocr recheck extra: literal role word followed by bracketed form stays one name
+ok 32 - Sites ocr recheck extra: literal role word followed by bracketed form stays one name
+  ---
+  duration_ms: 0.63419
+  type: 'test'
+  ...
+1..32
+# tests 32
+# suites 0
+# pass 32
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 565.425404

@@ -1,0 +1,7 @@
+{
+  "casesSha256": "8f72fc82b369d015c60dc24d06d6803e659d7159a8c3bce86ccdb8f3d7c420f3",
+  "testOriginalSha256": "bc468a7bced8bd59ba8c054bb3721a2b9e384962d1e72eb4aa97960f063d1daf",
+  "testIntegratedSha256": "44b434761e46a3f02d4165bc9da27641ec514e10562f360c9ef1ef532a413455",
+  "changes": "Only default repository resolution and fixture pathname; assertions, cases and loops unchanged.",
+  "caseCount": 41
+}

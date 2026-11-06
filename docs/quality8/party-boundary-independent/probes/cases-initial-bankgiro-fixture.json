@@ -1,0 +1,416 @@
+{
+  "schema": "independent-party-boundary-cases-v1",
+  "baseline": "dd968c1fd10b4e21c2479a939df548e390f5c6d6",
+  "cases": [
+    {
+      "name": "recipient then supplier",
+      "group": "bare-role-boundary",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "supplier then recipient",
+      "group": "bare-role-boundary",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör: Oberoende Söder AB Faktureras till Oberoende Norr AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "recipient then customer",
+      "group": "bare-role-boundary",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Oberoende Söder AB Kund Oberoende Norr AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "repeated English recipient",
+      "group": "bare-role-boundary",
+      "direction": "customer",
+      "text": "FAKTURA\nBill to: Independent North AB bill to Independent South AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "repeated supplier",
+      "group": "bare-role-boundary",
+      "direction": "supplier",
+      "text": "FAKTURA\nSupplier: Independent North AB supplier Independent South AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "upper case roles",
+      "group": "bare-role-boundary",
+      "direction": "supplier",
+      "text": "FAKTURA\nSUPPLIER: Independent North AB CUSTOMER Independent South AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "lowercase legal form",
+      "group": "bare-role-boundary",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Oberoende Söder ab leverantör Oberoende Norr AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "period after legal form",
+      "group": "bare-role-boundary",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Independent North AB. supplier Independent South AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "comma after legal form",
+      "group": "bare-role-boundary",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Independent North AB, customer Independent South AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "semicolon after legal form",
+      "group": "bare-role-boundary",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Independent North AB; recipient Independent South AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "parenthesized legal form",
+      "group": "bare-role-boundary",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Independent North (AB) supplier Independent South AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "tab before new role",
+      "group": "bare-role-boundary",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Oberoende Söder AB\tLeverantör Oberoende Norr AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "column spaces before new role",
+      "group": "bare-role-boundary",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Oberoende Söder AB    Leverantör Oberoende Norr AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "tab after explicit colon",
+      "group": "bare-role-boundary",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till:\tOberoende Söder AB Leverantör Oberoende Norr AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "HB before new role",
+      "group": "bare-role-boundary",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör: Oberoende Söder HB Kund Oberoende Norr AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "KB before new role",
+      "group": "bare-role-boundary",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Oberoende Söder KB Leverantör Oberoende Norr AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "single-letter prefix",
+      "group": "bare-role-boundary",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: A AB Leverantör B AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": "5560160680",
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "literal supplier in name",
+      "group": "literal-name-positive",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör: Original supplier AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Original supplier AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "literal customer in name",
+      "group": "literal-name-positive",
+      "direction": "customer",
+      "text": "FAKTURA\nKund: Synthetic customer AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Synthetic customer AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "literal middle Customer",
+      "group": "literal-name-positive",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör: North Customer Support AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "North Customer Support AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "literal leading Kund",
+      "group": "literal-name-positive",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör: Kund AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Kund AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "literal middle Supplier",
+      "group": "literal-name-positive",
+      "direction": "customer",
+      "text": "FAKTURA\nKund: Svenska Supplier Support AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Svenska Supplier Support AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "uppercase literal role word",
+      "group": "literal-name-positive",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör: Original SUPPLIER AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Original SUPPLIER AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "literal leading Customer",
+      "group": "literal-name-positive",
+      "direction": "customer",
+      "text": "FAKTURA\nKund: Customer Care AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Customer Care AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "hyphenated literal role word",
+      "group": "literal-name-positive",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör: North Customer-Support AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "North Customer-Support AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "role fragment",
+      "group": "literal-name-positive",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör: Suppliership AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Suppliership AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "legal-form suffix fragment",
+      "group": "literal-name-positive",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör: North AAB Customer Support AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "North AAB Customer Support AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "tab after colon with literal role",
+      "group": "literal-name-positive",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör:\tOriginal supplier AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Original supplier AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "tab within explicit recipient label",
+      "group": "literal-name-positive",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras\ttill: Synthetic customer AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Synthetic customer AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "wrapped explicit supplier name",
+      "group": "literal-name-positive",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör:\nOriginal supplier AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Original supplier AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "repeated Kund as literal value",
+      "group": "literal-name-positive",
+      "direction": "customer",
+      "text": "FAKTURA\nKund: Kund AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Kund AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "plain complete name",
+      "group": "literal-name-positive",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Oberoende Avtalsbyrån AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Oberoende Avtalsbyrån AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    },
+    {
+      "name": "two separately explicit colon roles",
+      "group": "explicit-roles-positive",
+      "direction": "customer",
+      "text": "FAKTURA\nLeverantör: Original supplier AB Kund: Synthetic customer AB\nMottagarens organisationsnummer: 556016-0680\nLeverantörens organisationsnummer: 559762-3114\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Synthetic customer AB",
+      "organization": "5560160680",
+      "otherName": "Original supplier AB",
+      "green": true
+    },
+    {
+      "name": "unowned number after recipient then supplier",
+      "group": "owner-census",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": null,
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "unowned number after supplier then recipient",
+      "group": "owner-census",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör: Oberoende Söder AB Faktureras till Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": null,
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "unowned number after repeated recipient",
+      "group": "owner-census",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Oberoende Söder AB Kund Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": null,
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "inline unowned number after new bare role",
+      "group": "owner-census",
+      "direction": "customer",
+      "text": "FAKTURA\nFaktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB Organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": null,
+      "organization": null,
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "unknown field cannot donate ownership",
+      "group": "owner-census-control",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör: Original supplier AB\nAvtal: Oberoende notering\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Original supplier AB",
+      "organization": null,
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "invalid unowned number before owned number holds census",
+      "group": "owner-census-control",
+      "direction": "supplier",
+      "text": "FAKTURA\nOrganisationsnummer: 0000000000\nLeverantör: Original supplier AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Original supplier AB",
+      "organization": null,
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "different unowned number after scalar holds census",
+      "group": "owner-census-control",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör: Original supplier AB\nLeverantörens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nOrganisationsnummer: 559762-3114\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Original supplier AB",
+      "organization": null,
+      "otherName": null,
+      "green": false
+    },
+    {
+      "name": "equal unowned duplicate preserves independently owned number",
+      "group": "owner-census-control",
+      "direction": "supplier",
+      "text": "FAKTURA\nLeverantör: Original supplier AB\nLeverantörens organisationsnummer: 556016-0680\nAvtal: Oberoende notering\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "party": "Original supplier AB",
+      "organization": "5560160680",
+      "otherName": null,
+      "green": true
+    }
+  ]
+}

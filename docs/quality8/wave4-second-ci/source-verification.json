@@ -1,0 +1,20 @@
+{
+  "schema": "exact-pr-ci-source-binding-v1",
+  "head": {
+    "sha": "364232a393fe96257a2579aac77dfb8dcfb87999",
+    "tree": "189bbc347ac5ac5f50729796f71b341c7a91c63a"
+  },
+  "checkout": {
+    "sha": "93ebe255217e064c007c379a24a028ffe5e4e098",
+    "tree": "189bbc347ac5ac5f50729796f71b341c7a91c63a",
+    "parents": [
+      "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+      "364232a393fe96257a2579aac77dfb8dcfb87999"
+    ]
+  },
+  "sameTree": true,
+  "observedAt": "2026-11-06T03:07:12.253Z",
+  "runHeadSha": "364232a393fe96257a2579aac77dfb8dcfb87999",
+  "checkoutSource": "git log -1 --format=%H in all four full job logs",
+  "checkoutApiUrl": "https://api.github.com/repos/sharbel0022/Mgeorge/git/commits/93ebe255217e064c007c379a24a028ffe5e4e098"
+}

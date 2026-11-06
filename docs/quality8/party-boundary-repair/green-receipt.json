@@ -1,0 +1,30 @@
+{
+  "base": "dd968c1fd10b4e21c2479a939df548e390f5c6d6",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--experimental-strip-types",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "sites/tests/review-explicit-recipient-boundaries.test.mjs",
+    "sites/tests/party-role-name-grammar.test.mjs",
+    "sites/tests/party-completed-name-boundaries.test.mjs"
+  ],
+  "exitCode": 0,
+  "log": "green.tap",
+  "logSha256": "57edead71d1e90fb45904ad6c5319c696f0c5abcacca690ad8b34bd865181600",
+  "productSha256": "601845116067fe4860bf14d2f21f7f3a1d11cadcced8e73dc248dcbe7ebd48d5",
+  "nodeSitesBytesEqual": true,
+  "counts": [
+    "# tests 144",
+    "# pass 144",
+    "# fail 0",
+    "# cancelled 0",
+    "# skipped 0",
+    "# todo 0",
+    "# duration_ms 1984.807872"
+  ],
+  "failures": []
+}

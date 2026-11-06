@@ -1,0 +1,3942 @@
+TAP version 13
+# Subtest: Q8: selecting a Gmail document opens its original using reads only
+ok 1 - Q8: selecting a Gmail document opens its original using reads only
+  ---
+  duration_ms: 209.584538
+  type: 'test'
+  ...
+# Subtest: Gmail preview preserves original-bound bankgiro words through its contextual parser: high
+ok 2 - Gmail preview preserves original-bound bankgiro words through its contextual parser: high
+  ---
+  duration_ms: 63.858579
+  type: 'test'
+  ...
+# Subtest: Gmail preview preserves original-bound bankgiro words through its contextual parser: low
+ok 3 - Gmail preview preserves original-bound bankgiro words through its contextual parser: low
+  ---
+  duration_ms: 53.722929
+  type: 'test'
+  ...
+# Subtest: Gmail preview preserves original-bound bankgiro words through its contextual parser: missing
+ok 4 - Gmail preview preserves original-bound bankgiro words through its contextual parser: missing
+  ---
+  duration_ms: 42.657473
+  type: 'test'
+  ...
+# Subtest: Gmail preview preserves original-bound bankgiro words through its contextual parser: other-original
+ok 5 - Gmail preview preserves original-bound bankgiro words through its contextual parser: other-original
+  ---
+  duration_ms: 53.153125
+  type: 'test'
+  ...
+# Subtest: Gmail preview interprets complete bounded OCR text beyond the display excerpt: supported value
+ok 6 - Gmail preview interprets complete bounded OCR text beyond the display excerpt: supported value
+  ---
+  duration_ms: 147.463604
+  type: 'test'
+  ...
+# Subtest: Gmail preview interprets complete bounded OCR text beyond the display excerpt: late conflict
+ok 7 - Gmail preview interprets complete bounded OCR text beyond the display excerpt: late conflict
+  ---
+  duration_ms: 92.776002
+  type: 'test'
+  ...
+# Subtest: Q8: explicit approval sends original extraction with the separately corrected invoice fields
+ok 8 - Q8: explicit approval sends original extraction with the separately corrected invoice fields
+  ---
+  duration_ms: 48.97891
+  type: 'test'
+  ...
+# Subtest: Q8: explicit rejection sends the displayed original extraction once
+ok 9 - Q8: explicit rejection sends the displayed original extraction once
+  ---
+  duration_ms: 56.540343
+  type: 'test'
+  ...
+# Subtest: Q8: preview uses retained first extraction when no later worker extraction exists
+ok 10 - Q8: preview uses retained first extraction when no later worker extraction exists
+  ---
+  duration_ms: 49.747549
+  type: 'test'
+  ...
+# Subtest: Q8: preview uses the latest worker extraction while retaining the prior source separately
+ok 11 - Q8: preview uses the latest worker extraction while retaining the prior source separately
+  ---
+  duration_ms: 53.338246
+  type: 'test'
+  ...
+# Subtest: Q8: registration UI keeps the committed outcome and reports a pending after-check
+ok 12 - Q8: registration UI keeps the committed outcome and reports a pending after-check
+  ---
+  duration_ms: 57.81452
+  type: 'test'
+  ...
+# Subtest: Q8: a reloaded OCR status retains the registration after-check warning
+ok 13 - Q8: a reloaded OCR status retains the registration after-check warning
+  ---
+  duration_ms: 18.152002
+  type: 'test'
+  ...
+# Subtest: Q8 review: processing UI reports a metadata warning while keeping the accepted work visible
+ok 14 - Q8 review: processing UI reports a metadata warning while keeping the accepted work visible
+  ---
+  duration_ms: 42.792183
+  type: 'test'
+  ...
+# Subtest: Q8 finalizer: Gmail sync UI retains the accepted count and uncertain final-status warning
+ok 15 - Q8 finalizer: Gmail sync UI retains the accepted count and uncertain final-status warning
+  ---
+  duration_ms: 46.9223
+  type: 'test'
+  ...
+# Subtest: Q8: review diagnostics explain overlap and coverage without presenting old extraction as a new verification
+ok 16 - Q8: review diagnostics explain overlap and coverage without presenting old extraction as a new verification
+  ---
+  duration_ms: 7.502881
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: accepted sync updates the parent revision and retains metadata warnings
+ok 17 - Gmail workspace refresh: accepted sync updates the parent revision and retains metadata warnings
+  ---
+  duration_ms: 40.066276
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: accepted process updates the parent revision and retains metadata warnings
+ok 18 - Gmail workspace refresh: accepted process updates the parent revision and retains metadata warnings
+  ---
+  duration_ms: 38.001749
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: accepted retry updates the parent revision and retains metadata warnings
+ok 19 - Gmail workspace refresh: accepted retry updates the parent revision and retains metadata warnings
+  ---
+  duration_ms: 44.949923
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: approve waits for an asynchronous parent refresh before completing
+ok 20 - Gmail workspace refresh: approve waits for an asynchronous parent refresh before completing
+  ---
+  duration_ms: 41.564284
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: reject waits for an asynchronous parent refresh before completing
+ok 21 - Gmail workspace refresh: reject waits for an asynchronous parent refresh before completing
+  ---
+  duration_ms: 55.400456
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: accepted processing still updates the parent after local status fails
+ok 22 - Gmail workspace refresh: accepted processing still updates the parent after local status fails
+  ---
+  duration_ms: 39.12036
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: a rejected asynchronous parent refresh is handled after accepted registration
+ok 23 - Gmail workspace refresh: a rejected asynchronous parent refresh is handled after accepted registration
+  ---
+  duration_ms: 55.296912
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed sync (HTTP) leaves the parent revision unchanged
+ok 24 - Gmail workspace refresh: failed sync (HTTP) leaves the parent revision unchanged
+  ---
+  duration_ms: 49.689458
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed sync (transport) leaves the parent revision unchanged
+ok 25 - Gmail workspace refresh: failed sync (transport) leaves the parent revision unchanged
+  ---
+  duration_ms: 49.891456
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed process (HTTP) leaves the parent revision unchanged
+ok 26 - Gmail workspace refresh: failed process (HTTP) leaves the parent revision unchanged
+  ---
+  duration_ms: 62.807645
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed process (transport) leaves the parent revision unchanged
+ok 27 - Gmail workspace refresh: failed process (transport) leaves the parent revision unchanged
+  ---
+  duration_ms: 44.599505
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed retry (HTTP) leaves the parent revision unchanged
+ok 28 - Gmail workspace refresh: failed retry (HTTP) leaves the parent revision unchanged
+  ---
+  duration_ms: 43.335884
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed retry (transport) leaves the parent revision unchanged
+ok 29 - Gmail workspace refresh: failed retry (transport) leaves the parent revision unchanged
+  ---
+  duration_ms: 32.042842
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed reject (HTTP) leaves the parent revision unchanged
+ok 30 - Gmail workspace refresh: failed reject (HTTP) leaves the parent revision unchanged
+  ---
+  duration_ms: 30.763556
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed reject (transport) leaves the parent revision unchanged
+ok 31 - Gmail workspace refresh: failed reject (transport) leaves the parent revision unchanged
+  ---
+  duration_ms: 46.947021
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed approve (HTTP) leaves the parent revision unchanged
+ok 32 - Gmail workspace refresh: failed approve (HTTP) leaves the parent revision unchanged
+  ---
+  duration_ms: 36.522044
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed approve (transport) leaves the parent revision unchanged
+ok 33 - Gmail workspace refresh: failed approve (transport) leaves the parent revision unchanged
+  ---
+  duration_ms: 33.52746
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: an accepted retry refreshes its changed queue even when processing fails
+ok 34 - Gmail workspace refresh: an accepted retry refreshes its changed queue even when processing fails
+  ---
+  duration_ms: 32.375644
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: rate-limited sync retains its error while accepted document processing refreshes both workspaces
+ok 35 - Gmail workspace refresh: rate-limited sync retains its error while accepted document processing refreshes both workspaces
+  ---
+  duration_ms: 90.084226
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: cumulative processing status in a rejected sync does not fabricate accepted work
+ok 36 - Gmail workspace refresh: cumulative processing status in a rejected sync does not fabricate accepted work
+  ---
+  duration_ms: 63.764589
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: partial processing clears an earlier sync success and awaits the parent before retaining the sync error
+ok 37 - Gmail workspace refresh: partial processing clears an earlier sync success and awaits the parent before retaining the sync error
+  ---
+  duration_ms: 39.794319
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: inline ISO dates keep their label boundary
+ok 38 - Sites scalar layout: inline ISO dates keep their label boundary
+  ---
+  duration_ms: 58.78329
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: inline Swedish dots dates keep their label boundary
+ok 39 - Sites scalar layout: inline Swedish dots dates keep their label boundary
+  ---
+  duration_ms: 4.563598
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: inline Swedish slashes dates keep their label boundary
+ok 40 - Sites scalar layout: inline Swedish slashes dates keep their label boundary
+  ---
+  duration_ms: 1.144555
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: inline spaced digits dates keep their label boundary
+ok 41 - Sites scalar layout: inline spaced digits dates keep their label boundary
+  ---
+  duration_ms: 1.095191
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: date suffix XYZ is not silently truncated
+ok 42 - Sites scalar layout: date suffix XYZ is not silently truncated
+  ---
+  duration_ms: 1.320896
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: date suffix  99 is not silently truncated
+ok 43 - Sites scalar layout: date suffix  99 is not silently truncated
+  ---
+  duration_ms: 1.106619
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: date suffix /17 is not silently truncated
+ok 44 - Sites scalar layout: date suffix /17 is not silently truncated
+  ---
+  duration_ms: 0.888245
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: incomplete line-item header Benämning Antal Belopp exkl. moms cannot poison a printed net summary
+ok 45 - Sites scalar layout: incomplete line-item header Benämning Antal Belopp exkl. moms cannot poison a printed net summary
+  ---
+  duration_ms: 1.976397
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: incomplete line-item header Beskrivning Antal Belopp exklusive moms cannot poison a printed net summary
+ok 46 - Sites scalar layout: incomplete line-item header Beskrivning Antal Belopp exklusive moms cannot poison a printed net summary
+  ---
+  duration_ms: 1.136644
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: incomplete line-item header Description Quantity Net amount cannot poison a printed net summary
+ok 47 - Sites scalar layout: incomplete line-item header Description Quantity Net amount cannot poison a printed net summary
+  ---
+  duration_ms: 1.218184
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: bare monetary summaries end an incomplete table
+ok 48 - Sites scalar layout: bare monetary summaries end an incomplete table
+  ---
+  duration_ms: 1.149021
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: bare monetary summaries end an incomplete table
+ok 49 - Sites scalar layout: bare monetary summaries end an incomplete table
+  ---
+  duration_ms: 0.819264
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: actual invalid or conflicting net summaries remain in the full census
+ok 50 - Sites scalar layout: actual invalid or conflicting net summaries remain in the full census
+  ---
+  duration_ms: 1.561782
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: an explicit invoice-number label can identify an OCR title without admitting a native document
+ok 51 - Sites scalar layout: an explicit invoice-number label can identify an OCR title without admitting a native document
+  ---
+  duration_ms: 4.163006
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Offert is not promoted by a referenced invoice number
+ok 52 - Sites scalar layout: Offert is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.916096
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Quotation is not promoted by a referenced invoice number
+ok 53 - Sites scalar layout: Quotation is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.820525
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Påminnelse is not promoted by a referenced invoice number
+ok 54 - Sites scalar layout: Påminnelse is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.799724
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Betalningspåminnelse is not promoted by a referenced invoice number
+ok 55 - Sites scalar layout: Betalningspåminnelse is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.809789
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Orderbekräftelse is not promoted by a referenced invoice number
+ok 56 - Sites scalar layout: Orderbekräftelse is not promoted by a referenced invoice number
+  ---
+  duration_ms: 1.024908
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Payment reminder is not promoted by a referenced invoice number
+ok 57 - Sites scalar layout: Payment reminder is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.825913
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: explicit non-invoice type Dokumenttyp: Offert prevents new type inference
+ok 58 - Sites scalar layout: explicit non-invoice type Dokumenttyp: Offert prevents new type inference
+  ---
+  duration_ms: 1.715971
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: explicit non-invoice type Dokumenttyp: Påminnelse prevents new type inference
+ok 59 - Sites scalar layout: explicit non-invoice type Dokumenttyp: Påminnelse prevents new type inference
+  ---
+  duration_ms: 1.770692
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: explicit non-invoice type Leveransbekräftelse prevents new type inference
+ok 60 - Sites scalar layout: explicit non-invoice type Leveransbekräftelse prevents new type inference
+  ---
+  duration_ms: 1.482575
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: explicit non-invoice type Bekräftelse prevents new type inference
+ok 61 - Sites scalar layout: explicit non-invoice type Bekräftelse prevents new type inference
+  ---
+  duration_ms: 1.507943
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: explicit non-invoice type Offertnummer: Q-417 prevents new type inference
+ok 62 - Sites scalar layout: explicit non-invoice type Offertnummer: Q-417 prevents new type inference
+  ---
+  duration_ms: 1.598537
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: competing type is retained across scalar/table/display filtering
+ok 63 - Sites scalar layout: competing type is retained across scalar/table/display filtering
+  ---
+  duration_ms: 1.023496
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: competing type is retained across scalar/table/display filtering
+ok 64 - Sites scalar layout: competing type is retained across scalar/table/display filtering
+  ---
+  duration_ms: 0.97874
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: competing type is retained across scalar/table/display filtering
+ok 65 - Sites scalar layout: competing type is retained across scalar/table/display filtering
+  ---
+  duration_ms: 51.288551
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+ok 66 - Sites scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+  ---
+  duration_ms: 3.434616
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+ok 67 - Sites scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+  ---
+  duration_ms: 1.382437
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+ok 68 - Sites scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+  ---
+  duration_ms: 1.369758
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: OCR amount 12345 keeps explicit currency/decimal or ordinary integer evidence
+ok 69 - Sites scalar layout: OCR amount 12345 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.927304
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: OCR amount 00123 SEK keeps explicit currency/decimal or ordinary integer evidence
+ok 70 - Sites scalar layout: OCR amount 00123 SEK keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.696691
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: OCR amount SEK 00123 keeps explicit currency/decimal or ordinary integer evidence
+ok 71 - Sites scalar layout: OCR amount SEK 00123 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.748949
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: OCR amount 00123,50 keeps explicit currency/decimal or ordinary integer evidence
+ok 72 - Sites scalar layout: OCR amount 00123,50 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.713827
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: OCR amount 0,50 keeps explicit currency/decimal or ordinary integer evidence
+ok 73 - Sites scalar layout: OCR amount 0,50 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.705745
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: OCR amount 0 keeps explicit currency/decimal or ordinary integer evidence
+ok 74 - Sites scalar layout: OCR amount 0 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.721048
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Kreditfaktura retains precedence over invoice-number evidence
+ok 75 - Sites scalar layout: Kreditfaktura retains precedence over invoice-number evidence
+  ---
+  duration_ms: 0.809999
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Kvitto retains precedence over invoice-number evidence
+ok 76 - Sites scalar layout: Kvitto retains precedence over invoice-number evidence
+  ---
+  duration_ms: 0.711233
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: an invalid invoice identity does not establish a missing document title
+ok 77 - Sites scalar layout: an invalid invoice identity does not establish a missing document title
+  ---
+  duration_ms: 1.04702
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: exact intended reference is projected as review intention: 0001
+ok 78 - invoice reference policy read: exact intended reference is projected as review intention: 0001
+  ---
+  duration_ms: 304.323428
+  type: 'test'
+  ...
+# (node:38) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: invoice reference policy read: exact intended reference is projected as review intention: 0599
+ok 79 - invoice reference policy read: exact intended reference is projected as review intention: 0599
+  ---
+  duration_ms: 120.581643
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: separators, omitted zeros and prefixes cannot be repaired into an exact match
+ok 80 - invoice reference policy read: separators, omitted zeros and prefixes cannot be repaired into an exact match
+  ---
+  duration_ms: 128.132434
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: a different complete bank identifier never becomes an exact invoice match
+ok 81 - invoice reference policy read: a different complete bank identifier never becomes an exact invoice match
+  ---
+  duration_ms: 96.354446
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: workspace scope stays strict when the invoice register is empty
+ok 82 - invoice reference policy read: workspace scope stays strict when the invoice register is empty
+  ---
+  duration_ms: 71.972631
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: blocked invoice is not projected as an exact registered match: 0600 / 0599
+ok 83 - invoice reference policy read: blocked invoice is not projected as an exact registered match: 0600 / 0599
+  ---
+  duration_ms: 79.608878
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: blocked invoice is not projected as an exact registered match: 0599 / 000018
+ok 84 - invoice reference policy read: blocked invoice is not projected as an exact registered match: 0599 / 000018
+  ---
+  duration_ms: 84.183213
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: booked conflicting invoice exposes intended and raw references without changing history
+ok 85 - invoice reference policy read: booked conflicting invoice exposes intended and raw references without changing history
+  ---
+  duration_ms: 103.473419
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: generic-company reference comparison and explicit OCR remain unchanged
+ok 86 - invoice reference policy read: generic-company reference comparison and explicit OCR remain unchanged
+  ---
+  duration_ms: 106.212354
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: supplier invoices keep their separate explicit reference
+ok 87 - invoice reference policy read: supplier invoices keep their separate explicit reference
+  ---
+  duration_ms: 80.809837
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read review: outgoing supplier payments retain the legacy reference comparison
+ok 88 - invoice reference policy read review: outgoing supplier payments retain the legacy reference comparison
+  ---
+  duration_ms: 82.156212
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read review: all scoped identifiers reserve ownership in the payment direction
+ok 89 - invoice reference policy read review: all scoped identifiers reserve ownership in the payment direction
+  ---
+  duration_ms: 124.480226
+  type: 'test'
+  ...
+# Subtest: owner MCP payment reader exposes existing verifier without writes or account resources
+ok 90 - owner MCP payment reader exposes existing verifier without writes or account resources
+  ---
+  duration_ms: 79.293091
+  type: 'test'
+  ...
+# Subtest: exact-reference ambiguity survives amount/date selectors and includes missing-reference AIS candidates
+ok 91 - exact-reference ambiguity survives amount/date selectors and includes missing-reference AIS candidates
+  ---
+  duration_ms: 114.717971
+  type: 'test'
+  ...
+# Subtest: foreign/missing IDs and strict arguments fail before originals are read
+ok 92 - foreign/missing IDs and strict arguments fail before originals are read
+  ---
+  duration_ms: 87.652499
+  type: 'test'
+  ...
+# Subtest: MCP evidence tools require the current Sites identity
+ok 93 - MCP evidence tools require the current Sites identity
+  ---
+  duration_ms: 63.847158
+  type: 'test'
+  ...
+# Subtest: retained original can be selected by owned SHA256 with bounded rows and explicit account verdict
+ok 94 - retained original can be selected by owned SHA256 with bounded rows and explicit account verdict
+  ---
+  duration_ms: 71.664585
+  type: 'test'
+  ...
+# Subtest: corrupt retained originals fail closed without mutations
+ok 95 - corrupt retained originals fail closed without mutations
+  ---
+  duration_ms: 64.156366
+  type: 'test'
+  ...
+# Subtest: pagination and oversized evidence are explicit and bounded
+ok 96 - pagination and oversized evidence are explicit and bounded
+  ---
+  duration_ms: 108.739928
+  type: 'test'
+  ...
+# Subtest: evidence tools are discoverable with read-only schemas and the existing MCP transport guards
+ok 97 - evidence tools are discoverable with read-only schemas and the existing MCP transport guards
+  ---
+  duration_ms: 73.981355
+  type: 'test'
+  ...
+# Subtest: foreign owner cannot select another owner original even by its exact hash
+ok 98 - foreign owner cannot select another owner original even by its exact hash
+  ---
+  duration_ms: 92.413986
+  type: 'test'
+  ...
+# Subtest: duplicate owned hashes report ambiguity without opening an arbitrarily chosen original
+ok 99 - duplicate owned hashes report ambiguity without opening an arbitrarily chosen original
+  ---
+  duration_ms: 85.136601
+  type: 'test'
+  ...
+# Subtest: stored consent expiry blocks account evidence while retained AIS integrity remains independently intact
+ok 100 - stored consent expiry blocks account evidence while retained AIS integrity remains independently intact
+  ---
+  duration_ms: 87.945503
+  type: 'test'
+  ...
+# Subtest: source suggestions match exact OCR separately from invoice number and admit incomplete historical scans
+ok 101 - source suggestions match exact OCR separately from invoice number and admit incomplete historical scans
+  ---
+  duration_ms: 106.894103
+  type: 'test'
+  ...
+# Subtest: retained report reads flag a concurrent workspace revision rather than claiming a complete snapshot
+ok 102 - retained report reads flag a concurrent workspace revision rather than claiming a complete snapshot
+  ---
+  duration_ms: 92.584612
+  type: 'test'
+  ...
+# Subtest: both preserved references from one selected AIS source find the same invoice without inventing a conflict
+ok 103 - both preserved references from one selected AIS source find the same invoice without inventing a conflict
+  ---
+  duration_ms: 104.647616
+  type: 'test'
+  ...
+# Subtest: preserved secondary reference cannot hide competing transactions or conflicting invoice identities
+ok 104 - preserved secondary reference cannot hide competing transactions or conflicting invoice identities
+  ---
+  duration_ms: 106.703562
+  type: 'test'
+  ...
+# Subtest: selected detail source never merges AIS secondary identifiers and preserves incomplete flags
+ok 105 - selected detail source never merges AIS secondary identifiers and preserves incomplete flags
+  ---
+  duration_ms: 99.149755
+  type: 'test'
+  ...
+# Subtest: actual serialized invoice parser reference is searchable from Gmail source
+ok 106 - actual serialized invoice parser reference is searchable from Gmail source
+  ---
+  duration_ms: 143.787601
+  type: 'test'
+  ...
+# Subtest: actual serialized invoice parser reference is searchable from current document job
+ok 107 - actual serialized invoice parser reference is searchable from current document job
+  ---
+  duration_ms: 167.777729
+  type: 'test'
+  ...
+# Subtest: conflicting current and legacy document references are both searchable and remain explicit
+ok 108 - conflicting current and legacy document references are both searchable and remain explicit
+  ---
+  duration_ms: 91.785579
+  type: 'test'
+  ...
+# Subtest: current parsed document reference keeps leading zeros and distinct invoice identity
+ok 109 - current parsed document reference keeps leading zeros and distinct invoice identity
+  ---
+  duration_ms: 81.230557
+  type: 'test'
+  ...
+# Subtest: MCP and the actual verification reader agree on intact current reference candidates without writes
+ok 110 - MCP and the actual verification reader agree on intact current reference candidates without writes
+  ---
+  duration_ms: 78.393396
+  type: 'test'
+  ...
+# Subtest: MCP economic membership identifies separate review evidence and existing engine exclusions
+ok 111 - MCP economic membership identifies separate review evidence and existing engine exclusions
+  ---
+  duration_ms: 237.192373
+  type: 'test'
+  ...
+# Subtest: Node pdf retains legitimate colon recipient
+ok 112 - Node pdf retains legitimate colon recipient
+  ---
+  duration_ms: 46.963451
+  type: 'test'
+  ...
+# Subtest: Node pdf retains legitimate colonless recipient
+ok 113 - Node pdf retains legitimate colonless recipient
+  ---
+  duration_ms: 5.687963
+  type: 'test'
+  ...
+# Subtest: Node pdf retains legitimate supplier with a role-prefix inside a real name
+ok 114 - Node pdf retains legitimate supplier with a role-prefix inside a real name
+  ---
+  duration_ms: 1.582414
+  type: 'test'
+  ...
+# Subtest: Node pdf retains legitimate two separately explicit colon roles
+ok 115 - Node pdf retains legitimate two separately explicit colon roles
+  ---
+  duration_ms: 1.376128
+  type: 'test'
+  ...
+# Subtest: Node ocr retains legitimate colon recipient
+ok 116 - Node ocr retains legitimate colon recipient
+  ---
+  duration_ms: 1.995014
+  type: 'test'
+  ...
+# Subtest: Node ocr retains legitimate colonless recipient
+ok 117 - Node ocr retains legitimate colonless recipient
+  ---
+  duration_ms: 1.73473
+  type: 'test'
+  ...
+# Subtest: Node ocr retains legitimate supplier with a role-prefix inside a real name
+ok 118 - Node ocr retains legitimate supplier with a role-prefix inside a real name
+  ---
+  duration_ms: 0.721598
+  type: 'test'
+  ...
+# Subtest: Node ocr retains legitimate two separately explicit colon roles
+ok 119 - Node ocr retains legitimate two separately explicit colon roles
+  ---
+  duration_ms: 0.958419
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains legitimate colon recipient
+ok 120 - Sites pdf retains legitimate colon recipient
+  ---
+  duration_ms: 7.50206
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains legitimate colonless recipient
+ok 121 - Sites pdf retains legitimate colonless recipient
+  ---
+  duration_ms: 1.165216
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains legitimate supplier with a role-prefix inside a real name
+ok 122 - Sites pdf retains legitimate supplier with a role-prefix inside a real name
+  ---
+  duration_ms: 0.969586
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains legitimate two separately explicit colon roles
+ok 123 - Sites pdf retains legitimate two separately explicit colon roles
+  ---
+  duration_ms: 0.821636
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains legitimate colon recipient
+ok 124 - Sites ocr retains legitimate colon recipient
+  ---
+  duration_ms: 0.799554
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains legitimate colonless recipient
+ok 125 - Sites ocr retains legitimate colonless recipient
+  ---
+  duration_ms: 0.933292
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains legitimate supplier with a role-prefix inside a real name
+ok 126 - Sites ocr retains legitimate supplier with a role-prefix inside a real name
+  ---
+  duration_ms: 0.829579
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains legitimate two separately explicit colon roles
+ok 127 - Sites ocr retains legitimate two separately explicit colon roles
+  ---
+  duration_ms: 0.772133
+  type: 'test'
+  ...
+# Subtest: Node cross-axis ambiguity remains unassigned by the actual scalar consumer
+ok 128 - Node cross-axis ambiguity remains unassigned by the actual scalar consumer
+  ---
+  duration_ms: 48.854801
+  type: 'test'
+  ...
+# Subtest: Node two complete role columns preserve both explicit roles
+ok 129 - Node two complete role columns preserve both explicit roles
+  ---
+  duration_ms: 19.116351
+  type: 'test'
+  ...
+# Subtest: Node incomplete role-name row is indivisible: extra
+ok 130 - Node incomplete role-name row is indivisible: extra
+  ---
+  duration_ms: 2.111757
+  type: 'test'
+  ...
+# Subtest: Node incomplete role-name row is indivisible: missing
+ok 131 - Node incomplete role-name row is indivisible: missing
+  ---
+  duration_ms: 1.600229
+  type: 'test'
+  ...
+# Subtest: Node incomplete role-name row is indivisible: merged
+ok 132 - Node incomplete role-name row is indivisible: merged
+  ---
+  duration_ms: 1.414015
+  type: 'test'
+  ...
+# Subtest: Node the exact explicit recipient alias is understood: "Faktureras till: "
+ok 133 - Node the exact explicit recipient alias is understood: "Faktureras till: "
+  ---
+  duration_ms: 1.154039
+  type: 'test'
+  ...
+# Subtest: Node the exact explicit recipient alias is understood: "Faktureras till "
+ok 134 - Node the exact explicit recipient alias is understood: "Faktureras till "
+  ---
+  duration_ms: 1.01282
+  type: 'test'
+  ...
+# Subtest: Node the exact explicit recipient alias is understood: "Faktureras till\\n"
+ok 135 - Node the exact explicit recipient alias is understood: "Faktureras till\\n"
+  ---
+  duration_ms: 1.379073
+  type: 'test'
+  ...
+# Subtest: Node ambiguous or absent recipient role stays unknown: Faktureras tillfälle Syntetiska Ek Handel AB
+ok 136 - Node ambiguous or absent recipient role stays unknown: Faktureras tillfälle Syntetiska Ek Handel AB
+  ---
+  duration_ms: 1.006811
+  type: 'test'
+  ...
+# Subtest: Node ambiguous or absent recipient role stays unknown: Faktureras till
+ok 137 - Node ambiguous or absent recipient role stays unknown: Faktureras till
+  ---
+  duration_ms: 1.361326
+  type: 'test'
+  ...
+# Subtest: Node ambiguous or absent recipient role stays unknown: Faktureras till saknas
+ok 138 - Node ambiguous or absent recipient role stays unknown: Faktureras till saknas
+  ---
+  duration_ms: 1.216681
+  type: 'test'
+  ...
+# Subtest: Node ambiguous or absent recipient role stays unknown: Faktureras till Syntetiska Ek Handel AB Leverantör Syntetiska Lind Verkstad AB
+ok 139 - Node ambiguous or absent recipient role stays unknown: Faktureras till Syntetiska Ek Handel AB Leverantör Syntetiska Lind Verkstad AB
+  ---
+  duration_ms: 0.806124
+  type: 'test'
+  ...
+# Subtest: Node ambiguous or absent recipient role stays unknown: Syntetiska Ek Handel AB
+ok 140 - Node ambiguous or absent recipient role stays unknown: Syntetiska Ek Handel AB
+  ---
+  duration_ms: 0.799214
+  type: 'test'
+  ...
+# Subtest: Node reordered role columns cannot claim an unowned following organization by output order
+ok 141 - Node reordered role columns cannot claim an unowned following organization by output order
+  ---
+  duration_ms: 1.841557
+  type: 'test'
+  ...
+# Subtest: Node explicit owner-qualified organization survives the role-column reconstruction
+ok 142 - Node explicit owner-qualified organization survives the role-column reconstruction
+  ---
+  duration_ms: 1.673027
+  type: 'test'
+  ...
+# Subtest: Node a mixed explicit role row cannot assign a following unowned organization to its last event
+ok 143 - Node a mixed explicit role row cannot assign a following unowned organization to its last event
+  ---
+  duration_ms: 1.16144
+  type: 'test'
+  ...
+# Subtest: Sites cross-axis ambiguity remains unassigned by the actual scalar consumer
+ok 144 - Sites cross-axis ambiguity remains unassigned by the actual scalar consumer
+  ---
+  duration_ms: 6.831578
+  type: 'test'
+  ...
+# Subtest: Sites two complete role columns preserve both explicit roles
+ok 145 - Sites two complete role columns preserve both explicit roles
+  ---
+  duration_ms: 4.578719
+  type: 'test'
+  ...
+# Subtest: Sites incomplete role-name row is indivisible: extra
+ok 146 - Sites incomplete role-name row is indivisible: extra
+  ---
+  duration_ms: 1.597195
+  type: 'test'
+  ...
+# Subtest: Sites incomplete role-name row is indivisible: missing
+ok 147 - Sites incomplete role-name row is indivisible: missing
+  ---
+  duration_ms: 1.356319
+  type: 'test'
+  ...
+# Subtest: Sites incomplete role-name row is indivisible: merged
+ok 148 - Sites incomplete role-name row is indivisible: merged
+  ---
+  duration_ms: 1.46511
+  type: 'test'
+  ...
+# Subtest: Sites the exact explicit recipient alias is understood: "Faktureras till: "
+ok 149 - Sites the exact explicit recipient alias is understood: "Faktureras till: "
+  ---
+  duration_ms: 0.978479
+  type: 'test'
+  ...
+# Subtest: Sites the exact explicit recipient alias is understood: "Faktureras till "
+ok 150 - Sites the exact explicit recipient alias is understood: "Faktureras till "
+  ---
+  duration_ms: 0.866694
+  type: 'test'
+  ...
+# Subtest: Sites the exact explicit recipient alias is understood: "Faktureras till\\n"
+ok 151 - Sites the exact explicit recipient alias is understood: "Faktureras till\\n"
+  ---
+  duration_ms: 1.030666
+  type: 'test'
+  ...
+# Subtest: Sites ambiguous or absent recipient role stays unknown: Faktureras tillfälle Syntetiska Ek Handel AB
+ok 152 - Sites ambiguous or absent recipient role stays unknown: Faktureras tillfälle Syntetiska Ek Handel AB
+  ---
+  duration_ms: 0.996516
+  type: 'test'
+  ...
+# Subtest: Sites ambiguous or absent recipient role stays unknown: Faktureras till
+ok 153 - Sites ambiguous or absent recipient role stays unknown: Faktureras till
+  ---
+  duration_ms: 0.895386
+  type: 'test'
+  ...
+# Subtest: Sites ambiguous or absent recipient role stays unknown: Faktureras till saknas
+ok 154 - Sites ambiguous or absent recipient role stays unknown: Faktureras till saknas
+  ---
+  duration_ms: 0.716261
+  type: 'test'
+  ...
+# Subtest: Sites ambiguous or absent recipient role stays unknown: Faktureras till Syntetiska Ek Handel AB Leverantör Syntetiska Lind Verkstad AB
+ok 155 - Sites ambiguous or absent recipient role stays unknown: Faktureras till Syntetiska Ek Handel AB Leverantör Syntetiska Lind Verkstad AB
+  ---
+  duration_ms: 0.759124
+  type: 'test'
+  ...
+# Subtest: Sites ambiguous or absent recipient role stays unknown: Syntetiska Ek Handel AB
+ok 156 - Sites ambiguous or absent recipient role stays unknown: Syntetiska Ek Handel AB
+  ---
+  duration_ms: 0.856518
+  type: 'test'
+  ...
+# Subtest: Sites reordered role columns cannot claim an unowned following organization by output order
+ok 157 - Sites reordered role columns cannot claim an unowned following organization by output order
+  ---
+  duration_ms: 1.584417
+  type: 'test'
+  ...
+# Subtest: Sites explicit owner-qualified organization survives the role-column reconstruction
+ok 158 - Sites explicit owner-qualified organization survives the role-column reconstruction
+  ---
+  duration_ms: 1.290481
+  type: 'test'
+  ...
+# Subtest: Sites a mixed explicit role row cannot assign a following unowned organization to its last event
+ok 159 - Sites a mixed explicit role row cannot assign a following unowned organization to its last event
+  ---
+  duration_ms: 0.963456
+  type: 'test'
+  ...
+# Subtest: Node pdf holds organization context at scalar prefix on the organization row
+ok 160 - Node pdf holds organization context at scalar prefix on the organization row
+  ---
+  duration_ms: 51.409524
+  type: 'test'
+  ...
+# Subtest: Node pdf holds organization context at registered tax-summary prefix on the organization row
+ok 161 - Node pdf holds organization context at registered tax-summary prefix on the organization row
+  ---
+  duration_ms: 4.548967
+  type: 'test'
+  ...
+# Subtest: Node pdf holds organization context at separate registered tax-summary row
+ok 162 - Node pdf holds organization context at separate registered tax-summary row
+  ---
+  duration_ms: 1.200177
+  type: 'test'
+  ...
+# Subtest: Node pdf holds organization context at a different explicit owner before an unqualified organization
+ok 163 - Node pdf holds organization context at a different explicit owner before an unqualified organization
+  ---
+  duration_ms: 1.177534
+  type: 'test'
+  ...
+# Subtest: Node pdf retains scalar suffix after the last name event
+ok 164 - Node pdf retains scalar suffix after the last name event
+  ---
+  duration_ms: 2.595243
+  type: 'test'
+  ...
+# Subtest: Node pdf retains known inline VAT with a colon
+ok 165 - Node pdf retains known inline VAT with a colon
+  ---
+  duration_ms: 1.025149
+  type: 'test'
+  ...
+# Subtest: Node pdf retains known inline currency without a colon
+ok 166 - Node pdf retains known inline currency without a colon
+  ---
+  duration_ms: 1.111836
+  type: 'test'
+  ...
+# Subtest: Node pdf retains recognized adjacent identity fields separated by a pipe
+ok 167 - Node pdf retains recognized adjacent identity fields separated by a pipe
+  ---
+  duration_ms: 1.163283
+  type: 'test'
+  ...
+# Subtest: Node pdf retains explicit ownership after an unknown inline field
+ok 168 - Node pdf retains explicit ownership after an unknown inline field
+  ---
+  duration_ms: 1.156983
+  type: 'test'
+  ...
+# Subtest: Node pdf retains matching explicit ownership keeps its existing local section
+ok 169 - Node pdf retains matching explicit ownership keeps its existing local section
+  ---
+  duration_ms: 1.211003
+  type: 'test'
+  ...
+# Subtest: Node pdf a name prefix is not a scalar label or a new section
+ok 170 - Node pdf a name prefix is not a scalar label or a new section
+  ---
+  duration_ms: 1.101681
+  type: 'test'
+  ...
+# Subtest: Node ocr holds organization context at scalar prefix on the organization row
+ok 171 - Node ocr holds organization context at scalar prefix on the organization row
+  ---
+  duration_ms: 1.611717
+  type: 'test'
+  ...
+# Subtest: Node ocr holds organization context at registered tax-summary prefix on the organization row
+ok 172 - Node ocr holds organization context at registered tax-summary prefix on the organization row
+  ---
+  duration_ms: 1.365072
+  type: 'test'
+  ...
+# Subtest: Node ocr holds organization context at separate registered tax-summary row
+ok 173 - Node ocr holds organization context at separate registered tax-summary row
+  ---
+  duration_ms: 0.814356
+  type: 'test'
+  ...
+# Subtest: Node ocr holds organization context at a different explicit owner before an unqualified organization
+ok 174 - Node ocr holds organization context at a different explicit owner before an unqualified organization
+  ---
+  duration_ms: 0.774177
+  type: 'test'
+  ...
+# Subtest: Node ocr retains scalar suffix after the last name event
+ok 175 - Node ocr retains scalar suffix after the last name event
+  ---
+  duration_ms: 0.754978
+  type: 'test'
+  ...
+# Subtest: Node ocr retains known inline VAT with a colon
+ok 176 - Node ocr retains known inline VAT with a colon
+  ---
+  duration_ms: 0.777601
+  type: 'test'
+  ...
+# Subtest: Node ocr retains known inline currency without a colon
+ok 177 - Node ocr retains known inline currency without a colon
+  ---
+  duration_ms: 0.916958
+  type: 'test'
+  ...
+# Subtest: Node ocr retains recognized adjacent identity fields separated by a pipe
+ok 178 - Node ocr retains recognized adjacent identity fields separated by a pipe
+  ---
+  duration_ms: 0.824982
+  type: 'test'
+  ...
+# Subtest: Node ocr retains explicit ownership after an unknown inline field
+ok 179 - Node ocr retains explicit ownership after an unknown inline field
+  ---
+  duration_ms: 0.823239
+  type: 'test'
+  ...
+# Subtest: Node ocr retains matching explicit ownership keeps its existing local section
+ok 180 - Node ocr retains matching explicit ownership keeps its existing local section
+  ---
+  duration_ms: 0.826704
+  type: 'test'
+  ...
+# Subtest: Node ocr a name prefix is not a scalar label or a new section
+ok 181 - Node ocr a name prefix is not a scalar label or a new section
+  ---
+  duration_ms: 1.131395
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds organization context at scalar prefix on the organization row
+ok 182 - Sites pdf holds organization context at scalar prefix on the organization row
+  ---
+  duration_ms: 8.792411
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds organization context at registered tax-summary prefix on the organization row
+ok 183 - Sites pdf holds organization context at registered tax-summary prefix on the organization row
+  ---
+  duration_ms: 1.329338
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds organization context at separate registered tax-summary row
+ok 184 - Sites pdf holds organization context at separate registered tax-summary row
+  ---
+  duration_ms: 1.204334
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds organization context at a different explicit owner before an unqualified organization
+ok 185 - Sites pdf holds organization context at a different explicit owner before an unqualified organization
+  ---
+  duration_ms: 1.153819
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains scalar suffix after the last name event
+ok 186 - Sites pdf retains scalar suffix after the last name event
+  ---
+  duration_ms: 1.218074
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains known inline VAT with a colon
+ok 187 - Sites pdf retains known inline VAT with a colon
+  ---
+  duration_ms: 1.038568
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains known inline currency without a colon
+ok 188 - Sites pdf retains known inline currency without a colon
+  ---
+  duration_ms: 1.04032
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains recognized adjacent identity fields separated by a pipe
+ok 189 - Sites pdf retains recognized adjacent identity fields separated by a pipe
+  ---
+  duration_ms: 0.940442
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains explicit ownership after an unknown inline field
+ok 190 - Sites pdf retains explicit ownership after an unknown inline field
+  ---
+  duration_ms: 1.069053
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains matching explicit ownership keeps its existing local section
+ok 191 - Sites pdf retains matching explicit ownership keeps its existing local section
+  ---
+  duration_ms: 1.076895
+  type: 'test'
+  ...
+# Subtest: Sites pdf a name prefix is not a scalar label or a new section
+ok 192 - Sites pdf a name prefix is not a scalar label or a new section
+  ---
+  duration_ms: 0.987663
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds organization context at scalar prefix on the organization row
+ok 193 - Sites ocr holds organization context at scalar prefix on the organization row
+  ---
+  duration_ms: 0.814867
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds organization context at registered tax-summary prefix on the organization row
+ok 194 - Sites ocr holds organization context at registered tax-summary prefix on the organization row
+  ---
+  duration_ms: 0.948054
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds organization context at separate registered tax-summary row
+ok 195 - Sites ocr holds organization context at separate registered tax-summary row
+  ---
+  duration_ms: 0.876968
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds organization context at a different explicit owner before an unqualified organization
+ok 196 - Sites ocr holds organization context at a different explicit owner before an unqualified organization
+  ---
+  duration_ms: 0.880134
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains scalar suffix after the last name event
+ok 197 - Sites ocr retains scalar suffix after the last name event
+  ---
+  duration_ms: 0.824571
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains known inline VAT with a colon
+ok 198 - Sites ocr retains known inline VAT with a colon
+  ---
+  duration_ms: 0.815487
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains known inline currency without a colon
+ok 199 - Sites ocr retains known inline currency without a colon
+  ---
+  duration_ms: 0.803289
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains recognized adjacent identity fields separated by a pipe
+ok 200 - Sites ocr retains recognized adjacent identity fields separated by a pipe
+  ---
+  duration_ms: 0.760978
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains explicit ownership after an unknown inline field
+ok 201 - Sites ocr retains explicit ownership after an unknown inline field
+  ---
+  duration_ms: 0.829529
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains matching explicit ownership keeps its existing local section
+ok 202 - Sites ocr retains matching explicit ownership keeps its existing local section
+  ---
+  duration_ms: 0.773705
+  type: 'test'
+  ...
+# Subtest: Sites ocr a name prefix is not a scalar label or a new section
+ok 203 - Sites ocr a name prefix is not a scalar label or a new section
+  ---
+  duration_ms: 2.434556
+  type: 'test'
+  ...
+# Subtest: Node pdf holds a bare role after a completed name: Leverantör: Exempel HB Kund Annan Firma
+ok 204 - Node pdf holds a bare role after a completed name: Leverantör: Exempel HB Kund Annan Firma
+  ---
+  duration_ms: 50.863941
+  type: 'test'
+  ...
+# Subtest: Node pdf holds a bare role after a completed name: Supplier: Example Ltd. Bill to Second Entity
+ok 205 - Node pdf holds a bare role after a completed name: Supplier: Example Ltd. Bill to Second Entity
+  ---
+  duration_ms: 3.571017
+  type: 'test'
+  ...
+# Subtest: Node pdf holds a bare role after a completed name: Kund: Exempel ab leverantör annan firma
+ok 206 - Node pdf holds a bare role after a completed name: Kund: Exempel ab leverantör annan firma
+  ---
+  duration_ms: 1.163604
+  type: 'test'
+  ...
+# Subtest: Node pdf holds a bare role after a completed name: Säljare: Exempel KB säljare Annan Firma
+ok 207 - Node pdf holds a bare role after a completed name: Säljare: Exempel KB säljare Annan Firma
+  ---
+  duration_ms: 1.055052
+  type: 'test'
+  ...
+# Subtest: Node pdf holds a bare role after a completed name: Faktureras till: Example AB, supplier Other Entity
+ok 208 - Node pdf holds a bare role after a completed name: Faktureras till: Example AB, supplier Other Entity
+  ---
+  duration_ms: 1.191604
+  type: 'test'
+  ...
+# Subtest: Node pdf holds a bare role after a completed name: Kund: Exempel AB Mottagare
+ok 209 - Node pdf holds a bare role after a completed name: Kund: Exempel AB Mottagare
+  ---
+  duration_ms: 0.947293
+  type: 'test'
+  ...
+# Subtest: Node pdf holds a bare role after a completed name: Kund: Exempel Aktiebolag Supplier Other Entity
+ok 210 - Node pdf holds a bare role after a completed name: Kund: Exempel Aktiebolag Supplier Other Entity
+  ---
+  duration_ms: 0.935816
+  type: 'test'
+  ...
+# Subtest: Node pdf holds a bare role after a completed name: Kund: A AB Supplier Second Entity
+ok 211 - Node pdf holds a bare role after a completed name: Kund: A AB Supplier Second Entity
+  ---
+  duration_ms: 1.00006
+  type: 'test'
+  ...
+# Subtest: Node pdf retains a literal company name: Original supplier AB
+ok 212 - Node pdf retains a literal company name: Original supplier AB
+  ---
+  duration_ms: 2.502936
+  type: 'test'
+  ...
+# Subtest: Node pdf retains a literal company name: North Customer Support AB
+ok 213 - Node pdf retains a literal company name: North Customer Support AB
+  ---
+  duration_ms: 1.340305
+  type: 'test'
+  ...
+# Subtest: Node pdf retains a literal company name: AB Customer Service
+ok 214 - Node pdf retains a literal company name: AB Customer Service
+  ---
+  duration_ms: 1.025088
+  type: 'test'
+  ...
+# Subtest: Node pdf retains a literal company name: The Supplier Company Ltd.
+ok 215 - Node pdf retains a literal company name: The Supplier Company Ltd.
+  ---
+  duration_ms: 0.787375
+  type: 'test'
+  ...
+# Subtest: Node pdf retains a literal company name: Kund AB
+ok 216 - Node pdf retains a literal company name: Kund AB
+  ---
+  duration_ms: 0.82371
+  type: 'test'
+  ...
+# Subtest: Node pdf retains a literal company name: Example AB SupplierSupport
+ok 217 - Node pdf retains a literal company name: Example AB SupplierSupport
+  ---
+  duration_ms: 0.741628
+  type: 'test'
+  ...
+# Subtest: Node ocr holds a bare role after a completed name: Leverantör: Exempel HB Kund Annan Firma
+ok 218 - Node ocr holds a bare role after a completed name: Leverantör: Exempel HB Kund Annan Firma
+  ---
+  duration_ms: 1.495424
+  type: 'test'
+  ...
+# Subtest: Node ocr holds a bare role after a completed name: Supplier: Example Ltd. Bill to Second Entity
+ok 219 - Node ocr holds a bare role after a completed name: Supplier: Example Ltd. Bill to Second Entity
+  ---
+  duration_ms: 1.312372
+  type: 'test'
+  ...
+# Subtest: Node ocr holds a bare role after a completed name: Kund: Exempel ab leverantör annan firma
+ok 220 - Node ocr holds a bare role after a completed name: Kund: Exempel ab leverantör annan firma
+  ---
+  duration_ms: 0.819463
+  type: 'test'
+  ...
+# Subtest: Node ocr holds a bare role after a completed name: Säljare: Exempel KB säljare Annan Firma
+ok 221 - Node ocr holds a bare role after a completed name: Säljare: Exempel KB säljare Annan Firma
+  ---
+  duration_ms: 0.761828
+  type: 'test'
+  ...
+# Subtest: Node ocr holds a bare role after a completed name: Faktureras till: Example AB, supplier Other Entity
+ok 222 - Node ocr holds a bare role after a completed name: Faktureras till: Example AB, supplier Other Entity
+  ---
+  duration_ms: 0.907204
+  type: 'test'
+  ...
+# Subtest: Node ocr holds a bare role after a completed name: Kund: Exempel AB Mottagare
+ok 223 - Node ocr holds a bare role after a completed name: Kund: Exempel AB Mottagare
+  ---
+  duration_ms: 0.794046
+  type: 'test'
+  ...
+# Subtest: Node ocr holds a bare role after a completed name: Kund: Exempel Aktiebolag Supplier Other Entity
+ok 224 - Node ocr holds a bare role after a completed name: Kund: Exempel Aktiebolag Supplier Other Entity
+  ---
+  duration_ms: 0.862577
+  type: 'test'
+  ...
+# Subtest: Node ocr holds a bare role after a completed name: Kund: A AB Supplier Second Entity
+ok 225 - Node ocr holds a bare role after a completed name: Kund: A AB Supplier Second Entity
+  ---
+  duration_ms: 0.82378
+  type: 'test'
+  ...
+# Subtest: Node ocr retains a literal company name: Original supplier AB
+ok 226 - Node ocr retains a literal company name: Original supplier AB
+  ---
+  duration_ms: 0.937368
+  type: 'test'
+  ...
+# Subtest: Node ocr retains a literal company name: North Customer Support AB
+ok 227 - Node ocr retains a literal company name: North Customer Support AB
+  ---
+  duration_ms: 0.988464
+  type: 'test'
+  ...
+# Subtest: Node ocr retains a literal company name: AB Customer Service
+ok 228 - Node ocr retains a literal company name: AB Customer Service
+  ---
+  duration_ms: 0.851771
+  type: 'test'
+  ...
+# Subtest: Node ocr retains a literal company name: The Supplier Company Ltd.
+ok 229 - Node ocr retains a literal company name: The Supplier Company Ltd.
+  ---
+  duration_ms: 1.056704
+  type: 'test'
+  ...
+# Subtest: Node ocr retains a literal company name: Kund AB
+ok 230 - Node ocr retains a literal company name: Kund AB
+  ---
+  duration_ms: 0.887695
+  type: 'test'
+  ...
+# Subtest: Node ocr retains a literal company name: Example AB SupplierSupport
+ok 231 - Node ocr retains a literal company name: Example AB SupplierSupport
+  ---
+  duration_ms: 0.788727
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds a bare role after a completed name: Leverantör: Exempel HB Kund Annan Firma
+ok 232 - Sites pdf holds a bare role after a completed name: Leverantör: Exempel HB Kund Annan Firma
+  ---
+  duration_ms: 8.494878
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds a bare role after a completed name: Supplier: Example Ltd. Bill to Second Entity
+ok 233 - Sites pdf holds a bare role after a completed name: Supplier: Example Ltd. Bill to Second Entity
+  ---
+  duration_ms: 1.315598
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds a bare role after a completed name: Kund: Exempel ab leverantör annan firma
+ok 234 - Sites pdf holds a bare role after a completed name: Kund: Exempel ab leverantör annan firma
+  ---
+  duration_ms: 1.165306
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds a bare role after a completed name: Säljare: Exempel KB säljare Annan Firma
+ok 235 - Sites pdf holds a bare role after a completed name: Säljare: Exempel KB säljare Annan Firma
+  ---
+  duration_ms: 1.049654
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds a bare role after a completed name: Faktureras till: Example AB, supplier Other Entity
+ok 236 - Sites pdf holds a bare role after a completed name: Faktureras till: Example AB, supplier Other Entity
+  ---
+  duration_ms: 1.164484
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds a bare role after a completed name: Kund: Exempel AB Mottagare
+ok 237 - Sites pdf holds a bare role after a completed name: Kund: Exempel AB Mottagare
+  ---
+  duration_ms: 0.97247
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds a bare role after a completed name: Kund: Exempel Aktiebolag Supplier Other Entity
+ok 238 - Sites pdf holds a bare role after a completed name: Kund: Exempel Aktiebolag Supplier Other Entity
+  ---
+  duration_ms: 0.970017
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds a bare role after a completed name: Kund: A AB Supplier Second Entity
+ok 239 - Sites pdf holds a bare role after a completed name: Kund: A AB Supplier Second Entity
+  ---
+  duration_ms: 0.959501
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains a literal company name: Original supplier AB
+ok 240 - Sites pdf retains a literal company name: Original supplier AB
+  ---
+  duration_ms: 1.291332
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains a literal company name: North Customer Support AB
+ok 241 - Sites pdf retains a literal company name: North Customer Support AB
+  ---
+  duration_ms: 1.06078
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains a literal company name: AB Customer Service
+ok 242 - Sites pdf retains a literal company name: AB Customer Service
+  ---
+  duration_ms: 0.910448
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains a literal company name: The Supplier Company Ltd.
+ok 243 - Sites pdf retains a literal company name: The Supplier Company Ltd.
+  ---
+  duration_ms: 0.867514
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains a literal company name: Kund AB
+ok 244 - Sites pdf retains a literal company name: Kund AB
+  ---
+  duration_ms: 0.839824
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains a literal company name: Example AB SupplierSupport
+ok 245 - Sites pdf retains a literal company name: Example AB SupplierSupport
+  ---
+  duration_ms: 0.75594
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds a bare role after a completed name: Leverantör: Exempel HB Kund Annan Firma
+ok 246 - Sites ocr holds a bare role after a completed name: Leverantör: Exempel HB Kund Annan Firma
+  ---
+  duration_ms: 0.918821
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds a bare role after a completed name: Supplier: Example Ltd. Bill to Second Entity
+ok 247 - Sites ocr holds a bare role after a completed name: Supplier: Example Ltd. Bill to Second Entity
+  ---
+  duration_ms: 2.639769
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds a bare role after a completed name: Kund: Exempel ab leverantör annan firma
+ok 248 - Sites ocr holds a bare role after a completed name: Kund: Exempel ab leverantör annan firma
+  ---
+  duration_ms: 0.81731
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds a bare role after a completed name: Säljare: Exempel KB säljare Annan Firma
+ok 249 - Sites ocr holds a bare role after a completed name: Säljare: Exempel KB säljare Annan Firma
+  ---
+  duration_ms: 0.743801
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds a bare role after a completed name: Faktureras till: Example AB, supplier Other Entity
+ok 250 - Sites ocr holds a bare role after a completed name: Faktureras till: Example AB, supplier Other Entity
+  ---
+  duration_ms: 0.681169
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds a bare role after a completed name: Kund: Exempel AB Mottagare
+ok 251 - Sites ocr holds a bare role after a completed name: Kund: Exempel AB Mottagare
+  ---
+  duration_ms: 0.704153
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds a bare role after a completed name: Kund: Exempel Aktiebolag Supplier Other Entity
+ok 252 - Sites ocr holds a bare role after a completed name: Kund: Exempel Aktiebolag Supplier Other Entity
+  ---
+  duration_ms: 0.732064
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds a bare role after a completed name: Kund: A AB Supplier Second Entity
+ok 253 - Sites ocr holds a bare role after a completed name: Kund: A AB Supplier Second Entity
+  ---
+  duration_ms: 0.763059
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains a literal company name: Original supplier AB
+ok 254 - Sites ocr retains a literal company name: Original supplier AB
+  ---
+  duration_ms: 0.792073
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains a literal company name: North Customer Support AB
+ok 255 - Sites ocr retains a literal company name: North Customer Support AB
+  ---
+  duration_ms: 0.744372
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains a literal company name: AB Customer Service
+ok 256 - Sites ocr retains a literal company name: AB Customer Service
+  ---
+  duration_ms: 0.761608
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains a literal company name: The Supplier Company Ltd.
+ok 257 - Sites ocr retains a literal company name: The Supplier Company Ltd.
+  ---
+  duration_ms: 0.957447
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains a literal company name: Kund AB
+ok 258 - Sites ocr retains a literal company name: Kund AB
+  ---
+  duration_ms: 0.899753
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains a literal company name: Example AB SupplierSupport
+ok 259 - Sites ocr retains a literal company name: Example AB SupplierSupport
+  ---
+  duration_ms: 0.798993
+  type: 'test'
+  ...
+# Subtest: Node pdf a colon-labelled name keeps literal role words: Original supplier AB
+ok 260 - Node pdf a colon-labelled name keeps literal role words: Original supplier AB
+  ---
+  duration_ms: 52.115334
+  type: 'test'
+  ...
+# Subtest: Node pdf a colon-labelled name keeps literal role words: Synthetic customer AB
+ok 261 - Node pdf a colon-labelled name keeps literal role words: Synthetic customer AB
+  ---
+  duration_ms: 4.449839
+  type: 'test'
+  ...
+# Subtest: Node pdf a colon-labelled name keeps literal role words: Nord Customer Service AB
+ok 262 - Node pdf a colon-labelled name keeps literal role words: Nord Customer Service AB
+  ---
+  duration_ms: 1.489595
+  type: 'test'
+  ...
+# Subtest: Node pdf a colon-labelled name keeps literal role words: Svenska Supplier Support AB
+ok 263 - Node pdf a colon-labelled name keeps literal role words: Svenska Supplier Support AB
+  ---
+  duration_ms: 1.275959
+  type: 'test'
+  ...
+# Subtest: Node pdf a colon-labelled name keeps literal role words: Original supplier AB
+ok 264 - Node pdf a colon-labelled name keeps literal role words: Original supplier AB
+  ---
+  duration_ms: 1.523476
+  type: 'test'
+  ...
+# Subtest: Node pdf a colon-labelled name keeps literal role words: Kund AB
+ok 265 - Node pdf a colon-labelled name keeps literal role words: Kund AB
+  ---
+  duration_ms: 1.05993
+  type: 'test'
+  ...
+# Subtest: Node pdf literal-name grammar keeps bare conflicting roles unresolved
+ok 266 - Node pdf literal-name grammar keeps bare conflicting roles unresolved
+  ---
+  duration_ms: 1.868146
+  type: 'test'
+  ...
+# Subtest: Node pdf literal-name grammar keeps unresolved heading columns unresolved
+ok 267 - Node pdf literal-name grammar keeps unresolved heading columns unresolved
+  ---
+  duration_ms: 1.564837
+  type: 'test'
+  ...
+# Subtest: Node pdf literal-name grammar keeps unknown explicit inline label unresolved
+ok 268 - Node pdf literal-name grammar keeps unknown explicit inline label unresolved
+  ---
+  duration_ms: 1.077475
+  type: 'test'
+  ...
+# Subtest: Node pdf literal-name grammar keeps tab-delimited bare role column unresolved
+ok 269 - Node pdf literal-name grammar keeps tab-delimited bare role column unresolved
+  ---
+  duration_ms: 1.122452
+  type: 'test'
+  ...
+# Subtest: Node pdf literal-name grammar keeps space-delimited bare role column unresolved
+ok 270 - Node pdf literal-name grammar keeps space-delimited bare role column unresolved
+  ---
+  duration_ms: 0.870839
+  type: 'test'
+  ...
+# Subtest: Node pdf a second explicit colon role remains an independent party
+ok 271 - Node pdf a second explicit colon role remains an independent party
+  ---
+  duration_ms: 1.078206
+  type: 'test'
+  ...
+# Subtest: Node ocr a colon-labelled name keeps literal role words: Original supplier AB
+ok 272 - Node ocr a colon-labelled name keeps literal role words: Original supplier AB
+  ---
+  duration_ms: 1.520442
+  type: 'test'
+  ...
+# Subtest: Node ocr a colon-labelled name keeps literal role words: Synthetic customer AB
+ok 273 - Node ocr a colon-labelled name keeps literal role words: Synthetic customer AB
+  ---
+  duration_ms: 1.329167
+  type: 'test'
+  ...
+# Subtest: Node ocr a colon-labelled name keeps literal role words: Nord Customer Service AB
+ok 274 - Node ocr a colon-labelled name keeps literal role words: Nord Customer Service AB
+  ---
+  duration_ms: 0.917088
+  type: 'test'
+  ...
+# Subtest: Node ocr a colon-labelled name keeps literal role words: Svenska Supplier Support AB
+ok 275 - Node ocr a colon-labelled name keeps literal role words: Svenska Supplier Support AB
+  ---
+  duration_ms: 0.773635
+  type: 'test'
+  ...
+# Subtest: Node ocr a colon-labelled name keeps literal role words: Original supplier AB
+ok 276 - Node ocr a colon-labelled name keeps literal role words: Original supplier AB
+  ---
+  duration_ms: 0.985911
+  type: 'test'
+  ...
+# Subtest: Node ocr a colon-labelled name keeps literal role words: Kund AB
+ok 277 - Node ocr a colon-labelled name keeps literal role words: Kund AB
+  ---
+  duration_ms: 0.848015
+  type: 'test'
+  ...
+# Subtest: Node ocr literal-name grammar keeps bare conflicting roles unresolved
+ok 278 - Node ocr literal-name grammar keeps bare conflicting roles unresolved
+  ---
+  duration_ms: 0.824381
+  type: 'test'
+  ...
+# Subtest: Node ocr literal-name grammar keeps unresolved heading columns unresolved
+ok 279 - Node ocr literal-name grammar keeps unresolved heading columns unresolved
+  ---
+  duration_ms: 0.827455
+  type: 'test'
+  ...
+# Subtest: Node ocr literal-name grammar keeps unknown explicit inline label unresolved
+ok 280 - Node ocr literal-name grammar keeps unknown explicit inline label unresolved
+  ---
+  duration_ms: 0.750712
+  type: 'test'
+  ...
+# Subtest: Node ocr literal-name grammar keeps tab-delimited bare role column unresolved
+ok 281 - Node ocr literal-name grammar keeps tab-delimited bare role column unresolved
+  ---
+  duration_ms: 0.751343
+  type: 'test'
+  ...
+# Subtest: Node ocr literal-name grammar keeps space-delimited bare role column unresolved
+ok 282 - Node ocr literal-name grammar keeps space-delimited bare role column unresolved
+  ---
+  duration_ms: 0.866482
+  type: 'test'
+  ...
+# Subtest: Node ocr a second explicit colon role remains an independent party
+ok 283 - Node ocr a second explicit colon role remains an independent party
+  ---
+  duration_ms: 1.020822
+  type: 'test'
+  ...
+# Subtest: Sites pdf a colon-labelled name keeps literal role words: Original supplier AB
+ok 284 - Sites pdf a colon-labelled name keeps literal role words: Original supplier AB
+  ---
+  duration_ms: 8.267852
+  type: 'test'
+  ...
+# Subtest: Sites pdf a colon-labelled name keeps literal role words: Synthetic customer AB
+ok 285 - Sites pdf a colon-labelled name keeps literal role words: Synthetic customer AB
+  ---
+  duration_ms: 1.251162
+  type: 'test'
+  ...
+# Subtest: Sites pdf a colon-labelled name keeps literal role words: Nord Customer Service AB
+ok 286 - Sites pdf a colon-labelled name keeps literal role words: Nord Customer Service AB
+  ---
+  duration_ms: 1.102383
+  type: 'test'
+  ...
+# Subtest: Sites pdf a colon-labelled name keeps literal role words: Svenska Supplier Support AB
+ok 287 - Sites pdf a colon-labelled name keeps literal role words: Svenska Supplier Support AB
+  ---
+  duration_ms: 1.10789
+  type: 'test'
+  ...
+# Subtest: Sites pdf a colon-labelled name keeps literal role words: Original supplier AB
+ok 288 - Sites pdf a colon-labelled name keeps literal role words: Original supplier AB
+  ---
+  duration_ms: 1.302448
+  type: 'test'
+  ...
+# Subtest: Sites pdf a colon-labelled name keeps literal role words: Kund AB
+ok 289 - Sites pdf a colon-labelled name keeps literal role words: Kund AB
+  ---
+  duration_ms: 0.970937
+  type: 'test'
+  ...
+# Subtest: Sites pdf literal-name grammar keeps bare conflicting roles unresolved
+ok 290 - Sites pdf literal-name grammar keeps bare conflicting roles unresolved
+  ---
+  duration_ms: 0.985249
+  type: 'test'
+  ...
+# Subtest: Sites pdf literal-name grammar keeps unresolved heading columns unresolved
+ok 291 - Sites pdf literal-name grammar keeps unresolved heading columns unresolved
+  ---
+  duration_ms: 1.01987
+  type: 'test'
+  ...
+# Subtest: Sites pdf literal-name grammar keeps unknown explicit inline label unresolved
+ok 292 - Sites pdf literal-name grammar keeps unknown explicit inline label unresolved
+  ---
+  duration_ms: 1.0335
+  type: 'test'
+  ...
+# Subtest: Sites pdf literal-name grammar keeps tab-delimited bare role column unresolved
+ok 293 - Sites pdf literal-name grammar keeps tab-delimited bare role column unresolved
+  ---
+  duration_ms: 0.996085
+  type: 'test'
+  ...
+# Subtest: Sites pdf literal-name grammar keeps space-delimited bare role column unresolved
+ok 294 - Sites pdf literal-name grammar keeps space-delimited bare role column unresolved
+  ---
+  duration_ms: 0.88501
+  type: 'test'
+  ...
+# Subtest: Sites pdf a second explicit colon role remains an independent party
+ok 295 - Sites pdf a second explicit colon role remains an independent party
+  ---
+  duration_ms: 1.050384
+  type: 'test'
+  ...
+# Subtest: Sites ocr a colon-labelled name keeps literal role words: Original supplier AB
+ok 296 - Sites ocr a colon-labelled name keeps literal role words: Original supplier AB
+  ---
+  duration_ms: 0.894764
+  type: 'test'
+  ...
+# Subtest: Sites ocr a colon-labelled name keeps literal role words: Synthetic customer AB
+ok 297 - Sites ocr a colon-labelled name keeps literal role words: Synthetic customer AB
+  ---
+  duration_ms: 0.909827
+  type: 'test'
+  ...
+# Subtest: Sites ocr a colon-labelled name keeps literal role words: Nord Customer Service AB
+ok 298 - Sites ocr a colon-labelled name keeps literal role words: Nord Customer Service AB
+  ---
+  duration_ms: 0.811441
+  type: 'test'
+  ...
+# Subtest: Sites ocr a colon-labelled name keeps literal role words: Svenska Supplier Support AB
+ok 299 - Sites ocr a colon-labelled name keeps literal role words: Svenska Supplier Support AB
+  ---
+  duration_ms: 0.847294
+  type: 'test'
+  ...
+# Subtest: Sites ocr a colon-labelled name keeps literal role words: Original supplier AB
+ok 300 - Sites ocr a colon-labelled name keeps literal role words: Original supplier AB
+  ---
+  duration_ms: 0.82398
+  type: 'test'
+  ...
+# Subtest: Sites ocr a colon-labelled name keeps literal role words: Kund AB
+ok 301 - Sites ocr a colon-labelled name keeps literal role words: Kund AB
+  ---
+  duration_ms: 0.804041
+  type: 'test'
+  ...
+# Subtest: Sites ocr literal-name grammar keeps bare conflicting roles unresolved
+ok 302 - Sites ocr literal-name grammar keeps bare conflicting roles unresolved
+  ---
+  duration_ms: 0.805343
+  type: 'test'
+  ...
+# Subtest: Sites ocr literal-name grammar keeps unresolved heading columns unresolved
+ok 303 - Sites ocr literal-name grammar keeps unresolved heading columns unresolved
+  ---
+  duration_ms: 0.840104
+  type: 'test'
+  ...
+# Subtest: Sites ocr literal-name grammar keeps unknown explicit inline label unresolved
+ok 304 - Sites ocr literal-name grammar keeps unknown explicit inline label unresolved
+  ---
+  duration_ms: 2.08648
+  type: 'test'
+  ...
+# Subtest: Sites ocr literal-name grammar keeps tab-delimited bare role column unresolved
+ok 305 - Sites ocr literal-name grammar keeps tab-delimited bare role column unresolved
+  ---
+  duration_ms: 0.838902
+  type: 'test'
+  ...
+# Subtest: Sites ocr literal-name grammar keeps space-delimited bare role column unresolved
+ok 306 - Sites ocr literal-name grammar keeps space-delimited bare role column unresolved
+  ---
+  duration_ms: 0.803479
+  type: 'test'
+  ...
+# Subtest: Sites ocr a second explicit colon role remains an independent party
+ok 307 - Sites ocr a second explicit colon role remains an independent party
+  ---
+  duration_ms: 0.842738
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient census: colon recipient followed by bare supplier
+ok 308 - Node pdf independent recipient census: colon recipient followed by bare supplier
+  ---
+  duration_ms: 52.540283
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient census: colon recipient followed by bare customer
+ok 309 - Node pdf independent recipient census: colon recipient followed by bare customer
+  ---
+  duration_ms: 4.091859
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient census: colon recipient followed by unknown colon field
+ok 310 - Node pdf independent recipient census: colon recipient followed by unknown colon field
+  ---
+  duration_ms: 1.424068
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient census: colon recipient followed by repeated bare recipient
+ok 311 - Node pdf independent recipient census: colon recipient followed by repeated bare recipient
+  ---
+  duration_ms: 1.220767
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient census: bare recipient followed by bare supplier
+ok 312 - Node pdf independent recipient census: bare recipient followed by bare supplier
+  ---
+  duration_ms: 1.896488
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient census: empty recipient followed by unknown colon field
+ok 313 - Node pdf independent recipient census: empty recipient followed by unknown colon field
+  ---
+  duration_ms: 1.595221
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient control: single explicit colon recipient
+ok 314 - Node pdf independent recipient control: single explicit colon recipient
+  ---
+  duration_ms: 1.461965
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient control: single explicit bare recipient
+ok 315 - Node pdf independent recipient control: single explicit bare recipient
+  ---
+  duration_ms: 1.754978
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient control: two fully explicit colon roles
+ok 316 - Node pdf independent recipient control: two fully explicit colon roles
+  ---
+  duration_ms: 1.137094
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient control: ordinary company name containing no competing field
+ok 317 - Node pdf independent recipient control: ordinary company name containing no competing field
+  ---
+  duration_ms: 1.20229
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient census: colon recipient followed by bare supplier
+ok 318 - Node ocr independent recipient census: colon recipient followed by bare supplier
+  ---
+  duration_ms: 2.339945
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient census: colon recipient followed by bare customer
+ok 319 - Node ocr independent recipient census: colon recipient followed by bare customer
+  ---
+  duration_ms: 1.532638
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient census: colon recipient followed by unknown colon field
+ok 320 - Node ocr independent recipient census: colon recipient followed by unknown colon field
+  ---
+  duration_ms: 0.96585
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient census: colon recipient followed by repeated bare recipient
+ok 321 - Node ocr independent recipient census: colon recipient followed by repeated bare recipient
+  ---
+  duration_ms: 0.915256
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient census: bare recipient followed by bare supplier
+ok 322 - Node ocr independent recipient census: bare recipient followed by bare supplier
+  ---
+  duration_ms: 0.897409
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient census: empty recipient followed by unknown colon field
+ok 323 - Node ocr independent recipient census: empty recipient followed by unknown colon field
+  ---
+  duration_ms: 1.135561
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient control: single explicit colon recipient
+ok 324 - Node ocr independent recipient control: single explicit colon recipient
+  ---
+  duration_ms: 0.982976
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient control: single explicit bare recipient
+ok 325 - Node ocr independent recipient control: single explicit bare recipient
+  ---
+  duration_ms: 0.880703
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient control: two fully explicit colon roles
+ok 326 - Node ocr independent recipient control: two fully explicit colon roles
+  ---
+  duration_ms: 0.97965
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient control: ordinary company name containing no competing field
+ok 327 - Node ocr independent recipient control: ordinary company name containing no competing field
+  ---
+  duration_ms: 0.978849
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient census: colon recipient followed by bare supplier
+ok 328 - Sites pdf independent recipient census: colon recipient followed by bare supplier
+  ---
+  duration_ms: 9.050581
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient census: colon recipient followed by bare customer
+ok 329 - Sites pdf independent recipient census: colon recipient followed by bare customer
+  ---
+  duration_ms: 1.369898
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient census: colon recipient followed by unknown colon field
+ok 330 - Sites pdf independent recipient census: colon recipient followed by unknown colon field
+  ---
+  duration_ms: 1.28277
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient census: colon recipient followed by repeated bare recipient
+ok 331 - Sites pdf independent recipient census: colon recipient followed by repeated bare recipient
+  ---
+  duration_ms: 1.299123
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient census: bare recipient followed by bare supplier
+ok 332 - Sites pdf independent recipient census: bare recipient followed by bare supplier
+  ---
+  duration_ms: 1.164354
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient census: empty recipient followed by unknown colon field
+ok 333 - Sites pdf independent recipient census: empty recipient followed by unknown colon field
+  ---
+  duration_ms: 1.263882
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient control: single explicit colon recipient
+ok 334 - Sites pdf independent recipient control: single explicit colon recipient
+  ---
+  duration_ms: 2.031978
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient control: single explicit bare recipient
+ok 335 - Sites pdf independent recipient control: single explicit bare recipient
+  ---
+  duration_ms: 1.066459
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient control: two fully explicit colon roles
+ok 336 - Sites pdf independent recipient control: two fully explicit colon roles
+  ---
+  duration_ms: 1.504598
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient control: ordinary company name containing no competing field
+ok 337 - Sites pdf independent recipient control: ordinary company name containing no competing field
+  ---
+  duration_ms: 1.163713
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient census: colon recipient followed by bare supplier
+ok 338 - Sites ocr independent recipient census: colon recipient followed by bare supplier
+  ---
+  duration_ms: 1.091086
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient census: colon recipient followed by bare customer
+ok 339 - Sites ocr independent recipient census: colon recipient followed by bare customer
+  ---
+  duration_ms: 0.920513
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient census: colon recipient followed by unknown colon field
+ok 340 - Sites ocr independent recipient census: colon recipient followed by unknown colon field
+  ---
+  duration_ms: 1.006881
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient census: colon recipient followed by repeated bare recipient
+ok 341 - Sites ocr independent recipient census: colon recipient followed by repeated bare recipient
+  ---
+  duration_ms: 1.153638
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient census: bare recipient followed by bare supplier
+ok 342 - Sites ocr independent recipient census: bare recipient followed by bare supplier
+  ---
+  duration_ms: 0.941023
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient census: empty recipient followed by unknown colon field
+ok 343 - Sites ocr independent recipient census: empty recipient followed by unknown colon field
+  ---
+  duration_ms: 1.038618
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient control: single explicit colon recipient
+ok 344 - Sites ocr independent recipient control: single explicit colon recipient
+  ---
+  duration_ms: 0.958008
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient control: single explicit bare recipient
+ok 345 - Sites ocr independent recipient control: single explicit bare recipient
+  ---
+  duration_ms: 4.09895
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient control: two fully explicit colon roles
+ok 346 - Sites ocr independent recipient control: two fully explicit colon roles
+  ---
+  duration_ms: 0.703982
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient control: ordinary company name containing no competing field
+ok 347 - Sites ocr independent recipient control: ordinary company name containing no competing field
+  ---
+  duration_ms: 0.624075
+  type: 'test'
+  ...
+# Subtest: Node pdf independent inline organization boundary: Avsändare:
+ok 348 - Node pdf independent inline organization boundary: Avsändare:
+  ---
+  duration_ms: 53.526404
+  type: 'test'
+  ...
+# Subtest: Node pdf independent inline organization boundary: Utställd av:
+ok 349 - Node pdf independent inline organization boundary: Utställd av:
+  ---
+  duration_ms: 5.171067
+  type: 'test'
+  ...
+# Subtest: Node pdf independent inline organization positive: same-line explicit recipient section
+ok 350 - Node pdf independent inline organization positive: same-line explicit recipient section
+  ---
+  duration_ms: 1.498189
+  type: 'test'
+  ...
+# Subtest: Node pdf independent inline organization positive: explicit owner-qualified number after an unknown field
+ok 351 - Node pdf independent inline organization positive: explicit owner-qualified number after an unknown field
+  ---
+  duration_ms: 1.360645
+  type: 'test'
+  ...
+# Subtest: Node ocr independent inline organization boundary: Avsändare:
+ok 352 - Node ocr independent inline organization boundary: Avsändare:
+  ---
+  duration_ms: 2.367866
+  type: 'test'
+  ...
+# Subtest: Node ocr independent inline organization boundary: Utställd av:
+ok 353 - Node ocr independent inline organization boundary: Utställd av:
+  ---
+  duration_ms: 1.623133
+  type: 'test'
+  ...
+# Subtest: Node ocr independent inline organization positive: same-line explicit recipient section
+ok 354 - Node ocr independent inline organization positive: same-line explicit recipient section
+  ---
+  duration_ms: 1.180638
+  type: 'test'
+  ...
+# Subtest: Node ocr independent inline organization positive: explicit owner-qualified number after an unknown field
+ok 355 - Node ocr independent inline organization positive: explicit owner-qualified number after an unknown field
+  ---
+  duration_ms: 1.102723
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent inline organization boundary: Avsändare:
+ok 356 - Sites pdf independent inline organization boundary: Avsändare:
+  ---
+  duration_ms: 9.134885
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent inline organization boundary: Utställd av:
+ok 357 - Sites pdf independent inline organization boundary: Utställd av:
+  ---
+  duration_ms: 1.590706
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent inline organization positive: same-line explicit recipient section
+ok 358 - Sites pdf independent inline organization positive: same-line explicit recipient section
+  ---
+  duration_ms: 1.40464
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent inline organization positive: explicit owner-qualified number after an unknown field
+ok 359 - Sites pdf independent inline organization positive: explicit owner-qualified number after an unknown field
+  ---
+  duration_ms: 1.18861
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent inline organization boundary: Avsändare:
+ok 360 - Sites ocr independent inline organization boundary: Avsändare:
+  ---
+  duration_ms: 1.33702
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent inline organization boundary: Utställd av:
+ok 361 - Sites ocr independent inline organization boundary: Utställd av:
+  ---
+  duration_ms: 1.118526
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent inline organization positive: same-line explicit recipient section
+ok 362 - Sites ocr independent inline organization positive: same-line explicit recipient section
+  ---
+  duration_ms: 1.027711
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent inline organization positive: explicit owner-qualified number after an unknown field
+ok 363 - Sites ocr independent inline organization positive: explicit owner-qualified number after an unknown field
+  ---
+  duration_ms: 1.017356
+  type: 'test'
+  ...
+# Subtest: Node pdf cannot move an organization across Utställd av before-recipient
+ok 364 - Node pdf cannot move an organization across Utställd av before-recipient
+  ---
+  duration_ms: 51.080852
+  type: 'test'
+  ...
+# Subtest: Node pdf cannot move an organization across Utställd av after-recipient
+ok 365 - Node pdf cannot move an organization across Utställd av after-recipient
+  ---
+  duration_ms: 4.406765
+  type: 'test'
+  ...
+# Subtest: Node pdf cannot move an organization across Utställd av after-paragraph
+ok 366 - Node pdf cannot move an organization across Utställd av after-paragraph
+  ---
+  duration_ms: 1.329518
+  type: 'test'
+  ...
+# Subtest: Node pdf cannot move an organization across Avsändare before-recipient
+ok 367 - Node pdf cannot move an organization across Avsändare before-recipient
+  ---
+  duration_ms: 1.173768
+  type: 'test'
+  ...
+# Subtest: Node pdf cannot move an organization across Avsändare after-recipient
+ok 368 - Node pdf cannot move an organization across Avsändare after-recipient
+  ---
+  duration_ms: 1.101701
+  type: 'test'
+  ...
+# Subtest: Node pdf cannot move an organization across Avsändare after-paragraph
+ok 369 - Node pdf cannot move an organization across Avsändare after-paragraph
+  ---
+  duration_ms: 1.04655
+  type: 'test'
+  ...
+# Subtest: Node pdf retains source-bound adjacent recipient identity
+ok 370 - Node pdf retains source-bound adjacent recipient identity
+  ---
+  duration_ms: 2.190874
+  type: 'test'
+  ...
+# Subtest: Node pdf retains source-bound same-line recipient identity
+ok 371 - Node pdf retains source-bound same-line recipient identity
+  ---
+  duration_ms: 0.977667
+  type: 'test'
+  ...
+# Subtest: Node pdf retains source-bound explicitly owner-qualified identities
+ok 372 - Node pdf retains source-bound explicitly owner-qualified identities
+  ---
+  duration_ms: 1.182251
+  type: 'test'
+  ...
+# Subtest: Node ocr cannot move an organization across Utställd av before-recipient
+ok 373 - Node ocr cannot move an organization across Utställd av before-recipient
+  ---
+  duration_ms: 2.050266
+  type: 'test'
+  ...
+# Subtest: Node ocr cannot move an organization across Utställd av after-recipient
+ok 374 - Node ocr cannot move an organization across Utställd av after-recipient
+  ---
+  duration_ms: 1.396477
+  type: 'test'
+  ...
+# Subtest: Node ocr cannot move an organization across Utställd av after-paragraph
+ok 375 - Node ocr cannot move an organization across Utställd av after-paragraph
+  ---
+  duration_ms: 1.006019
+  type: 'test'
+  ...
+# Subtest: Node ocr cannot move an organization across Avsändare before-recipient
+ok 376 - Node ocr cannot move an organization across Avsändare before-recipient
+  ---
+  duration_ms: 0.868055
+  type: 'test'
+  ...
+# Subtest: Node ocr cannot move an organization across Avsändare after-recipient
+ok 377 - Node ocr cannot move an organization across Avsändare after-recipient
+  ---
+  duration_ms: 0.756149
+  type: 'test'
+  ...
+# Subtest: Node ocr cannot move an organization across Avsändare after-paragraph
+ok 378 - Node ocr cannot move an organization across Avsändare after-paragraph
+  ---
+  duration_ms: 0.783229
+  type: 'test'
+  ...
+# Subtest: Node ocr retains source-bound adjacent recipient identity
+ok 379 - Node ocr retains source-bound adjacent recipient identity
+  ---
+  duration_ms: 1.069324
+  type: 'test'
+  ...
+# Subtest: Node ocr retains source-bound same-line recipient identity
+ok 380 - Node ocr retains source-bound same-line recipient identity
+  ---
+  duration_ms: 0.732174
+  type: 'test'
+  ...
+# Subtest: Node ocr retains source-bound explicitly owner-qualified identities
+ok 381 - Node ocr retains source-bound explicitly owner-qualified identities
+  ---
+  duration_ms: 1.018378
+  type: 'test'
+  ...
+# Subtest: Sites pdf cannot move an organization across Utställd av before-recipient
+ok 382 - Sites pdf cannot move an organization across Utställd av before-recipient
+  ---
+  duration_ms: 8.659172
+  type: 'test'
+  ...
+# Subtest: Sites pdf cannot move an organization across Utställd av after-recipient
+ok 383 - Sites pdf cannot move an organization across Utställd av after-recipient
+  ---
+  duration_ms: 1.356418
+  type: 'test'
+  ...
+# Subtest: Sites pdf cannot move an organization across Utställd av after-paragraph
+ok 384 - Sites pdf cannot move an organization across Utställd av after-paragraph
+  ---
+  duration_ms: 1.181469
+  type: 'test'
+  ...
+# Subtest: Sites pdf cannot move an organization across Avsändare before-recipient
+ok 385 - Sites pdf cannot move an organization across Avsändare before-recipient
+  ---
+  duration_ms: 1.14738
+  type: 'test'
+  ...
+# Subtest: Sites pdf cannot move an organization across Avsändare after-recipient
+ok 386 - Sites pdf cannot move an organization across Avsändare after-recipient
+  ---
+  duration_ms: 1.146688
+  type: 'test'
+  ...
+# Subtest: Sites pdf cannot move an organization across Avsändare after-paragraph
+ok 387 - Sites pdf cannot move an organization across Avsändare after-paragraph
+  ---
+  duration_ms: 1.020842
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains source-bound adjacent recipient identity
+ok 388 - Sites pdf retains source-bound adjacent recipient identity
+  ---
+  duration_ms: 1.142412
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains source-bound same-line recipient identity
+ok 389 - Sites pdf retains source-bound same-line recipient identity
+  ---
+  duration_ms: 1.069324
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains source-bound explicitly owner-qualified identities
+ok 390 - Sites pdf retains source-bound explicitly owner-qualified identities
+  ---
+  duration_ms: 1.256652
+  type: 'test'
+  ...
+# Subtest: Sites ocr cannot move an organization across Utställd av before-recipient
+ok 391 - Sites ocr cannot move an organization across Utställd av before-recipient
+  ---
+  duration_ms: 1.057406
+  type: 'test'
+  ...
+# Subtest: Sites ocr cannot move an organization across Utställd av after-recipient
+ok 392 - Sites ocr cannot move an organization across Utställd av after-recipient
+  ---
+  duration_ms: 0.918811
+  type: 'test'
+  ...
+# Subtest: Sites ocr cannot move an organization across Utställd av after-paragraph
+ok 393 - Sites ocr cannot move an organization across Utställd av after-paragraph
+  ---
+  duration_ms: 0.994262
+  type: 'test'
+  ...
+# Subtest: Sites ocr cannot move an organization across Avsändare before-recipient
+ok 394 - Sites ocr cannot move an organization across Avsändare before-recipient
+  ---
+  duration_ms: 0.892261
+  type: 'test'
+  ...
+# Subtest: Sites ocr cannot move an organization across Avsändare after-recipient
+ok 395 - Sites ocr cannot move an organization across Avsändare after-recipient
+  ---
+  duration_ms: 0.841215
+  type: 'test'
+  ...
+# Subtest: Sites ocr cannot move an organization across Avsändare after-paragraph
+ok 396 - Sites ocr cannot move an organization across Avsändare after-paragraph
+  ---
+  duration_ms: 0.923908
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains source-bound adjacent recipient identity
+ok 397 - Sites ocr retains source-bound adjacent recipient identity
+  ---
+  duration_ms: 0.944849
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains source-bound same-line recipient identity
+ok 398 - Sites ocr retains source-bound same-line recipient identity
+  ---
+  duration_ms: 0.969225
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains source-bound explicitly owner-qualified identities
+ok 399 - Sites ocr retains source-bound explicitly owner-qualified identities
+  ---
+  duration_ms: 0.998969
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Utställd av: issuer-first gap=1
+ok 400 - Node pdf independent organization provenance: Utställd av: issuer-first gap=1
+  ---
+  duration_ms: 52.907156
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Utställd av: recipient-first gap=1
+ok 401 - Node pdf independent organization provenance: Utställd av: recipient-first gap=1
+  ---
+  duration_ms: 4.985833
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Utställd av: issuer-first gap=2
+ok 402 - Node pdf independent organization provenance: Utställd av: issuer-first gap=2
+  ---
+  duration_ms: 1.311331
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Utställd av: recipient-first gap=2
+ok 403 - Node pdf independent organization provenance: Utställd av: recipient-first gap=2
+  ---
+  duration_ms: 1.179235
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Avsändare: issuer-first gap=1
+ok 404 - Node pdf independent organization provenance: Avsändare: issuer-first gap=1
+  ---
+  duration_ms: 1.207498
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Avsändare: recipient-first gap=1
+ok 405 - Node pdf independent organization provenance: Avsändare: recipient-first gap=1
+  ---
+  duration_ms: 1.293094
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Avsändare: issuer-first gap=2
+ok 406 - Node pdf independent organization provenance: Avsändare: issuer-first gap=2
+  ---
+  duration_ms: 1.067481
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Avsändare: recipient-first gap=2
+ok 407 - Node pdf independent organization provenance: Avsändare: recipient-first gap=2
+  ---
+  duration_ms: 1.128802
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization positive: same explicit recipient section
+ok 408 - Node pdf independent organization positive: same explicit recipient section
+  ---
+  duration_ms: 1.365321
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization positive: explicit recipient-owned organization across paragraph
+ok 409 - Node pdf independent organization positive: explicit recipient-owned organization across paragraph
+  ---
+  duration_ms: 1.334846
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Utställd av: issuer-first gap=1
+ok 410 - Node ocr independent organization provenance: Utställd av: issuer-first gap=1
+  ---
+  duration_ms: 2.357099
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Utställd av: recipient-first gap=1
+ok 411 - Node ocr independent organization provenance: Utställd av: recipient-first gap=1
+  ---
+  duration_ms: 1.572909
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Utställd av: issuer-first gap=2
+ok 412 - Node ocr independent organization provenance: Utställd av: issuer-first gap=2
+  ---
+  duration_ms: 0.954083
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Utställd av: recipient-first gap=2
+ok 413 - Node ocr independent organization provenance: Utställd av: recipient-first gap=2
+  ---
+  duration_ms: 0.998388
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Avsändare: issuer-first gap=1
+ok 414 - Node ocr independent organization provenance: Avsändare: issuer-first gap=1
+  ---
+  duration_ms: 0.849999
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Avsändare: recipient-first gap=1
+ok 415 - Node ocr independent organization provenance: Avsändare: recipient-first gap=1
+  ---
+  duration_ms: 0.929286
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Avsändare: issuer-first gap=2
+ok 416 - Node ocr independent organization provenance: Avsändare: issuer-first gap=2
+  ---
+  duration_ms: 0.904168
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Avsändare: recipient-first gap=2
+ok 417 - Node ocr independent organization provenance: Avsändare: recipient-first gap=2
+  ---
+  duration_ms: 1.104705
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization positive: same explicit recipient section
+ok 418 - Node ocr independent organization positive: same explicit recipient section
+  ---
+  duration_ms: 1.011338
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization positive: explicit recipient-owned organization across paragraph
+ok 419 - Node ocr independent organization positive: explicit recipient-owned organization across paragraph
+  ---
+  duration_ms: 1.014201
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Utställd av: issuer-first gap=1
+ok 420 - Sites pdf independent organization provenance: Utställd av: issuer-first gap=1
+  ---
+  duration_ms: 8.901871
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Utställd av: recipient-first gap=1
+ok 421 - Sites pdf independent organization provenance: Utställd av: recipient-first gap=1
+  ---
+  duration_ms: 1.410639
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Utställd av: issuer-first gap=2
+ok 422 - Sites pdf independent organization provenance: Utställd av: issuer-first gap=2
+  ---
+  duration_ms: 1.312794
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Utställd av: recipient-first gap=2
+ok 423 - Sites pdf independent organization provenance: Utställd av: recipient-first gap=2
+  ---
+  duration_ms: 1.252244
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Avsändare: issuer-first gap=1
+ok 424 - Sites pdf independent organization provenance: Avsändare: issuer-first gap=1
+  ---
+  duration_ms: 1.209341
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Avsändare: recipient-first gap=1
+ok 425 - Sites pdf independent organization provenance: Avsändare: recipient-first gap=1
+  ---
+  duration_ms: 1.218875
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Avsändare: issuer-first gap=2
+ok 426 - Sites pdf independent organization provenance: Avsändare: issuer-first gap=2
+  ---
+  duration_ms: 1.099187
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Avsändare: recipient-first gap=2
+ok 427 - Sites pdf independent organization provenance: Avsändare: recipient-first gap=2
+  ---
+  duration_ms: 1.103655
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization positive: same explicit recipient section
+ok 428 - Sites pdf independent organization positive: same explicit recipient section
+  ---
+  duration_ms: 1.162151
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization positive: explicit recipient-owned organization across paragraph
+ok 429 - Sites pdf independent organization positive: explicit recipient-owned organization across paragraph
+  ---
+  duration_ms: 1.152467
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Utställd av: issuer-first gap=1
+ok 430 - Sites ocr independent organization provenance: Utställd av: issuer-first gap=1
+  ---
+  duration_ms: 1.096283
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Utställd av: recipient-first gap=1
+ok 431 - Sites ocr independent organization provenance: Utställd av: recipient-first gap=1
+  ---
+  duration_ms: 1.056965
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Utställd av: issuer-first gap=2
+ok 432 - Sites ocr independent organization provenance: Utställd av: issuer-first gap=2
+  ---
+  duration_ms: 0.990847
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Utställd av: recipient-first gap=2
+ok 433 - Sites ocr independent organization provenance: Utställd av: recipient-first gap=2
+  ---
+  duration_ms: 0.937979
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Avsändare: issuer-first gap=1
+ok 434 - Sites ocr independent organization provenance: Avsändare: issuer-first gap=1
+  ---
+  duration_ms: 1.096885
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Avsändare: recipient-first gap=1
+ok 435 - Sites ocr independent organization provenance: Avsändare: recipient-first gap=1
+  ---
+  duration_ms: 1.006209
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Avsändare: issuer-first gap=2
+ok 436 - Sites ocr independent organization provenance: Avsändare: issuer-first gap=2
+  ---
+  duration_ms: 0.98615
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Avsändare: recipient-first gap=2
+ok 437 - Sites ocr independent organization provenance: Avsändare: recipient-first gap=2
+  ---
+  duration_ms: 1.059289
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization positive: same explicit recipient section
+ok 438 - Sites ocr independent organization positive: same explicit recipient section
+  ---
+  duration_ms: 3.485902
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization positive: explicit recipient-owned organization across paragraph
+ok 439 - Sites ocr independent organization positive: explicit recipient-owned organization across paragraph
+  ---
+  duration_ms: 1.118316
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: recipient then supplier
+ok 440 - Node pdf independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 52.61189
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: supplier then recipient
+ok 441 - Node pdf independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 4.137215
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: recipient then customer
+ok 442 - Node pdf independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 1.172947
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: repeated English recipient
+ok 443 - Node pdf independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 1.180017
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: repeated supplier
+ok 444 - Node pdf independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 1.183592
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: upper case roles
+ok 445 - Node pdf independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 1.039058
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: lowercase legal form
+ok 446 - Node pdf independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 0.990377
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: period after legal form
+ok 447 - Node pdf independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 1.038789
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: comma after legal form
+ok 448 - Node pdf independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 1.300366
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: semicolon after legal form
+ok 449 - Node pdf independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 1.378391
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: parenthesized legal form
+ok 450 - Node pdf independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 1.044797
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: tab before new role
+ok 451 - Node pdf independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 1.616844
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: column spaces before new role
+ok 452 - Node pdf independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 1.45269
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: tab after explicit colon
+ok 453 - Node pdf independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.972921
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: HB before new role
+ok 454 - Node pdf independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 0.879512
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: KB before new role
+ok 455 - Node pdf independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 0.86421
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: single-letter prefix
+ok 456 - Node pdf independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.835947
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal supplier in name
+ok 457 - Node pdf independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 2.279254
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal customer in name
+ok 458 - Node pdf independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 1.068012
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal middle Customer
+ok 459 - Node pdf independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.944098
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal leading Kund
+ok 460 - Node pdf independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 1.015393
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal middle Supplier
+ok 461 - Node pdf independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 0.913993
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: uppercase literal role word
+ok 462 - Node pdf independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 1.028012
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal leading Customer
+ok 463 - Node pdf independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 0.91883
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: hyphenated literal role word
+ok 464 - Node pdf independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.876177
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: role fragment
+ok 465 - Node pdf independent literal-name-positive: role fragment
+  ---
+  duration_ms: 0.876187
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: legal-form suffix fragment
+ok 466 - Node pdf independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.88517
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: tab after colon with literal role
+ok 467 - Node pdf independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.807205
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: tab within explicit recipient label
+ok 468 - Node pdf independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.865661
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: wrapped explicit supplier name
+ok 469 - Node pdf independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 1.118536
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: repeated Kund as literal value
+ok 470 - Node pdf independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 0.850088
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: plain complete name
+ok 471 - Node pdf independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.825823
+  type: 'test'
+  ...
+# Subtest: Node pdf independent explicit-roles-positive: two separately explicit colon roles
+ok 472 - Node pdf independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 1.084756
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census: unowned number after recipient then supplier
+ok 473 - Node pdf independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.976977
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census: unowned number after supplier then recipient
+ok 474 - Node pdf independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 0.813565
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census: unowned number after repeated recipient
+ok 475 - Node pdf independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 2.723082
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census: inline unowned number after new bare role
+ok 476 - Node pdf independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.675741
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: unknown field cannot donate ownership
+ok 477 - Node pdf independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 0.860505
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: invalid unowned number before owned number holds census
+ok 478 - Node pdf independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 0.865361
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: different unowned number after scalar holds census
+ok 479 - Node pdf independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 0.976466
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 480 - Node pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.839022
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: recipient then supplier
+ok 481 - Node ocr independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 1.578207
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: supplier then recipient
+ok 482 - Node ocr independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 1.289179
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: recipient then customer
+ok 483 - Node ocr independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 0.885992
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: repeated English recipient
+ok 484 - Node ocr independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 0.779134
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: repeated supplier
+ok 485 - Node ocr independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 0.880253
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: upper case roles
+ok 486 - Node ocr independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 0.73627
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: lowercase legal form
+ok 487 - Node ocr independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 0.79747
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: period after legal form
+ok 488 - Node ocr independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 0.787616
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: comma after legal form
+ok 489 - Node ocr independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 0.938448
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: semicolon after legal form
+ok 490 - Node ocr independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 0.788999
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: parenthesized legal form
+ok 491 - Node ocr independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 0.9661
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: tab before new role
+ok 492 - Node ocr independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 0.804651
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: column spaces before new role
+ok 493 - Node ocr independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 0.784812
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: tab after explicit colon
+ok 494 - Node ocr independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.733837
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: HB before new role
+ok 495 - Node ocr independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 0.771903
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: KB before new role
+ok 496 - Node ocr independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 0.875746
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: single-letter prefix
+ok 497 - Node ocr independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.862146
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal supplier in name
+ok 498 - Node ocr independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 0.7767
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal customer in name
+ok 499 - Node ocr independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 0.800556
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal middle Customer
+ok 500 - Node ocr independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.78371
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal leading Kund
+ok 501 - Node ocr independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 0.783691
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal middle Supplier
+ok 502 - Node ocr independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 0.741608
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: uppercase literal role word
+ok 503 - Node ocr independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 0.902767
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal leading Customer
+ok 504 - Node ocr independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 0.847856
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: hyphenated literal role word
+ok 505 - Node ocr independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.822498
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: role fragment
+ok 506 - Node ocr independent literal-name-positive: role fragment
+  ---
+  duration_ms: 0.761818
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: legal-form suffix fragment
+ok 507 - Node ocr independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.776189
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: tab after colon with literal role
+ok 508 - Node ocr independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.768808
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: tab within explicit recipient label
+ok 509 - Node ocr independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.787656
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: wrapped explicit supplier name
+ok 510 - Node ocr independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 1.104175
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: repeated Kund as literal value
+ok 511 - Node ocr independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 0.767796
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: plain complete name
+ok 512 - Node ocr independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.774917
+  type: 'test'
+  ...
+# Subtest: Node ocr independent explicit-roles-positive: two separately explicit colon roles
+ok 513 - Node ocr independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 0.85141
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census: unowned number after recipient then supplier
+ok 514 - Node ocr independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.798963
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census: unowned number after supplier then recipient
+ok 515 - Node ocr independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 0.820004
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census: unowned number after repeated recipient
+ok 516 - Node ocr independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 0.716882
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census: inline unowned number after new bare role
+ok 517 - Node ocr independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.789158
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: unknown field cannot donate ownership
+ok 518 - Node ocr independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 2.632728
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: invalid unowned number before owned number holds census
+ok 519 - Node ocr independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 0.823349
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: different unowned number after scalar holds census
+ok 520 - Node ocr independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 0.809308
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 521 - Node ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.761518
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: recipient then supplier
+ok 522 - Sites pdf independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 7.826488
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: supplier then recipient
+ok 523 - Sites pdf independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 1.357249
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: recipient then customer
+ok 524 - Sites pdf independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 1.099007
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: repeated English recipient
+ok 525 - Sites pdf independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 1.48621
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: repeated supplier
+ok 526 - Sites pdf independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 1.145976
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: upper case roles
+ok 527 - Sites pdf independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 1.074371
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: lowercase legal form
+ok 528 - Sites pdf independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 1.177023
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: period after legal form
+ok 529 - Sites pdf independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 1.089603
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: comma after legal form
+ok 530 - Sites pdf independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 0.965279
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: semicolon after legal form
+ok 531 - Sites pdf independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 0.979531
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: parenthesized legal form
+ok 532 - Sites pdf independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 0.835156
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: tab before new role
+ok 533 - Sites pdf independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 0.906612
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: column spaces before new role
+ok 534 - Sites pdf independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 0.774316
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: tab after explicit colon
+ok 535 - Sites pdf independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.751072
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: HB before new role
+ok 536 - Sites pdf independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 0.807976
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: KB before new role
+ok 537 - Sites pdf independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 0.769349
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: single-letter prefix
+ok 538 - Sites pdf independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.820184
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal supplier in name
+ok 539 - Sites pdf independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 1.043045
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal customer in name
+ok 540 - Sites pdf independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 0.792424
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal middle Customer
+ok 541 - Sites pdf independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.772474
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal leading Kund
+ok 542 - Sites pdf independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 0.847926
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal middle Supplier
+ok 543 - Sites pdf independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 0.92495
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: uppercase literal role word
+ok 544 - Sites pdf independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 0.897619
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal leading Customer
+ok 545 - Sites pdf independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 0.870058
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: hyphenated literal role word
+ok 546 - Sites pdf independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.704303
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: role fragment
+ok 547 - Sites pdf independent literal-name-positive: role fragment
+  ---
+  duration_ms: 0.847876
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: legal-form suffix fragment
+ok 548 - Sites pdf independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.79
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: tab after colon with literal role
+ok 549 - Sites pdf independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.740066
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: tab within explicit recipient label
+ok 550 - Sites pdf independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.721388
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: wrapped explicit supplier name
+ok 551 - Sites pdf independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 0.753395
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: repeated Kund as literal value
+ok 552 - Sites pdf independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 0.811952
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: plain complete name
+ok 553 - Sites pdf independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.912511
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent explicit-roles-positive: two separately explicit colon roles
+ok 554 - Sites pdf independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 0.976686
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census: unowned number after recipient then supplier
+ok 555 - Sites pdf independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.883479
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census: unowned number after supplier then recipient
+ok 556 - Sites pdf independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 0.814516
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census: unowned number after repeated recipient
+ok 557 - Sites pdf independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 0.730241
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census: inline unowned number after new bare role
+ok 558 - Sites pdf independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.898079
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: unknown field cannot donate ownership
+ok 559 - Sites pdf independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 0.831822
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: invalid unowned number before owned number holds census
+ok 560 - Sites pdf independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 0.83088
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: different unowned number after scalar holds census
+ok 561 - Sites pdf independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 1.007162
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 562 - Sites pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.798221
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: recipient then supplier
+ok 563 - Sites ocr independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 0.77561
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: supplier then recipient
+ok 564 - Sites ocr independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 0.713407
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: recipient then customer
+ok 565 - Sites ocr independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 0.790471
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: repeated English recipient
+ok 566 - Sites ocr independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 0.73584
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: repeated supplier
+ok 567 - Sites ocr independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 0.835027
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: upper case roles
+ok 568 - Sites ocr independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 1.831662
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: lowercase legal form
+ok 569 - Sites ocr independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 0.800004
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: period after legal form
+ok 570 - Sites ocr independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 0.735339
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: comma after legal form
+ok 571 - Sites ocr independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 0.66851
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: semicolon after legal form
+ok 572 - Sites ocr independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 0.707728
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: parenthesized legal form
+ok 573 - Sites ocr independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 0.831471
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: tab before new role
+ok 574 - Sites ocr independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 0.766785
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: column spaces before new role
+ok 575 - Sites ocr independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 0.726827
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: tab after explicit colon
+ok 576 - Sites ocr independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.654339
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: HB before new role
+ok 577 - Sites ocr independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 0.71639
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: KB before new role
+ok 578 - Sites ocr independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 0.704202
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: single-letter prefix
+ok 579 - Sites ocr independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.774516
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal supplier in name
+ok 580 - Sites ocr independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 0.732735
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal customer in name
+ok 581 - Sites ocr independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 0.732084
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal middle Customer
+ok 582 - Sites ocr independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.714007
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal leading Kund
+ok 583 - Sites ocr independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 0.70223
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal middle Supplier
+ok 584 - Sites ocr independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 0.946231
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: uppercase literal role word
+ok 585 - Sites ocr independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 0.856729
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal leading Customer
+ok 586 - Sites ocr independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 0.671254
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: hyphenated literal role word
+ok 587 - Sites ocr independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.705655
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: role fragment
+ok 588 - Sites ocr independent literal-name-positive: role fragment
+  ---
+  duration_ms: 0.703662
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: legal-form suffix fragment
+ok 589 - Sites ocr independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.692064
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: tab after colon with literal role
+ok 590 - Sites ocr independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.806714
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: tab within explicit recipient label
+ok 591 - Sites ocr independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.732024
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: wrapped explicit supplier name
+ok 592 - Sites ocr independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 0.732014
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: repeated Kund as literal value
+ok 593 - Sites ocr independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 0.640799
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: plain complete name
+ok 594 - Sites ocr independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.66219
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent explicit-roles-positive: two separately explicit colon roles
+ok 595 - Sites ocr independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 0.817271
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census: unowned number after recipient then supplier
+ok 596 - Sites ocr independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.730021
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census: unowned number after supplier then recipient
+ok 597 - Sites ocr independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 0.692766
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census: unowned number after repeated recipient
+ok 598 - Sites ocr independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 0.657043
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census: inline unowned number after new bare role
+ok 599 - Sites ocr independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.739005
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: unknown field cannot donate ownership
+ok 600 - Sites ocr independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 0.805923
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: invalid unowned number before owned number holds census
+ok 601 - Sites ocr independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 0.798362
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: different unowned number after scalar holds census
+ok 602 - Sites ocr independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 0.835357
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 603 - Sites ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.768027
+  type: 'test'
+  ...
+# Subtest: Node independent literal opposite role inside name and independent owner
+ok 604 - Node independent literal opposite role inside name and independent owner
+  ---
+  duration_ms: 51.570698
+  type: 'test'
+  ...
+# Subtest: Node independent unknown inline colon cannot be hidden inside explicit name
+ok 605 - Node independent unknown inline colon cannot be hidden inside explicit name
+  ---
+  duration_ms: 6.034946
+  type: 'test'
+  ...
+# Subtest: Node independent unowned identical valid duplicate never donates an owner
+ok 606 - Node independent unowned identical valid duplicate never donates an owner
+  ---
+  duration_ms: 1.643163
+  type: 'test'
+  ...
+# Subtest: Node independent equal duplicate preserves an independently owned identity
+ok 607 - Node independent equal duplicate preserves an independently owned identity
+  ---
+  duration_ms: 1.230612
+  type: 'test'
+  ...
+# Subtest: Node independent bad unowned occurrence before owned identity remains in census
+ok 608 - Node independent bad unowned occurrence before owned identity remains in census
+  ---
+  duration_ms: 1.197603
+  type: 'test'
+  ...
+# Subtest: Node independent different unowned occurrence after scalar boundary holds identity
+ok 609 - Node independent different unowned occurrence after scalar boundary holds identity
+  ---
+  duration_ms: 1.284652
+  type: 'test'
+  ...
+# Subtest: Sites independent literal opposite role inside name and independent owner
+ok 610 - Sites independent literal opposite role inside name and independent owner
+  ---
+  duration_ms: 10.058572
+  type: 'test'
+  ...
+# Subtest: Sites independent unknown inline colon cannot be hidden inside explicit name
+ok 611 - Sites independent unknown inline colon cannot be hidden inside explicit name
+  ---
+  duration_ms: 2.677474
+  type: 'test'
+  ...
+# Subtest: Sites independent unowned identical valid duplicate never donates an owner
+ok 612 - Sites independent unowned identical valid duplicate never donates an owner
+  ---
+  duration_ms: 2.449146
+  type: 'test'
+  ...
+# Subtest: Sites independent equal duplicate preserves an independently owned identity
+ok 613 - Sites independent equal duplicate preserves an independently owned identity
+  ---
+  duration_ms: 1.757913
+  type: 'test'
+  ...
+# Subtest: Sites independent bad unowned occurrence before owned identity remains in census
+ok 614 - Sites independent bad unowned occurrence before owned identity remains in census
+  ---
+  duration_ms: 1.299985
+  type: 'test'
+  ...
+# Subtest: Sites independent different unowned occurrence after scalar boundary holds identity
+ok 615 - Sites independent different unowned occurrence after scalar boundary holds identity
+  ---
+  duration_ms: 1.771974
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: inline ISO dates keep their label boundary
+ok 616 - Node scalar layout: inline ISO dates keep their label boundary
+  ---
+  duration_ms: 52.081407
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: inline Swedish dots dates keep their label boundary
+ok 617 - Node scalar layout: inline Swedish dots dates keep their label boundary
+  ---
+  duration_ms: 4.595235
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: inline Swedish slashes dates keep their label boundary
+ok 618 - Node scalar layout: inline Swedish slashes dates keep their label boundary
+  ---
+  duration_ms: 1.218274
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: inline spaced digits dates keep their label boundary
+ok 619 - Node scalar layout: inline spaced digits dates keep their label boundary
+  ---
+  duration_ms: 1.06722
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: date suffix XYZ is not silently truncated
+ok 620 - Node scalar layout: date suffix XYZ is not silently truncated
+  ---
+  duration_ms: 1.422546
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: date suffix  99 is not silently truncated
+ok 621 - Node scalar layout: date suffix  99 is not silently truncated
+  ---
+  duration_ms: 1.197363
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: date suffix /17 is not silently truncated
+ok 622 - Node scalar layout: date suffix /17 is not silently truncated
+  ---
+  duration_ms: 0.995164
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: incomplete line-item header Benämning Antal Belopp exkl. moms cannot poison a printed net summary
+ok 623 - Node scalar layout: incomplete line-item header Benämning Antal Belopp exkl. moms cannot poison a printed net summary
+  ---
+  duration_ms: 2.057748
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: incomplete line-item header Beskrivning Antal Belopp exklusive moms cannot poison a printed net summary
+ok 624 - Node scalar layout: incomplete line-item header Beskrivning Antal Belopp exklusive moms cannot poison a printed net summary
+  ---
+  duration_ms: 5.461288
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: incomplete line-item header Description Quantity Net amount cannot poison a printed net summary
+ok 625 - Node scalar layout: incomplete line-item header Description Quantity Net amount cannot poison a printed net summary
+  ---
+  duration_ms: 1.26984
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: bare monetary summaries end an incomplete table
+ok 626 - Node scalar layout: bare monetary summaries end an incomplete table
+  ---
+  duration_ms: 1.149412
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: bare monetary summaries end an incomplete table
+ok 627 - Node scalar layout: bare monetary summaries end an incomplete table
+  ---
+  duration_ms: 0.925271
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: actual invalid or conflicting net summaries remain in the full census
+ok 628 - Node scalar layout: actual invalid or conflicting net summaries remain in the full census
+  ---
+  duration_ms: 1.573009
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: an explicit invoice-number label can identify an OCR title without admitting a native document
+ok 629 - Node scalar layout: an explicit invoice-number label can identify an OCR title without admitting a native document
+  ---
+  duration_ms: 2.633711
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Offert is not promoted by a referenced invoice number
+ok 630 - Node scalar layout: Offert is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.82392
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Quotation is not promoted by a referenced invoice number
+ok 631 - Node scalar layout: Quotation is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.962957
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Påminnelse is not promoted by a referenced invoice number
+ok 632 - Node scalar layout: Påminnelse is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.816759
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Betalningspåminnelse is not promoted by a referenced invoice number
+ok 633 - Node scalar layout: Betalningspåminnelse is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.812032
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Orderbekräftelse is not promoted by a referenced invoice number
+ok 634 - Node scalar layout: Orderbekräftelse is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.799814
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Payment reminder is not promoted by a referenced invoice number
+ok 635 - Node scalar layout: Payment reminder is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.789099
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: explicit non-invoice type Dokumenttyp: Offert prevents new type inference
+ok 636 - Node scalar layout: explicit non-invoice type Dokumenttyp: Offert prevents new type inference
+  ---
+  duration_ms: 1.745065
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: explicit non-invoice type Dokumenttyp: Påminnelse prevents new type inference
+ok 637 - Node scalar layout: explicit non-invoice type Dokumenttyp: Påminnelse prevents new type inference
+  ---
+  duration_ms: 1.639046
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: explicit non-invoice type Leveransbekräftelse prevents new type inference
+ok 638 - Node scalar layout: explicit non-invoice type Leveransbekräftelse prevents new type inference
+  ---
+  duration_ms: 1.544898
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: explicit non-invoice type Bekräftelse prevents new type inference
+ok 639 - Node scalar layout: explicit non-invoice type Bekräftelse prevents new type inference
+  ---
+  duration_ms: 1.414385
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: explicit non-invoice type Offertnummer: Q-417 prevents new type inference
+ok 640 - Node scalar layout: explicit non-invoice type Offertnummer: Q-417 prevents new type inference
+  ---
+  duration_ms: 3.791405
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: competing type is retained across scalar/table/display filtering
+ok 641 - Node scalar layout: competing type is retained across scalar/table/display filtering
+  ---
+  duration_ms: 0.871501
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: competing type is retained across scalar/table/display filtering
+ok 642 - Node scalar layout: competing type is retained across scalar/table/display filtering
+  ---
+  duration_ms: 0.845973
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: competing type is retained across scalar/table/display filtering
+ok 643 - Node scalar layout: competing type is retained across scalar/table/display filtering
+  ---
+  duration_ms: 49.333529
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+ok 644 - Node scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+  ---
+  duration_ms: 2.49138
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+ok 645 - Node scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+  ---
+  duration_ms: 1.312093
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+ok 646 - Node scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+  ---
+  duration_ms: 1.334566
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: OCR amount 12345 keeps explicit currency/decimal or ordinary integer evidence
+ok 647 - Node scalar layout: OCR amount 12345 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.882637
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: OCR amount 00123 SEK keeps explicit currency/decimal or ordinary integer evidence
+ok 648 - Node scalar layout: OCR amount 00123 SEK keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.766204
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: OCR amount SEK 00123 keeps explicit currency/decimal or ordinary integer evidence
+ok 649 - Node scalar layout: OCR amount SEK 00123 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.78339
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: OCR amount 00123,50 keeps explicit currency/decimal or ordinary integer evidence
+ok 650 - Node scalar layout: OCR amount 00123,50 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.73602
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: OCR amount 0,50 keeps explicit currency/decimal or ordinary integer evidence
+ok 651 - Node scalar layout: OCR amount 0,50 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.637283
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: OCR amount 0 keeps explicit currency/decimal or ordinary integer evidence
+ok 652 - Node scalar layout: OCR amount 0 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.68216
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Kreditfaktura retains precedence over invoice-number evidence
+ok 653 - Node scalar layout: Kreditfaktura retains precedence over invoice-number evidence
+  ---
+  duration_ms: 0.883108
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Kvitto retains precedence over invoice-number evidence
+ok 654 - Node scalar layout: Kvitto retains precedence over invoice-number evidence
+  ---
+  duration_ms: 0.726425
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: an invalid invoice identity does not establish a missing document title
+ok 655 - Node scalar layout: an invalid invoice identity does not establish a missing document title
+  ---
+  duration_ms: 0.993942
+  type: 'test'
+  ...
+1..655
+# tests 655
+# suites 0
+# pass 655
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 16498.321142

@@ -1,6 +1,6 @@
 {
   "schema": "mgeorge-quality8-current-assessment-v1",
-  "assessed_at": "2026-11-06T01:14:58.629771+00:00",
+  "assessed_at": "2026-11-06T03:34:52.229754+00:00",
   "published_site_version": 65,
   "published_main": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
   "status": "current_evidence_assessment_goal_not_yet_met",
@@ -34,7 +34,8 @@
     "docs/quality8/area28-33-independent-read-review.md",
     "docs/quality8/area28-33-independent-read-review.json",
     "docs/quality8/backup-2026-11-06-final-pass/summary.json",
-    "docs/quality8/schedule-runtime-observations-20261106.json"
+    "docs/quality8/schedule-runtime-observations-20261106.json",
+    "docs/quality8/ocr-periodic-20261106/README.md"
   ],
   "rows": [
     {
@@ -464,9 +465,9 @@
       "score": 6.5,
       "at_least_8": false,
       "criterion": "Befintliga scheman fungerar och minst en faktisk körning observeras; överlapp, paus och sen körning hanteras; ingen grön status från enbart konfiguration.",
-      "evidence": "Gmails schemalagda 00:00-körning slutfördes 00:08:33 med sex importer. OCR efter Site 65 är ännu endast workflow_run; aktuell periodisk körning saknas. Backupens tidigare 80-stegsbudget var otillräcklig och är korrigerad, men den nya instruktionen är inte prövad från ofärdig snapshot.",
-      "remaining_for_8": "Observera faktisk periodisk OCR med aktuell relevant kod och meningsfull köprogress samt schemalagd backup med nya instruktionen från ofärdig snapshot till separat bekräftad fullständig verifiering, eller en automatisk återupptagningskedja som når samma slutläge.",
-      "scope_and_limitations": "Gmails faktiska schemabevis räknas trots appens konservativa konfigurationsflagga. CI-utlöst OCR är inte periodisk OCR. Manuellt färdigställd backup och en efterföljande complete-no-op provar inte den korrigerade schemabudgeten. Ingen generell schema-SLA är uppmätt.",
+      "evidence": "Gmails avslutade schemakörningar ger verkliga importer. Periodisk OCR-run 42153093698 på publicerad main 41aad slutfördes 02:54:40 UTC med 6 behandlade och 0 fel; appkö 66→60 och färsk worker stödjer samma drift. Backupens nya instruktion är ännu inte prövad automatiskt från ofärdig snapshot.",
+      "remaining_for_8": "Observera schemalagd backup med den nya instruktionen från ofärdig snapshot till separat bekräftad fullständig verifiering, eller en automatisk återupptagningskedja som når samma slutläge. OCR-delen är nu verifierad.",
+      "scope_and_limitations": "Den observerade OCR-körningen har faktiskt event=schedule och behandlar väntande jobb. Ingen generell schema-SLA är uppmätt. Dagens manuellt färdigställda backup och senare complete-no-op provar inte den korrigerade anropsbudgeten.",
       "prior_independent_evidence_refs": [
         "operations",
         "published_release",

@@ -1,0 +1,163 @@
+{
+  "schema": "independent-party-boundary-recheck-v1",
+  "recordedAt": "2026-11-06T03:32:42.484094+00:00",
+  "reviewer": "/root/bank_details_review_resume",
+  "commit": "96d1404d4b7bb4a791f0313c8cd95a29eec5a8c7",
+  "previousReviewedCommit": "0f550950b99d41d932b91370b458e9b85abf9451",
+  "baseline": "dd968c1fd10b4e21c2479a939df548e390f5c6d6",
+  "decision": "READY",
+  "closedFindings": [
+    "I1",
+    "I2"
+  ],
+  "remainingCritical": 0,
+  "remainingImportant": 0,
+  "node": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+  "nodeVersion": "v24.22.1",
+  "runs": [
+    {
+      "log": "logs/frozen-independent-164.tap",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent",
+      "command": "PARTY_REVIEW_REPO=/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/recheck-96d1404/snapshot NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./recheck-96d1404/snapshot/scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap probes/independent-boundary.test.mjs",
+      "exitCode": 0,
+      "tests": 164,
+      "pass": 164,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 859.170497
+    },
+    {
+      "log": "logs/retained-regression-144.tap",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/recheck-96d1404/snapshot",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap sites/tests/review-explicit-recipient-boundaries.test.mjs sites/tests/party-role-name-grammar.test.mjs sites/tests/party-completed-name-boundaries.test.mjs",
+      "exitCode": 0,
+      "tests": 144,
+      "pass": 144,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 2140.312121
+    },
+    {
+      "log": "logs/extra-owner-punctuation-32.tap",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/recheck-96d1404",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./snapshot/scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap extra-owner-punctuation.test.mjs",
+      "exitCode": 0,
+      "tests": 32,
+      "pass": 32,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 565.425404
+    }
+  ],
+  "totals": {
+    "tests": 340,
+    "pass": 340,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "priorManifestFilesVerified": 30,
+  "frozenCases": {
+    "path": "/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/cases.json",
+    "sha256": "8f72fc82b369d015c60dc24d06d6803e659d7159a8c3bce86ccdb8f3d7c420f3"
+  },
+  "frozenAssertions": {
+    "path": "/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs",
+    "sha256": "bc468a7bced8bd59ba8c054bb3721a2b9e384962d1e72eb4aa97960f063d1daf"
+  },
+  "sourceSha256": "db76b24ff1e68701f624b395588627b634767f9034289b163855dbc3b9226255",
+  "files": [
+    {
+      "path": "REVIEW.md",
+      "sha256": "aafb6d233feb2148997b403961c983515bbb9b91eb650e436589a3045c1b9843",
+      "bytes": 7172
+    },
+    {
+      "path": "source-preservation.json",
+      "sha256": "2bcb6d100ae5f6793f3994c52f8678031c0ed1f02114232b89bc27f036fd9769",
+      "bytes": 6551
+    },
+    {
+      "path": "product.diff",
+      "sha256": "2e88490fe1ac587e539887f6819234ddb3e5d3bb6a55a2a68bd07fac67f0b461",
+      "bytes": 4298
+    },
+    {
+      "path": "extra-owner-punctuation.test.mjs",
+      "sha256": "669287f250236a766c8d7872b646cf9383f884623b8cfa167eaa8d61d2401942",
+      "bytes": 3441
+    },
+    {
+      "path": "logs/extra-owner-punctuation-32.tap",
+      "sha256": "37aa0a249477bf67e72f6fadf5d019449a11827561f721da1e83c6d788d4658c",
+      "bytes": 7038
+    },
+    {
+      "path": "logs/frozen-independent-164.tap",
+      "sha256": "9189448de7a1c07781e8dc33ae5482f16f5969c1a30f18fa30a1ca0d614ac9f8",
+      "bytes": 35092
+    },
+    {
+      "path": "logs/retained-regression-144.tap",
+      "sha256": "667a0d7f6f0fd68bfbf6379c98867081d58e9c746cdf0868409fda995f8132e5",
+      "bytes": 33067
+    },
+    {
+      "path": "snapshot/src/invoice-details.js",
+      "sha256": "db76b24ff1e68701f624b395588627b634767f9034289b163855dbc3b9226255",
+      "bytes": 25393
+    },
+    {
+      "path": "snapshot/sites/lib/invoice-details.js",
+      "sha256": "db76b24ff1e68701f624b395588627b634767f9034289b163855dbc3b9226255",
+      "bytes": 25393
+    },
+    {
+      "path": "snapshot/src/invoice-extraction.js",
+      "sha256": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e",
+      "bytes": 21922
+    },
+    {
+      "path": "snapshot/sites/lib/invoice-fields.js",
+      "sha256": "e7f2ecd75e56cd82f1296234daf1bb11886f743a2ee84d233119f7588ba9b4e2",
+      "bytes": 20283
+    },
+    {
+      "path": "snapshot/sites/tests/review-explicit-recipient-boundaries.test.mjs",
+      "sha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545",
+      "bytes": 2811
+    },
+    {
+      "path": "snapshot/sites/tests/party-role-name-grammar.test.mjs",
+      "sha256": "d7c764aa007c5e1738649d45a819e5aa15471f86f53aeef74d87712ef2e5943d",
+      "bytes": 3432
+    },
+    {
+      "path": "snapshot/sites/tests/party-completed-name-boundaries.test.mjs",
+      "sha256": "c7c638957007f47561945e44325b1b7dd4b3232a63d21200a7d7ff927be60fd8",
+      "bytes": 2754
+    }
+  ],
+  "productEdits": 0,
+  "bankCalls": 0,
+  "opticalCalls": 0,
+  "productionCalls": 0,
+  "v3Reads": 0,
+  "scoreChanges": 0,
+  "transportDisconnections": 0,
+  "fixtureCorrectionsThisRecheck": 0,
+  "limits": [
+    "READY is limited to this exact candidate and explicit role/company-form/ownership boundary scope.",
+    "No universal company-name, punctuation or layout understanding is claimed.",
+    "No broad CI or bank suite was run; integration remains with root.",
+    "B reviewer VAT-census work is separate.",
+    "Original NOTREADY report, RED records and frozen cases remain unchanged."
+  ]
+}

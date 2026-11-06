@@ -1,0 +1,12 @@
+{
+  "schema": "party-boundary-source-history-v1",
+  "path": "docs/quality8/wave4-party-boundary-source-history.bundle",
+  "bytes": 72836,
+  "sha256": "1ea1493ab582a38de7b4a50ceb0b973c70c0f740cbd1a49a814162fb0570ba84",
+  "gitBlob": "e2115ccacd91db0ec81b69d3e7181b4c6fb4c1ab",
+  "head": "96d1404d4b7bb4a791f0313c8cd95a29eec5a8c7",
+  "prerequisite": "dd968c1fd10b4e21c2479a939df548e390f5c6d6",
+  "prerequisiteBundle": "wave4-repair-source-history.bundle",
+  "verification": "git bundle verify passed",
+  "scope": "Original producer commits 0b19269 through 96d1404 only; no root operational history, no OCR A/B or sealed V3."
+}

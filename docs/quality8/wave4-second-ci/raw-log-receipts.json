@@ -1,0 +1,42 @@
+[
+  {
+    "path": "/workspace/scratch/4d79ab4bea8e/reviews/wave4-repaired-pr-ci-364232a/logs/test-127681065581.log",
+    "bytes": 990523,
+    "sha256": "30e4ef1f6ec03723f37d73a62b0116f2221939bc3e128bc9365cf9d2c33f8554",
+    "job_id": 127681065581,
+    "run_id": 42153187290,
+    "name": "test",
+    "receivedAt": "2026-11-06T02:58:05.446Z",
+    "source": "github_fetch_workflow_job_logs decoded content, preserved as UTF-8"
+  },
+  {
+    "path": "/workspace/scratch/4d79ab4bea8e/reviews/wave4-repaired-pr-ci-364232a/logs/bankgiro_bridge-127681065799.log",
+    "bytes": 36935,
+    "sha256": "25ff848c5b54ce911a8341fd7dfa8756bb90eaa4be76a544217b47886d9ee617",
+    "job_id": 127681065799,
+    "run_id": 42153187290,
+    "name": "bankgiro_bridge",
+    "receivedAt": "2026-11-06T02:58:04.953Z",
+    "source": "github_fetch_workflow_job_logs decoded content, preserved as UTF-8"
+  },
+  {
+    "path": "/workspace/scratch/4d79ab4bea8e/reviews/wave4-repaired-pr-ci-364232a/logs/security_acceptance-127681065605.log",
+    "bytes": 19836,
+    "sha256": "4f5f877ffaa732637126fbf748565ceae3f393711b072e0bad0359bedd323a82",
+    "job_id": 127681065605,
+    "run_id": 42153187307,
+    "name": "security_acceptance",
+    "receivedAt": "2026-11-06T02:58:04.874Z",
+    "source": "github_fetch_workflow_job_logs decoded content, preserved as UTF-8"
+  },
+  {
+    "path": "/workspace/scratch/4d79ab4bea8e/reviews/wave4-repaired-pr-ci-364232a/logs/sites-127681065709.log",
+    "bytes": 2112339,
+    "sha256": "51148428127879779802bd4df37354d205b4996e82abc5df90e0a65c84851d5e",
+    "job_id": 127681065709,
+    "run_id": 42153187290,
+    "name": "sites",
+    "receivedAt": "2026-11-06T03:02:54.843Z",
+    "source": "github_fetch_workflow_job_logs decoded content, preserved as UTF-8"
+  }
+]

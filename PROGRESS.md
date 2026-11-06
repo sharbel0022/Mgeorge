@@ -1,3 +1,15 @@
+## 2026-11-06 — tredje PR 58-kandidat redo för full CI
+
+Exakt parserfix 96d1404 har oberoende READY efter två stängda fynd, 340/340 egna granskarprov och 655/655 berörda integrationsprov. Alla äldre RED-/CI-fel är bevarade. Känd OCR-replay är oförändrad i 52/52 parserresultat, inga nya optiska anrop. [Aktuell leveransgrind](docs/quality8/wave4-invoice-release-readiness.md) och nytt hashbundet native-paket är klara; full PR-/main-CI och publicering återstår. Site 65 är fortfarande live och 28/33 når minst 8. OCR B är separat och ännu under reparation efter oberoende censusfynd.
+
+## 2026-11-06 — faktisk periodisk OCR verifierad
+
+GitHub-run **42153093698**, `event=schedule`, på den publicerade huvudgrenen `41aadcef` slutfördes 02:54:40 UTC: **6 behandlade, 0 fel**. Appstatus visar samma färska worker, väntande kö 66→60 och granskningskö 374→380. [Full källa, rålogg och appstatus](docs/quality8/ocr-periodic-20261106/README.md). OCR-delen av schemabevisningen är nu uppfylld. Område 28 väntar fortfarande på backupens nya instruktion från en faktiskt ofärdig dagssnapshot; dagens 430-filssnapshot är redan verifierad. Betygen förblir 28/33 minst 8. Parserfixens oberoende granskning fann två ytterligare konkreta gränsfel, som rättas före ny kandidat.
+
+## 2026-11-06 — andra fulla PR 58-körningen blockerar publicering
+
+Kandidat `364232a` har **7337/7349** godkända obligatoriska tester: tolv befintliga gränsfall för mottagarnamn underkänns. Ett kolonmärkt företagsnamn får felaktigt absorbera en senare bar partsroll på samma rad. [Fullt bevarat CI-kvitto](docs/quality8/wave4-second-ci/README.md) visar att Sites-bygget hoppades över; inget av kandidatpaketen får publiceras. Den smala parserrättningen behåller gamla assertions och granskas separat. Site 65 och **28/33 minst 8** kvarstår. OCR B har dessutom ett separat granskningsfynd om ofullständigt momscensus; ingen ny optisk körning är godkänd.
+
 ## 2026-11-06 — sammansatt PR 58-kandidat klar för ny full CI
 
 Parser63, MCP-återköning, bankdiagnos e66 och testharnessens minnesrättning 7a5a397 är sammanförda med oberoende READY. Två separata fulla banksviter passerar samma 273 fall med oförändrade assertions och max-RSS 783 912 respektive 807 608 KiB. Alla tidigare underkända CI-/harnesskörningar är bevarade; [aktuell avgränsning](docs/quality8/wave4-invoice-release-readiness.md). Nytt native-paket är byggt, men full PR-/main-CI och publicering återstår. Produktionsläget är fortfarande Site 65 och 28/33 minst 8. OCR A/B och förseglad V3 är separata.

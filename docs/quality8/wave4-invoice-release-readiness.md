@@ -1,3 +1,19 @@
+## Aktuell tredje kandidat: oberoende granskad, full CI återstår — 2026-11-06
+
+Den andra fulla PR-körningens tolv recipient-regressioner har reparerats. Den första smala reparationen fick i sin tur två oberoende fynd om parenteser och oägt organisationsnummer; båda är rättade i exakt produkt `96d1404`. [Ursprunglig NOTREADY och separat READY](party-boundary-independent/README.md) bevarar alla frysta prov och råloggar. Granskaren har själv kört **340/340**, medan [rootintegrationens avgränsade grind](party-boundary-integration/receipt.json) passerar **655/655**. Populationerna överlappar och summeras inte.
+
+Den [kända OCR-replayen](party-boundary-repair/known-ocr-replay-comparison.json) gör 52 parseranrop och 0 nya optiska anrop. Samtliga fält, evidens, varningar, nivåer och parter är oförändrade mot 63edd9f; PSM3 står kvar på 57/100 mandatory och 79/130 All13, utan falska fältvärden. Detta är inte ett nytt hållprov eller ett högre OCR-betyg.
+
+[Nytt native-paket](wave4-third-native-preparation.json) är byggt från Sites-träd `58c2cae56a5be177842c360ae46d5caed83fdd9b`, native source `0b119b8d472f70a1bfeac686c12889b618a32fb2`, arkiv-SHA256 `8cb1aace94955204027302b08acdbb9e308b57c40a1fc95f33ace1830b8fee2d`. Ingen version är sparad eller publicerad. Exakt kommande PR-CI, normal merge och separat exakt main-CI krävs först. Båda tidigare underkända paket är fortsatt uteslutna.
+
+Bankdiagnos e66, normal MCP-återköning och banktestharnessens rättning är oförändrade mot föregående sammansatta kandidat. OCR A/B och förseglad V3 ingår inte. B:s separata negativa-censusfynd rättas och granskas i sin egen utvecklingslinje. Produktion är fortfarande Site 65 och **28/33 minst 8**. Periodisk OCR har nu faktiskt behandlat sex väntande dokument på levererad kod; område 28 väntar fortfarande på automatisk backupverifiering från ofärdig snapshot.
+
+## Aktuellt: full CI underkänd, ingen publicering — 2026-11-06
+
+Den andra fulla körningen på `364232a` underkänner tolv befintliga recipient-boundary-assertions. [Bevarat CI-kvitto och alla fel](wave4-second-ci/README.md): Node 2321/2321, Sites 4969/4981, bridge 47/47; Sites build skipped. Den tidigare smala parsergranskningen täckte inte dessa tolv fall och ger ingen integrerad publiceringsklarhet. En separat smal fix måste få oberoende granskning samt ny full PR- och main-CI.
+
+Nativepaketet från `1fda827` / Sites-träd `7671a5b` tillhör denna underkända kandidat och får inte publiceras. Det tidigare paketet från den första underkända körningen är också uteslutet. Site 65 är fortfarande live, alla betyg oförändrade. De daterade READY-beskeden nedan gäller sina uttryckliga delomfattningar, inte den sammansatta kandidatens fulla grind.
+
 ## Slutlig kodgranskning efter harnessrättning — 2026-11-06
 
 Alla ingående koddelar har nu separata oberoende READY-besked. Den utökade banktestfilen avbröts lokalt med SIGKILL efter drygt 3 GB RSS; den underkända körningen är bevarad. Den avgränsade testharnessrättningen 7a5a397 använder korta fil-URL:er i stället för rekursivt inbäddade data-URL:er. Produktkod, importmappningar, fixtures och samtliga assertions är oförändrade.

@@ -35,7 +35,7 @@ Site 65 är publicerad från main `41aadcef5fc6f65cc73979997b195c7b4f12eec1`, me
 | 25 | Betalstatus | 8 | Publicerad översikt/detalj behåller registrerat saldo och stoppar falskt verifierad visning. |
 | 26 | Kontrollera alla betalningar | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 27 | Mejlförslag | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
-| 28 | Schemaläggning | 6,5 | Gmails schemalagda 00:00-körning slutfördes 00:08:33 med sex importer. OCR efter Site 65 är ännu endast workflow_run; aktuell periodisk körning saknas. Backupens tidigare 80-stegsbudget var otillräcklig och är korrigerad, men den nya instruktionen är inte prövad från ofärdig snapshot. |
+| 28 | Schemaläggning | 6,5 | [Verklig periodisk OCR](docs/quality8/ocr-periodic-20261106/README.md) på Site65: sex behandlade, noll körfel; Gmail har avslutade schemakörningar. Backupens korrigerade anropsbudget återstår att verifiera från ofärdig snapshot eller automatisk återupptagningskedja. |
 | 29 | Backup | 8 | Snapshot 768fde9a-27a2-4b85-b85a-278239ec4aea: 430/430 original kopierade och kontrollästa, 185 567 855 byte i båda stegen, manifest_pass och verifiering slutförd 2026-11-06 00:48:58 UTC; separat slutstatus 00:49:04 UTC. |
 | 30 | Säkerhet | 8,5 | Exakt full CI/audit och negativa säkerhetsgrindar godkända;8 moderate utvecklingsfynd kvarstår. |
 | 31 | Katastrofåterställning | 8 | Isolerad återställning med riktig kod; lokalRTO 3,417 s och simuleradRPO 15 min, inte produktionsåterställning. |

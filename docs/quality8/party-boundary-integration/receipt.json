@@ -1,0 +1,39 @@
+{
+  "sourceCommit": "5dd481dd400163369bf96cbef18237f373ac6c29",
+  "productCommit": "96d1404d4b7bb4a791f0313c8cd95a29eec5a8c7",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "sites/tests/party-role-name-grammar.test.mjs",
+    "sites/tests/organization-event-context.test.mjs",
+    "sites/tests/review-organization-source-order-independent.test.mjs",
+    "sites/tests/review-organization-inline-context-independent.test.mjs",
+    "sites/tests/review-organization-owner-boundaries.test.mjs",
+    "sites/tests/ocr-explicit-role-boundary-positive.test.mjs",
+    "sites/tests/ocr-layout-role-parity.test.mjs",
+    "test/invoice-scalar-layout-regression.test.js",
+    "sites/tests/invoice-scalar-layout-regression.test.mjs",
+    "sites/tests/review-explicit-recipient-boundaries.test.mjs",
+    "sites/tests/party-completed-name-boundaries.test.mjs",
+    "sites/tests/review-party-completed-name-independent.test.mjs",
+    "sites/tests/review-party-name-census-independent.test.mjs",
+    "sites/tests/gmail-preview-q8.test.mjs",
+    "sites/tests/mcp-evidence-read.test.mjs"
+  ],
+  "exitCode": 0,
+  "logSha256": "b73b30fb7c99ddc7db533ce93c3b97b4cf3ab255f257521164dbaae295991770",
+  "counts": [
+    "# tests 655",
+    "# pass 655",
+    "# fail 0",
+    "# cancelled 0",
+    "# skipped 0",
+    "# todo 0",
+    "# duration_ms 16498.321142"
+  ],
+  "failures": []
+}

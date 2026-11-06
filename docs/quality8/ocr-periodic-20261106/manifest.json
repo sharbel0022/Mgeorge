@@ -1,0 +1,34 @@
+{
+  "files": [
+    {
+      "path": "application-status.json",
+      "bytes": 2452,
+      "sha256": "5cb88449d557295774ce6175cc59ca1823de8d1669309df2a32831beaf802228"
+    },
+    {
+      "path": "capture.json",
+      "bytes": 54,
+      "sha256": "70db293638c7fa531d0cbbb9ece2881f0e3ed640552dff20cc510b7e1a041bb4"
+    },
+    {
+      "path": "job.log",
+      "bytes": 15410,
+      "sha256": "0ae28f640d87a5e5ce07a785122c912f446dd49a7a64b365658b9c1bc95c65b5"
+    },
+    {
+      "path": "jobs.json",
+      "bytes": 1993,
+      "sha256": "bb88bf80b293e73ddec15a9828caa5f338150ff36649bf488b318f90177d8468"
+    },
+    {
+      "path": "run.json",
+      "bytes": 587,
+      "sha256": "c5bafa7ebde0461650811590bd7171c8b913737fd3b38cb73cef820ae3d82dde"
+    },
+    {
+      "path": "schedule-list.json",
+      "bytes": 2027,
+      "sha256": "56792a88d4dcaf3addc0c10ffbb727372d69444f30f54eda988e26197f32a2b2"
+    }
+  ]
+}

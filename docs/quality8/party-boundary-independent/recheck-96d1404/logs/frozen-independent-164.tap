@@ -1,0 +1,994 @@
+TAP version 13
+# Subtest: Node pdf independent bare-role-boundary: recipient then supplier
+ok 1 - Node pdf independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 51.400386
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: supplier then recipient
+ok 2 - Node pdf independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 5.340681
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: recipient then customer
+ok 3 - Node pdf independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 3.024539
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: repeated English recipient
+ok 4 - Node pdf independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 1.379603
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: repeated supplier
+ok 5 - Node pdf independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 1.288008
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: upper case roles
+ok 6 - Node pdf independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 1.131767
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: lowercase legal form
+ok 7 - Node pdf independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 1.075733
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: period after legal form
+ok 8 - Node pdf independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 0.904048
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: comma after legal form
+ok 9 - Node pdf independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 0.990927
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: semicolon after legal form
+ok 10 - Node pdf independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 1.356519
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: parenthesized legal form
+ok 11 - Node pdf independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 0.763191
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: tab before new role
+ok 12 - Node pdf independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 2.194329
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: column spaces before new role
+ok 13 - Node pdf independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 1.99808
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: tab after explicit colon
+ok 14 - Node pdf independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.669722
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: HB before new role
+ok 15 - Node pdf independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 0.729991
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: KB before new role
+ok 16 - Node pdf independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 0.923338
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: single-letter prefix
+ok 17 - Node pdf independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.636683
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal supplier in name
+ok 18 - Node pdf independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 2.618879
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal customer in name
+ok 19 - Node pdf independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 1.036044
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal middle Customer
+ok 20 - Node pdf independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 1.119628
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal leading Kund
+ok 21 - Node pdf independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 1.342027
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal middle Supplier
+ok 22 - Node pdf independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 0.866472
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: uppercase literal role word
+ok 23 - Node pdf independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 0.809479
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal leading Customer
+ok 24 - Node pdf independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 0.919873
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: hyphenated literal role word
+ok 25 - Node pdf independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.826032
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: role fragment
+ok 26 - Node pdf independent literal-name-positive: role fragment
+  ---
+  duration_ms: 1.008544
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: legal-form suffix fragment
+ok 27 - Node pdf independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.655551
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: tab after colon with literal role
+ok 28 - Node pdf independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 1.037597
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: tab within explicit recipient label
+ok 29 - Node pdf independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.881916
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: wrapped explicit supplier name
+ok 30 - Node pdf independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 1.212646
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: repeated Kund as literal value
+ok 31 - Node pdf independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 1.820246
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: plain complete name
+ok 32 - Node pdf independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.883127
+  type: 'test'
+  ...
+# Subtest: Node pdf independent explicit-roles-positive: two separately explicit colon roles
+ok 33 - Node pdf independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 1.09411
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census: unowned number after recipient then supplier
+ok 34 - Node pdf independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.912231
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census: unowned number after supplier then recipient
+ok 35 - Node pdf independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 0.783209
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census: unowned number after repeated recipient
+ok 36 - Node pdf independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 0.66816
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census: inline unowned number after new bare role
+ok 37 - Node pdf independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.893723
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: unknown field cannot donate ownership
+ok 38 - Node pdf independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 1.435686
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: invalid unowned number before owned number holds census
+ok 39 - Node pdf independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 3.344423
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: different unowned number after scalar holds census
+ok 40 - Node pdf independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 1.752305
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 41 - Node pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 1.119739
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: recipient then supplier
+ok 42 - Node ocr independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 3.147972
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: supplier then recipient
+ok 43 - Node ocr independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 2.261519
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: recipient then customer
+ok 44 - Node ocr independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 1.626229
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: repeated English recipient
+ok 45 - Node ocr independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 1.207298
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: repeated supplier
+ok 46 - Node ocr independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 0.928185
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: upper case roles
+ok 47 - Node ocr independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 0.510676
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: lowercase legal form
+ok 48 - Node ocr independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 0.56667
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: period after legal form
+ok 49 - Node ocr independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 0.467122
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: comma after legal form
+ok 50 - Node ocr independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 0.512979
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: semicolon after legal form
+ok 51 - Node ocr independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 0.549173
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: parenthesized legal form
+ok 52 - Node ocr independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 0.720136
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: tab before new role
+ok 53 - Node ocr independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 0.561501
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: column spaces before new role
+ok 54 - Node ocr independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 0.475685
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: tab after explicit colon
+ok 55 - Node ocr independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.696912
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: HB before new role
+ok 56 - Node ocr independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 1.287571
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: KB before new role
+ok 57 - Node ocr independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 0.726216
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: single-letter prefix
+ok 58 - Node ocr independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.757932
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal supplier in name
+ok 59 - Node ocr independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 0.904389
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal customer in name
+ok 60 - Node ocr independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 0.551827
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal middle Customer
+ok 61 - Node ocr independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.656613
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal leading Kund
+ok 62 - Node ocr independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 0.509054
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal middle Supplier
+ok 63 - Node ocr independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 0.747778
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: uppercase literal role word
+ok 64 - Node ocr independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 0.936577
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal leading Customer
+ok 65 - Node ocr independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 0.744443
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: hyphenated literal role word
+ok 66 - Node ocr independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.738754
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: role fragment
+ok 67 - Node ocr independent literal-name-positive: role fragment
+  ---
+  duration_ms: 0.61484
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: legal-form suffix fragment
+ok 68 - Node ocr independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.534512
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: tab after colon with literal role
+ok 69 - Node ocr independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.606659
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: tab within explicit recipient label
+ok 70 - Node ocr independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.60817
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: wrapped explicit supplier name
+ok 71 - Node ocr independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 0.807716
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: repeated Kund as literal value
+ok 72 - Node ocr independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 0.61452
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: plain complete name
+ok 73 - Node ocr independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.638625
+  type: 'test'
+  ...
+# Subtest: Node ocr independent explicit-roles-positive: two separately explicit colon roles
+ok 74 - Node ocr independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 0.567952
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census: unowned number after recipient then supplier
+ok 75 - Node ocr independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.553971
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census: unowned number after supplier then recipient
+ok 76 - Node ocr independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 0.513411
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census: unowned number after repeated recipient
+ok 77 - Node ocr independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 0.576624
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census: inline unowned number after new bare role
+ok 78 - Node ocr independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.775859
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: unknown field cannot donate ownership
+ok 79 - Node ocr independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 0.595232
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: invalid unowned number before owned number holds census
+ok 80 - Node ocr independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 0.829228
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: different unowned number after scalar holds census
+ok 81 - Node ocr independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 0.740026
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 82 - Node ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.624976
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: recipient then supplier
+ok 83 - Sites pdf independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 7.961641
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: supplier then recipient
+ok 84 - Sites pdf independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 1.166056
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: recipient then customer
+ok 85 - Sites pdf independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 0.935726
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: repeated English recipient
+ok 86 - Sites pdf independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 0.853314
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: repeated supplier
+ok 87 - Sites pdf independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 0.796569
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: upper case roles
+ok 88 - Sites pdf independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 1.525569
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: lowercase legal form
+ok 89 - Sites pdf independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 1.944721
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: period after legal form
+ok 90 - Sites pdf independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 1.126728
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: comma after legal form
+ok 91 - Sites pdf independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 0.969595
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: semicolon after legal form
+ok 92 - Sites pdf independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 0.901285
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: parenthesized legal form
+ok 93 - Sites pdf independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 0.68891
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: tab before new role
+ok 94 - Sites pdf independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 0.975655
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: column spaces before new role
+ok 95 - Sites pdf independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 1.04023
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: tab after explicit colon
+ok 96 - Sites pdf independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.858812
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: HB before new role
+ok 97 - Sites pdf independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 0.893803
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: KB before new role
+ok 98 - Sites pdf independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 0.941363
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: single-letter prefix
+ok 99 - Sites pdf independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.995255
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal supplier in name
+ok 100 - Sites pdf independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 1.349599
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal customer in name
+ok 101 - Sites pdf independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 0.705244
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal middle Customer
+ok 102 - Sites pdf independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.748749
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal leading Kund
+ok 103 - Sites pdf independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 1.07319
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal middle Supplier
+ok 104 - Sites pdf independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 0.724422
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: uppercase literal role word
+ok 105 - Sites pdf independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 1.020963
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal leading Customer
+ok 106 - Sites pdf independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 1.098877
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: hyphenated literal role word
+ok 107 - Sites pdf independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.65481
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: role fragment
+ok 108 - Sites pdf independent literal-name-positive: role fragment
+  ---
+  duration_ms: 0.660098
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: legal-form suffix fragment
+ok 109 - Sites pdf independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.579959
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: tab after colon with literal role
+ok 110 - Sites pdf independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.714748
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: tab within explicit recipient label
+ok 111 - Sites pdf independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.800555
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: wrapped explicit supplier name
+ok 112 - Sites pdf independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 0.826184
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: repeated Kund as literal value
+ok 113 - Sites pdf independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 1.082864
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: plain complete name
+ok 114 - Sites pdf independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.836098
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent explicit-roles-positive: two separately explicit colon roles
+ok 115 - Sites pdf independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 0.796369
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census: unowned number after recipient then supplier
+ok 116 - Sites pdf independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.717742
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census: unowned number after supplier then recipient
+ok 117 - Sites pdf independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 0.719155
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census: unowned number after repeated recipient
+ok 118 - Sites pdf independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 0.596573
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census: inline unowned number after new bare role
+ok 119 - Sites pdf independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.590354
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: unknown field cannot donate ownership
+ok 120 - Sites pdf independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 0.831072
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: invalid unowned number before owned number holds census
+ok 121 - Sites pdf independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 1.014022
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: different unowned number after scalar holds census
+ok 122 - Sites pdf independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 1.086969
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 123 - Sites pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.761738
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: recipient then supplier
+ok 124 - Sites ocr independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 1.425091
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: supplier then recipient
+ok 125 - Sites ocr independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 0.571166
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: recipient then customer
+ok 126 - Sites ocr independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 1.011408
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: repeated English recipient
+ok 127 - Sites ocr independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 0.571577
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: repeated supplier
+ok 128 - Sites ocr independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 0.80984
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: upper case roles
+ok 129 - Sites ocr independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 0.76282
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: lowercase legal form
+ok 130 - Sites ocr independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 0.534472
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: period after legal form
+ok 131 - Sites ocr independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 0.569614
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: comma after legal form
+ok 132 - Sites ocr independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 0.64196
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: semicolon after legal form
+ok 133 - Sites ocr independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 0.517847
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: parenthesized legal form
+ok 134 - Sites ocr independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 0.795107
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: tab before new role
+ok 135 - Sites ocr independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 0.744102
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: column spaces before new role
+ok 136 - Sites ocr independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 3.064068
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: tab after explicit colon
+ok 137 - Sites ocr independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.527782
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: HB before new role
+ok 138 - Sites ocr independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 0.566168
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: KB before new role
+ok 139 - Sites ocr independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 2.040743
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: single-letter prefix
+ok 140 - Sites ocr independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.963356
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal supplier in name
+ok 141 - Sites ocr independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 0.646639
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal customer in name
+ok 142 - Sites ocr independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 0.509094
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal middle Customer
+ok 143 - Sites ocr independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.70258
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal leading Kund
+ok 144 - Sites ocr independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 0.483366
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal middle Supplier
+ok 145 - Sites ocr independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 0.573369
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: uppercase literal role word
+ok 146 - Sites ocr independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 0.572758
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal leading Customer
+ok 147 - Sites ocr independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 0.456656
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: hyphenated literal role word
+ok 148 - Sites ocr independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.488422
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: role fragment
+ok 149 - Sites ocr independent literal-name-positive: role fragment
+  ---
+  duration_ms: 0.450717
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: legal-form suffix fragment
+ok 150 - Sites ocr independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.822027
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: tab after colon with literal role
+ok 151 - Sites ocr independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.564016
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: tab within explicit recipient label
+ok 152 - Sites ocr independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.488123
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: wrapped explicit supplier name
+ok 153 - Sites ocr independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 0.63453
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: repeated Kund as literal value
+ok 154 - Sites ocr independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 0.459
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: plain complete name
+ok 155 - Sites ocr independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.509214
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent explicit-roles-positive: two separately explicit colon roles
+ok 156 - Sites ocr independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 0.488854
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census: unowned number after recipient then supplier
+ok 157 - Sites ocr independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.696041
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census: unowned number after supplier then recipient
+ok 158 - Sites ocr independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 0.664033
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census: unowned number after repeated recipient
+ok 159 - Sites ocr independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 0.46632
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census: inline unowned number after new bare role
+ok 160 - Sites ocr independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.63506
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: unknown field cannot donate ownership
+ok 161 - Sites ocr independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 0.753816
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: invalid unowned number before owned number holds census
+ok 162 - Sites ocr independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 0.66194
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: different unowned number after scalar holds census
+ok 163 - Sites ocr independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 0.712855
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 164 - Sites ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.568242
+  type: 'test'
+  ...
+1..164
+# tests 164
+# suites 0
+# pass 164
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 859.170497

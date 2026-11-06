@@ -1,0 +1,793 @@
+{
+  "commit": "0f550950b99d41d932b91370b458e9b85abf9451",
+  "rows": [
+    {
+      "case": "parenthesized legal form",
+      "engine": "Node",
+      "method": "pdf",
+      "input": "FAKTURA\nFaktureras till: Independent North (AB) supplier Independent South AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": "5560160680",
+        "green": false
+      },
+      "actual": {
+        "party": "Independent North (AB) supplier Independent South AB",
+        "organization": "5560160680",
+        "level": "green",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": "Independent North (AB) supplier Independent South AB",
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Independent North (AB) supplier Independent South AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Mottagarens organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": []
+      }
+    },
+    {
+      "case": "unowned number after recipient then supplier",
+      "engine": "Node",
+      "method": "pdf",
+      "input": "FAKTURA\nFaktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "unowned number after supplier then recipient",
+      "engine": "Node",
+      "method": "pdf",
+      "input": "FAKTURA\nLeverantör: Oberoende Söder AB Faktureras till Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Leverantör: Oberoende Söder AB Faktureras till Oberoende Norr AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "unowned number after repeated recipient",
+      "engine": "Node",
+      "method": "pdf",
+      "input": "FAKTURA\nFaktureras till: Oberoende Söder AB Kund Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Oberoende Söder AB Kund Oberoende Norr AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "inline unowned number after new bare role",
+      "engine": "Node",
+      "method": "pdf",
+      "input": "FAKTURA\nFaktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB Organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "parenthesized legal form",
+      "engine": "Node",
+      "method": "ocr",
+      "input": "FAKTURA\nFaktureras till: Independent North (AB) supplier Independent South AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": "5560160680",
+        "green": false
+      },
+      "actual": {
+        "party": "Independent North (AB) supplier Independent South AB",
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": "Independent North (AB) supplier Independent South AB",
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Independent North (AB) supplier Independent South AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Mottagarens organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": []
+      }
+    },
+    {
+      "case": "unowned number after recipient then supplier",
+      "engine": "Node",
+      "method": "ocr",
+      "input": "FAKTURA\nFaktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "unowned number after supplier then recipient",
+      "engine": "Node",
+      "method": "ocr",
+      "input": "FAKTURA\nLeverantör: Oberoende Söder AB Faktureras till Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Leverantör: Oberoende Söder AB Faktureras till Oberoende Norr AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "unowned number after repeated recipient",
+      "engine": "Node",
+      "method": "ocr",
+      "input": "FAKTURA\nFaktureras till: Oberoende Söder AB Kund Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Oberoende Söder AB Kund Oberoende Norr AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "inline unowned number after new bare role",
+      "engine": "Node",
+      "method": "ocr",
+      "input": "FAKTURA\nFaktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB Organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "parenthesized legal form",
+      "engine": "Sites",
+      "method": "pdf",
+      "input": "FAKTURA\nFaktureras till: Independent North (AB) supplier Independent South AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": "5560160680",
+        "green": false
+      },
+      "actual": {
+        "party": "Independent North (AB) supplier Independent South AB",
+        "organization": "5560160680",
+        "level": "green",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": "Independent North (AB) supplier Independent South AB",
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Independent North (AB) supplier Independent South AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Mottagarens organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": []
+      }
+    },
+    {
+      "case": "unowned number after recipient then supplier",
+      "engine": "Sites",
+      "method": "pdf",
+      "input": "FAKTURA\nFaktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "unowned number after supplier then recipient",
+      "engine": "Sites",
+      "method": "pdf",
+      "input": "FAKTURA\nLeverantör: Oberoende Söder AB Faktureras till Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Leverantör: Oberoende Söder AB Faktureras till Oberoende Norr AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "unowned number after repeated recipient",
+      "engine": "Sites",
+      "method": "pdf",
+      "input": "FAKTURA\nFaktureras till: Oberoende Söder AB Kund Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Oberoende Söder AB Kund Oberoende Norr AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "inline unowned number after new bare role",
+      "engine": "Sites",
+      "method": "pdf",
+      "input": "FAKTURA\nFaktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB Organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "parenthesized legal form",
+      "engine": "Sites",
+      "method": "ocr",
+      "input": "FAKTURA\nFaktureras till: Independent North (AB) supplier Independent South AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": "5560160680",
+        "green": false
+      },
+      "actual": {
+        "party": "Independent North (AB) supplier Independent South AB",
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": "Independent North (AB) supplier Independent South AB",
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Independent North (AB) supplier Independent South AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Mottagarens organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": []
+      }
+    },
+    {
+      "case": "unowned number after recipient then supplier",
+      "engine": "Sites",
+      "method": "ocr",
+      "input": "FAKTURA\nFaktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "unowned number after supplier then recipient",
+      "engine": "Sites",
+      "method": "ocr",
+      "input": "FAKTURA\nLeverantör: Oberoende Söder AB Faktureras till Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Leverantör: Oberoende Söder AB Faktureras till Oberoende Norr AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "unowned number after repeated recipient",
+      "engine": "Sites",
+      "method": "ocr",
+      "input": "FAKTURA\nFaktureras till: Oberoende Söder AB Kund Oberoende Norr AB\nOrganisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Oberoende Söder AB Kund Oberoende Norr AB"
+            },
+            {
+              "page": 1,
+              "line": 3,
+              "text": "Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "case": "inline unowned number after new bare role",
+      "engine": "Sites",
+      "method": "ocr",
+      "input": "FAKTURA\nFaktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB Organisationsnummer: 556016-0680\nFakturanummer: INDEP-843\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBetalningsreferens: 537924",
+      "expected": {
+        "party": null,
+        "organization": null,
+        "green": false
+      },
+      "actual": {
+        "party": null,
+        "organization": "5560160680",
+        "level": "yellow",
+        "supplier": {
+          "name": null,
+          "organization_number": null,
+          "evidence": []
+        },
+        "recipient": {
+          "name": null,
+          "organization_number": "5560160680",
+          "evidence": [
+            {
+              "page": 1,
+              "line": 2,
+              "text": "Faktureras till: Oberoende Söder AB Leverantör Oberoende Norr AB Organisationsnummer: 556016-0680"
+            }
+          ]
+        },
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    }
+  ]
+}

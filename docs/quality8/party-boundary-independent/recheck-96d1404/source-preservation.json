@@ -1,0 +1,173 @@
+{
+  "commit": "96d1404d4b7bb4a791f0313c8cd95a29eec5a8c7",
+  "previousReviewedCommit": "0f550950b99d41d932b91370b458e9b85abf9451",
+  "files": [
+    {
+      "path": "src/invoice-details.js",
+      "sha256": "db76b24ff1e68701f624b395588627b634767f9034289b163855dbc3b9226255",
+      "matchesExactCommit": true,
+      "unchangedFrom0f550950": false
+    },
+    {
+      "path": "sites/lib/invoice-details.js",
+      "sha256": "db76b24ff1e68701f624b395588627b634767f9034289b163855dbc3b9226255",
+      "matchesExactCommit": true,
+      "unchangedFrom0f550950": false
+    },
+    {
+      "path": "src/invoice-extraction.js",
+      "sha256": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e",
+      "matchesExactCommit": true,
+      "unchangedFrom0f550950": true
+    },
+    {
+      "path": "sites/lib/invoice-fields.js",
+      "sha256": "e7f2ecd75e56cd82f1296234daf1bb11886f743a2ee84d233119f7588ba9b4e2",
+      "matchesExactCommit": true,
+      "unchangedFrom0f550950": true
+    },
+    {
+      "path": "sites/tests/review-explicit-recipient-boundaries.test.mjs",
+      "sha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545",
+      "matchesExactCommit": true,
+      "unchangedFrom0f550950": true
+    },
+    {
+      "path": "sites/tests/party-role-name-grammar.test.mjs",
+      "sha256": "d7c764aa007c5e1738649d45a819e5aa15471f86f53aeef74d87712ef2e5943d",
+      "matchesExactCommit": true,
+      "unchangedFrom0f550950": true
+    },
+    {
+      "path": "sites/tests/party-completed-name-boundaries.test.mjs",
+      "sha256": "c7c638957007f47561945e44325b1b7dd4b3232a63d21200a7d7ff927be60fd8",
+      "matchesExactCommit": true,
+      "unchangedFrom0f550950": true
+    }
+  ],
+  "previousManifestFilesPreserved": 30,
+  "preserved": [
+    {
+      "path": "REVIEW-0f550950.md",
+      "sha256": "9745d2f220c3ac5609159da8b3aeeaed9a6ea0aff9a11585d5fce07e17dc7e5d"
+    },
+    {
+      "path": "source-verification-0f550950.json",
+      "sha256": "0c60733ba002167eff380ac4131333b63bac3e78d0467b260c7561ab69ad0728"
+    },
+    {
+      "path": "product-0f550950.diff",
+      "sha256": "f08cf81f08887f1b4c5c423e16c8b1fe0dc55c9a7a5b79d54aeb4b40bdd3e593"
+    },
+    {
+      "path": "observed-findings-0f550950.json",
+      "sha256": "450a3432078e868cdd9968fe65818751a806eec32118f204216e474bd01f02da"
+    },
+    {
+      "path": "logs/independent-0f550950.tap",
+      "sha256": "930cdc356bce4793a2efddff47374bfbb4824360678910abb4e1ef0dd7f6f762"
+    },
+    {
+      "path": "logs/independent-baseline-initial-bankgiro-fixture.tap",
+      "sha256": "297d43c816563ccac00f86998ba7fab888c874a7e37c02cb85cc547554bc76e5"
+    },
+    {
+      "path": "logs/independent-baseline.tap",
+      "sha256": "31bda5e9236ce4598e1d9d6ec86615e1cc73d8b7ebc31d9abcca6c57cee6793b"
+    },
+    {
+      "path": "logs/observed-findings-0f550950.log",
+      "sha256": "6e32b31fa57a4296a9b5d83241d4b83429b8d0512aade59393abc975fb258110"
+    },
+    {
+      "path": "logs/original-recipient-baseline.tap",
+      "sha256": "88d2a557a0660ad87e21afae10254877efbc1859ceea7ae10aaf232718f262a8"
+    },
+    {
+      "path": "logs/retained-regression-0f550950.tap",
+      "sha256": "8934826d9a7f25a97615aead2208e5b57af3d7a2cf581e69ee641bbb0b14f59b"
+    },
+    {
+      "path": "probes/cases-initial-bankgiro-fixture.json",
+      "sha256": "2704845c6420961f145f8ccc8f731d1653a3eb0802558797f4286dda3bd8c2f0"
+    },
+    {
+      "path": "probes/cases.json",
+      "sha256": "8f72fc82b369d015c60dc24d06d6803e659d7159a8c3bce86ccdb8f3d7c420f3"
+    },
+    {
+      "path": "probes/create-cases-initial-bankgiro-fixture.py",
+      "sha256": "109b9a8d64d4c7568439a0f397fb684b1c233dd1e7c26fa2d61015e5e33dcb20"
+    },
+    {
+      "path": "probes/create-cases.py",
+      "sha256": "fd3c6b6571f39ab1783e7df4ebda95e6fcbba7b743b2485b8be8cf9bb728ea74"
+    },
+    {
+      "path": "probes/independent-boundary.test.mjs",
+      "sha256": "bc468a7bced8bd59ba8c054bb3721a2b9e384962d1e72eb4aa97960f063d1daf"
+    },
+    {
+      "path": "probes/observe-findings.mjs",
+      "sha256": "7b1546b99615ef48378848e07cdf0d0212bdcf0ca201b8f1081573ee7b367970"
+    },
+    {
+      "path": "baseline/src/invoice-details.js",
+      "sha256": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7"
+    },
+    {
+      "path": "baseline/sites/lib/invoice-details.js",
+      "sha256": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7"
+    },
+    {
+      "path": "baseline/src/invoice-extraction.js",
+      "sha256": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e"
+    },
+    {
+      "path": "baseline/sites/lib/invoice-fields.js",
+      "sha256": "e7f2ecd75e56cd82f1296234daf1bb11886f743a2ee84d233119f7588ba9b4e2"
+    },
+    {
+      "path": "baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs",
+      "sha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545"
+    },
+    {
+      "path": "baseline/sites/tests/party-role-name-grammar.test.mjs",
+      "sha256": "d7c764aa007c5e1738649d45a819e5aa15471f86f53aeef74d87712ef2e5943d"
+    },
+    {
+      "path": "baseline/sites/tests/ocr-explicit-role-boundary-positive.test.mjs",
+      "sha256": "39bc1368be46c8cae8541e64b3032d0ff5554a34996f2246beafd46681668506"
+    },
+    {
+      "path": "fix-0f550950/src/invoice-details.js",
+      "sha256": "601845116067fe4860bf14d2f21f7f3a1d11cadcced8e73dc248dcbe7ebd48d5"
+    },
+    {
+      "path": "fix-0f550950/sites/lib/invoice-details.js",
+      "sha256": "601845116067fe4860bf14d2f21f7f3a1d11cadcced8e73dc248dcbe7ebd48d5"
+    },
+    {
+      "path": "fix-0f550950/src/invoice-extraction.js",
+      "sha256": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e"
+    },
+    {
+      "path": "fix-0f550950/sites/lib/invoice-fields.js",
+      "sha256": "e7f2ecd75e56cd82f1296234daf1bb11886f743a2ee84d233119f7588ba9b4e2"
+    },
+    {
+      "path": "fix-0f550950/sites/tests/review-explicit-recipient-boundaries.test.mjs",
+      "sha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545"
+    },
+    {
+      "path": "fix-0f550950/sites/tests/party-role-name-grammar.test.mjs",
+      "sha256": "d7c764aa007c5e1738649d45a819e5aa15471f86f53aeef74d87712ef2e5943d"
+    },
+    {
+      "path": "fix-0f550950/sites/tests/ocr-explicit-role-boundary-positive.test.mjs",
+      "sha256": "39bc1368be46c8cae8541e64b3032d0ff5554a34996f2246beafd46681668506"
+    }
+  ],
+  "frozenCasesSha256": "8f72fc82b369d015c60dc24d06d6803e659d7159a8c3bce86ccdb8f3d7c420f3",
+  "frozenAdapterSha256": "bc468a7bced8bd59ba8c054bb3721a2b9e384962d1e72eb4aa97960f063d1daf"
+}

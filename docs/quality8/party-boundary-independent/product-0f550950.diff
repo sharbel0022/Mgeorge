@@ -1,0 +1,60 @@
+diff --git a/sites/lib/invoice-details.js b/sites/lib/invoice-details.js
+index 79a4a41..1f1f8f8 100644
+--- a/sites/lib/invoice-details.js
++++ b/sites/lib/invoice-details.js
+@@ -34,6 +34,11 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1,s
+   const barePartyPattern=new RegExp('^('+supplierLabel+'|'+recipientAlias+')(?:[ \\t]+(?:namn|name))?[ \\t]+(?=\\S)','iu');
+   const partyRoleSource=entityLabel+'(?=[ \\t:#]|$)';
+   const partyRoleStart=new RegExp('^'+partyRoleSource,'iu'),competingRole=new RegExp('(?<![\\p{L}\\p{N}/_-])'+partyRoleSource,'iu');
++  // A printed company ending followed by another bare role is a boundary,
++  // even when OCR has collapsed the columns to one space. This is negative
++  // evidence only: it neither splits the parties nor assigns a new owner.
++  const completedNameBeforeRole=new RegExp('(?:^|[ \\t])(?:ab|aktiebolag(?:et)?|hb|handelsbolag|kb|kommanditbolag|ltd|limited|inc|incorporated|llc|plc)\\.?[,;]?[ \\t]+(?='+partyRoleSource+')','giu');
++  const laterBareRole=value=>[...value.matchAll(completedNameBeforeRole)].some(match=>/\p{L}/u.test(value.slice(0,match.index)));
+   const isSupplier=value=>new RegExp('^'+supplierLabel+'$','iu').test(value);
+   let section=null,page=0;
+   for(let n=0;n<lines.length;n++){
+@@ -90,9 +95,10 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1,s
+       if(event.kind==='name'){
+         // A colon explicitly introduces a name value. An ordinary word inside
+         // that value is not another role label (e.g. "Original supplier AB").
+-        // Explicit sibling labels are separate events above; unknown colons,
+-        // pipes and unresolved bare/column headings still cannot become names.
+-        const ambiguous=(!event.explicit||/\t| {2,}/.test(value))&&competingRole.test(value)||/[:|]/.test(value);
++        // Explicit sibling labels are separate events above. A later bare
++        // role after a completed name, unknown colons and unresolved columns
++        // remain ambiguous; a role word within one ordinary name does not.
++        const ambiguous=(!event.explicit||/\t| {2,}/.test(value))&&competingRole.test(value)||laterBareRole(value)||/[:|]/.test(value);
+         section=event.role;records[event.role].names.push({value:ambiguous?null:nameValue(value),evidence});
+       }else{
+         const record={value:organizations(value,validOrganization),evidence},role=event.role||(rowRoles.size>1?null:section);
+diff --git a/src/invoice-details.js b/src/invoice-details.js
+index 79a4a41..1f1f8f8 100644
+--- a/src/invoice-details.js
++++ b/src/invoice-details.js
+@@ -34,6 +34,11 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1,s
+   const barePartyPattern=new RegExp('^('+supplierLabel+'|'+recipientAlias+')(?:[ \\t]+(?:namn|name))?[ \\t]+(?=\\S)','iu');
+   const partyRoleSource=entityLabel+'(?=[ \\t:#]|$)';
+   const partyRoleStart=new RegExp('^'+partyRoleSource,'iu'),competingRole=new RegExp('(?<![\\p{L}\\p{N}/_-])'+partyRoleSource,'iu');
++  // A printed company ending followed by another bare role is a boundary,
++  // even when OCR has collapsed the columns to one space. This is negative
++  // evidence only: it neither splits the parties nor assigns a new owner.
++  const completedNameBeforeRole=new RegExp('(?:^|[ \\t])(?:ab|aktiebolag(?:et)?|hb|handelsbolag|kb|kommanditbolag|ltd|limited|inc|incorporated|llc|plc)\\.?[,;]?[ \\t]+(?='+partyRoleSource+')','giu');
++  const laterBareRole=value=>[...value.matchAll(completedNameBeforeRole)].some(match=>/\p{L}/u.test(value.slice(0,match.index)));
+   const isSupplier=value=>new RegExp('^'+supplierLabel+'$','iu').test(value);
+   let section=null,page=0;
+   for(let n=0;n<lines.length;n++){
+@@ -90,9 +95,10 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1,s
+       if(event.kind==='name'){
+         // A colon explicitly introduces a name value. An ordinary word inside
+         // that value is not another role label (e.g. "Original supplier AB").
+-        // Explicit sibling labels are separate events above; unknown colons,
+-        // pipes and unresolved bare/column headings still cannot become names.
+-        const ambiguous=(!event.explicit||/\t| {2,}/.test(value))&&competingRole.test(value)||/[:|]/.test(value);
++        // Explicit sibling labels are separate events above. A later bare
++        // role after a completed name, unknown colons and unresolved columns
++        // remain ambiguous; a role word within one ordinary name does not.
++        const ambiguous=(!event.explicit||/\t| {2,}/.test(value))&&competingRole.test(value)||laterBareRole(value)||/[:|]/.test(value);
+         section=event.role;records[event.role].names.push({value:ambiguous?null:nameValue(value),evidence});
+       }else{
+         const record={value:organizations(value,validOrganization),evidence},role=event.role||(rowRoles.size>1?null:section);

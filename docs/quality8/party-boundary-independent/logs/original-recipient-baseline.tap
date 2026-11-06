@@ -1,0 +1,512 @@
+TAP version 13
+# Subtest: Node pdf independent recipient census: colon recipient followed by bare supplier
+not ok 1 - Node pdf independent recipient census: colon recipient followed by bare supplier
+  ---
+  duration_ms: 51.909736
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unresolved role/field is not part of a recipient name
+    + actual - expected
+    
+    + 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.start (node:internal/test_runner/test:1262:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+  ...
+# Subtest: Node pdf independent recipient census: colon recipient followed by bare customer
+not ok 2 - Node pdf independent recipient census: colon recipient followed by bare customer
+  ---
+  duration_ms: 4.298689
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unresolved role/field is not part of a recipient name
+    + actual - expected
+    
+    + 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: Node pdf independent recipient census: colon recipient followed by unknown colon field
+ok 3 - Node pdf independent recipient census: colon recipient followed by unknown colon field
+  ---
+  duration_ms: 1.553228
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient census: colon recipient followed by repeated bare recipient
+not ok 4 - Node pdf independent recipient census: colon recipient followed by repeated bare recipient
+  ---
+  duration_ms: 1.316108
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unresolved role/field is not part of a recipient name
+    + actual - expected
+    
+    + 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent recipient census: bare recipient followed by bare supplier
+ok 5 - Node pdf independent recipient census: bare recipient followed by bare supplier
+  ---
+  duration_ms: 1.826389
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient census: empty recipient followed by unknown colon field
+ok 6 - Node pdf independent recipient census: empty recipient followed by unknown colon field
+  ---
+  duration_ms: 1.289248
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient control: single explicit colon recipient
+ok 7 - Node pdf independent recipient control: single explicit colon recipient
+  ---
+  duration_ms: 1.210112
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient control: single explicit bare recipient
+ok 8 - Node pdf independent recipient control: single explicit bare recipient
+  ---
+  duration_ms: 1.653916
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient control: two fully explicit colon roles
+ok 9 - Node pdf independent recipient control: two fully explicit colon roles
+  ---
+  duration_ms: 1.171184
+  type: 'test'
+  ...
+# Subtest: Node pdf independent recipient control: ordinary company name containing no competing field
+ok 10 - Node pdf independent recipient control: ordinary company name containing no competing field
+  ---
+  duration_ms: 1.28352
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient census: colon recipient followed by bare supplier
+not ok 11 - Node ocr independent recipient census: colon recipient followed by bare supplier
+  ---
+  duration_ms: 2.299997
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unresolved role/field is not part of a recipient name
+    + actual - expected
+    
+    + 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent recipient census: colon recipient followed by bare customer
+not ok 12 - Node ocr independent recipient census: colon recipient followed by bare customer
+  ---
+  duration_ms: 1.54855
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unresolved role/field is not part of a recipient name
+    + actual - expected
+    
+    + 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent recipient census: colon recipient followed by unknown colon field
+ok 13 - Node ocr independent recipient census: colon recipient followed by unknown colon field
+  ---
+  duration_ms: 0.891463
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient census: colon recipient followed by repeated bare recipient
+not ok 14 - Node ocr independent recipient census: colon recipient followed by repeated bare recipient
+  ---
+  duration_ms: 1.004638
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unresolved role/field is not part of a recipient name
+    + actual - expected
+    
+    + 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent recipient census: bare recipient followed by bare supplier
+ok 15 - Node ocr independent recipient census: bare recipient followed by bare supplier
+  ---
+  duration_ms: 0.906405
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient census: empty recipient followed by unknown colon field
+ok 16 - Node ocr independent recipient census: empty recipient followed by unknown colon field
+  ---
+  duration_ms: 1.200177
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient control: single explicit colon recipient
+ok 17 - Node ocr independent recipient control: single explicit colon recipient
+  ---
+  duration_ms: 0.96436
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient control: single explicit bare recipient
+ok 18 - Node ocr independent recipient control: single explicit bare recipient
+  ---
+  duration_ms: 0.970179
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient control: two fully explicit colon roles
+ok 19 - Node ocr independent recipient control: two fully explicit colon roles
+  ---
+  duration_ms: 0.956429
+  type: 'test'
+  ...
+# Subtest: Node ocr independent recipient control: ordinary company name containing no competing field
+ok 20 - Node ocr independent recipient control: ordinary company name containing no competing field
+  ---
+  duration_ms: 1.093811
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient census: colon recipient followed by bare supplier
+not ok 21 - Sites pdf independent recipient census: colon recipient followed by bare supplier
+  ---
+  duration_ms: 8.860897
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unresolved role/field is not part of a recipient name
+    + actual - expected
+    
+    + 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent recipient census: colon recipient followed by bare customer
+not ok 22 - Sites pdf independent recipient census: colon recipient followed by bare customer
+  ---
+  duration_ms: 1.466199
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unresolved role/field is not part of a recipient name
+    + actual - expected
+    
+    + 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent recipient census: colon recipient followed by unknown colon field
+ok 23 - Sites pdf independent recipient census: colon recipient followed by unknown colon field
+  ---
+  duration_ms: 1.346722
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient census: colon recipient followed by repeated bare recipient
+not ok 24 - Sites pdf independent recipient census: colon recipient followed by repeated bare recipient
+  ---
+  duration_ms: 1.382436
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unresolved role/field is not part of a recipient name
+    + actual - expected
+    
+    + 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent recipient census: bare recipient followed by bare supplier
+ok 25 - Sites pdf independent recipient census: bare recipient followed by bare supplier
+  ---
+  duration_ms: 1.18183
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient census: empty recipient followed by unknown colon field
+ok 26 - Sites pdf independent recipient census: empty recipient followed by unknown colon field
+  ---
+  duration_ms: 1.142091
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient control: single explicit colon recipient
+ok 27 - Sites pdf independent recipient control: single explicit colon recipient
+  ---
+  duration_ms: 1.079851
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient control: single explicit bare recipient
+ok 28 - Sites pdf independent recipient control: single explicit bare recipient
+  ---
+  duration_ms: 1.02536
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient control: two fully explicit colon roles
+ok 29 - Sites pdf independent recipient control: two fully explicit colon roles
+  ---
+  duration_ms: 1.105768
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent recipient control: ordinary company name containing no competing field
+ok 30 - Sites pdf independent recipient control: ordinary company name containing no competing field
+  ---
+  duration_ms: 1.151836
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient census: colon recipient followed by bare supplier
+not ok 31 - Sites ocr independent recipient census: colon recipient followed by bare supplier
+  ---
+  duration_ms: 1.226957
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unresolved role/field is not part of a recipient name
+    + actual - expected
+    
+    + 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent recipient census: colon recipient followed by bare customer
+not ok 32 - Sites ocr independent recipient census: colon recipient followed by bare customer
+  ---
+  duration_ms: 1.024557
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unresolved role/field is not part of a recipient name
+    + actual - expected
+    
+    + 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent recipient census: colon recipient followed by unknown colon field
+ok 33 - Sites ocr independent recipient census: colon recipient followed by unknown colon field
+  ---
+  duration_ms: 0.956939
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient census: colon recipient followed by repeated bare recipient
+not ok 34 - Sites ocr independent recipient census: colon recipient followed by repeated bare recipient
+  ---
+  duration_ms: 1.130775
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unresolved role/field is not part of a recipient name
+    + actual - expected
+    
+    + 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent recipient census: bare recipient followed by bare supplier
+ok 35 - Sites ocr independent recipient census: bare recipient followed by bare supplier
+  ---
+  duration_ms: 0.929159
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient census: empty recipient followed by unknown colon field
+ok 36 - Sites ocr independent recipient census: empty recipient followed by unknown colon field
+  ---
+  duration_ms: 0.912614
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient control: single explicit colon recipient
+ok 37 - Sites ocr independent recipient control: single explicit colon recipient
+  ---
+  duration_ms: 0.913545
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient control: single explicit bare recipient
+ok 38 - Sites ocr independent recipient control: single explicit bare recipient
+  ---
+  duration_ms: 0.869361
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient control: two fully explicit colon roles
+ok 39 - Sites ocr independent recipient control: two fully explicit colon roles
+  ---
+  duration_ms: 0.887116
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent recipient control: ordinary company name containing no competing field
+ok 40 - Sites ocr independent recipient control: ordinary company name containing no competing field
+  ---
+  duration_ms: 2.657434
+  type: 'test'
+  ...
+1..40
+# tests 40
+# suites 0
+# pass 28
+# fail 12
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 701.736858
