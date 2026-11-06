@@ -48,7 +48,7 @@ async function fixture(t,{responses={}}={}){
   const state={permissions:['accounts:read','transactions:read'],id:'connection-a',bankId:'OPBKSE21',generation:'g1',status:'active',validUntil:expiry,consentHandle:await resources.seal('consent',consent,expiry),selected:['account-a'],accounts:[{id:'account-a',identity,handle:await resources.seal('account',{id:'resource-a',identity,consent},expiry)}]};
   const payload=await seal(key,owner,'saas-bank-state',state);await db.prepare('INSERT INTO saas_bank_state(owner,revision,payload) VALUES(?,1,?)').bind(owner,payload).run();return state;
  }
- return{f,scope,context,owner,env,key,config,registration,binding,provider,call,server,runtime,accounts,sync,saveActiveState,plainFetches:()=>plainFetches};
+ return{f,scope,context,owner,env,key,config,registration,binding,provider,principal,call,server,runtime,accounts,sync,saveActiveState,plainFetches:()=>plainFetches};
 }
 test('production Workers configuration recognizes an actual mTLS binding without any egress',async t=>{
  const f=await fixture(t),result=await f.call('saasBankSyncConfiguration');
@@ -126,4 +126,27 @@ for(const action of ['configuration','account-state'])test('binding rotation dur
  t.mock.method(f.f.raw,'prepare',function(query){const statement=prepare.call(this,query),bind=statement.bind;if(/FROM (?:main\.)?saas_bank_state\b/.test(query))statement.bind=function(...args){const bound=bind.apply(this,args),first=bound.first;bound.first=async function(...values){const row=await first.apply(this,values);rotations++;f.env.OPENPAYMENTS_MTLS={fetch:f.binding.fetch};return row;};return bound;};return statement;});
  const result=action==='configuration'?await f.call('saasBankSyncConfiguration'):await f.call('readOpenPaymentsAccountState',{target:f.accounts,args:[f.owner]});
  assert.equal(rotations,1,'the injected rotation occurred during the actual scoped SQL read');assert.notEqual(result.status,200);assert.equal(f.provider.calls.length,0);assert.equal(f.plainFetches(),0);
+});
+
+test('two separate Sites requests reuse the verified binding app-token state',async t=>{
+ const f=await fixture(t);
+ for(let attempt=0;attempt<2;attempt++){const result=await f.call('saasBankDiscovery');assert.equal(result.status,200,JSON.stringify(result.data));assert.equal(result.data.banks.length,1);}
+ assert.equal(f.provider.calls.filter(c=>new URL(c.url).pathname==='/connect/token').length,1);
+ assert.equal(f.provider.calls.filter(c=>new URL(c.url).pathname.endsWith('/aspsps')).length,2);assert.equal(f.plainFetches(),0);
+});
+for(const count of [1,10,100])test(count+' actual isolated company requests share one app token without cross-company access',async t=>{
+ const f=await fixture(t),registrations=[];
+ for(let index=0;index<count;index++){
+  const companyId='synthetic-company-'+index,actorId='synthetic-actor-'+index;await f.f.create(companyId,actorId);
+  registrations.push({...f.registration,companyId,actorId,corporateId:'synthetic-corporate-'+index,psuId:'synthetic-psu-'+index});
+ }
+ f.env.SAAS_OPENPAYMENTS_REGISTRATIONS=JSON.stringify(registrations);
+ for(const registration of registrations){
+  f.principal.user={userId:registration.actorId,displayName:'Synthetic actor'};
+  const result=await f.call('saasBankDiscovery',{companyId:registration.companyId});assert.equal(result.status,200,JSON.stringify(result.data));assert.equal(result.data.banks.length,1);
+ }
+ assert.equal(f.provider.calls.filter(c=>new URL(c.url).pathname==='/connect/token').length,1);
+ assert.equal(f.provider.calls.filter(c=>new URL(c.url).pathname.endsWith('/aspsps')).length,count);
+ const calls=f.provider.calls.length;assert.notEqual((await f.call('saasBankDiscovery',{companyId:'company-a'})).status,200);assert.equal(f.provider.calls.length,calls);
+ assert.equal(f.f.sql.prepare('SELECT count(*) n FROM saas_bank_state').get().n,0);assert.equal(f.plainFetches(),0);
 });

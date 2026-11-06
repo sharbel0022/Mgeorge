@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createOpenPaymentsHttpClient} from '../lib/banking/openpayments/http.js';
 import {validateOpenPaymentsConfig} from '../lib/banking/openpayments/config.js';
+import {OpenPaymentsTokenClient} from '../lib/banking/openpayments/token.js';
 import {CONFIG,json} from './helpers/openpayments-fixture.mjs';
 import {workersBindingConfiguration,syntheticWorkersCertificate} from './helpers/openpayments-workers-fixture.mjs';
 
@@ -93,4 +94,29 @@ test('shared HTTP limits, rate advice, and one request boundary survive binding 
  await assert.rejects(http.send({path:'/psd2/accountinformation/v1/accounts'}),e=>e.code==='PROVIDER_RATE_LIMIT'&&e.retryAfter===120);assert.equal(boundaries,1);assert.equal(f.calls.length,1);
  status=200;const tiny=createOpenPaymentsHttpClient(validateOpenPaymentsConfig(f.configuration),{transport:f.create().transport,maxResponseBytes:5});
  await assert.rejects(tiny.send({path:'/psd2/accountinformation/v1/accounts'}),e=>e.code==='PROVIDER_RESPONSE_INVALID');assert.equal(f.calls.length,2);assert.equal(f.plainFetches(),0);
+});
+
+test('recreated transport wrappers retain only the same opaque app-token capability',async t=>{
+ const f=fixture(t),first=f.create(),second=f.create();let exchanges=0;
+ const token=runtime=>new OpenPaymentsTokenClient(f.configuration,{async send(input){exchanges++;return{data:{access_token:'synthetic-'+exchanges,token_type:'Bearer',expires_in:3600,scope:new URLSearchParams(input.body).get('scope')}};}},Date.now,{identity:runtime.cacheIdentity});
+ assert.equal(first.cacheIdentity,second.cacheIdentity);assert.deepEqual(Object.keys(first.cacheIdentity),[]);assert.equal(Object.isFrozen(first.cacheIdentity),true);
+ assert.equal(await token(first).accessToken(),'synthetic-1');assert.equal(await token(second).accessToken(),'synthetic-1');assert.equal(exchanges,1);
+});
+for(const rotation of ['metadata','provider','binding','fetch','disabled','missing','malformed','expired'])test('observed '+rotation+' rotation permanently revokes old cached token capability',async t=>{
+ const cert=syntheticWorkersCertificate();let clock=cert.validFrom+1000,exchanges=0;
+ const f=fixture(t,{clock:()=>clock}),first=f.create(),client=new OpenPaymentsTokenClient(f.configuration,{async send(input){exchanges++;return{data:{access_token:'synthetic-old-token',token_type:'Bearer',expires_in:3600,scope:new URLSearchParams(input.body).get('scope')}};}},()=>clock,{identity:first.cacheIdentity});
+ await client.accessToken();
+ if(rotation==='metadata')f.environment.SAAS_OPENPAYMENTS_MTLS_BINDING_CONFIG+=' ';
+ if(rotation==='provider')f.environment.SAAS_OPENPAYMENTS_CONFIG+=' ';
+ if(rotation==='binding')f.environment.OPENPAYMENTS_MTLS={fetch:f.binding.fetch};
+ if(rotation==='fetch')f.binding.fetch=async()=>json({});
+ if(rotation==='disabled')f.environment.SAAS_BANK_ENABLED='false';
+ if(rotation==='missing')delete f.environment.SAAS_OPENPAYMENTS_MTLS_BINDING_CONFIG;
+ if(rotation==='malformed')f.environment.SAAS_OPENPAYMENTS_MTLS_BINDING_CONFIG='{"certificatePem":"bank-secret"}';
+ if(rotation==='expired')clock=cert.validTo;
+ if(rotation==='malformed')assert.throws(f.create,e=>safe(e,'INVALID_CLIENT_CERTIFICATE'));
+ else if(rotation==='expired')assert.throws(f.create,e=>safe(e,'CLIENT_CERTIFICATE_EXPIRED'));
+ else{const replacement=f.create();if(replacement)assert.notEqual(replacement.cacheIdentity,first.cacheIdentity);}
+ await assert.rejects(client.accessToken(),e=>e.code==='INVALID_ACCESS_TOKEN');assert.equal(exchanges,1);
+ await assert.rejects(first.transport.request(API,init()),e=>e.code==='INVALID_CLIENT_CERTIFICATE'||e.code==='CLIENT_CERTIFICATE_EXPIRED');assert.equal(f.calls.length,0);
 });

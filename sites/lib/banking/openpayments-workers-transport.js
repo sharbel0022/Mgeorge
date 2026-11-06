@@ -1,7 +1,17 @@
 import {X509Certificate} from 'node:crypto';
 import {BankProviderError,assertServerRuntime,isRecord} from './bank-data-provider.js';
+import {createOpenPaymentsTokenCacheIdentity,invalidateOpenPaymentsTokenCacheIdentity} from './openpayments/token-cache.js';
 
 const CONFIG_KEY='SAAS_OPENPAYMENTS_MTLS_BINDING_CONFIG';
+// App-token values live in the bounded shared cache. These weak maps retain
+// only the opaque capability for one verified binding/configuration identity.
+const identities=new WeakMap(),environments=new WeakMap();
+function retire(identity){
+ if(!identity)return;
+ identity.retired=true;invalidateOpenPaymentsTokenCacheIdentity(identity.cacheIdentity);
+ if(identities.get(identity.binding)===identity)identities.delete(identity.binding);
+}
+function forget(environment){const identity=environments.get(environment);retire(identity);environments.delete(environment);}
 const INVALID=()=>new BankProviderError('INVALID_CLIENT_CERTIFICATE',409);
 const denied=()=>new BankProviderError('FEATURE_NOT_ALLOWED',403);
 const aborted=()=>new BankProviderError('PROVIDER_ABORTED',499);
@@ -43,8 +53,8 @@ export function configuredOpenPaymentsWorkersTransport({configuration,environmen
  assertServerRuntime();
  if(typeof environment!=='function'||typeof now!=='function')throw INVALID();
  const initial=environment();
- if(initial.SAAS_BANK_ENABLED!=='true'||configuration?.environment!=='PRODUCTION')return null;
- const raw=initial[CONFIG_KEY];if(raw===undefined||raw==='')return null;
+ if(initial.SAAS_BANK_ENABLED!=='true'||configuration?.environment!=='PRODUCTION'){forget(initial);return null;}
+ const raw=initial[CONFIG_KEY];if(raw===undefined||raw===''){forget(initial);return null;}
  const providerRaw=initial.SAAS_OPENPAYMENTS_CONFIG;
  let metadata,certificate,validFrom,validTo;
  try{
@@ -62,14 +72,22 @@ export function configuredOpenPaymentsWorkersTransport({configuration,environmen
   validFrom=Date.parse(certificate.validFrom);validTo=Date.parse(certificate.validTo);
   if(certificate.fingerprint256.replaceAll(':','').toLowerCase()!==metadata.certificateSha256||
    !Number.isFinite(validFrom)||!Number.isFinite(validTo)||validFrom>=validTo)throw INVALID();
- }catch{throw INVALID();}
+ }catch{forget(initial);throw INVALID();}
  const binding=initial[metadata.binding],fetch=binding?.fetch;
- if(!isRecord(binding)||typeof fetch!=='function'||fetch===globalThis.fetch)throw INVALID();
+ if(!isRecord(binding)||typeof fetch!=='function'||fetch===globalThis.fetch){forget(initial);throw INVALID();}
+ let identity=identities.get(binding);
+ if(identity&&(identity.raw!==raw||identity.providerRaw!==providerRaw||identity.fetch!==fetch)){retire(identity);identity=undefined;}
+ if(!identity){identity={binding,raw,providerRaw,fetch,cacheIdentity:createOpenPaymentsTokenCacheIdentity(),retired:false};identities.set(binding,identity);}
+ const previous=environments.get(initial);if(previous&&previous!==identity)retire(previous);environments.set(initial,identity);
+ const capturedIdentity=identity;
  function assertCurrent(){
-  const current=environment(),timestamp=now();
-  if(current.SAAS_BANK_ENABLED!=='true'||current[CONFIG_KEY]!==raw||current.SAAS_OPENPAYMENTS_CONFIG!==providerRaw||
-   current[metadata.binding]!==binding||binding.fetch!==fetch||!Number.isFinite(timestamp)||timestamp<validFrom)throw INVALID();
-  if(timestamp>=validTo)throw new BankProviderError('CLIENT_CERTIFICATE_EXPIRED',409);
+  try{
+   const current=environment(),timestamp=now();
+   if(current.SAAS_BANK_ENABLED!=='true'||current[CONFIG_KEY]!==raw||current.SAAS_OPENPAYMENTS_CONFIG!==providerRaw||
+    current[metadata.binding]!==binding||binding.fetch!==fetch||!Number.isFinite(timestamp)||timestamp<validFrom)throw INVALID();
+   if(timestamp>=validTo)throw new BankProviderError('CLIENT_CERTIFICATE_EXPIRED',409);
+   if(capturedIdentity.retired||identities.get(binding)!==capturedIdentity||environments.get(initial)!==capturedIdentity)throw INVALID();
+  }catch(error){retire(capturedIdentity);if(environments.get(initial)===capturedIdentity)environments.delete(initial);throw error;}
  }
  assertCurrent();
  async function request(input,init){
@@ -120,5 +138,5 @@ export function configuredOpenPaymentsWorkersTransport({configuration,environmen
   return new Response(body,{status:response.status,headers:response.headers});
  }
  const transport=Object.freeze({kind:'mtls',validateCertificate:assertCurrent,request});
- return Object.freeze({transport,assertCurrent,certificateValidUntil:new Date(validTo).toISOString()});
+ return Object.freeze({transport,assertCurrent,cacheIdentity:capturedIdentity.cacheIdentity,certificateValidUntil:new Date(validTo).toISOString()});
 }

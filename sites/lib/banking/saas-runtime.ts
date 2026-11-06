@@ -20,7 +20,7 @@ async function runtime(request:Request,companyId:string,providerOptions?:OpenPay
  const registration=parsed(config.SAAS_OPENPAYMENTS_REGISTRATIONS)?.find((entry:Record<string,unknown>)=>entry.companyId===companyId&&entry.actorId===context.actorId);
  // Production cannot replace the environment binding with a caller-supplied
  // transport. Preserve the trusted coordinator's per-request quota boundary.
- const options=providerConfig?.environment==='PRODUCTION'?{...providerOptions,transport:mtls?.transport}:providerOptions;
+ const options=providerConfig?.environment==='PRODUCTION'?{...providerOptions,transport:mtls?.transport,applicationTokenCache:mtls?{identity:mtls.cacheIdentity}:undefined}:providerOptions;
  const bank=createSaasBankRuntime({context,config:providerConfig,registration,enabled:config.SAAS_BANK_ENABLED==='true',requestKey:request.headers.get('idempotency-key'),providerOptions:options,codec,store,assertCurrent:guard,sessionHash:/^[a-f0-9]{64}$/.test(cookieValue(request,'__Host-mg-onboarding'))?await digest(cookieValue(request,'__Host-mg-onboarding')):'',redirectUri:new URL(`/api/companies/${companyId}/bank/callback`,request.url).href});
  if(!mtls)return bank;
  return{...bank,async syncContext(accountId:string){const resolved=await bank.syncContext(accountId);await guard();return{...resolved,context:{...resolved.context,validUntil:new Date(Math.min(Date.parse(resolved.context.validUntil),Date.parse(mtls.certificateValidUntil))).toISOString()}};}};

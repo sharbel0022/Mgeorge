@@ -59,6 +59,22 @@ privat nyckel, rå banktext eller certifikatsubjekt.
   certifikatet. Den ekonomiska SQL-spärren kan därför inte använda en längre
   medgivandetid som ersättning för ett utgånget certifikat.
 
+### App-token mellan separata requestobjekt
+
+Den verifierade bindningen får en opak cacheidentitet för delad app-token-state.
+Runtime skickar den via det typade `applicationTokenCache: {identity}`-gränssnittet.
+Nya requestobjekt med samma faktiska bindning, fetchfunktion och serverkonfiguration
+återanvänder identiteten; inget HTTP-objekt eller företagsguard återanvänds.
+Certifikat-/konfigurationsbyte, avstängning, saknad/ogiltig konfiguration och expiry
+återkallar den gamla identiteten permanent. Återställda konfigurationsbytes kan
+inte återuppliva gammalt token-state.
+
+Cacheägandet är process-/Worker-isolate-lokalt. Den här transportkopplingen ensam
+är **inte** en distribuerad tokenkoordinator. Flera isolat/processer behöver en
+gemensam tokenägare eller beständig lease/cache innan distribuerad produktion kan
+styrkas mot leverantörens råd om en aktiv token per PSU-kontext. Den grinden ska
+hållas åtskild från saknade kundmedgivanden eller certifikat.
+
 ## Verifiering på isolerade syntetiska data
 
 Första RED på oförändrad integrerad bas `2982b6c` gav **0/3**: runtime hade
@@ -66,11 +82,20 @@ Första RED på oförändrad integrerad bas `2982b6c` gav **0/3**: runtime hade
 avvisades trots en korrekt syntetisk bindningsfixtur. Detta reproducerade det
 faktiska saknade integrationssteget.
 
-Slutlig fokuskörning omfattar **90/90** tester, noll fail/cancel/skip/TODO:
+Transportens första slutliga fokuskörning omfattar **90/90** tester, noll fail/cancel/skip/TODO:
 `openpayments-workers-runtime`, `openpayments-workers-transport`,
 `openpayments-account-state`, `openpayments-company-sync`, `openpayments-ingest`
 och `saas-bank-runtime`. De 43 nya testerna ingår i dessa 90 och adderas inte
 en gång till. TypeScriptkontrollen passerade.
+
+Cachekopplingens RED gav 1/4 godkända: två requestobjekt hämtade två token och
+10/100 företag hämtade 10/100. Efter kopplingen ger verkliga syntetiska
+företags-/serverrequester för 1, 10 och 100 företag en app-token, med separata
+företagskontroller och avvisad cross-company-access. Den utökade fokuskörningen,
+inklusive den delade cachesviten, ger **120/120**, noll fail/cancel/skip/TODO.
+Den första cachekörningen fann också att en upprepad expiry-kontroll tappade den
+precisa felkoden efter återkallelse. Produktkoden rättades; testets ursprungliga
+krav på `CLIENT_CERTIFICATE_EXPIRED` behölls.
 
 Den integrerade fixturen använder verkliga server-/företags-/SQLite-/krypterings-
 moduler och en syntetisk extern fetchbindning. Den går genom consent, callback,
@@ -130,3 +155,5 @@ produktionsdata eller betalning ändrades i detta arbete.
   `node:crypto` under Node-kompatibilitet.
 - [Cloudflare Node HTTPS](https://developers.cloudflare.com/workers/runtime-apis/nodejs/https/):
   Node HTTPS-alternativ är ingen ersättning för den verkliga mTLS-bindningen.
+- [Open Payments access tokens](https://docs.openpayments.io/docs/get_access_token):
+  app-token, kombinerade API-scopes och separata PSU-kontexter.
