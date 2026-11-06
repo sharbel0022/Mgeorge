@@ -1,0 +1,19 @@
+{
+  "format": "MG-independent-alias-review-freeze-1",
+  "frozenAt": "2026-11-06T16:03:45.263050+00:00",
+  "baselineProductCommit": "f5d178ea816d276457685fbc0421cf144f7cf655",
+  "textObservations": 40,
+  "wordboxObservations": 13,
+  "runtimes": [
+    "node",
+    "sites"
+  ],
+  "expectedChecks": 106,
+  "executedBeforeFreeze": false,
+  "candidateDiffReadBeforeFreeze": false,
+  "sha256": {
+    "cases.json": "276d9f64225129da52b39bdbc1797aadbfa16a336154730e1fb00c37f4536255",
+    "probes.test.mjs": "54bee041057fd47b4ced19942f02546675b19bc4bccc38440739d6b11dfd647e",
+    "predeclared-plan.md": "20c8b9fcde8c012ec0ac6e9c344c36e69168a741ec8383d802941623dd9529a3"
+  }
+}
