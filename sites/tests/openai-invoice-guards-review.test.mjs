@@ -89,7 +89,7 @@ for(const scenario of ['enabled after acceptance','profile changed after accepta
     const accepted=f.sql.prepare('SELECT state,lease,extraction FROM document_jobs WHERE owner=? AND document_id=?').get(f.owner,f.id);
     assert.equal(accepted.state,'processing');
     assert.equal(accepted.lease,'synthetic-lease');
-    assert.match(JSON.parse(accepted.extraction).processing.run_id,/^[a-f0-9]{64}$/);
+    assert.equal(JSON.parse(accepted.extraction).processing.run_id,createHash('sha256').update(JSON.stringify(['document-job-v1',f.owner,f.id,'synthetic-lease'])).digest('base64url'));
     assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);
     const beforeReservations=reserved(f.sql);
     Object.assign(f.env,environment(f.owner));
