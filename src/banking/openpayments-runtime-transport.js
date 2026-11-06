@@ -75,7 +75,9 @@ export function configuredOpenPaymentsNodeTransport({environment=process.env,con
       if(identities.get(environment)?.identity!==cacheIdentity)throw denied();
     }catch(error){invalidateTokenCache();if(identities.get(environment)?.identity===cacheIdentity)identities.delete(environment);throw error;}
   };
-  return Object.freeze({kind:'mtls',cacheIdentity,invalidateTokenCache,validateCertificate,async request(input,init){
+  const transportIdentity=digest(JSON.stringify(['node-mtls-v1',fingerprint]));
+  const certificateValidUntil=Date.parse(new X509Certificate(initial.certificatePem).validTo);
+  return Object.freeze({kind:'mtls',transportIdentity,certificateValidUntil,cacheIdentity,invalidateTokenCache,validateCertificate,async request(input,init){
     validateCertificate();const response=await native.request(input,init);
     try{validateCertificate();return response;}
     catch(error){try{await response.body?.cancel();}catch{}throw error;}

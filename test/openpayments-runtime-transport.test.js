@@ -8,6 +8,7 @@ import {configuredOpenPaymentsNodeTransport} from '../src/banking/openpayments-r
 import {openDatabase} from '../src/db.js';
 import {createNodeOpenPaymentsCompanySyncRuntime,readNodeOpenPaymentsCompanySyncStatus} from '../src/openpayments-company-bank-sync.js';
 import {certificateFixture,localProvider} from './helpers/openpayments-local-tls.mjs';
+process.env.BANK_DATA_KEY='b'.repeat(64);delete process.env.ENCRYPTION_KEY;
 
 let certificates;
 before(()=>{certificates=certificateFixture();});
@@ -15,10 +16,11 @@ after(()=>certificates.close());
 const context={version:'company-context-v1',companyId:'synthetic-company',storageOwner:'synthetic-owner',actorId:'synthetic-actor',role:'owner',membershipVersion:1,companyVersion:1,contextVersion:1};
 function fixture(t,{mtls=certificates.configuration,disabled=false,durable=false}={}) {
   const db=durable?openDatabase(certificates.file('synthetic-'+crypto.randomUUID()+'.sqlite')):new DatabaseSync(':memory:');db.exec('CREATE TABLE IF NOT EXISTS saas_bank_state(owner TEXT PRIMARY KEY,revision INTEGER,payload TEXT)');t.after(()=>db.close());
+  const controlDb=new DatabaseSync(':memory:');controlDb.exec(readFileSync(new URL('../sites/lib/banking/openpayments/token-coordinator.schema.sql',import.meta.url),'utf8'));t.after(()=>controlDb.close());
   const config={environment:'PRODUCTION',clientId:'synthetic-app',clientSecret:'synthetic-secret',credentialGeneration:'synthetic-production-g1',features:['bank_discovery','consents','accounts','transactions'],redirectUris:['https://app.example/api/companies/synthetic-company/bank/callback']};
   const registration={companyId:context.companyId,actorId:context.actorId,verified:true,corporateAccessVerified:true,redirectVerified:true,corporateId:'synthetic-company-id',psuId:'synthetic-psu-id',bicFi:'OPBKSE21',bankId:'OPBKSE21',bankName:'Synthetic Bank',authenticationMethodId:'mbid',psu:{ipAddress:'192.0.2.10',userAgent:'Synthetic TLS test'},ratePolicy:{verified:true,evidenceId:'synthetic-rate-policy',maxRequests:100,windowMs:60000}};
   const environment={SAAS_BANK_ENABLED:disabled?'false':'true',SAAS_OPENPAYMENTS_CONFIG:JSON.stringify(config),SAAS_OPENPAYMENTS_REGISTRATIONS:JSON.stringify([registration]),...(mtls===null?{}:{SAAS_OPENPAYMENTS_MTLS_CONFIG:JSON.stringify(mtls)})};
-  const options={db,context,assertCurrent:()=>{},sessionHash:'synthetic-session',origin:'https://app.example',environment};
+  const options={db,controlDb,context,assertCurrent:()=>{},sessionHash:'synthetic-session',origin:'https://app.example',environment};
   return {environment,options,create:overrides=>nodeSaasBankRuntime({...options,...overrides})};
 }
 const discovery=received=>received.path==='/connect/token'?{access_token:'synthetic-token',token_type:'Bearer',expires_in:3600,scope:new URLSearchParams(received.body).get('scope')}:{aspsps:[{bicFi:'OPBKSE21',name:'Synthetic Bank'}]};
@@ -32,6 +34,8 @@ test('ordinary Node production runtime uses configured certificate files for rea
   assert.ok(provider.requests.every(r=>r.clientAuthorized&&r.clientFingerprint===certificates.fingerprint));
   assert.deepEqual(provider.requests.map(r=>r.host),['auth.openbankingplatform.com','api.openbankingplatform.com']);
   assert.equal(f.options.db.prepare('SELECT count(*) n FROM saas_bank_state').get().n,0,'discovery cannot create a consent');
+  assert.equal(f.options.controlDb.prepare('SELECT count(*) n FROM company_application_tokens').get().n,1,'app token is stored only in central state');
+  assert.equal(f.options.db.prepare("SELECT count(*) n FROM sqlite_master WHERE name='company_application_tokens'").get().n,0,'tenant data does not receive the global app token');
 });
 
 test('concurrent ordinary runtimes share only the application token while keeping each request boundary',async t=>{
@@ -66,11 +70,23 @@ test('an API token rejection invalidates all current runtime clients without ret
   await f.create().discovery();assert.equal(provider.requests.filter(r=>r.path==='/connect/token').length,2);assert.equal(apiReads,3);
 });
 
-test('restoring authorized configuration after observed rotation uses a fresh token identity',async t=>{
+test('restored identical configuration requires a fresh verified runtime and reuses the exact global token',async t=>{
   const provider=await localProvider(t,certificates,discovery),f=fixture(t),old=f.create(),original=f.environment.SAAS_OPENPAYMENTS_MTLS_CONFIG;
-  await old.discovery();f.environment.SAAS_OPENPAYMENTS_MTLS_CONFIG=JSON.stringify({...certificates.configuration,certificateSha256:'0'.repeat(64)});
+  await old.discovery();const stored=f.options.controlDb.prepare('SELECT token_version,token_ciphertext FROM company_application_tokens').get();f.environment.SAAS_OPENPAYMENTS_MTLS_CONFIG=JSON.stringify({...certificates.configuration,certificateSha256:'0'.repeat(64)});
   await assert.rejects(old.discovery(),{code:'CONSENT_APPLICATION_CHANGED'});f.environment.SAAS_OPENPAYMENTS_MTLS_CONFIG=original;
-  await f.create().discovery();assert.equal(provider.requests.filter(r=>r.path==='/connect/token').length,2,'the invalidated old token is never revived');
+  const before=provider.requests.length;await assert.rejects(old.discovery(),{code:'INVALID_CLIENT_CERTIFICATE'});assert.equal(provider.requests.length,before,'retired local runtimes stay fenced');
+  await f.create().discovery();assert.equal(provider.requests.filter(r=>r.path==='/connect/token').length,1,'the independent global issuer verifies the same app/config/certificate before reusing a still-valid token');
+  assert.deepEqual(f.options.controlDb.prepare('SELECT token_version,token_ciphertext FROM company_application_tokens').get(),stored);
+});
+
+test('ordinary production runtime never falls back when central storage is missing or configuration really rotates',async t=>{
+ const provider=await localProvider(t,certificates,discovery),f=fixture(t);
+ assert.throws(()=>f.create({controlDb:null}),{code:'APPLICATION_TOKEN_STORAGE_UNAVAILABLE'});assert.equal(provider.requests.length,0);
+ await f.create().discovery();const before=provider.requests.length,config=JSON.parse(f.environment.SAAS_OPENPAYMENTS_CONFIG);
+ f.environment.SAAS_OPENPAYMENTS_CONFIG=JSON.stringify({...config,clientSecret:'synthetic-rotated-secret'});
+ await assert.rejects(f.create().snapshot(),{code:'APPLICATION_TOKEN_CONFIGURATION_CHANGED'});await assert.rejects(f.create().discovery(),{code:'APPLICATION_TOKEN_CONFIGURATION_CHANGED'});assert.equal(provider.requests.length,before);
+ f.environment.SAAS_OPENPAYMENTS_CONFIG=JSON.stringify(config);f.options.controlDb.exec('DROP TABLE company_application_tokens');
+ await assert.rejects(f.create().discovery(),{code:'APPLICATION_TOKEN_STORAGE_UNAVAILABLE'});assert.equal(provider.requests.length,before);
 });
 
 test('repeated validation preserves the exact expiry cause after retiring the token cache',t=>{

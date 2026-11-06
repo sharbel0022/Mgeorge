@@ -49,6 +49,7 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
  controlDb.exec('BEGIN IMMEDIATE');
  try{
   controlDb.exec(readFileSync(new URL('../migrations/node/0001_company_catalog.sql',import.meta.url),'utf8'));
+  controlDb.exec(readFileSync(new URL('../sites/lib/banking/openpayments/token-coordinator.schema.sql',import.meta.url),'utf8'));
   const boundary=readCompanyDatabaseBoundary(controlDb);
   if(boundary){
    const binding=controlDb.prepare("SELECT company_id,storage_owner FROM companies WHERE database_key='legacy'").get();
@@ -140,6 +141,7 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
   }
  }
  function operation(scope,bundle,sql,execute,forceWrite=false){
+  denyApplicationTokenSql(scope,sql);
   const action=!forceWrite&&readOnlySql(sql)?'read':'write';
   if(!scope&&storage.getStore())throw fail('company_context_mismatch');
   if(scope?.initializing||!scope){return execute();}
@@ -150,6 +152,7 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
   catch(error){if(catalogLock)controlDb.exec('ROLLBACK');throw error;}
  }
  function capture(){const scope=storage.getStore(),bundle=scope?.bundle||legacyBundle;return {scope,bundle};}
+ function denyApplicationTokenSql(scope,sql){if(scope&&!scope.initializing&&/\bcompany_application_tokens?\b|\bcompany_application_token_control\b/i.test(String(sql)))throw fail('company_control_plane_access_denied');}
  /** A data export is a permitted read with one fixed, append-only audit effect.
   * This capability accepts no SQL, event name, details or tenant selector and
   * does not confer write permission through the ordinary database proxy. */
@@ -213,7 +216,7 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
     };
    }
    if(key==='prepare')return sql=>{
-    const {scope,bundle}=capture();assertScope(scope,readOnlySql(sql)?'read':'write');
+    const {scope,bundle}=capture();denyApplicationTokenSql(scope,sql);assertScope(scope,readOnlySql(sql)?'read':'write');
     const statement=bundle.db.prepare(sql);
     const effectiveScope=()=>{
      if(!scope?.initializing||storage.getStore()===scope)return scope;
@@ -233,6 +236,7 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
    };
    if(key==='exec')return sql=>{
     const {scope,bundle}=capture();
+    denyApplicationTokenSql(scope,sql);
     if(!scope||scope.initializing)return bundle.db.exec(sql);
     if(/^\s*BEGIN(?:\s+IMMEDIATE|\s+DEFERRED|\s+EXCLUSIVE)?\s*;?\s*$/i.test(sql)){
      if(bundle.transactionScope)throw fail('company_transaction_nested',409);

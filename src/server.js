@@ -497,12 +497,12 @@ async function openPaymentsSyncRuntime(req=null,{scheduled=false}={}){
  const automatic={enabled:registration.automaticEnabled===true,operatorVerified:registration.operatorVerified===true,evidenceId:registration.operatorEvidenceId};
  if(scheduled&&!(automatic.enabled&&automatic.operatorVerified&&automatic.evidenceId))return null;
  const assertCurrent=req?()=>assertSessionStillAuthorized(req):()=>companyRuntime.assert('manage_integrations');
- const snapshot=await nodeSaasBankRuntime({db,context,assertCurrent,sessionHash:req?sessionHash(req):'internal-authorized-sync',origin:check.origin}).snapshot();
+ const snapshot=await nodeSaasBankRuntime({db,controlDb,context,assertCurrent,sessionHash:req?sessionHash(req):'internal-authorized-sync',origin:check.origin}).snapshot();
  if(snapshot.connection?.status!=='active'||!snapshot.accounts.some(account=>account.selected&&account.importable)){
   if(scheduled)return null;
   throw new ConsentError('BANK_CONSENT_INVALID',409);
  }
- return createNodeOpenPaymentsCompanySyncRuntime({db,context,assertCurrent,evidenceId:registration.syncEvidenceId||registration.ratePolicy?.evidenceId,existingDataCompanyId:readCompanyDatabaseBoundary(db)?.companyId,origin:check.origin,automatic});
+ return createNodeOpenPaymentsCompanySyncRuntime({db,controlDb,context,assertCurrent,evidenceId:registration.syncEvidenceId||registration.ratePolicy?.evidenceId,existingDataCompanyId:readCompanyDatabaseBoundary(db)?.companyId,origin:check.origin,automatic});
 }
 async function runCompanyScheduledSync(){
   const settings=getSettings(db),interval=settings.sync_interval_minutes,gmailInterval=settings.gmail_sync_interval_minutes;
@@ -683,12 +683,12 @@ async function companyRoute(req,res,url,path){
   const saas=/^\/api\/companies\/([^/]+)\/bank(?:\/(.*))?$/.exec(path);
   if(saas){
     if(!req.companyContext||decodeURIComponent(saas[1])!==req.companyContext.companyId)throw new ConsentError('COMPANY_ACCESS_DENIED',403);
-    const runtime=nodeSaasBankRuntime({db,context:req.companyContext,assertCurrent:()=>assertSessionStillAuthorized(req),sessionHash:sessionHash(req),origin:check.origin,requestKey:req.headers['idempotency-key']});
+    const runtime=nodeSaasBankRuntime({db,controlDb,context:req.companyContext,assertCurrent:()=>assertSessionStillAuthorized(req),sessionHash:sessionHash(req),origin:check.origin,requestKey:req.headers['idempotency-key']});
     const action=saas[2]||'';
     if(req.method==='GET'&&action==='')return json(res,200,await runtime.snapshot());
     if(req.method==='GET'&&action==='sync'){
       if([...url.searchParams.keys()].some(key=>!['accountId','companyId','companyContextVersion'].includes(key))||url.searchParams.getAll('accountId').length!==1)throw bad(400,'Välj ett konto.');
-      return json(res,200,await readNodeOpenPaymentsCompanySyncStatus({db,context:req.companyContext,assertCurrent:()=>assertSessionStillAuthorized(req),accountId:url.searchParams.get('accountId'),environment:process.env}));
+      return json(res,200,await readNodeOpenPaymentsCompanySyncStatus({db,controlDb,context:req.companyContext,assertCurrent:()=>assertSessionStillAuthorized(req),accountId:url.searchParams.get('accountId'),environment:process.env}));
     }
     if(req.method==='GET'&&action==='callback'){
       const body={};for(const [key,value]of url.searchParams){if(Object.hasOwn(body,key))throw new ConsentError('INVALID_CALLBACK',403);body[key]=value;}
