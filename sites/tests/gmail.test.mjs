@@ -188,6 +188,18 @@ test('Gmail eligibility preserves provider cooldown and active-run deadlines wit
   assert.equal(status.connection,null);assert.equal(status.last_successful_fetch,'');
 });
 
+for(const expiry of ['unknown-private-deadline','9999-99-99T99:99:99.999Z','2099-01-01'])test(`Gmail status fails closed for a noncanonical active lock deadline: ${expiry}`,async t=>{
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  await f.processing.processingSettings(f.user);
+  f.sql.prepare('INSERT INTO gmail_locks(owner,token,expires_at) VALUES(?,?,?)').run(f.owner,'synthetic-private-lock',expiry);
+  const calls=f.providerCalls,before={...f.sql.prepare('SELECT * FROM gmail_locks').get()};
+  const response=await f.api.gmailStatus(true);assert.equal(response.status,200);
+  const status=await response.json();
+  assert.deepEqual(status.sync_eligibility,{eligible:false,reason:'lock_expiry_unknown',next_eligible_at:null});
+  assert.equal(f.providerCalls,calls);assert.deepEqual({...f.sql.prepare('SELECT * FROM gmail_locks').get()},before);
+  assert.ok(!JSON.stringify(status).includes(expiry));assert.ok(!JSON.stringify(status).includes('synthetic-private-lock'));
+});
+
 test('Gmail automation: rejected attachment reasons survive replay and are scoped without exposing message data',async t=>{
   const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());
   const originalFetch=globalThis.fetch;

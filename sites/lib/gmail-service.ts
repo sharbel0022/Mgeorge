@@ -98,14 +98,16 @@ export async function gmailStatus(summary=false,documentId=''){
   // particular, stale/not-yet-verified work can be due. This read-only snapshot
   // does not bypass the sync entrypoint's current authorization or SQL lease.
   const activeLock=await db().prepare("SELECT expires_at FROM gmail_locks WHERE owner=? AND expires_at>strftime('%Y-%m-%dT%H:%M:%fZ','now')").bind(user.userId).first<{expires_at:string}>();
+  const lockDeadline=Date.parse(activeLock?.expires_at||'');
+  const knownLockDeadline=Number.isFinite(lockDeadline)&&new Date(lockDeadline).toISOString()===activeLock?.expires_at;
   const eligibilityReason=!configured?'not_configured':!connection?'disconnected'
     :connection.email.toLowerCase()!==account?'mailbox_mismatch':!processing.enabled?'paused'
     :permanentGmailErrors.has(connection.status)?'reconnect_required':connection.blocked?'blocked'
-    :!['connected','retry_wait','error'].includes(connection.status)?'disconnected':activeLock?'running'
+    :!['connected','retry_wait','error'].includes(connection.status)?'disconnected':activeLock?(knownLockDeadline?'running':'lock_expiry_unknown')
     :Date.parse(connection.retry_after||'')>at?'retry_after'
     :Date.parse(connection.last_attempt||'')+15*60000>at?'minimum_interval':'eligible';
   const sync_eligibility={eligible:eligibilityReason==='eligible',reason:eligibilityReason,
-    next_eligible_at:eligibilityReason==='running'?new Date(Math.max(Date.parse(activeLock!.expires_at),Date.parse(next_eligible_sync!))).toISOString()
+    next_eligible_at:eligibilityReason==='running'?new Date(Math.max(lockDeadline,Date.parse(next_eligible_sync!))).toISOString()
       :['eligible','retry_after','minimum_interval'].includes(eligibilityReason)?next_eligible_sync:null};
   const schedule_observation=await automaticObservation(user.userId);
   const attachment_rejections=await attachmentRejections(user.userId);
