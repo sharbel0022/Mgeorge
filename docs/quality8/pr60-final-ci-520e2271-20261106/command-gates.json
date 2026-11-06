@@ -1,0 +1,297 @@
+{
+  "head": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+  "run": 42176691810,
+  "expected": 16,
+  "observed": 16,
+  "allPassed": true,
+  "gates": [
+    {
+      "gate": 1,
+      "job": "test",
+      "jobId": 127756675126,
+      "step": 4,
+      "name": "Run npm ci --ignore-scripts",
+      "command": "npm ci --ignore-scripts",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:47:51Z",
+      "completedAt": "2026-11-06T06:47:53Z",
+      "commandEvidence": [
+        {
+          "line": 160,
+          "text": "npm ci --ignore-scripts"
+        }
+      ]
+    },
+    {
+      "gate": 2,
+      "job": "test",
+      "jobId": 127756675126,
+      "step": 5,
+      "name": "Run npm run check",
+      "command": "npm run check",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:47:53Z",
+      "completedAt": "2026-11-06T06:47:58Z",
+      "commandEvidence": [
+        {
+          "line": 171,
+          "text": "npm run check"
+        }
+      ]
+    },
+    {
+      "gate": 3,
+      "job": "test",
+      "jobId": 127756675126,
+      "step": 6,
+      "name": "Audit production dependencies",
+      "command": "npm audit --audit-level=high",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:47:58Z",
+      "completedAt": "2026-11-06T06:47:58Z",
+      "commandEvidence": [
+        {
+          "line": 180,
+          "text": "npm audit --audit-level=high"
+        }
+      ]
+    },
+    {
+      "gate": 4,
+      "job": "test",
+      "jobId": 127756675126,
+      "step": 7,
+      "name": "Run tests with synthetic data",
+      "command": "npm run test:isolated",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:47:58Z",
+      "completedAt": "2026-11-06T06:51:31Z",
+      "commandEvidence": [
+        {
+          "line": 185,
+          "text": "npm run test:isolated"
+        }
+      ]
+    },
+    {
+      "gate": 5,
+      "job": "sites",
+      "jobId": 127756675056,
+      "step": 4,
+      "name": "Run npm run install:ci",
+      "command": "npm run install:ci",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:47:51Z",
+      "completedAt": "2026-11-06T06:48:06Z",
+      "commandEvidence": [
+        {
+          "line": 162,
+          "text": "npm run install:ci"
+        }
+      ]
+    },
+    {
+      "gate": 6,
+      "job": "sites",
+      "jobId": 127756675056,
+      "step": 5,
+      "name": "Verify exact installed minimatch mitigation bytes",
+      "command": "node scripts/minimatch-backport.mjs --check --require-target",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:48:06Z",
+      "completedAt": "2026-11-06T06:48:06Z",
+      "commandEvidence": [
+        {
+          "line": 180,
+          "text": "node scripts/minimatch-backport.mjs --check --require-target"
+        }
+      ]
+    },
+    {
+      "gate": 7,
+      "job": "sites",
+      "jobId": 127756675056,
+      "step": 6,
+      "name": "Install shared OCR runtime for cloud integration test",
+      "command": "npm ci --ignore-scripts",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:48:06Z",
+      "completedAt": "2026-11-06T06:48:07Z",
+      "commandEvidence": [
+        {
+          "line": 185,
+          "text": "npm ci --ignore-scripts"
+        }
+      ]
+    },
+    {
+      "gate": 8,
+      "job": "sites",
+      "jobId": 127756675056,
+      "step": 7,
+      "name": "Run npm run check",
+      "command": "npm run check",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:48:07Z",
+      "completedAt": "2026-11-06T06:48:19Z",
+      "commandEvidence": [
+        {
+          "line": 196,
+          "text": "npm run check"
+        }
+      ]
+    },
+    {
+      "gate": 9,
+      "job": "sites",
+      "jobId": 127756675056,
+      "step": 8,
+      "name": "Audit Sites production dependencies",
+      "command": "npm audit --audit-level=high",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:48:19Z",
+      "completedAt": "2026-11-06T06:48:46Z",
+      "commandEvidence": [
+        {
+          "line": 204,
+          "text": "npm audit --audit-level=high"
+        }
+      ]
+    },
+    {
+      "gate": 10,
+      "job": "sites",
+      "jobId": 127756675056,
+      "step": 9,
+      "name": "Install isolated bridge for full synthetic SFTP chain",
+      "command": "npm --prefix ../bridge/bankgiro ci --ignore-scripts",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:48:46Z",
+      "completedAt": "2026-11-06T06:48:47Z",
+      "commandEvidence": [
+        {
+          "line": 251,
+          "text": "npm --prefix ../bridge/bankgiro ci --ignore-scripts"
+        }
+      ]
+    },
+    {
+      "gate": 11,
+      "job": "sites",
+      "jobId": 127756675056,
+      "step": 10,
+      "name": "Run Sites tests with synthetic data",
+      "command": "npm run test:isolated",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:48:47Z",
+      "completedAt": "2026-11-06T06:53:37Z",
+      "commandEvidence": [
+        {
+          "line": 259,
+          "text": "npm run test:isolated"
+        }
+      ]
+    },
+    {
+      "gate": 12,
+      "job": "sites",
+      "jobId": 127756675056,
+      "step": 11,
+      "name": "Run npm run build",
+      "command": "npm run build",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:53:37Z",
+      "completedAt": "2026-11-06T06:53:50Z",
+      "commandEvidence": [
+        {
+          "line": 31937,
+          "text": "npm run build"
+        }
+      ]
+    },
+    {
+      "gate": 13,
+      "job": "bankgiro_bridge",
+      "jobId": 127756674626,
+      "step": 4,
+      "name": "Install isolated SFTP bridge",
+      "command": "npm --prefix bridge/bankgiro ci --ignore-scripts",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:47:48Z",
+      "completedAt": "2026-11-06T06:47:49Z",
+      "commandEvidence": [
+        {
+          "line": 160,
+          "text": "npm --prefix bridge/bankgiro ci --ignore-scripts"
+        }
+      ]
+    },
+    {
+      "gate": 14,
+      "job": "bankgiro_bridge",
+      "jobId": 127756674626,
+      "step": 5,
+      "name": "Check isolated bridge syntax",
+      "command": "npm --prefix bridge/bankgiro run check",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:47:49Z",
+      "completedAt": "2026-11-06T06:47:49Z",
+      "commandEvidence": [
+        {
+          "line": 168,
+          "text": "npm --prefix bridge/bankgiro run check"
+        }
+      ]
+    },
+    {
+      "gate": 15,
+      "job": "bankgiro_bridge",
+      "jobId": 127756674626,
+      "step": 6,
+      "name": "Audit isolated bridge production dependencies",
+      "command": "npm --prefix bridge/bankgiro audit --omit=dev --audit-level=high",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:47:49Z",
+      "completedAt": "2026-11-06T06:47:50Z",
+      "commandEvidence": [
+        {
+          "line": 176,
+          "text": "npm --prefix bridge/bankgiro audit --omit=dev --audit-level=high"
+        }
+      ]
+    },
+    {
+      "gate": 16,
+      "job": "bankgiro_bridge",
+      "jobId": 127756674626,
+      "step": 7,
+      "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+      "command": "npm --prefix bridge/bankgiro run test:isolated",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:47:50Z",
+      "completedAt": "2026-11-06T06:47:55Z",
+      "commandEvidence": [
+        {
+          "line": 181,
+          "text": "npm --prefix bridge/bankgiro run test:isolated"
+        }
+      ]
+    }
+  ]
+}

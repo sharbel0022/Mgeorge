@@ -1,0 +1,228 @@
+{
+  "version": 1,
+  "repository": "sharbel0022/Mgeorge",
+  "pr": 60,
+  "frozenHead": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+  "base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "testedPrTree": "4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+  "actualCiCheckout": "c7a22cbc13c9b1dbed1d825278c91ea369c2c447",
+  "attempts": [
+    {
+      "run": 42176691810,
+      "attempt": 1
+    },
+    {
+      "run": 42176691849,
+      "attempt": 1
+    }
+  ],
+  "scope": "Final PR60 head520 only. Covers all 24 data/report files, excluding this manifest itself. No main CI, prior head8c or RED evidence is substituted.",
+  "rawJobLogCount": 4,
+  "rawJobLogUtf8Bytes": 3299234,
+  "mandatoryCommandGates": 16,
+  "paymentTests": 7607,
+  "saasOverlappingTests": 1254,
+  "archiveOnly": true,
+  "productOrTestChanges": false,
+  "files": [
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/logs/payment-bridge-127756674626.log",
+      "kind": "complete-original-job-log",
+      "jobId": 127756674626,
+      "utf8Bytes": 36939,
+      "sha256": "dde739923c421f373e8f8bdf196814501cd2c887156fafa8fa948d1a75d01c8f",
+      "gitBlobSha1": "c98770963a891f3d34fed4a30df67b67b6d534e3",
+      "fetchedAt": "2026-11-06T07:00:03.818Z",
+      "preservedUtf8Bom": true
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/logs/payment-sites-127756675056.log",
+      "kind": "complete-original-job-log",
+      "jobId": 127756675056,
+      "utf8Bytes": 2250520,
+      "sha256": "a21f061c3827dde38f6e67ca56a93420cf1a4d2ccdbea4b8aef6759b1897b2b6",
+      "gitBlobSha1": "0a472af2d30f29e6bfe41f132304d541c75a6ebd",
+      "fetchedAt": "2026-11-06T07:00:04.667Z",
+      "preservedUtf8Bom": true
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/logs/payment-node-127756675126.log",
+      "kind": "complete-original-job-log",
+      "jobId": 127756675126,
+      "utf8Bytes": 991938,
+      "sha256": "af4030d7212562bcf42c9d72fe8a57b062b3fb1c8b122c69e428dce4db83f3a7",
+      "gitBlobSha1": "de36485c2a1ee11083528fe46e11ec91178a6776",
+      "fetchedAt": "2026-11-06T07:00:04.227Z",
+      "preservedUtf8Bom": true
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/logs/saas-security-127756675302.log",
+      "kind": "complete-original-job-log",
+      "jobId": 127756675302,
+      "utf8Bytes": 19837,
+      "sha256": "b43f46960ceaa0d04e5f93bfd3a384e08b838bd7db939b0d4f25ce435d4593df",
+      "gitBlobSha1": "c7dde313d2f841866b14f703b47d559cdfccb77a",
+      "fetchedAt": "2026-11-06T07:00:03.849Z",
+      "preservedUtf8Bom": true
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/github/run-42176691810.json",
+      "kind": "original-github-api-json",
+      "utf8Bytes": 13099,
+      "sha256": "f1255070f24668cbb1930436dad9803d0397fcce0c09d850570ba5bbd89395f3",
+      "gitBlobSha1": "5cb0264f2ad8d9db6e1997aab0d844d269e3c869",
+      "fetchedAt": "2026-11-06T06:59:31.115Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/github/jobs-42176691810.json",
+      "kind": "original-github-api-json",
+      "utf8Bytes": 8997,
+      "sha256": "742fad3f70cf9a574de3d4a13746bd8202c23099e2cc73d6b4744b4b2d8fb01a",
+      "gitBlobSha1": "61c53e6128c2e0a4285bc4c19e7232f3b2ad66fa",
+      "fetchedAt": "2026-11-06T06:59:31.273Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/source/.github/workflows/payment-control-ci.yml",
+      "kind": "frozen-head-source",
+      "utf8Bytes": 3078,
+      "sha256": "fda1e1e17ace428c580124df362e6a038746b957e22be12295af56188f21d986",
+      "gitBlobSha1": "093737d0fcc940b8876a179b0f5e4303dd30abc9",
+      "fetchedAt": "2026-11-06T07:00:03.226Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/github/run-42176691849.json",
+      "kind": "original-github-api-json",
+      "utf8Bytes": 13106,
+      "sha256": "520fad6e7d0d961c0c74a9d966c82c6c82b763d77203baeed0be3c3cae8df73c",
+      "gitBlobSha1": "fa1e238a327a8e04ae039002f29f51f63b8952e0",
+      "fetchedAt": "2026-11-06T06:59:31.107Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/github/jobs-42176691849.json",
+      "kind": "original-github-api-json",
+      "utf8Bytes": 2828,
+      "sha256": "9e566884f482728d204dc2b3f7c97af73ab1a98a0e7fca650b951aeebc94a71e",
+      "gitBlobSha1": "44c4a45bb9604223cf42e4b92554f54bd2ca38f9",
+      "fetchedAt": "2026-11-06T06:59:31.208Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/source/.github/workflows/saas-security-acceptance.yml",
+      "kind": "frozen-head-source",
+      "utf8Bytes": 1429,
+      "sha256": "8968081569e21e722d7518e0bfa070e18fb607d37668dad3c77684463c59617b",
+      "gitBlobSha1": "3c8fbd5aa04c982c7c05003515bb1ee865d0c646",
+      "fetchedAt": "2026-11-06T07:00:03.228Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/github/head-commit.json",
+      "kind": "original-github-api-json",
+      "utf8Bytes": 1567,
+      "sha256": "d84852c487d0dbdb65853a1e103609b77f7420b5273d2e72e124fe2301fd929a",
+      "gitBlobSha1": "0d0f8d9331d1a26879bfb3066838290b295a5a53",
+      "fetchedAt": "2026-11-06T06:59:31.241Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/github/merge-commit.json",
+      "kind": "original-github-api-json",
+      "utf8Bytes": 2668,
+      "sha256": "8da34e2dff76ae8a23f9b0d9b40220e5cc42f14d0b5d5554929e4ed6dc65a6c6",
+      "gitBlobSha1": "5eaa55ff8f5b3ae207af80c1148afca50a9d6324",
+      "fetchedAt": "2026-11-06T07:00:03.464Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/source/test/payment-concurrency.test.js",
+      "kind": "frozen-head-source",
+      "sourcePath": "test/payment-concurrency.test.js",
+      "utf8Bytes": 8625,
+      "sha256": "2b8e3cc1f9a784097a0ea804de522951bd7f244327b62491b955654d7c1f555c",
+      "gitBlobSha1": "5f27bd1ce8dbd88f8bce2d5b1ff05c55ff6e1e23",
+      "fetchedAt": "2026-11-06T07:00:03.643Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/source/test/database-startup-contention.test.js",
+      "kind": "frozen-head-source",
+      "sourcePath": "test/database-startup-contention.test.js",
+      "utf8Bytes": 5262,
+      "sha256": "ee7653e3af8f411064338805ba61c2c1d593b3f11b2b7a4409d130c360a38ea7",
+      "gitBlobSha1": "7a20e4135f5c0a1b2ad7a9504a5128ec821b118e",
+      "fetchedAt": "2026-11-06T07:00:03.186Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/source/test/database-startup-cancellation.test.js",
+      "kind": "frozen-head-source",
+      "sourcePath": "test/database-startup-cancellation.test.js",
+      "utf8Bytes": 6824,
+      "sha256": "fd40426a5c40481d7516d6840dc26d3d0572fc28c025c9b57e25f3973bad046d",
+      "gitBlobSha1": "0d337415be3689f71f217f1d5ea88cf3d688a595",
+      "fetchedAt": "2026-11-06T07:00:03.203Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/source/test/helpers/startup-test-resources.js",
+      "kind": "frozen-head-source",
+      "sourcePath": "test/helpers/startup-test-resources.js",
+      "utf8Bytes": 1214,
+      "sha256": "e54af9e6548bf27907dc1c281247bcb0ddcb1fe2464326a10faa832f1d70d430",
+      "gitBlobSha1": "b6bd733d547351c7ec871605ccf05e006ccc0a60",
+      "fetchedAt": "2026-11-06T07:00:03.202Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/source/sites/scripts/run-verified-tool.mjs",
+      "kind": "frozen-head-source",
+      "sourcePath": "sites/scripts/run-verified-tool.mjs",
+      "utf8Bytes": 709,
+      "sha256": "9140270cde0cb35a6d37b9aa9b2fdb3f02dc89a9aaef784d40ebc56dd6365f8e",
+      "gitBlobSha1": "b7c6e399a3004129dee46ece301a05dbc85111a4",
+      "fetchedAt": "2026-11-06T07:00:03.194Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/github/pr-snapshot.json",
+      "kind": "minimal-pr-projection",
+      "utf8Bytes": 490,
+      "sha256": "da6b0de42fbb0f792028a93b9c9f56965eedbff0e40b318de3d15de341a8ac8b",
+      "gitBlobSha1": "a9deb3ab2181ba8526fbd477b84865b860939fc9"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/github/saas-artifacts.json",
+      "kind": "original-github-api-json",
+      "utf8Bytes": 786,
+      "sha256": "f8a5e4071a2104dee76d71242c3b904ea5ef91fb554d40f3867aab97c5024f9f",
+      "gitBlobSha1": "4a5e8c612354df7beeafef88fa0c4f932e12706c",
+      "fetchedAt": "2026-11-06T07:04:21.215Z"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/ci-receipt.json",
+      "kind": "derived-evidence",
+      "utf8Bytes": 38449,
+      "sha256": "802976918e5ae914ba658a6b51e9fe6d30280fd7015fc5076b14e4be66ab7eb3",
+      "gitBlobSha1": "e371ea04e7e82f9d47ef2c8f872b05dd43b08674"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/command-gates.json",
+      "kind": "derived-evidence",
+      "utf8Bytes": 7893,
+      "sha256": "f5dee69d8eec4a8cae4924fb0e5ed9aa053b805121cc3b887c86cbc371c6887e",
+      "gitBlobSha1": "214c86f09d704b97e9046c6d5b6dee3d58c0a73a"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/focused-results.json",
+      "kind": "derived-evidence",
+      "utf8Bytes": 2626,
+      "sha256": "3923b268645f870e2ae7adf8a8cd9a27ffab0fb6f44de41e26b3cd5c9b99ebcc",
+      "gitBlobSha1": "fc1a736c4a48660f0764ab4d91df363825842abc"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/README.md",
+      "kind": "derived-evidence",
+      "utf8Bytes": 6557,
+      "sha256": "cf11e3a197e7552851af0cc78673760d7abb735c614fbc095506894c6b3dfb9a",
+      "gitBlobSha1": "9544c1dc28084944f9599176d2d0ef986c6b710b"
+    },
+    {
+      "path": "docs/quality8/pr60-final-ci-520e2271-20261106/readbacks.json",
+      "kind": "derived-readback-receipt",
+      "utf8Bytes": 9818,
+      "sha256": "ae0ba89e08add338e971715a325d4a923c58f438610f5eea81f2a8adf1706e84",
+      "gitBlobSha1": "f2f90aa609c6f39ec2f7b78ad1186599fe9968ca"
+    }
+  ]
+}

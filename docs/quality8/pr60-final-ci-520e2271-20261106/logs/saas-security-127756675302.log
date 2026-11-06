@@ -1,0 +1,241 @@
+﻿2026-11-06T06:47:41.5021895Z Current runner version: '2.338.2'
+2026-11-06T06:47:41.5048257Z ##[group]Runner Image Provisioner
+2026-11-06T06:47:41.5049936Z Hosted Compute Agent
+2026-11-06T06:47:41.5050611Z Version: 20261028.624
+2026-11-06T06:47:41.5051289Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-06T06:47:41.5052026Z Build Date: 2026-10-28T21:51:42Z
+2026-11-06T06:47:41.5052713Z Worker ID: {54e056b6-563d-4126-a56f-f566e0e19613}
+2026-11-06T06:47:41.5053502Z Region: eastus2
+2026-11-06T06:47:41.5054058Z Cloud: Azure
+2026-11-06T06:47:41.5054615Z ##[endgroup]
+2026-11-06T06:47:41.5056609Z ##[group]Operating System
+2026-11-06T06:47:41.5057251Z Ubuntu
+2026-11-06T06:47:41.5057909Z 26.04.1
+2026-11-06T06:47:41.5058450Z LTS
+2026-11-06T06:47:41.5059013Z ##[endgroup]
+2026-11-06T06:47:41.5059623Z ##[group]Runner Image
+2026-11-06T06:47:41.5060696Z Image: ubuntu-26.04
+2026-11-06T06:47:41.5061593Z Version: 20261101.186.1
+2026-11-06T06:47:41.5062957Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261101.186/images/ubuntu/Ubuntu2604-Readme.md
+2026-11-06T06:47:41.5064640Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261101.186
+2026-11-06T06:47:41.5065623Z ##[endgroup]
+2026-11-06T06:47:41.5067074Z ##[group]GITHUB_TOKEN Permissions
+2026-11-06T06:47:41.5069269Z Contents: read
+2026-11-06T06:47:41.5069925Z Metadata: read
+2026-11-06T06:47:41.5070499Z ##[endgroup]
+2026-11-06T06:47:41.5072791Z Secret source: Actions
+2026-11-06T06:47:41.5073868Z Cache mode: write
+2026-11-06T06:47:41.5074802Z Prepare workflow directory
+2026-11-06T06:47:41.5405322Z Prepare all required actions
+2026-11-06T06:47:41.5454395Z Getting action download info
+2026-11-06T06:47:41.7720420Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-06T06:47:41.9066275Z Download action repository 'actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-11-06T06:47:41.9710599Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-11-06T06:47:42.1590738Z Complete job name: security_acceptance
+2026-11-06T06:47:42.2499438Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-11-06T06:47:42.2500527Z with:
+2026-11-06T06:47:42.2500978Z   persist-credentials: false
+2026-11-06T06:47:42.2501515Z   repository: sharbel0022/Mgeorge
+2026-11-06T06:47:42.2505162Z   token: ***
+2026-11-06T06:47:42.2505595Z   ssh-strict: true
+2026-11-06T06:47:42.2506217Z   ssh-user: git
+2026-11-06T06:47:42.2506645Z   clean: true
+2026-11-06T06:47:42.2507094Z   sparse-checkout-cone-mode: true
+2026-11-06T06:47:42.2507625Z   fetch-depth: 1
+2026-11-06T06:47:42.2508053Z   fetch-tags: false
+2026-11-06T06:47:42.2508492Z   show-progress: true
+2026-11-06T06:47:42.2508941Z   lfs: false
+2026-11-06T06:47:42.2509353Z   submodules: false
+2026-11-06T06:47:42.2509793Z   set-safe-directory: true
+2026-11-06T06:47:42.2510306Z   allow-unsafe-pr-checkout: false
+2026-11-06T06:47:42.2511098Z ##[endgroup]
+2026-11-06T06:47:42.6147240Z Syncing repository: sharbel0022/Mgeorge
+2026-11-06T06:47:42.6150423Z ##[group]Getting Git version info
+2026-11-06T06:47:42.6151862Z Working directory is '/home/runner/work/Mgeorge/Mgeorge'
+2026-11-06T06:47:42.6154044Z [command]/usr/bin/git version
+2026-11-06T06:47:42.6207399Z git version 2.56.0
+2026-11-06T06:47:42.6221437Z ##[endgroup]
+2026-11-06T06:47:42.6236993Z Temporarily overriding HOME='/home/runner/work/_temp/d543052b-0cd0-4b66-999e-53a96b6b9594' before making global git config changes
+2026-11-06T06:47:42.6239607Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-06T06:47:42.6241773Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Mgeorge/Mgeorge
+2026-11-06T06:47:42.6327382Z Deleting the contents of '/home/runner/work/Mgeorge/Mgeorge'
+2026-11-06T06:47:42.6331200Z ##[group]Initializing the repository
+2026-11-06T06:47:42.6336749Z [command]/usr/bin/git init /home/runner/work/Mgeorge/Mgeorge
+2026-11-06T06:47:42.6474012Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-06T06:47:42.6476270Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-06T06:47:42.6478199Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-06T06:47:42.6479679Z hint: call:
+2026-11-06T06:47:42.6480447Z hint:
+2026-11-06T06:47:42.6481434Z hint: 	git config --global init.defaultBranch <name>
+2026-11-06T06:47:42.6482672Z hint:
+2026-11-06T06:47:42.6483790Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-06T06:47:42.6485503Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-06T06:47:42.6487075Z hint:
+2026-11-06T06:47:42.6487846Z hint: 	git branch -m <name>
+2026-11-06T06:47:42.6488699Z hint:
+2026-11-06T06:47:42.6489807Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-06T06:47:42.6491633Z Initialized empty Git repository in /home/runner/work/Mgeorge/Mgeorge/.git/
+2026-11-06T06:47:42.6503141Z [command]/usr/bin/git remote add origin https://github.com/sharbel0022/Mgeorge
+2026-11-06T06:47:42.6564108Z ##[endgroup]
+2026-11-06T06:47:42.6565641Z ##[group]Disabling automatic garbage collection
+2026-11-06T06:47:42.6568656Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-06T06:47:42.6605287Z ##[endgroup]
+2026-11-06T06:47:42.6606906Z ##[group]Setting up auth
+2026-11-06T06:47:42.6612294Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-06T06:47:42.6648706Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-06T06:47:42.7164656Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-06T06:47:42.7199202Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-06T06:47:42.7478445Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-06T06:47:42.7513320Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-06T06:47:42.7785217Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-06T06:47:42.7826676Z ##[endgroup]
+2026-11-06T06:47:42.7827588Z ##[group]Fetching the repository
+2026-11-06T06:47:42.7836202Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +c7a22cbc13c9b1dbed1d825278c91ea369c2c447:refs/remotes/pull/60/merge
+2026-11-06T06:47:47.1627701Z From https://github.com/sharbel0022/Mgeorge
+2026-11-06T06:47:47.1629542Z  * [new ref]         c7a22cbc13c9b1dbed1d825278c91ea369c2c447 -> pull/60/merge
+2026-11-06T06:47:47.1632327Z ##[endgroup]
+2026-11-06T06:47:47.1632991Z ##[group]Determining the checkout info
+2026-11-06T06:47:47.1634746Z ##[endgroup]
+2026-11-06T06:47:47.1641364Z [command]/usr/bin/git sparse-checkout disable
+2026-11-06T06:47:47.1699619Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-06T06:47:47.1734869Z ##[group]Checking out the ref
+2026-11-06T06:47:47.1738753Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/60/merge
+2026-11-06T06:47:47.5535546Z Note: switching to 'refs/remotes/pull/60/merge'.
+2026-11-06T06:47:47.5536685Z 
+2026-11-06T06:47:47.5537221Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-06T06:47:47.5538491Z changes and commit them, and you can discard any commits you make in this
+2026-11-06T06:47:47.5539745Z state without impacting any branches by switching back to a branch.
+2026-11-06T06:47:47.5540605Z 
+2026-11-06T06:47:47.5541063Z If you want to create a new branch to retain commits you create, you may
+2026-11-06T06:47:47.5542406Z do so (now or later) by using -c with the switch command. Example:
+2026-11-06T06:47:47.5542907Z 
+2026-11-06T06:47:47.5543156Z   git switch -c <new-branch-name>
+2026-11-06T06:47:47.5543529Z 
+2026-11-06T06:47:47.5543758Z Or undo this operation with:
+2026-11-06T06:47:47.5544100Z 
+2026-11-06T06:47:47.5544298Z   git switch -
+2026-11-06T06:47:47.5544577Z 
+2026-11-06T06:47:47.5545018Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-06T06:47:47.5545694Z 
+2026-11-06T06:47:47.5546612Z HEAD is now at c7a22cb Merge 520e22716c6298e4d24ccf3989e87cfe563d8d14 into 237dd45e7e1b40513d2dd25ccff59bb08f023264
+2026-11-06T06:47:47.5578375Z ##[endgroup]
+2026-11-06T06:47:47.5626450Z [command]/usr/bin/git log -1 --format=%H
+2026-11-06T06:47:47.5651246Z c7a22cbc13c9b1dbed1d825278c91ea369c2c447
+2026-11-06T06:47:47.5660744Z ##[group]Removing auth
+2026-11-06T06:47:47.5664422Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-06T06:47:47.5695007Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-06T06:47:47.5967438Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-06T06:47:47.6066218Z http.https://github.com/.extraheader
+2026-11-06T06:47:47.6086253Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-06T06:47:47.6088205Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-06T06:47:47.6308390Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-06T06:47:47.6341921Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-06T06:47:47.6607759Z ##[endgroup]
+2026-11-06T06:47:47.6882475Z ##[group]Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+2026-11-06T06:47:47.6882957Z with:
+2026-11-06T06:47:47.6883198Z   node-version: 22
+2026-11-06T06:47:47.6883449Z   cache: npm
+2026-11-06T06:47:47.6883810Z   cache-dependency-path: package-lock.json
+sites/package-lock.json
+
+2026-11-06T06:47:47.6884238Z   always-auth: false
+2026-11-06T06:47:47.6884502Z   check-latest: false
+2026-11-06T06:47:47.6887042Z   token: ***
+2026-11-06T06:47:47.6887285Z ##[endgroup]
+2026-11-06T06:47:47.8382443Z Found in cache @ /opt/hostedtoolcache/node/22.23.4/x64
+2026-11-06T06:47:47.8386958Z (node:2476) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-06T06:47:47.8388383Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-06T06:47:47.8390652Z ##[group]Environment details
+2026-11-06T06:47:48.2983890Z node: v22.23.4
+2026-11-06T06:47:48.2984179Z npm: 10.9.9
+2026-11-06T06:47:48.2984447Z yarn: 1.22.22
+2026-11-06T06:47:48.2985555Z ##[endgroup]
+2026-11-06T06:47:48.3005668Z [command]/opt/hostedtoolcache/node/22.23.4/x64/bin/npm config get cache
+2026-11-06T06:47:48.4138196Z /home/runner/.npm
+2026-11-06T06:47:48.5183163Z Cache hit for: node-cache-Linux-x64-npm-618cd38257d3256ce152f28067e39002c3ceb9211fb41cbcbb959fe625564257
+2026-11-06T06:47:48.5285964Z (node:2476) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-06T06:47:49.5531327Z Received 251658240 of 380706436 (66.1%), 239.0 MBs/sec
+2026-11-06T06:47:49.9959662Z Received 380706436 of 380706436 (100.0%), 250.9 MBs/sec
+2026-11-06T06:47:49.9960811Z Cache Size: ~363 MB (380706436 B)
+2026-11-06T06:47:50.0099924Z [command]/usr/bin/tar -xf /home/runner/work/_temp/ecc78637-6e14-4799-8bf9-1db5f91dda02/cache.tzst -P -C /home/runner/work/Mgeorge/Mgeorge --use-compress-program unzstd
+2026-11-06T06:47:50.6198531Z Cache restored successfully
+2026-11-06T06:47:50.6360281Z Cache restored from key: node-cache-Linux-x64-npm-618cd38257d3256ce152f28067e39002c3ceb9211fb41cbcbb959fe625564257
+2026-11-06T06:47:50.6577542Z ##[group]Run npm ci --ignore-scripts
+2026-11-06T06:47:50.6577945Z [36;1mnpm ci --ignore-scripts[0m
+2026-11-06T06:47:50.6639885Z shell: /usr/bin/bash -e {0}
+2026-11-06T06:47:50.6640169Z ##[endgroup]
+2026-11-06T06:47:52.3061546Z 
+2026-11-06T06:47:52.3070521Z added 21 packages, and audited 22 packages in 2s
+2026-11-06T06:47:52.3070849Z 
+2026-11-06T06:47:52.3071058Z 1 package is looking for funding
+2026-11-06T06:47:52.3071553Z   run `npm fund` for details
+2026-11-06T06:47:52.3071988Z 
+2026-11-06T06:47:52.3072330Z found 0 vulnerabilities
+2026-11-06T06:47:52.3624148Z ##[group]Run npm run install:ci
+2026-11-06T06:47:52.3624473Z [36;1mnpm run install:ci[0m
+2026-11-06T06:47:52.3675420Z shell: /usr/bin/bash -e {0}
+2026-11-06T06:47:52.3675701Z ##[endgroup]
+2026-11-06T06:47:52.4687761Z 
+2026-11-06T06:47:52.4688809Z > site-creator-vinext-starter@0.1.0 install:ci
+2026-11-06T06:47:52.4689618Z > node scripts/install-ci.mjs
+2026-11-06T06:47:52.4689975Z 
+2026-11-06T06:47:58.6550054Z npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+2026-11-06T06:47:58.8364453Z npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+2026-11-06T06:48:08.7962963Z 
+2026-11-06T06:48:08.7964019Z > site-creator-vinext-starter@0.1.0 postinstall
+2026-11-06T06:48:08.7964823Z > node scripts/minimatch-backport.mjs
+2026-11-06T06:48:08.7965261Z 
+2026-11-06T06:48:09.1732591Z [minimatch-backport] {"targets":1,"writes":4,"status":"verified"}
+2026-11-06T06:48:09.1882280Z 
+2026-11-06T06:48:09.1882936Z added 719 packages in 17s
+2026-11-06T06:48:09.5797419Z [minimatch-backport] { targets: 1, writes: 0, status: 'verified' }
+2026-11-06T06:48:09.5942693Z ##[group]Run node scripts/run-saas-security-acceptance.mjs "$RUNNER_TEMP/saas-security-acceptance"
+2026-11-06T06:48:09.5943500Z [36;1mnode scripts/run-saas-security-acceptance.mjs "$RUNNER_TEMP/saas-security-acceptance"[0m
+2026-11-06T06:48:09.5993059Z shell: /usr/bin/bash -e {0}
+2026-11-06T06:48:09.5993313Z ##[endgroup]
+2026-11-06T06:48:41.0474399Z node-security: PASS {"tests":325,"pass":325,"fail":0,"cancelled":0,"skipped":0,"todo":0}
+2026-11-06T06:50:29.0592348Z sites-security: PASS {"tests":929,"pass":929,"fail":0,"cancelled":0,"skipped":0,"todo":0}
+2026-11-06T06:50:29.0595682Z Multi-company commercial launch remains gated; see docs/integration/saas/security-acceptance.md.
+2026-11-06T06:50:29.0596819Z Synthetic evidence: /home/runner/work/_temp/saas-security-acceptance
+2026-11-06T06:50:29.0730252Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-11-06T06:50:29.0730685Z with:
+2026-11-06T06:50:29.0730980Z   name: saas-security-c7a22cbc13c9b1dbed1d825278c91ea369c2c447
+2026-11-06T06:50:29.0731402Z   path: /home/runner/work/_temp/saas-security-acceptance
+2026-11-06T06:50:29.0731753Z   if-no-files-found: error
+2026-11-06T06:50:29.0731987Z   retention-days: 14
+2026-11-06T06:50:29.0732211Z   compression-level: 6
+2026-11-06T06:50:29.0732427Z   overwrite: false
+2026-11-06T06:50:29.0732647Z   include-hidden-files: false
+2026-11-06T06:50:29.0732887Z ##[endgroup]
+2026-11-06T06:50:29.2407763Z (node:3362) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-06T06:50:29.2408617Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-06T06:50:29.2483625Z With the provided path, there will be 3 files uploaded
+2026-11-06T06:50:29.2486137Z Artifact name is valid!
+2026-11-06T06:50:29.2487278Z Root directory input is valid!
+2026-11-06T06:50:29.4704923Z Beginning upload of artifact content to blob storage
+2026-11-06T06:50:29.4998330Z (node:3362) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-06T06:50:29.5480997Z Uploaded bytes 52711
+2026-11-06T06:50:29.5673802Z Finished uploading artifact content to blob storage!
+2026-11-06T06:50:29.5675284Z SHA256 digest of uploaded artifact zip is 881e5e88e3e6b16365e252151fafef7e1c4fb3b522246837acf4fbd30409078d
+2026-11-06T06:50:29.5677142Z Finalizing artifact upload
+2026-11-06T06:50:29.9657934Z Artifact saas-security-c7a22cbc13c9b1dbed1d825278c91ea369c2c447.zip successfully finalized. Artifact ID 13483314471
+2026-11-06T06:50:29.9660235Z Artifact saas-security-c7a22cbc13c9b1dbed1d825278c91ea369c2c447 has been successfully uploaded! Final size is 52711 bytes. Artifact ID is 13483314471
+2026-11-06T06:50:29.9666242Z Artifact download URL: https://github.com/sharbel0022/Mgeorge/actions/runs/42176691849/artifacts/13483314471
+2026-11-06T06:50:29.9912043Z Post job cleanup.
+2026-11-06T06:50:30.1587240Z (node:3375) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-06T06:50:30.1588732Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-06T06:50:30.1592092Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-618cd38257d3256ce152f28067e39002c3ceb9211fb41cbcbb959fe625564257, not saving cache.
+2026-11-06T06:50:30.1746945Z Post job cleanup.
+2026-11-06T06:50:30.2847781Z [command]/usr/bin/git version
+2026-11-06T06:50:30.2894629Z git version 2.56.0
+2026-11-06T06:50:30.2938918Z Temporarily overriding HOME='/home/runner/work/_temp/72f38a96-09dd-47eb-ae4a-bf31ca91a9cd' before making global git config changes
+2026-11-06T06:50:30.2940011Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-06T06:50:30.2954140Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Mgeorge/Mgeorge
+2026-11-06T06:50:30.3010604Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-06T06:50:30.3061925Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-06T06:50:30.3396607Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-06T06:50:30.3440561Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-06T06:50:30.3821666Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-06T06:50:30.3859650Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-06T06:50:30.4302505Z Cleaning up orphan processes
+2026-11-06T06:50:30.4719223Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

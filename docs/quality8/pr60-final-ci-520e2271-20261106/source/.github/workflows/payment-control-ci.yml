@@ -1,0 +1,88 @@
+name: Payment control checks
+on:
+  push:
+    branches: [main, 'codex/**', 'fix/**']
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: payment-control-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - name: Audit production dependencies
+        run: npm audit --audit-level=high
+      - name: Run tests with synthetic data
+        env:
+          NODE_ENV: test
+        run: npm run test:isolated
+  sites:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: sites
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: sites/package-lock.json
+      - run: npm run install:ci
+      - name: Verify exact installed minimatch mitigation bytes
+        run: node scripts/minimatch-backport.mjs --check --require-target
+      - name: Install shared OCR runtime for cloud integration test
+        working-directory: .
+        run: npm ci --ignore-scripts
+      - run: npm run check
+      - name: Audit Sites production dependencies
+        run: npm audit --audit-level=high
+      - name: Install isolated bridge for full synthetic SFTP chain
+        run: npm --prefix ../bridge/bankgiro ci --ignore-scripts
+      - name: Run Sites tests with synthetic data
+        env:
+          NODE_ENV: test
+          CLOUDFLARE_CF_FETCH_ENABLED: 'false'
+          WRANGLER_SEND_METRICS: 'false'
+        run: npm run test:isolated
+      - run: npm run build
+        env:
+          CLOUDFLARE_CF_FETCH_ENABLED: 'false'
+  bankgiro_bridge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: bridge/bankgiro/package-lock.json
+      - name: Install isolated SFTP bridge
+        run: npm --prefix bridge/bankgiro ci --ignore-scripts
+      - name: Check isolated bridge syntax
+        run: npm --prefix bridge/bankgiro run check
+      - name: Audit isolated bridge production dependencies
+        run: npm --prefix bridge/bankgiro audit --omit=dev --audit-level=high
+      - name: Test synthetic SSH SFTP HTTP and durable recovery
+        env:
+          NODE_ENV: test
+        run: npm --prefix bridge/bankgiro run test:isolated

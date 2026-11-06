@@ -1,0 +1,1319 @@
+{
+  "version": 1,
+  "status": "FINAL_PR60_CI_VERIFIED_SUCCESS",
+  "verifiedAt": "2026-11-06T07:06:19.337Z",
+  "repository": "sharbel0022/Mgeorge",
+  "pr": 60,
+  "frozenHead": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+  "base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "headTree": "4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+  "actualCheckout": {
+    "sha": "c7a22cbc13c9b1dbed1d825278c91ea369c2c447",
+    "tree": "4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+    "parents": [
+      "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "520e22716c6298e4d24ccf3989e87cfe563d8d14"
+    ],
+    "headTreeExactlyEqual": true,
+    "allFourLogsVerified": true
+  },
+  "scope": "Only PR60 pull_request attempts 1 at head520. No result is borrowed from earlier head8c. This archive includes no main CI proof, RED-run proof or deployment claim.",
+  "runs": [
+    {
+      "id": 42176691810,
+      "name": "Payment control checks",
+      "event": "pull_request",
+      "headSha": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+      "attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "createdAt": "2026-11-06T06:47:38Z",
+      "startedAt": "2026-11-06T06:47:38Z",
+      "completedOrUpdatedAt": "2026-11-06T06:53:53Z",
+      "path": ".github/workflows/payment-control-ci.yml",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42176691810"
+    },
+    {
+      "id": 42176691849,
+      "name": "SaaS security acceptance",
+      "event": "pull_request",
+      "headSha": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+      "attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "createdAt": "2026-11-06T06:47:38Z",
+      "startedAt": "2026-11-06T06:47:38Z",
+      "completedOrUpdatedAt": "2026-11-06T06:50:32Z",
+      "path": ".github/workflows/saas-security-acceptance.yml",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42176691849"
+    }
+  ],
+  "jobs": [
+    {
+      "id": 127756674626,
+      "runId": 42176691810,
+      "name": "bankgiro_bridge",
+      "status": "completed",
+      "conclusion": "success",
+      "headSha": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+      "attempt": 1,
+      "startedAt": "2026-11-06T06:47:41Z",
+      "completedAt": "2026-11-06T06:47:57Z",
+      "actualCheckout": {
+        "line": 122,
+        "text": "c7a22cbc13c9b1dbed1d825278c91ea369c2c447"
+      },
+      "statistics": [
+        {
+          "line": 480,
+          "text": "# tests 47"
+        },
+        {
+          "line": 481,
+          "text": "# suites 0"
+        },
+        {
+          "line": 482,
+          "text": "# pass 47"
+        },
+        {
+          "line": 483,
+          "text": "# fail 0"
+        },
+        {
+          "line": 484,
+          "text": "# cancelled 0"
+        },
+        {
+          "line": 485,
+          "text": "# skipped 0"
+        },
+        {
+          "line": 486,
+          "text": "# todo 0"
+        },
+        {
+          "line": 487,
+          "text": "# duration_ms 5155.016057"
+        }
+      ],
+      "testSummary": {
+        "tests": 47,
+        "suites": 0,
+        "pass": 47,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 5155.016057
+      },
+      "acceptance": [],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T06:47:41Z",
+          "completed_at": "2026-11-06T06:47:42Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T06:47:42Z",
+          "completed_at": "2026-11-06T06:47:47Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T06:47:47Z",
+          "completed_at": "2026-11-06T06:47:48Z"
+        },
+        {
+          "name": "Install isolated SFTP bridge",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T06:47:48Z",
+          "completed_at": "2026-11-06T06:47:49Z"
+        },
+        {
+          "name": "Check isolated bridge syntax",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T06:47:49Z",
+          "completed_at": "2026-11-06T06:47:49Z"
+        },
+        {
+          "name": "Audit isolated bridge production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T06:47:49Z",
+          "completed_at": "2026-11-06T06:47:50Z"
+        },
+        {
+          "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T06:47:50Z",
+          "completed_at": "2026-11-06T06:47:55Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T06:47:55Z",
+          "completed_at": "2026-11-06T06:47:55Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-06T06:47:55Z",
+          "completed_at": "2026-11-06T06:47:55Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-06T06:47:55Z",
+          "completed_at": "2026-11-06T06:47:55Z"
+        }
+      ],
+      "versions": [
+        {
+          "line": 1,
+          "text": "Current runner version: '2.338.2'"
+        },
+        {
+          "line": 55,
+          "text": "git version 2.56.0"
+        },
+        {
+          "line": 146,
+          "text": "node: v22.23.4"
+        },
+        {
+          "line": 147,
+          "text": "npm: 10.9.9"
+        },
+        {
+          "line": 148,
+          "text": "yarn: 1.22.22"
+        },
+        {
+          "line": 494,
+          "text": "git version 2.56.0"
+        }
+      ],
+      "auditEvidence": [
+        {
+          "line": 166,
+          "text": "found 0 vulnerabilities"
+        },
+        {
+          "line": 179,
+          "text": "found 0 vulnerabilities"
+        }
+      ],
+      "log": {
+        "path": "docs/quality8/pr60-final-ci-520e2271-20261106/logs/payment-bridge-127756674626.log",
+        "utf8Bytes": 36939,
+        "sha256": "dde739923c421f373e8f8bdf196814501cd2c887156fafa8fa948d1a75d01c8f",
+        "gitBlobSha1": "c98770963a891f3d34fed4a30df67b67b6d534e3",
+        "fetchedAt": "2026-11-06T07:00:03.818Z",
+        "preservedUtf8Bom": true
+      }
+    },
+    {
+      "id": 127756675056,
+      "runId": 42176691810,
+      "name": "sites",
+      "status": "completed",
+      "conclusion": "success",
+      "headSha": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+      "attempt": 1,
+      "startedAt": "2026-11-06T06:47:41Z",
+      "completedAt": "2026-11-06T06:53:53Z",
+      "actualCheckout": {
+        "line": 122,
+        "text": "c7a22cbc13c9b1dbed1d825278c91ea369c2c447"
+      },
+      "statistics": [
+        {
+          "line": 31928,
+          "text": "# tests 5237"
+        },
+        {
+          "line": 31929,
+          "text": "# suites 0"
+        },
+        {
+          "line": 31930,
+          "text": "# pass 5237"
+        },
+        {
+          "line": 31931,
+          "text": "# fail 0"
+        },
+        {
+          "line": 31932,
+          "text": "# cancelled 0"
+        },
+        {
+          "line": 31933,
+          "text": "# skipped 0"
+        },
+        {
+          "line": 31934,
+          "text": "# todo 0"
+        },
+        {
+          "line": 31935,
+          "text": "# duration_ms 289626.56316"
+        }
+      ],
+      "testSummary": {
+        "tests": 5237,
+        "suites": 0,
+        "pass": 5237,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 289626.56316
+      },
+      "acceptance": [],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T06:47:41Z",
+          "completed_at": "2026-11-06T06:47:42Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T06:47:42Z",
+          "completed_at": "2026-11-06T06:47:47Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T06:47:47Z",
+          "completed_at": "2026-11-06T06:47:51Z"
+        },
+        {
+          "name": "Run npm run install:ci",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T06:47:51Z",
+          "completed_at": "2026-11-06T06:48:06Z"
+        },
+        {
+          "name": "Verify exact installed minimatch mitigation bytes",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T06:48:06Z",
+          "completed_at": "2026-11-06T06:48:06Z"
+        },
+        {
+          "name": "Install shared OCR runtime for cloud integration test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T06:48:06Z",
+          "completed_at": "2026-11-06T06:48:07Z"
+        },
+        {
+          "name": "Run npm run check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T06:48:07Z",
+          "completed_at": "2026-11-06T06:48:19Z"
+        },
+        {
+          "name": "Audit Sites production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-06T06:48:19Z",
+          "completed_at": "2026-11-06T06:48:46Z"
+        },
+        {
+          "name": "Install isolated bridge for full synthetic SFTP chain",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-06T06:48:46Z",
+          "completed_at": "2026-11-06T06:48:47Z"
+        },
+        {
+          "name": "Run Sites tests with synthetic data",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-06T06:48:47Z",
+          "completed_at": "2026-11-06T06:53:37Z"
+        },
+        {
+          "name": "Run npm run build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T06:53:37Z",
+          "completed_at": "2026-11-06T06:53:50Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-06T06:53:50Z",
+          "completed_at": "2026-11-06T06:53:50Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-06T06:53:50Z",
+          "completed_at": "2026-11-06T06:53:51Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-06T06:53:51Z",
+          "completed_at": "2026-11-06T06:53:51Z"
+        }
+      ],
+      "versions": [
+        {
+          "line": 1,
+          "text": "Current runner version: '2.338.2'"
+        },
+        {
+          "line": 55,
+          "text": "git version 2.56.0"
+        },
+        {
+          "line": 146,
+          "text": "node: v22.23.4"
+        },
+        {
+          "line": 147,
+          "text": "npm: 10.9.9"
+        },
+        {
+          "line": 148,
+          "text": "yarn: 1.22.22"
+        },
+        {
+          "line": 31952,
+          "text": "vite v8.3.5 building rsc environment for production..."
+        },
+        {
+          "line": 31962,
+          "text": "vite v8.3.5 building ssr environment for production..."
+        },
+        {
+          "line": 31970,
+          "text": "vite v8.3.5 building rsc environment for production..."
+        },
+        {
+          "line": 32146,
+          "text": "vite v8.3.5 building client environment for production..."
+        },
+        {
+          "line": 32182,
+          "text": "vite v8.3.5 building ssr environment for production..."
+        },
+        {
+          "line": 32288,
+          "text": "git version 2.56.0"
+        }
+      ],
+      "auditEvidence": [
+        {
+          "line": 194,
+          "text": "found 0 vulnerabilities"
+        },
+        {
+          "line": 243,
+          "text": "8 moderate severity vulnerabilities"
+        },
+        {
+          "line": 257,
+          "text": "found 0 vulnerabilities"
+        }
+      ],
+      "log": {
+        "path": "docs/quality8/pr60-final-ci-520e2271-20261106/logs/payment-sites-127756675056.log",
+        "utf8Bytes": 2250520,
+        "sha256": "a21f061c3827dde38f6e67ca56a93420cf1a4d2ccdbea4b8aef6759b1897b2b6",
+        "gitBlobSha1": "0a472af2d30f29e6bfe41f132304d541c75a6ebd",
+        "fetchedAt": "2026-11-06T07:00:04.667Z",
+        "preservedUtf8Bom": true
+      }
+    },
+    {
+      "id": 127756675126,
+      "runId": 42176691810,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "success",
+      "headSha": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+      "attempt": 1,
+      "startedAt": "2026-11-06T06:47:41Z",
+      "completedAt": "2026-11-06T06:51:35Z",
+      "actualCheckout": {
+        "line": 122,
+        "text": "c7a22cbc13c9b1dbed1d825278c91ea369c2c447"
+      },
+      "statistics": [
+        {
+          "line": 14317,
+          "text": "# tests 2323"
+        },
+        {
+          "line": 14318,
+          "text": "# suites 0"
+        },
+        {
+          "line": 14319,
+          "text": "# pass 2323"
+        },
+        {
+          "line": 14320,
+          "text": "# fail 0"
+        },
+        {
+          "line": 14321,
+          "text": "# cancelled 0"
+        },
+        {
+          "line": 14322,
+          "text": "# skipped 0"
+        },
+        {
+          "line": 14323,
+          "text": "# todo 0"
+        },
+        {
+          "line": 14324,
+          "text": "# duration_ms 212676.708812"
+        }
+      ],
+      "testSummary": {
+        "tests": 2323,
+        "suites": 0,
+        "pass": 2323,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 212676.708812
+      },
+      "acceptance": [],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T06:47:42Z",
+          "completed_at": "2026-11-06T06:47:42Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T06:47:42Z",
+          "completed_at": "2026-11-06T06:47:47Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T06:47:47Z",
+          "completed_at": "2026-11-06T06:47:51Z"
+        },
+        {
+          "name": "Run npm ci --ignore-scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T06:47:51Z",
+          "completed_at": "2026-11-06T06:47:53Z"
+        },
+        {
+          "name": "Run npm run check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T06:47:53Z",
+          "completed_at": "2026-11-06T06:47:58Z"
+        },
+        {
+          "name": "Audit production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T06:47:58Z",
+          "completed_at": "2026-11-06T06:47:58Z"
+        },
+        {
+          "name": "Run tests with synthetic data",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T06:47:58Z",
+          "completed_at": "2026-11-06T06:51:31Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T06:51:31Z",
+          "completed_at": "2026-11-06T06:51:31Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-06T06:51:31Z",
+          "completed_at": "2026-11-06T06:51:31Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-06T06:51:31Z",
+          "completed_at": "2026-11-06T06:51:31Z"
+        }
+      ],
+      "versions": [
+        {
+          "line": 1,
+          "text": "Current runner version: '2.338.2'"
+        },
+        {
+          "line": 55,
+          "text": "git version 2.56.0"
+        },
+        {
+          "line": 145,
+          "text": "node: v22.23.4"
+        },
+        {
+          "line": 146,
+          "text": "npm: 10.9.9"
+        },
+        {
+          "line": 147,
+          "text": "yarn: 1.22.22"
+        },
+        {
+          "line": 14331,
+          "text": "git version 2.56.0"
+        }
+      ],
+      "auditEvidence": [
+        {
+          "line": 169,
+          "text": "found 0 vulnerabilities"
+        },
+        {
+          "line": 183,
+          "text": "found 0 vulnerabilities"
+        }
+      ],
+      "log": {
+        "path": "docs/quality8/pr60-final-ci-520e2271-20261106/logs/payment-node-127756675126.log",
+        "utf8Bytes": 991938,
+        "sha256": "af4030d7212562bcf42c9d72fe8a57b062b3fb1c8b122c69e428dce4db83f3a7",
+        "gitBlobSha1": "de36485c2a1ee11083528fe46e11ec91178a6776",
+        "fetchedAt": "2026-11-06T07:00:04.227Z",
+        "preservedUtf8Bom": true
+      }
+    },
+    {
+      "id": 127756675302,
+      "runId": 42176691849,
+      "name": "security_acceptance",
+      "status": "completed",
+      "conclusion": "success",
+      "headSha": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+      "attempt": 1,
+      "startedAt": "2026-11-06T06:47:40Z",
+      "completedAt": "2026-11-06T06:50:31Z",
+      "actualCheckout": {
+        "line": 123,
+        "text": "c7a22cbc13c9b1dbed1d825278c91ea369c2c447"
+      },
+      "statistics": [],
+      "testSummary": null,
+      "acceptance": [
+        {
+          "suite": "node-security",
+          "tests": 325,
+          "pass": 325,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        {
+          "suite": "sites-security",
+          "tests": 929,
+          "pass": 929,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T06:47:41Z",
+          "completed_at": "2026-11-06T06:47:42Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T06:47:42Z",
+          "completed_at": "2026-11-06T06:47:47Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T06:47:47Z",
+          "completed_at": "2026-11-06T06:47:50Z"
+        },
+        {
+          "name": "Install locked dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T06:47:50Z",
+          "completed_at": "2026-11-06T06:47:52Z"
+        },
+        {
+          "name": "Install verified Sites dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T06:47:52Z",
+          "completed_at": "2026-11-06T06:48:09Z"
+        },
+        {
+          "name": "Exercise synthetic authorization, isolation and recovery boundaries",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T06:48:09Z",
+          "completed_at": "2026-11-06T06:50:29Z"
+        },
+        {
+          "name": "Retain synthetic acceptance evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T06:50:29Z",
+          "completed_at": "2026-11-06T06:50:29Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T06:50:29Z",
+          "completed_at": "2026-11-06T06:50:30Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-06T06:50:30Z",
+          "completed_at": "2026-11-06T06:50:30Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-06T06:50:30Z",
+          "completed_at": "2026-11-06T06:50:30Z"
+        }
+      ],
+      "versions": [
+        {
+          "line": 1,
+          "text": "Current runner version: '2.338.2'"
+        },
+        {
+          "line": 56,
+          "text": "git version 2.56.0"
+        },
+        {
+          "line": 149,
+          "text": "node: v22.23.4"
+        },
+        {
+          "line": 150,
+          "text": "npm: 10.9.9"
+        },
+        {
+          "line": 151,
+          "text": "yarn: 1.22.22"
+        },
+        {
+          "line": 230,
+          "text": "git version 2.56.0"
+        }
+      ],
+      "auditEvidence": [
+        {
+          "line": 173,
+          "text": "found 0 vulnerabilities"
+        }
+      ],
+      "log": {
+        "path": "docs/quality8/pr60-final-ci-520e2271-20261106/logs/saas-security-127756675302.log",
+        "utf8Bytes": 19837,
+        "sha256": "b43f46960ceaa0d04e5f93bfd3a384e08b838bd7db939b0d4f25ce435d4593df",
+        "gitBlobSha1": "c7dde313d2f841866b14f703b47d559cdfccb77a",
+        "fetchedAt": "2026-11-06T07:00:03.849Z",
+        "preservedUtf8Bom": true
+      }
+    }
+  ],
+  "payment": {
+    "tests": 7607,
+    "pass": 7607,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "saasOverlap": {
+    "tests": 1254,
+    "pass": 1254,
+    "suites": [
+      {
+        "suite": "node-security",
+        "tests": 325,
+        "pass": 325,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      {
+        "suite": "sites-security",
+        "tests": 929,
+        "pass": 929,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    ],
+    "addedToPaymentTotal": false
+  },
+  "mandatoryCommandGates": {
+    "expected": 16,
+    "observed": 16,
+    "allPassed": true,
+    "verifiedAgainstFrozenWorkflowAndExactRawCommandLines": true,
+    "gates": [
+      {
+        "gate": 1,
+        "job": "test",
+        "jobId": 127756675126,
+        "step": 4,
+        "name": "Run npm ci --ignore-scripts",
+        "command": "npm ci --ignore-scripts",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:47:51Z",
+        "completedAt": "2026-11-06T06:47:53Z",
+        "commandEvidence": [
+          {
+            "line": 160,
+            "text": "npm ci --ignore-scripts"
+          }
+        ]
+      },
+      {
+        "gate": 2,
+        "job": "test",
+        "jobId": 127756675126,
+        "step": 5,
+        "name": "Run npm run check",
+        "command": "npm run check",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:47:53Z",
+        "completedAt": "2026-11-06T06:47:58Z",
+        "commandEvidence": [
+          {
+            "line": 171,
+            "text": "npm run check"
+          }
+        ]
+      },
+      {
+        "gate": 3,
+        "job": "test",
+        "jobId": 127756675126,
+        "step": 6,
+        "name": "Audit production dependencies",
+        "command": "npm audit --audit-level=high",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:47:58Z",
+        "completedAt": "2026-11-06T06:47:58Z",
+        "commandEvidence": [
+          {
+            "line": 180,
+            "text": "npm audit --audit-level=high"
+          }
+        ]
+      },
+      {
+        "gate": 4,
+        "job": "test",
+        "jobId": 127756675126,
+        "step": 7,
+        "name": "Run tests with synthetic data",
+        "command": "npm run test:isolated",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:47:58Z",
+        "completedAt": "2026-11-06T06:51:31Z",
+        "commandEvidence": [
+          {
+            "line": 185,
+            "text": "npm run test:isolated"
+          }
+        ]
+      },
+      {
+        "gate": 5,
+        "job": "sites",
+        "jobId": 127756675056,
+        "step": 4,
+        "name": "Run npm run install:ci",
+        "command": "npm run install:ci",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:47:51Z",
+        "completedAt": "2026-11-06T06:48:06Z",
+        "commandEvidence": [
+          {
+            "line": 162,
+            "text": "npm run install:ci"
+          }
+        ]
+      },
+      {
+        "gate": 6,
+        "job": "sites",
+        "jobId": 127756675056,
+        "step": 5,
+        "name": "Verify exact installed minimatch mitigation bytes",
+        "command": "node scripts/minimatch-backport.mjs --check --require-target",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:48:06Z",
+        "completedAt": "2026-11-06T06:48:06Z",
+        "commandEvidence": [
+          {
+            "line": 180,
+            "text": "node scripts/minimatch-backport.mjs --check --require-target"
+          }
+        ]
+      },
+      {
+        "gate": 7,
+        "job": "sites",
+        "jobId": 127756675056,
+        "step": 6,
+        "name": "Install shared OCR runtime for cloud integration test",
+        "command": "npm ci --ignore-scripts",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:48:06Z",
+        "completedAt": "2026-11-06T06:48:07Z",
+        "commandEvidence": [
+          {
+            "line": 185,
+            "text": "npm ci --ignore-scripts"
+          }
+        ]
+      },
+      {
+        "gate": 8,
+        "job": "sites",
+        "jobId": 127756675056,
+        "step": 7,
+        "name": "Run npm run check",
+        "command": "npm run check",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:48:07Z",
+        "completedAt": "2026-11-06T06:48:19Z",
+        "commandEvidence": [
+          {
+            "line": 196,
+            "text": "npm run check"
+          }
+        ]
+      },
+      {
+        "gate": 9,
+        "job": "sites",
+        "jobId": 127756675056,
+        "step": 8,
+        "name": "Audit Sites production dependencies",
+        "command": "npm audit --audit-level=high",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:48:19Z",
+        "completedAt": "2026-11-06T06:48:46Z",
+        "commandEvidence": [
+          {
+            "line": 204,
+            "text": "npm audit --audit-level=high"
+          }
+        ]
+      },
+      {
+        "gate": 10,
+        "job": "sites",
+        "jobId": 127756675056,
+        "step": 9,
+        "name": "Install isolated bridge for full synthetic SFTP chain",
+        "command": "npm --prefix ../bridge/bankgiro ci --ignore-scripts",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:48:46Z",
+        "completedAt": "2026-11-06T06:48:47Z",
+        "commandEvidence": [
+          {
+            "line": 251,
+            "text": "npm --prefix ../bridge/bankgiro ci --ignore-scripts"
+          }
+        ]
+      },
+      {
+        "gate": 11,
+        "job": "sites",
+        "jobId": 127756675056,
+        "step": 10,
+        "name": "Run Sites tests with synthetic data",
+        "command": "npm run test:isolated",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:48:47Z",
+        "completedAt": "2026-11-06T06:53:37Z",
+        "commandEvidence": [
+          {
+            "line": 259,
+            "text": "npm run test:isolated"
+          }
+        ]
+      },
+      {
+        "gate": 12,
+        "job": "sites",
+        "jobId": 127756675056,
+        "step": 11,
+        "name": "Run npm run build",
+        "command": "npm run build",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:53:37Z",
+        "completedAt": "2026-11-06T06:53:50Z",
+        "commandEvidence": [
+          {
+            "line": 31937,
+            "text": "npm run build"
+          }
+        ]
+      },
+      {
+        "gate": 13,
+        "job": "bankgiro_bridge",
+        "jobId": 127756674626,
+        "step": 4,
+        "name": "Install isolated SFTP bridge",
+        "command": "npm --prefix bridge/bankgiro ci --ignore-scripts",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:47:48Z",
+        "completedAt": "2026-11-06T06:47:49Z",
+        "commandEvidence": [
+          {
+            "line": 160,
+            "text": "npm --prefix bridge/bankgiro ci --ignore-scripts"
+          }
+        ]
+      },
+      {
+        "gate": 14,
+        "job": "bankgiro_bridge",
+        "jobId": 127756674626,
+        "step": 5,
+        "name": "Check isolated bridge syntax",
+        "command": "npm --prefix bridge/bankgiro run check",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:47:49Z",
+        "completedAt": "2026-11-06T06:47:49Z",
+        "commandEvidence": [
+          {
+            "line": 168,
+            "text": "npm --prefix bridge/bankgiro run check"
+          }
+        ]
+      },
+      {
+        "gate": 15,
+        "job": "bankgiro_bridge",
+        "jobId": 127756674626,
+        "step": 6,
+        "name": "Audit isolated bridge production dependencies",
+        "command": "npm --prefix bridge/bankgiro audit --omit=dev --audit-level=high",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:47:49Z",
+        "completedAt": "2026-11-06T06:47:50Z",
+        "commandEvidence": [
+          {
+            "line": 176,
+            "text": "npm --prefix bridge/bankgiro audit --omit=dev --audit-level=high"
+          }
+        ]
+      },
+      {
+        "gate": 16,
+        "job": "bankgiro_bridge",
+        "jobId": 127756674626,
+        "step": 7,
+        "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+        "command": "npm --prefix bridge/bankgiro run test:isolated",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T06:47:50Z",
+        "completedAt": "2026-11-06T06:47:55Z",
+        "commandEvidence": [
+          {
+            "line": 181,
+            "text": "npm --prefix bridge/bankgiro run test:isolated"
+          }
+        ]
+      }
+    ]
+  },
+  "focusedTests": [
+    {
+      "title": "two real processes import and reconcile one bank payment once, then replay safely after restart",
+      "line": 11639,
+      "result": "ok 1866 - two real processes import and reconcile one bank payment once, then replay safely after restart",
+      "durationMs": 417.138003,
+      "following": [
+        "  ---",
+        "  duration_ms: 417.138003",
+        "  type: 'test'",
+        "  ..."
+      ]
+    },
+    {
+      "title": "abrupt process exit during bank insertion rolls back the entire import and retries once",
+      "line": 11645,
+      "result": "ok 1867 - abrupt process exit during bank insertion rolls back the entire import and retries once",
+      "durationMs": 315.228064,
+      "following": [
+        "  ---",
+        "  duration_ms: 315.228064",
+        "  type: 'test'",
+        "  ..."
+      ]
+    },
+    {
+      "title": "startup resources close a hanging contender and release its SQLite holder on real test cancellation",
+      "line": 4524,
+      "result": "ok 692 - startup resources close a hanging contender and release its SQLite holder on real test cancellation",
+      "durationMs": 80.056787,
+      "following": [
+        "  ---",
+        "  duration_ms: 80.056787",
+        "  type: 'test'",
+        "  ..."
+      ]
+    },
+    {
+      "title": "opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release",
+      "line": 4532,
+      "result": "ok 693 - opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release",
+      "durationMs": 5134.96192,
+      "following": [
+        "  ---",
+        "  duration_ms: 5134.96192",
+        "  type: 'test'",
+        "  ..."
+      ]
+    }
+  ],
+  "reviewedTestSourceBindings": [
+    {
+      "path": "test/payment-concurrency.test.js",
+      "gitBlobSha1": "5f27bd1ce8dbd88f8bce2d5b1ff05c55ff6e1e23",
+      "matchedAtFinalHead": true
+    },
+    {
+      "path": "test/database-startup-contention.test.js",
+      "gitBlobSha1": "7a20e4135f5c0a1b2ad7a9504a5128ec821b118e",
+      "matchedAtFinalHead": true
+    },
+    {
+      "path": "test/database-startup-cancellation.test.js",
+      "gitBlobSha1": "0d337415be3689f71f217f1d5ea88cf3d688a595",
+      "matchedAtFinalHead": true
+    },
+    {
+      "path": "test/helpers/startup-test-resources.js",
+      "gitBlobSha1": "b6bd733d547351c7ec871605ccf05e006ccc0a60",
+      "matchedAtFinalHead": true
+    }
+  ],
+  "actualSitesBuild": {
+    "step": {
+      "gate": 12,
+      "job": "sites",
+      "jobId": 127756675056,
+      "step": 11,
+      "name": "Run npm run build",
+      "command": "npm run build",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:53:37Z",
+      "completedAt": "2026-11-06T06:53:50Z",
+      "commandEvidence": [
+        {
+          "line": 31937,
+          "text": "npm run build"
+        }
+      ]
+    },
+    "buildCompleteInFullLog": true,
+    "viteVersion": "8.3.5"
+  },
+  "typecheck": {
+    "command": "npm run check",
+    "implementation": "Guarded TypeScript tsc --noEmit",
+    "source": "sites/scripts/run-verified-tool.mjs",
+    "sourceGitBlob": "b7c6e399a3004129dee46ece301a05dbc85111a4",
+    "step": {
+      "gate": 8,
+      "job": "sites",
+      "jobId": 127756675056,
+      "step": 7,
+      "name": "Run npm run check",
+      "command": "npm run check",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T06:48:07Z",
+      "completedAt": "2026-11-06T06:48:19Z",
+      "commandEvidence": [
+        {
+          "line": 196,
+          "text": "npm run check"
+        }
+      ]
+    }
+  },
+  "versions": {
+    "testNode": "v22.23.4",
+    "npm": "10.9.9",
+    "reportedYarn": "1.22.22",
+    "reportedGit": "2.56.0",
+    "runner": "2.338.2",
+    "siteBuildVite": "8.3.5",
+    "sqliteVersionNotPrinted": true
+  },
+  "audits": {
+    "node": "Passed; found 0 vulnerabilities.",
+    "bridge": "Passed; found 0 vulnerabilities.",
+    "sites": "Passed --audit-level=high; 8 moderate severity vulnerabilities reported."
+  },
+  "prSnapshot": {
+    "fetchedAt": "2026-11-06T06:59:31.175Z",
+    "url": "https://github.com/sharbel0022/Mgeorge/pull/60",
+    "number": 60,
+    "state": "open",
+    "merged": false,
+    "draft": false,
+    "head": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+    "base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+    "mergeCommitSha": "c7a22cbc13c9b1dbed1d825278c91ea369c2c447",
+    "mergeable": true,
+    "mergeableState": "clean",
+    "scope": "Point-in-time PR observation. No later main CI or merge outcome is inferred."
+  },
+  "rawPreservation": {
+    "fullJobLogs": 4,
+    "utf8Bytes": 3299234,
+    "boundary": "Complete decoded GitHub job-log strings stored as UTF-8 without normalization or filtering; original BOM, timestamps, line endings and already-masked placeholders preserved.",
+    "toolOrTransportHeadersAdded": false,
+    "credentialValuesOrPrivateChatReferencesAdded": false,
+    "saasZipDownloaded": false,
+    "saasArtifactMetadataAndDigestRetained": true
+  },
+  "actions": {
+    "shellUsed": false,
+    "ciRerunsRequested": 0,
+    "productOrTestChanges": false,
+    "prRefOrBodyChanged": false,
+    "mergePerformed": false,
+    "deploymentPerformed": false
+  },
+  "observedFailures": []
+}

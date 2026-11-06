@@ -1,0 +1,14 @@
+{
+  "fetchedAt": "2026-11-06T06:59:31.175Z",
+  "url": "https://github.com/sharbel0022/Mgeorge/pull/60",
+  "number": 60,
+  "state": "open",
+  "merged": false,
+  "draft": false,
+  "head": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+  "base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "mergeCommitSha": "c7a22cbc13c9b1dbed1d825278c91ea369c2c447",
+  "mergeable": true,
+  "mergeableState": "clean",
+  "scope": "Point-in-time PR observation. No later main CI or merge outcome is inferred."
+}

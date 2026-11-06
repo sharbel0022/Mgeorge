@@ -1,0 +1,78 @@
+{
+  "head": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+  "actualCheckout": "c7a22cbc13c9b1dbed1d825278c91ea369c2c447",
+  "nodeJob": 127756675126,
+  "nodeVersion": "v22.23.4",
+  "tests": [
+    {
+      "title": "two real processes import and reconcile one bank payment once, then replay safely after restart",
+      "line": 11639,
+      "result": "ok 1866 - two real processes import and reconcile one bank payment once, then replay safely after restart",
+      "durationMs": 417.138003,
+      "following": [
+        "  ---",
+        "  duration_ms: 417.138003",
+        "  type: 'test'",
+        "  ..."
+      ]
+    },
+    {
+      "title": "abrupt process exit during bank insertion rolls back the entire import and retries once",
+      "line": 11645,
+      "result": "ok 1867 - abrupt process exit during bank insertion rolls back the entire import and retries once",
+      "durationMs": 315.228064,
+      "following": [
+        "  ---",
+        "  duration_ms: 315.228064",
+        "  type: 'test'",
+        "  ..."
+      ]
+    },
+    {
+      "title": "startup resources close a hanging contender and release its SQLite holder on real test cancellation",
+      "line": 4524,
+      "result": "ok 692 - startup resources close a hanging contender and release its SQLite holder on real test cancellation",
+      "durationMs": 80.056787,
+      "following": [
+        "  ---",
+        "  duration_ms: 80.056787",
+        "  type: 'test'",
+        "  ..."
+      ]
+    },
+    {
+      "title": "opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release",
+      "line": 4532,
+      "result": "ok 693 - opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release",
+      "durationMs": 5134.96192,
+      "following": [
+        "  ---",
+        "  duration_ms: 5134.96192",
+        "  type: 'test'",
+        "  ..."
+      ]
+    }
+  ],
+  "sourceBindings": [
+    {
+      "path": "test/payment-concurrency.test.js",
+      "gitBlobSha1": "5f27bd1ce8dbd88f8bce2d5b1ff05c55ff6e1e23",
+      "matchedAtFinalHead": true
+    },
+    {
+      "path": "test/database-startup-contention.test.js",
+      "gitBlobSha1": "7a20e4135f5c0a1b2ad7a9504a5128ec821b118e",
+      "matchedAtFinalHead": true
+    },
+    {
+      "path": "test/database-startup-cancellation.test.js",
+      "gitBlobSha1": "0d337415be3689f71f217f1d5ea88cf3d688a595",
+      "matchedAtFinalHead": true
+    },
+    {
+      "path": "test/helpers/startup-test-resources.js",
+      "gitBlobSha1": "b6bd733d547351c7ec871605ccf05e006ccc0a60",
+      "matchedAtFinalHead": true
+    }
+  ]
+}
