@@ -1,0 +1,52 @@
+{
+  "head": "f0e845bb87ee08d15fa96cb75879849493aeb1fd",
+  "branch": "fix/startup-cancellation-red-20261106-0643",
+  "commit": {
+    "read_at": "2026-11-06T06:44:25.844Z",
+    "head": "f0e845bb87ee08d15fa96cb75879849493aeb1fd",
+    "tree": "c80381de41b5db7b046ad3c4f596a84fa0c7d716",
+    "parents": [
+      "8c744db37816411d8ad8b70c5b94202c74c37e62"
+    ]
+  },
+  "root_tree": "c80381de41b5db7b046ad3c4f596a84fa0c7d716",
+  "sites_tree": "4feabc128c5f677103232d1cad1e4406083e8f19",
+  "workflow_tree_matches_main237": true,
+  "source_test": {
+    "head": "f0e845bb87ee08d15fa96cb75879849493aeb1fd",
+    "path": "test/database-startup-cancellation.test.js",
+    "bytes": 6824,
+    "sha256": "fd40426a5c40481d7516d6840dc26d3d0572fc28c025c9b57e25f3973bad046d",
+    "git_blob_sha": "0d337415be3689f71f217f1d5ea88cf3d688a595"
+  },
+  "source_test_tree_proof": {
+    "read_at": "2026-11-06T06:51:59.275Z",
+    "test_tree": "7ba6d1fe83e8a6e8a2232c3a7e6597648b6df8b9",
+    "path": "database-startup-cancellation.test.js",
+    "blob_sha": "0d337415be3689f71f217f1d5ea88cf3d688a595",
+    "bytes": 6824,
+    "exact_source_verified": true
+  },
+  "all_job_checkouts": [
+    {
+      "job_id": 127754977736,
+      "checkouts": [
+        "f0e845bb87ee08d15fa96cb75879849493aeb1fd"
+      ]
+    },
+    {
+      "job_id": 127754977359,
+      "checkouts": [
+        "f0e845bb87ee08d15fa96cb75879849493aeb1fd"
+      ]
+    },
+    {
+      "job_id": 127754977854,
+      "checkouts": [
+        "f0e845bb87ee08d15fa96cb75879849493aeb1fd"
+      ]
+    }
+  ],
+  "checkpoint_base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "checkpoint_contains_product_changes": false
+}

@@ -1,0 +1,18 @@
+{
+  "outcome": "EXPECTED_CANCELLATION_RED_CONFIRMED",
+  "expected_test_path": "test/database-startup-cancellation.test.js",
+  "expected_test_name": "startup resources close a hanging contender and release its SQLite holder on real test cancellation",
+  "only_failure": true,
+  "expected_watchdog_present": true,
+  "ready_true": true,
+  "spawned_event": true,
+  "ready_event": true,
+  "watchdog_fired_true": true,
+  "inner_test_aborted": true,
+  "output_not_truncated": true,
+  "missing_done_event": true,
+  "missing_child_closed_event": true,
+  "import_or_setup_failure": false,
+  "interpretation": "The fixture reached its spawned/ready barrier, the real inner node:test host reported cancellation, and the outer watchdog fired before any done or childClosed evidence. The expected failure is independent of module import/setup success.",
+  "scope_limit": "This is the first RED attempt only. It does not assess any GREEN candidate."
+}

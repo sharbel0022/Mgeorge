@@ -1,0 +1,434 @@
+{
+  "schema": 1,
+  "kind": "original_first_attempt_RED_evidence",
+  "generated_at": "2026-11-06T06:52:46.424Z",
+  "outcome": "EXPECTED_CANCELLATION_RED_CONFIRMED",
+  "source": {
+    "head": "f0e845bb87ee08d15fa96cb75879849493aeb1fd",
+    "branch": "fix/startup-cancellation-red-20261106-0643",
+    "commit": {
+      "read_at": "2026-11-06T06:44:25.844Z",
+      "head": "f0e845bb87ee08d15fa96cb75879849493aeb1fd",
+      "tree": "c80381de41b5db7b046ad3c4f596a84fa0c7d716",
+      "parents": [
+        "8c744db37816411d8ad8b70c5b94202c74c37e62"
+      ]
+    },
+    "root_tree": "c80381de41b5db7b046ad3c4f596a84fa0c7d716",
+    "sites_tree": "4feabc128c5f677103232d1cad1e4406083e8f19",
+    "workflow_tree_matches_main237": true,
+    "source_test": {
+      "head": "f0e845bb87ee08d15fa96cb75879849493aeb1fd",
+      "path": "test/database-startup-cancellation.test.js",
+      "bytes": 6824,
+      "sha256": "fd40426a5c40481d7516d6840dc26d3d0572fc28c025c9b57e25f3973bad046d",
+      "git_blob_sha": "0d337415be3689f71f217f1d5ea88cf3d688a595"
+    },
+    "source_test_tree_proof": {
+      "read_at": "2026-11-06T06:51:59.275Z",
+      "test_tree": "7ba6d1fe83e8a6e8a2232c3a7e6597648b6df8b9",
+      "path": "database-startup-cancellation.test.js",
+      "blob_sha": "0d337415be3689f71f217f1d5ea88cf3d688a595",
+      "bytes": 6824,
+      "exact_source_verified": true
+    },
+    "all_job_checkouts": [
+      {
+        "job_id": 127754977736,
+        "checkouts": [
+          "f0e845bb87ee08d15fa96cb75879849493aeb1fd"
+        ]
+      },
+      {
+        "job_id": 127754977359,
+        "checkouts": [
+          "f0e845bb87ee08d15fa96cb75879849493aeb1fd"
+        ]
+      },
+      {
+        "job_id": 127754977854,
+        "checkouts": [
+          "f0e845bb87ee08d15fa96cb75879849493aeb1fd"
+        ]
+      }
+    ],
+    "checkpoint_base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+    "checkpoint_contains_product_changes": false
+  },
+  "run": {
+    "read_at": "2026-11-06T06:50:29.694Z",
+    "source": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42176156539/attempts/1",
+    "id": 42176156539,
+    "name": "Payment control checks",
+    "workflow_id": 398864112,
+    "head_sha": "f0e845bb87ee08d15fa96cb75879849493aeb1fd",
+    "head_branch": "fix/startup-cancellation-red-20261106-0643",
+    "event": "push",
+    "status": "completed",
+    "conclusion": "failure",
+    "run_attempt": 1,
+    "created_at": "2026-11-06T06:42:34Z",
+    "run_started_at": "2026-11-06T06:42:34Z",
+    "updated_at": "2026-11-06T06:49:59Z",
+    "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42176156539"
+  },
+  "job_count": 3,
+  "top_level_tap_totals": {
+    "tests": 7607,
+    "pass": 7606,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "per_job_logs": [
+    {
+      "job_id": 127754977736,
+      "name": "test",
+      "conclusion": "failure",
+      "bytes": 992024,
+      "sha256": "fe1eccac4bba5f6f796192f20b316d61a26574796bdc038bc7adb3950290dc97",
+      "blobSha": "18fab97578997de2ec6e27382c6b84cfc7d11c79",
+      "retrieved_at": "2026-11-06T06:45:57.084Z",
+      "tap": {
+        "tests": 2323,
+        "suites": 0,
+        "pass": 2322,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 146493.430742
+      },
+      "checkouts": [
+        "f0e845bb87ee08d15fa96cb75879849493aeb1fd"
+      ],
+      "failures": [
+        {
+          "name": "not ok 692 - startup resources close a hanging contender and release its SQLite holder on real test cancellation",
+          "bytes": 2112,
+          "sha256": "0d4409a8705bd866bd5b1dae919dbbde28c1812146cffde84b50bb02d2c65b3a",
+          "plain_block": "not ok 692 - startup resources close a hanging contender and release its SQLite holder on real test cancellation\n  ---\n  duration_ms: 10010.454839\n  type: 'test'\n  location: '/home/runner/work/Mgeorge/Mgeorge/test/database-startup-cancellation.test.js:48:1'\n  failureType: 'testCodeFailure'\n  error: 'SYNTHETIC_STARTUP_CANCELLATION_WATCHDOG: {\"ready\":true,\"events\":[{\"phase\":\"spawned\",\"pid\":4284},{\"phase\":\"ready\"}],\"watchdogFired\":true,\"stdout\":\"TAP version 13\\\\n# Subtest: synthetic held-lock cancellation\\\\nnot ok 1 - synthetic held-lock cancellation\\\\n  ---\\\\n  duration_ms: 23.707564\\\\n  type: \\'test\\'\\\\n  location: \\'/home/runner/work/Mgeorge/Mgeorge/[eval1]:10:11\\'\\\\n  failureType: \\'testAborted\\'\\\\n  error: \\'Synthetic ready-barrier cancellation\\'\\\\n  stack: |-\\\\n    process.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/[eval1]:9:67)\\\\n    process.emit (node:events:519:28)\\\\n    emit (node:internal/child_process:949:14)\\\\n    process.processTicksAndRejections (node:internal/process/task_queues:90:21)\\\\n  ...\\\\n\",\"stderr\":\"(node:4277) ExperimentalWarning: SQLite is an experimental feature and might change at any time\\\\n(Use `node --trace-warnings ...` to show where the warning was created)\\\\n\",\"truncated\":false}'\n  code: 'ERR_TEST_FAILURE'\n  stack: |-\n    Timeout.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/database-startup-cancellation.test.js:87:55)\n    listOnTimeout (node:internal/timers:585:17)\n    process.processTimers (node:internal/timers:521:7)\n  ...\n# (node:4294) ExperimentalWarning: SQLite is an experimental feature and might change at any time\n# (Use `node --trace-warnings ...` to show where the warning was created)"
+        }
+      ]
+    },
+    {
+      "job_id": 127754977359,
+      "name": "sites",
+      "conclusion": "success",
+      "bytes": 2251022,
+      "sha256": "5b96227ef807465d2c53005893e865d63d148fcbfddf8532ffb11fd4f0b4104f",
+      "blobSha": "f2d145d3cbdf64074284120b15ec0b5a9d335555",
+      "retrieved_at": "2026-11-06T06:50:59.563Z",
+      "tap": {
+        "tests": 5237,
+        "suites": 0,
+        "pass": 5237,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 348797.681644
+      },
+      "checkouts": [
+        "f0e845bb87ee08d15fa96cb75879849493aeb1fd"
+      ],
+      "failures": [],
+      "build_completion_line": "2026-11-06T06:49:56.1510746Z   Build complete.",
+      "audit_lines": [
+        "found 0 vulnerabilities",
+        "8 moderate severity vulnerabilities",
+        "found 0 vulnerabilities"
+      ]
+    },
+    {
+      "job_id": 127754977854,
+      "name": "bankgiro_bridge",
+      "conclusion": "success",
+      "bytes": 36141,
+      "sha256": "fcac69741abfac4f42161fda090e01e456144a98455b96dccce414f53d2de7e4",
+      "blobSha": "2ff3eaa37ff0e716a31e20547af1b2395f947e0e",
+      "retrieved_at": "2026-11-06T06:45:57.150Z",
+      "tap": {
+        "tests": 47,
+        "suites": 0,
+        "pass": 47,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 5813.478353
+      },
+      "checkouts": [
+        "f0e845bb87ee08d15fa96cb75879849493aeb1fd"
+      ],
+      "failures": []
+    }
+  ],
+  "required_command_steps": [
+    {
+      "job_id": 127754977359,
+      "job_name": "sites",
+      "name": "Run npm run install:ci",
+      "number": 4,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:42:46Z",
+      "completed_at": "2026-11-06T06:43:02Z"
+    },
+    {
+      "job_id": 127754977359,
+      "job_name": "sites",
+      "name": "Verify exact installed minimatch mitigation bytes",
+      "number": 5,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:43:02Z",
+      "completed_at": "2026-11-06T06:43:03Z"
+    },
+    {
+      "job_id": 127754977359,
+      "job_name": "sites",
+      "name": "Install shared OCR runtime for cloud integration test",
+      "number": 6,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:43:03Z",
+      "completed_at": "2026-11-06T06:43:04Z"
+    },
+    {
+      "job_id": 127754977359,
+      "job_name": "sites",
+      "name": "Run npm run check",
+      "number": 7,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:43:04Z",
+      "completed_at": "2026-11-06T06:43:17Z"
+    },
+    {
+      "job_id": 127754977359,
+      "job_name": "sites",
+      "name": "Audit Sites production dependencies",
+      "number": 8,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:43:17Z",
+      "completed_at": "2026-11-06T06:43:51Z"
+    },
+    {
+      "job_id": 127754977359,
+      "job_name": "sites",
+      "name": "Install isolated bridge for full synthetic SFTP chain",
+      "number": 9,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:43:51Z",
+      "completed_at": "2026-11-06T06:43:51Z"
+    },
+    {
+      "job_id": 127754977359,
+      "job_name": "sites",
+      "name": "Run Sites tests with synthetic data",
+      "number": 10,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:43:51Z",
+      "completed_at": "2026-11-06T06:49:40Z"
+    },
+    {
+      "job_id": 127754977359,
+      "job_name": "sites",
+      "name": "Run npm run build",
+      "number": 11,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:49:40Z",
+      "completed_at": "2026-11-06T06:49:56Z"
+    },
+    {
+      "job_id": 127754977736,
+      "job_name": "test",
+      "name": "Run npm ci --ignore-scripts",
+      "number": 4,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:42:44Z",
+      "completed_at": "2026-11-06T06:42:45Z"
+    },
+    {
+      "job_id": 127754977736,
+      "job_name": "test",
+      "name": "Run npm run check",
+      "number": 5,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:42:45Z",
+      "completed_at": "2026-11-06T06:42:49Z"
+    },
+    {
+      "job_id": 127754977736,
+      "job_name": "test",
+      "name": "Audit production dependencies",
+      "number": 6,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:42:49Z",
+      "completed_at": "2026-11-06T06:42:49Z"
+    },
+    {
+      "job_id": 127754977736,
+      "job_name": "test",
+      "name": "Run tests with synthetic data",
+      "number": 7,
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-11-06T06:42:49Z",
+      "completed_at": "2026-11-06T06:45:16Z"
+    },
+    {
+      "job_id": 127754977854,
+      "job_name": "bankgiro_bridge",
+      "name": "Install isolated SFTP bridge",
+      "number": 4,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:42:44Z",
+      "completed_at": "2026-11-06T06:42:45Z"
+    },
+    {
+      "job_id": 127754977854,
+      "job_name": "bankgiro_bridge",
+      "name": "Check isolated bridge syntax",
+      "number": 5,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:42:45Z",
+      "completed_at": "2026-11-06T06:42:46Z"
+    },
+    {
+      "job_id": 127754977854,
+      "job_name": "bankgiro_bridge",
+      "name": "Audit isolated bridge production dependencies",
+      "number": 6,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:42:46Z",
+      "completed_at": "2026-11-06T06:42:46Z"
+    },
+    {
+      "job_id": 127754977854,
+      "job_name": "bankgiro_bridge",
+      "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+      "number": 7,
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T06:42:46Z",
+      "completed_at": "2026-11-06T06:42:52Z"
+    }
+  ],
+  "required_command_step_totals": {
+    "success": 15,
+    "failure": 1
+  },
+  "other_non_success_steps": [
+    {
+      "job_id": 127754977736,
+      "name": "Run tests with synthetic data",
+      "number": 7,
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-11-06T06:42:49Z",
+      "completed_at": "2026-11-06T06:45:16Z"
+    },
+    {
+      "job_id": 127754977736,
+      "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+      "number": 13,
+      "status": "completed",
+      "conclusion": "skipped",
+      "started_at": "2026-11-06T06:45:16Z",
+      "completed_at": "2026-11-06T06:45:16Z"
+    }
+  ],
+  "actual_sites_build": {
+    "name": "Run npm run build",
+    "number": 11,
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-06T06:49:40Z",
+    "completed_at": "2026-11-06T06:49:56Z"
+  },
+  "checks_and_audit_log_lines": [
+    {
+      "job_id": 127754977736,
+      "name": "node",
+      "runtime_node": "node: v22.23.4",
+      "audit_lines": [
+        "found 0 vulnerabilities",
+        "found 0 vulnerabilities"
+      ]
+    },
+    {
+      "job_id": 127754977359,
+      "name": "sites",
+      "runtime_node": "node: v22.23.4",
+      "audit_lines": [
+        "found 0 vulnerabilities",
+        "8 moderate severity vulnerabilities",
+        "found 0 vulnerabilities"
+      ]
+    },
+    {
+      "job_id": 127754977854,
+      "name": "bankgiro-bridge",
+      "runtime_node": "node: v22.23.4",
+      "audit_lines": [
+        "found 0 vulnerabilities",
+        "found 0 vulnerabilities"
+      ]
+    }
+  ],
+  "audits": {
+    "node": "0 vulnerabilities reported; audit step success",
+    "bankgiro_bridge": "0 vulnerabilities reported; audit step success",
+    "sites": "8 moderate severity vulnerabilities; high-threshold audit step success"
+  },
+  "saas": {
+    "applicable": false,
+    "reason": "Fix branch push is outside the unchanged SaaS push filter feature/saas-*; this is not a PR event."
+  },
+  "failure_analysis": {
+    "outcome": "EXPECTED_CANCELLATION_RED_CONFIRMED",
+    "expected_test_path": "test/database-startup-cancellation.test.js",
+    "expected_test_name": "startup resources close a hanging contender and release its SQLite holder on real test cancellation",
+    "only_failure": true,
+    "expected_watchdog_present": true,
+    "ready_true": true,
+    "spawned_event": true,
+    "ready_event": true,
+    "watchdog_fired_true": true,
+    "inner_test_aborted": true,
+    "output_not_truncated": true,
+    "missing_done_event": true,
+    "missing_child_closed_event": true,
+    "import_or_setup_failure": false,
+    "interpretation": "The fixture reached its spawned/ready barrier, the real inner node:test host reported cancellation, and the outer watchdog fired before any done or childClosed evidence. The expected failure is independent of module import/setup success.",
+    "scope_limit": "This is the first RED attempt only. It does not assess any GREEN candidate."
+  },
+  "failure_block": {
+    "path": "failure-blocks.log",
+    "bytes": 2112,
+    "sha256": "0d4409a8705bd866bd5b1dae919dbbde28c1812146cffde84b50bb02d2c65b3a",
+    "git_blob_sha": "af34cdc987070a09af93b343fb46c8ab26c927f8"
+  },
+  "raw_log_files": 3,
+  "raw_log_bytes": 3279187,
+  "provenance": "Full raw job logs were fetched only after each specific original job became terminal. Every raw byte, including timestamps, BOM and ANSI sequences, is preserved. Status metadata is a sanitized first-attempt API readback.",
+  "limitations": [
+    "The top-level TAP totals have zero cancelled tests; the nested fixture intentionally reports a real testAborted cancellation, followed by the expected outer watchdog failure.",
+    "This archive does not review or monitor a GREEN candidate.",
+    "No test rerun, workflow dispatch, PR/ref change, product change or production operation was performed."
+  ],
+  "mutations": "Only this separate documentation checkpoint was created."
+}

@@ -1,0 +1,15 @@
+2026-11-06T06:43:36.3935882Z not ok 692 - startup resources close a hanging contender and release its SQLite holder on real test cancellation
+2026-11-06T06:43:36.3936419Z   ---
+2026-11-06T06:43:36.3936627Z   duration_ms: 10010.454839
+2026-11-06T06:43:36.3936873Z   type: 'test'
+2026-11-06T06:43:36.3937332Z   location: '/home/runner/work/Mgeorge/Mgeorge/test/database-startup-cancellation.test.js:48:1'
+2026-11-06T06:43:36.3937945Z   failureType: 'testCodeFailure'
+2026-11-06T06:43:36.3941328Z   error: 'SYNTHETIC_STARTUP_CANCELLATION_WATCHDOG: {"ready":true,"events":[{"phase":"spawned","pid":4284},{"phase":"ready"}],"watchdogFired":true,"stdout":"TAP version 13\\n# Subtest: synthetic held-lock cancellation\\nnot ok 1 - synthetic held-lock cancellation\\n  ---\\n  duration_ms: 23.707564\\n  type: \'test\'\\n  location: \'/home/runner/work/Mgeorge/Mgeorge/[eval1]:10:11\'\\n  failureType: \'testAborted\'\\n  error: \'Synthetic ready-barrier cancellation\'\\n  stack: |-\\n    process.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/[eval1]:9:67)\\n    process.emit (node:events:519:28)\\n    emit (node:internal/child_process:949:14)\\n    process.processTicksAndRejections (node:internal/process/task_queues:90:21)\\n  ...\\n","stderr":"(node:4277) ExperimentalWarning: SQLite is an experimental feature and might change at any time\\n(Use `node --trace-warnings ...` to show where the warning was created)\\n","truncated":false}'
+2026-11-06T06:43:36.3944263Z   code: 'ERR_TEST_FAILURE'
+2026-11-06T06:43:36.3944496Z   stack: |-
+2026-11-06T06:43:36.3945009Z     Timeout.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/database-startup-cancellation.test.js:87:55)
+2026-11-06T06:43:36.3945568Z     listOnTimeout (node:internal/timers:585:17)
+2026-11-06T06:43:36.3945932Z     process.processTimers (node:internal/timers:521:7)
+2026-11-06T06:43:36.3946235Z   ...
+2026-11-06T06:43:36.5012838Z # (node:4294) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+2026-11-06T06:43:36.5013861Z # (Use `node --trace-warnings ...` to show where the warning was created)

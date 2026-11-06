@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "prefix": "docs/quality8/startup-cancellation-red-f0e845bb-20261106",
+  "source_head": "f0e845bb87ee08d15fa96cb75879849493aeb1fd",
+  "source_tree": "c80381de41b5db7b046ad3c4f596a84fa0c7d716",
+  "run_id": 42176156539,
+  "run_attempt": 1,
+  "checkpoint_base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "excludes": [
+    "file-manifest.json",
+    "SHA256SUMS"
+  ],
+  "files": [
+    {
+      "path": "logs/node-127754977736.log",
+      "bytes": 992024,
+      "sha256": "fe1eccac4bba5f6f796192f20b316d61a26574796bdc038bc7adb3950290dc97",
+      "git_blob_sha": "18fab97578997de2ec6e27382c6b84cfc7d11c79"
+    },
+    {
+      "path": "logs/sites-127754977359.log",
+      "bytes": 2251022,
+      "sha256": "5b96227ef807465d2c53005893e865d63d148fcbfddf8532ffb11fd4f0b4104f",
+      "git_blob_sha": "f2d145d3cbdf64074284120b15ec0b5a9d335555"
+    },
+    {
+      "path": "logs/bankgiro-bridge-127754977854.log",
+      "bytes": 36141,
+      "sha256": "fcac69741abfac4f42161fda090e01e456144a98455b96dccce414f53d2de7e4",
+      "git_blob_sha": "2ff3eaa37ff0e716a31e20547af1b2395f947e0e"
+    },
+    {
+      "path": "failure-blocks.log",
+      "bytes": 2112,
+      "sha256": "0d4409a8705bd866bd5b1dae919dbbde28c1812146cffde84b50bb02d2c65b3a",
+      "git_blob_sha": "af34cdc987070a09af93b343fb46c8ab26c927f8"
+    },
+    {
+      "path": "diagnosis.json",
+      "bytes": 937,
+      "sha256": "7a8790f3a37107954038070b4a4881e1135daea5130639dadb1b00def13fb7ab",
+      "git_blob_sha": "7b4ffbd6099c24ce5c3eca80fc3d37bf1028d379"
+    },
+    {
+      "path": "run-attempt1.json",
+      "bytes": 646,
+      "sha256": "8969102194e389c14b11bb69d419b879314b9e4121e90cdd6508bc19e33f9075",
+      "git_blob_sha": "b0f55f6450b87a219ae1bd26471a6b068ff72f74"
+    },
+    {
+      "path": "jobs-attempt1.json",
+      "bytes": 10413,
+      "sha256": "7c62431487fc9bdf59866557f5c5a4f3b8b56b1ae147a799fdab3cd255b578e0",
+      "git_blob_sha": "9428a428b4ece293e8540ef22bc081003aa75603"
+    },
+    {
+      "path": "source.json",
+      "bytes": 1639,
+      "sha256": "2a6f0ea318d8bbe88de067a7859958fb50b42c48906be799a15297cfb596d5f9",
+      "git_blob_sha": "ab97ff0622bf4ecb1a9db96b753ce94fc8310d85"
+    },
+    {
+      "path": "source/database-startup-cancellation.test.js",
+      "bytes": 6824,
+      "sha256": "fd40426a5c40481d7516d6840dc26d3d0572fc28c025c9b57e25f3973bad046d",
+      "git_blob_sha": "0d337415be3689f71f217f1d5ea88cf3d688a595"
+    },
+    {
+      "path": "SUMMARY.json",
+      "bytes": 15626,
+      "sha256": "6fd451e3168d33e316d3dbd7efa188c72603fd467608ff09d56d5ef788b73aa3",
+      "git_blob_sha": "2a12c19a29aa359aacfc1aaeef794010afdca11d"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4154,
+      "sha256": "1f0207482d1d0abe3f2b3b2d3045853c16d507748384a16b222b1cd80e5cdc7e",
+      "git_blob_sha": "12a621ea53251c641e201f4d761cf9ba1db48ea8"
+    }
+  ]
+}

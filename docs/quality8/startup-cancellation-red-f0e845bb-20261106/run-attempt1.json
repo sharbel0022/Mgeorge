@@ -1,0 +1,17 @@
+{
+  "read_at": "2026-11-06T06:50:29.694Z",
+  "source": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42176156539/attempts/1",
+  "id": 42176156539,
+  "name": "Payment control checks",
+  "workflow_id": 398864112,
+  "head_sha": "f0e845bb87ee08d15fa96cb75879849493aeb1fd",
+  "head_branch": "fix/startup-cancellation-red-20261106-0643",
+  "event": "push",
+  "status": "completed",
+  "conclusion": "failure",
+  "run_attempt": 1,
+  "created_at": "2026-11-06T06:42:34Z",
+  "run_started_at": "2026-11-06T06:42:34Z",
+  "updated_at": "2026-11-06T06:49:59Z",
+  "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42176156539"
+}
