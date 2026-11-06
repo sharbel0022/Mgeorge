@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
 import {
-  SECURITY_SCOPE, SECURITY_SUITES, RECOVERY_SCOPE, RECOVERY_COMMAND, RECOVERY_REJECTIONS,
+  SECURITY_SCOPE, SECURITY_SUITES, RECOVERY_SCOPE, RECOVERY_COMMAND, RECOVERY_REJECTIONS, RECOVERY_TABLES, RECOVERY_LEDGER,
 } from './saas-security-scope.mjs';
 
 export const sha256 = value => createHash('sha256').update(value).digest('hex');
@@ -145,17 +145,16 @@ export function verifyRecoveryEvidence({ report, recoveryJson, expectedSource, n
     && timestamp(recovery.startedAt) <= timestamp(recovery.completedAt), 'TIME');
   requireEvidence(recovery.runtime?.node === report.node, 'RUNTIME');
   requireEvidence(equal(recovery.originals, { count: 430, bytes: 185567855, hashesChecked: 430 }), 'RECOVERY_ORIGINALS');
-  requireEvidence(Array.isArray(recovery.tables) && recovery.tables.length === 27
-    && new Set(recovery.tables.map(table => table.name)).size === 27
-    && recovery.tables.every(table => object(table) && /^[a-z_]+$/.test(table.name) && Number.isSafeInteger(table.rows) && table.rows > 0), 'RECOVERY_TABLES');
-  requireEvidence(recovery.ledger?.invoices === 2 && recovery.ledger.invoiceCents === 75000
-    && recovery.ledger.allocatedCents === 62500, 'RECOVERY_LEDGER');
+  requireEvidence(Array.isArray(recovery.tables) && recovery.tables.length === RECOVERY_TABLES.length
+    && recovery.tables.every(table => object(table) && /^[a-z_]+$/.test(table.name) && Number.isSafeInteger(table.rows) && table.rows > 0)
+    && equal(recovery.tables.map(table => table.name).sort(), [...RECOVERY_TABLES].sort()), 'RECOVERY_TABLES');
+  requireEvidence(equal(recovery.ledger, RECOVERY_LEDGER), 'RECOVERY_LEDGER');
   for (const key of ['sourceUnchanged', 'otherOwnerExcluded', 'authorizationAndTransientRowsAbsent',
     'workerLeasesInvalidated', 'applicationTokenRecoveryBlocked', 'sourceProvenanceVerified']) {
     requireEvidence(recovery[key] === true, 'RECOVERY_BOUNDARY');
   }
   const provenance = recovery.provenance;
-  requireEvidence(object(provenance) && typeof provenance.backupId === 'string' && provenance.backupId.length > 0
+  requireEvidence(object(provenance) && typeof provenance.backupId === 'string' && /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(provenance.backupId)
     && equal(provenance.companyBoundary, { version: 'company-data-boundary-v1', companyId: 'synthetic-company', storageOwner: 'synthetic-isolated-recovery-owner', boundaryVersion: 1 })
     && hex(provenance.snapshotSha256, 64) && hex(provenance.tableCensusSha256, 64)
     && hex(provenance.originalCensusSha256, 64) && object(provenance.sourceFiles)
@@ -167,7 +166,7 @@ export function verifyRecoveryEvidence({ report, recoveryJson, expectedSource, n
     requireEvidence(rows.length === 1 && rows[0].rejected === true, 'RECOVERY_REJECTIONS');
     if (['wrong_key', 'wrong_owner', 'wrong_company', 'corrupt_original', 'missing_original'].includes(name)) {
       requireEvidence(rows[0].stage === 'restore' && rows[0].outputCreated === false, 'RECOVERY_REJECTIONS');
-    }
+    } else requireEvidence(rows[0].stage === 'acceptance', 'RECOVERY_REJECTIONS');
   }
   requireEvidence(recovery.resume?.interruptionObserved === true && recovery.resume.snapshotPreserved === true, 'RECOVERY_RESUME');
   requireEvidence(recovery.objectives?.isolatedRtoMilliseconds === 60000

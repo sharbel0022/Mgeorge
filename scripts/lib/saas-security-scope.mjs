@@ -94,7 +94,8 @@ export const SECURITY_SUITES = Object.freeze([
       "tests/seven-agent-0599-joined.test.mjs",
       "tests/saas-migration-rollback.test.mjs",
       "tests/seven-agent-migration-order.test.mjs",
-      "tests/recovery-acceptance-provenance.test.mjs"
+      "tests/recovery-acceptance-provenance.test.mjs",
+      "tests/recovery-format-originals.test.mjs"
     ]
   }
 ].map(suite => Object.freeze({ ...suite, files: Object.freeze(suite.files) })));
@@ -113,3 +114,36 @@ export const RECOVERY_REJECTIONS = Object.freeze([
   'altered_source_manifest', 'altered_source_snapshot', 'missing_source_snapshot', 'extra_source_file',
   'altered_financial_reference', 'altered_revoked_bankgiro_reference',
 ]);
+
+// Independent expected durable-table and ledger census for the fixed synthetic drill.
+export const RECOVERY_TABLES = Object.freeze([
+  "workspaces",
+  "audit_events",
+  "documents",
+  "bank_applications",
+  "bank_connections",
+  "bank_sync_runs",
+  "gmail_connections",
+  "customer_contacts",
+  "customer_messages",
+  "reconciliation_findings",
+  "customer_deliveries",
+  "gmail_sources",
+  "gmail_runs",
+  "document_automation",
+  "document_jobs",
+  "document_extractions",
+  "invoice_counterparties",
+  "document_registrations",
+  "payment_control_runs",
+  "payment_control_requests",
+  "bankgiro_ingest_sources",
+  "bankgiro_ingest_jobs",
+  "saas_bank_state",
+  "company_bank_sync_scopes",
+  "company_bank_sync_jobs",
+  "company_bank_sync_requests",
+  "company_bank_sync_receipts"
+]);
+export const RECOVERY_LEDGER = Object.freeze({ invoices: 2, invoiceCents: 75000, transactions: 2, transactionCents: 75000,
+  allocations: 1, allocatedCents: 62500, revokedCredits: 1, revokedBankgiroLinks: 1 });

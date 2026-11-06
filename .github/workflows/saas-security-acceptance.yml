@@ -72,6 +72,13 @@ jobs:
       - name: Install verified Sites dependencies
         working-directory: sites
         run: npm run install:ci
+      - name: Restore and parse representative synthetic original formats
+        env:
+          NODE_ENV: test
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/saas-recovery-acceptance"
+          node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-reporter=tap --test-concurrency=1 sites/tests/recovery-format-originals.test.mjs | tee "$RUNNER_TEMP/saas-recovery-acceptance/format-originals.tap"
       - name: Export and restore 430 synthetic originals into a fresh isolated destination
         run: node scripts/run-saas-recovery-acceptance.mjs "$RUNNER_TEMP/saas-recovery-acceptance"
       - name: Require complete recovery provenance and negative controls for this checkout
