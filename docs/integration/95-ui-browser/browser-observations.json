@@ -1,0 +1,2178 @@
+{
+  "capturedAt": "2026-11-05T21:51:52.970Z",
+  "environment": "Chrome/CDP; actual compiled React components inside same-origin frames with exact CSS widths and no scaling",
+  "viewports": [
+    320,
+    390,
+    768,
+    1024,
+    1440
+  ],
+  "viewportHeight": 900,
+  "physicalDevices": false,
+  "productionBank": false,
+  "acceptedMeasurements": 28,
+  "acceptedTextContrastFailures": 0,
+  "acceptedHorizontalOverflow": 0,
+  "acceptedUnlabelledControls": 0,
+  "acceptedButtonsBelow24": 0,
+  "limitations": [
+    "Computed text-color scan excludes disabled controls, opacity, pseudo-elements, placeholders and complex backgrounds; not a complete WCAG audit.",
+    "CSS viewport tests are not physical device, touch keyboard, screen reader or browser zoom acceptance.",
+    "Live identity, bank consent, production payment/reconciliation and sending messages were not exercised."
+  ],
+  "observations": [
+    {
+      "case": "desktop-overview-1440",
+      "layout": {
+        "cards": [],
+        "clientWidth": 1425,
+        "headings": [
+          "Ekonomiöversikt"
+        ],
+        "innerWidth": 1440,
+        "scrollWidth": 1425
+      },
+      "contrast": {
+        "checked": 98,
+        "failures": []
+      }
+    },
+    {
+      "case": "mobile-invoice-search-dialog-390",
+      "open": {
+        "active": "Stäng dialog",
+        "dialogCount": 1,
+        "dialogWidth": 370,
+        "reference": [
+          "2026-10-01",
+          "2026-10-20",
+          "0000599",
+          "0000599",
+          "Inte angivet",
+          "Syntetiskt QA-underlag",
+          "Fakturauppgifter kontrollerade",
+          "Saknas i underlaget",
+          "Saknas i underlaget",
+          "Saknas i underlaget"
+        ],
+        "viewport": 390
+      },
+      "contrast": {
+        "checked": 49,
+        "failures": [
+          {
+            "class": "",
+            "color": "rgb(167, 167, 167)",
+            "font": "11px",
+            "parent": "",
+            "ratio": 2.41,
+            "text": "customer-1@example.invalid"
+          },
+          {
+            "class": "section-title",
+            "color": "rgb(124, 124, 124)",
+            "font": "12px",
+            "parent": "modal-body",
+            "ratio": 4.17,
+            "text": "Betalningar & krediter"
+          },
+          {
+            "class": "detail-empty",
+            "color": "rgb(175, 175, 175)",
+            "font": "11px",
+            "parent": "modal-body",
+            "ratio": 2.19,
+            "text": "Ingen betalning har matchats ännu."
+          },
+          {
+            "class": "section-title",
+            "color": "rgb(124, 124, 124)",
+            "font": "12px",
+            "parent": "",
+            "ratio": 4.17,
+            "text": "1. Originalfaktura och uppgifter"
+          },
+          {
+            "class": "detail-empty",
+            "color": "rgb(175, 175, 175)",
+            "font": "11px",
+            "parent": "",
+            "ratio": 2.19,
+            "text": "Inget original bifogat."
+          },
+          {
+            "class": "section-title",
+            "color": "rgb(124, 124, 124)",
+            "font": "12px",
+            "parent": "",
+            "ratio": 4.17,
+            "text": "2. Avvikelseanalys och förslag"
+          },
+          {
+            "class": "section-title",
+            "color": "rgb(124, 124, 124)",
+            "font": "12px",
+            "parent": "",
+            "ratio": 4.17,
+            "text": "3. Kundmeddelande"
+          },
+          {
+            "class": "detail-empty",
+            "color": "rgb(175, 175, 175)",
+            "font": "11px",
+            "parent": "",
+            "ratio": 2.19,
+            "text": "Inget aktuellt mejlutkast. Betalningskontrollen förbereder utkast"
+          }
+        ]
+      },
+      "shiftTab": {
+        "active": "Faktura 0000599KundfakturaSNSyntetisk Norrvik Studio ABcustomer-1@example.invalidEj avstämdFakturabelopp1 245,00 krVerifierat betalt0,00 krKvar att stämma av1 245,00 krFakturadatum2026-10-01Förfallodatum2026-10-20Fakturanummer0000599Avsedd betalningsreferens0000599Bankgiro / kontoInte angivetUnderlagSyntetiskt QA-underlagGranskningFakturauppgifter kontrollerade Fler åtgärder Redigera Matcha betalningRegistrera kreditBetalningar & krediterIngen betalning har matchats ännu.1. Originalfaktura och uppgifterInget original bifogat.Exklusive momsSaknas i underlagetMomsSaknas i underlagetOrganisationsnummerSaknas i underlaget2. Avvikelseanalys och förslagIngen säker betalning är kopplad. Detta bevisar inte att fakturan är obetald.Förslag att granskaUnik fakturareferens, verifierad betalare och bokfört bankunderlag.Granska betalningsunderlaget3. KundmeddelandeInget aktuellt mejlutkast. Betalningskontrollen förbereder utkast när underlaget visar ett uppföljningsbehov.Fakturans administrationMakulera registreringen",
+        "insideDialog": true
+      },
+      "escape": {
+        "dialogs": 0,
+        "focus": "Öppna faktura 0000599"
+      }
+    },
+    {
+      "case": "mobile-no-match-reset-390",
+      "result": {
+        "clientWidth": 375,
+        "focus": "Sök fakturor",
+        "innerWidth": 390,
+        "query": "",
+        "result": "5 fakturor",
+        "scrollWidth": 375
+      }
+    },
+    {
+      "case": "mobile-menu-keyboard-390",
+      "contrast": {
+        "checked": 18,
+        "failures": []
+      },
+      "shiftTab": {
+        "active": "Import & underlag ",
+        "inside": true
+      },
+      "escape": {
+        "focus": "Öppna menyn",
+        "openDialogs": 0
+      }
+    },
+    {
+      "case": "mobile-invoice-filter-direction-390",
+      "reviewFilter": "1 faktura matchar ditt urval",
+      "payable": {
+        "buttons": [
+          " Importera faktura",
+          " Ny faktura"
+        ],
+        "count": "2 fakturor",
+        "heading": "Leverantörsfakturor",
+        "horizontalOverflow": false,
+        "query": ""
+      }
+    },
+    {
+      "case": "review-list-320",
+      "layout": {
+        "clientWidth": 305,
+        "innerWidth": 320,
+        "rows": [
+          "Granska Saknat mottagarkonto",
+          "Granska Flera betalare i samma rapport",
+          "Granska Bankgirodetaljer saknas"
+        ],
+        "scrollWidth": 305
+      },
+      "contrast": {
+        "checked": 36,
+        "failures": []
+      }
+    },
+    {
+      "case": "review-inline-detail-320",
+      "result": {
+        "clientWidth": 305,
+        "detail": " Tillbaka till listanBetalare okändInbetalningBelopp880,00 krBlockeradBetalare enligt bankenBetalare okändFakturanummerMöjlig: 0599Betalningsdatum26 okt.Betalaruppgiftens källaBankens transaktionsoriginalAvsedd betalningsreferensInte fastställdBankrapporterad referensSaknas i bankunderlagetBank-OCR saknas.Betalningskontroll · Fakturaförslag 0599Samlad statusBlockeradKontroll som återstår: MottagarkontoMottagarkontot är inte verifierat i det syntetiska bankunderlaget.Nästa steg: Granska bevarade original före ett separat beslut.Ekonomisk bankpost · räknas som pengar.Läsande kontroll · inga saldon ändras. Öppna ett steg för källa, regel och nästa åtgärd.1Banktransaktion mottagenBehöver granskasSyntetiska bankuppgifter och fakturauppgifter granskas separat.KällaSyntetiskt bevarat originalKontrollerad2026-11-02 13:00:00Kontrollregelqa-read-only-v1Nästa stegGranska bevarade original före ett separat beslut.2Bankgirooriginal mottagetBehöver granskasSyntetiska bankuppgifter och fakturauppgifter granskas separat.KällaSyntetiskt bevarat originalKontrollerad2026-11-02 13:00:00Kontrollregelqa-read-only-v1Nästa stegGranska bevarade original före ett separat beslut.3OriginalintegritetBehöver granskasSyntetiska bankuppgifter och fakturauppgifter granskas separat.KällaSyntetiskt bevarat origina",
+        "dialogs": 0,
+        "focus": "Granskning: Saknat mottagarkonto",
+        "innerWidth": 320,
+        "scrollWidth": 305
+      },
+      "contrast": {
+        "checked": 250,
+        "failures": []
+      }
+    },
+    {
+      "case": "review-back-320",
+      "result": {
+        "detailVisible": false,
+        "focus": "Granska Saknat mottagarkonto"
+      }
+    },
+    {
+      "case": "review-200-503-retry-200-390",
+      "failure": {
+        "alerts": 1,
+        "controlDisabled": true,
+        "focus": "Granskningskö",
+        "queue": "Granskningskön kunde inte hämtasHämta aktuella uppgifter innan du fortsätter granska. Tidigare beslut visas när anslutningen fungerar igen.Hämta granskningskön igen"
+      },
+      "recovered": {
+        "currentCase": "Granskning: Saknat mottagarkonto",
+        "detailVisible": true,
+        "focus": "Granskning: Saknat mottagarkonto",
+        "queueFailureVisible": false
+      },
+      "assertionAdjustment": "Selected mobile detail is intentionally restored; the list row is hidden until Back."
+    },
+    {
+      "case": "bank-list-1440",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 1425,
+        "heading": "Bank",
+        "innerWidth": 1440,
+        "scrollWidth": 1425,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 223,
+        "failures": []
+      }
+    },
+    {
+      "case": "bank-payer-detail-1440",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 1440,
+        "heading": "Bank",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 231,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-overview-320",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 305,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 320,
+        "scrollWidth": 305,
+        "smallButtons": [
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          },
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          }
+        ],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 77,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-receivable-320",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 305,
+        "heading": "Kundfakturor",
+        "innerWidth": 320,
+        "scrollWidth": 305,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 96,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-bank-320",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 305,
+        "heading": "Bank",
+        "innerWidth": 320,
+        "scrollWidth": 305,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 195,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-review-320",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 305,
+        "heading": "Behöver granskas",
+        "innerWidth": 320,
+        "scrollWidth": 305,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 36,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-overview-390",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          },
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          }
+        ],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 77,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-receivable-390",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Kundfakturor",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 96,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-bank-390",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Bank",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 195,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-review-390",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Behöver granskas",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 36,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-overview-768",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 753,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 768,
+        "scrollWidth": 753,
+        "smallButtons": [
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          },
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          }
+        ],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 96,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-receivable-768",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 753,
+        "heading": "Kundfakturor",
+        "innerWidth": 768,
+        "scrollWidth": 753,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 115,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-bank-768",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 753,
+        "heading": "Bank",
+        "innerWidth": 768,
+        "scrollWidth": 753,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 214,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-review-768",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 753,
+        "heading": "Behöver granskas",
+        "innerWidth": 768,
+        "scrollWidth": 753,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 55,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-overview-1024",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 1009,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 1024,
+        "scrollWidth": 1009,
+        "smallButtons": [
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          },
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          }
+        ],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 98,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-receivable-1024",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 1009,
+        "heading": "Kundfakturor",
+        "innerWidth": 1024,
+        "scrollWidth": 1009,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 117,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-bank-1024",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 1009,
+        "heading": "Bank",
+        "innerWidth": 1024,
+        "scrollWidth": 1009,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 216,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-review-1024",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 1009,
+        "heading": "Behöver granskas",
+        "innerWidth": 1024,
+        "scrollWidth": 1009,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 287,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-overview-1440",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 1425,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 1440,
+        "scrollWidth": 1425,
+        "smallButtons": [
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          },
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          }
+        ],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 98,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-receivable-1440",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 1425,
+        "heading": "Kundfakturor",
+        "innerWidth": 1440,
+        "scrollWidth": 1425,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 117,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-bank-1440",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 1425,
+        "heading": "Bank",
+        "innerWidth": 1440,
+        "scrollWidth": 1425,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 223,
+        "failures": []
+      }
+    },
+    {
+      "case": "responsive-review-1440",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 1425,
+        "heading": "Behöver granskas",
+        "innerWidth": 1440,
+        "scrollWidth": 1425,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 287,
+        "failures": []
+      }
+    },
+    {
+      "case": "bank-onboarding-390",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Ditt företag. Din bank. En översikt.",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 57,
+        "failures": []
+      }
+    },
+    {
+      "case": "onboarding-bank-choice-keyboard-390",
+      "phase": "final-bundle",
+      "result": {
+        "selectedBank": "test-bank",
+        "mandatoryReadOnlyScopes": [
+          "accounts:read",
+          "transactions:read"
+        ],
+        "maxDays": 90,
+        "bankgiro": "separate agreement",
+        "consentSubmitted": false
+      }
+    },
+    {
+      "case": "onboarding-company-switch-390",
+      "phase": "final-bundle",
+      "result": {
+        "checkedBanks": [],
+        "companyRegion": "Företag för bankanslutningenExempel Beta ABOrganisationsnummer 559900-0002 · AdministratörByt företag i Aktivt företag högst upp.Lägg till företag",
+        "companySelectors": [
+          {
+            "label": "Aktivt företag",
+            "value": "company-beta"
+          }
+        ],
+        "oldCompanyInBody": true
+      }
+    },
+    {
+      "case": "bank-onboarding-beta-390",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Ditt företag. Din bank. En översikt.",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 57,
+        "failures": []
+      }
+    },
+    {
+      "case": "onboarding-bank-choice-pointer-390",
+      "phase": "final-bundle",
+      "result": [
+        {
+          "checked": true,
+          "value": "test-bank"
+        }
+      ],
+      "company": "company-beta",
+      "initialCheckApiFailed": true
+    },
+    {
+      "case": "legacy-connected-1440",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 1425,
+        "heading": "Bankanslutning",
+        "innerWidth": 1440,
+        "scrollWidth": 1425,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 56,
+        "failures": []
+      }
+    },
+    {
+      "case": "legacy-connected-copy",
+      "phase": "final-bundle",
+      "copy": "MG FAKTURAKOLL\nBankanslutning\n\nFöretagets bankhändelser, samlade i fakturakollen.\n\nExempelbanken\n\nStatus: Ansluten\n\nFöretag\nExempel Alfa AB\nKonto och hämtningsperiod\nFöretagskonto •••• 1234\nSEK\nÄndra konto eller period\nUppdatera bankhändelser\nSenast uppdaterad\n3 nov. 2026 12:59\nMedgivandet gäller till\n6 nov. 2026 22:43\nFörnya anslutningen\nKoppla från banken\nAutomatisk bankhämtning\nNär funktionen är aktiverad planeras hämtning med 6 timmars intervall.\nImportera bankfil istället\n\nEndast läsåtkomst. Inga betalningar utförs och inga BankID-koder eller banklösenord sparas.\n\nOm betalardetaljer saknas kan du komplettera med en betalningsspecifikation. Bankgiro kan innehålla flera kundbetalningar; använd underlaget för att kontrollera betalare och referenser innan du matchar."
+    },
+    {
+      "case": "legacy-unknown-expiry-768",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 753,
+        "heading": "Bankanslutning",
+        "innerWidth": 768,
+        "scrollWidth": 753,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 45,
+        "failures": []
+      }
+    },
+    {
+      "case": "legacy-unknown-expiry-copy",
+      "phase": "final-bundle",
+      "copy": "MG FAKTURAKOLL\nBankanslutning\n\nFöretagets bankhändelser, samlade i fakturakollen.\n\nExempelbanken\n\nStatus: Behöver förnyas\n\nFöretag\nExempel Alfa AB\nSenast uppdaterad\n3 nov. 2026 12:59\nMedgivandet gäller till\nGiltighet inte bekräftad\nFörnya anslutningen\nKoppla från banken\nImportera bankfil istället\n\nEndast läsåtkomst. Inga betalningar utförs och inga BankID-koder eller banklösenord sparas.\n\nOm betalardetaljer saknas kan du komplettera med en betalningsspecifikation. Bankgiro kan innehålla flera kundbetalningar; använd underlaget för att kontrollera betalare och referenser innan du matchar."
+    },
+    {
+      "case": "legacy-expired-390",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Bankanslutning",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 45,
+        "failures": []
+      }
+    },
+    {
+      "case": "legacy-expired-copy",
+      "phase": "final-bundle",
+      "copy": "MG FAKTURAKOLL\nBankanslutning\n\nFöretagets bankhändelser, samlade i fakturakollen.\n\nExempelbanken\n\nStatus: Behöver förnyas\n\nFöretag\nExempel Alfa AB\nSenast uppdaterad\n3 nov. 2026 12:59\nMedgivandet gäller till\n5 nov. 2026 22:42\nFörnya anslutningen\nKoppla från banken\nImportera bankfil istället\n\nEndast läsåtkomst. Inga betalningar utförs och inga BankID-koder eller banklösenord sparas.\n\nOm betalardetaljer saknas kan du komplettera med en betalningsspecifikation. Bankgiro kan innehålla flera kundbetalningar; använd underlaget för att kontrollera betalare och referenser innan du matchar."
+    },
+    {
+      "case": "legacy-disconnected-320",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 305,
+        "heading": "Bankanslutning",
+        "innerWidth": 320,
+        "scrollWidth": 305,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 43,
+        "failures": []
+      }
+    },
+    {
+      "case": "legacy-disconnected-copy",
+      "phase": "final-bundle",
+      "copy": "MG FAKTURAKOLL\nBankanslutning\n\nFöretagets bankhändelser, samlade i fakturakollen.\n\nFöretagets bank\n\nStatus: Ej ansluten\n\nFöretag\nExempel Alfa AB\nBank med stöd för företagskonton\nVälj bank\nHämta bankalternativ\n\nLäsbehörigheten gäller konton och bankhändelser. Bankgirodetaljer kräver separat behörighet.\n\nKoppla banken\n\nDu skickas till bankens godkända identifiering, med BankID där banken stöder det. Banken måste godkänna läsbehörigheten för företagets konton. BankID identifierar dig och är inte ensamt bevis på företagsbehörighet.\n\nImportera bankfil istället\n\nEndast läsåtkomst. Inga betalningar utförs och inga BankID-koder eller banklösenord sparas.\n\nOm betalardetaljer saknas kan du komplettera med en betalningsspecifikation. Bankgiro kan innehålla flera kundbetalningar; använd underlaget för att kontrollera betalare och referenser innan du matchar."
+    },
+    {
+      "case": "loading-overview-390",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          },
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          }
+        ],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 30,
+        "failures": []
+      }
+    },
+    {
+      "case": "loading-state",
+      "phase": "final-bundle",
+      "details": {
+        "cards": [
+          {
+            "disabled": true,
+            "text": "Inbetalt denna månad—Bekräftade kopplingar till bokförda betalningar."
+          },
+          {
+            "disabled": true,
+            "text": "Kvar att få—Kvarstående saldo är inte bevis på utebliven betalning."
+          },
+          {
+            "disabled": true,
+            "text": "Att betala—Leverantörsfakturor att kontrollera. Ingen bankbetalning utförs."
+          },
+          {
+            "disabled": true,
+            "text": "Behöver granskas—Inga nollvärden visas innan uppgifterna är hämtade."
+          }
+        ],
+        "defaultCompanyVisible": false,
+        "notice": [
+          "Hämtar ekonomiöversikten…",
+          " Granskningskön är inte tillgänglig ännu."
+        ]
+      }
+    },
+    {
+      "case": "error-overview-390",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          },
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          }
+        ],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 34,
+        "failures": [
+          {
+            "class": "",
+            "color": "rgb(135, 135, 135)",
+            "font": "10px",
+            "parent": "",
+            "ratio": 3.24,
+            "text": "Din privata fakturaöversikt finns kvar mellan besöken."
+          }
+        ]
+      }
+    },
+    {
+      "case": "error-state",
+      "phase": "final-bundle",
+      "details": {
+        "cards": [
+          {
+            "disabled": true,
+            "text": "Inbetalt denna månad—Bekräftade kopplingar till bokförda betalningar."
+          },
+          {
+            "disabled": true,
+            "text": "Kvar att få—Kvarstående saldo är inte bevis på utebliven betalning."
+          },
+          {
+            "disabled": true,
+            "text": "Att betala—Leverantörsfakturor att kontrollera. Ingen bankbetalning utförs."
+          },
+          {
+            "disabled": true,
+            "text": "Behöver granskas—Inga nollvärden visas innan uppgifterna är hämtade."
+          }
+        ],
+        "defaultCompanyVisible": false,
+        "notice": [
+          "Uppgifterna kunde inte uppdateras. Beloppen visas inte som noll; försök hämta status igen.Hämta översikten igen",
+          " Granskningskön är inte tillgänglig ännu."
+        ]
+      }
+    },
+    {
+      "case": "empty-receivable-768",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 753,
+        "heading": "Kundfakturor",
+        "innerWidth": 768,
+        "scrollWidth": 753,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 42,
+        "failures": []
+      }
+    },
+    {
+      "case": "empty-state",
+      "phase": "final-bundle",
+      "details": {
+        "cards": [],
+        "defaultCompanyVisible": false,
+        "notice": [
+          "0 fakturor"
+        ]
+      }
+    },
+    {
+      "case": "missing-bank-overview-1024",
+      "phase": "final-bundle",
+      "layout": {
+        "clientWidth": 1009,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 1024,
+        "scrollWidth": 1009,
+        "smallButtons": [
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          },
+          {
+            "h": 44,
+            "name": "Alla",
+            "w": 23.84375
+          }
+        ],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 84,
+        "failures": []
+      }
+    },
+    {
+      "case": "missing-bank-state",
+      "phase": "final-bundle",
+      "details": {
+        "cards": [
+          {
+            "disabled": false,
+            "text": "Inbetalt denna månad0,00 krVerifierade kundinbetalningar · 2026-11. Återbetalt: 0,00 kr."
+          },
+          {
+            "disabled": false,
+            "text": "Kvar att få6 245,00 kr1 245,00 kr har passerat förfallodatum. Alla öppna perioder ingår."
+          },
+          {
+            "disabled": false,
+            "text": "Att betala875,00 krFörfallna och kommande till 2026-11-12, inklusive fakturor utan förfallodatum."
+          },
+          {
+            "disabled": false,
+            "text": "Behöver granskas00 underlag bearbetas eller väntar. Endast beslut visas här."
+          }
+        ],
+        "defaultCompanyVisible": false,
+        "notice": [
+          "Översikten är preliminär. Alla kvarstående fakturor är inte avstämda. Ogranskade fakturor ingår inte i beloppen. Visa underlag ",
+          "Bankanslutningen behöver åtgärdasSparade underlag finns kvar. Nya bankhändelser kan saknas tills anslutningen fungerar igen.Öppna bankanslutning "
+        ]
+      }
+    },
+    {
+      "case": "review-draft-503-first-fix-rejected",
+      "phase": "intermediate-regression",
+      "before": "Syntetiskt utkast – bevara vid hämtningsfel.",
+      "after": "",
+      "resolution": "Parent readability changed the child subtree; review snapshot must preserve last ready renderer as well."
+    },
+    {
+      "case": "review-draft-survives-503-and-retry-390",
+      "phase": "accepted-final",
+      "before": "Syntetiskt utkast – bevara vid hämtningsfel.",
+      "during": {
+        "drafts": [
+          {
+            "hidden": true,
+            "inert": true,
+            "value": "Syntetiskt utkast – bevara vid hämtningsfel.",
+            "visible": false
+          }
+        ],
+        "focus": "Granskningskö",
+        "staleDetailVisible": false
+      },
+      "after": {
+        "hidden": false,
+        "inert": false,
+        "value": "Syntetiskt utkast – bevara vid hämtningsfel."
+      },
+      "pass": true
+    },
+    {
+      "case": "final-responsive-overview-320",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 305,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 320,
+        "scrollWidth": 305,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 77,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-receivable-320",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 305,
+        "heading": "Kundfakturor",
+        "innerWidth": 320,
+        "scrollWidth": 305,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 96,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-bank-320",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 305,
+        "heading": "Bank",
+        "innerWidth": 320,
+        "scrollWidth": 305,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 195,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-review-320",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 305,
+        "heading": "Behöver granskas",
+        "innerWidth": 320,
+        "scrollWidth": 305,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 36,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-overview-390",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 77,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-receivable-390",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Kundfakturor",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 96,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-bank-390",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Bank",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 195,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-review-390",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Behöver granskas",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 36,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-overview-768",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 753,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 768,
+        "scrollWidth": 753,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 96,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-receivable-768",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 753,
+        "heading": "Kundfakturor",
+        "innerWidth": 768,
+        "scrollWidth": 753,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 115,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-bank-768",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 753,
+        "heading": "Bank",
+        "innerWidth": 768,
+        "scrollWidth": 753,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 214,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-review-768",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 753,
+        "heading": "Behöver granskas",
+        "innerWidth": 768,
+        "scrollWidth": 753,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 55,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-overview-1024",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 1009,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 1024,
+        "scrollWidth": 1009,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 98,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-receivable-1024",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 1009,
+        "heading": "Kundfakturor",
+        "innerWidth": 1024,
+        "scrollWidth": 1009,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 117,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-bank-1024",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 1009,
+        "heading": "Bank",
+        "innerWidth": 1024,
+        "scrollWidth": 1009,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 216,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-review-1024",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 1009,
+        "heading": "Behöver granskas",
+        "innerWidth": 1024,
+        "scrollWidth": 1009,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 287,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-overview-1440",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 1425,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 1440,
+        "scrollWidth": 1425,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 98,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-receivable-1440",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 1425,
+        "heading": "Kundfakturor",
+        "innerWidth": 1440,
+        "scrollWidth": 1425,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 117,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-bank-1440",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 1425,
+        "heading": "Bank",
+        "innerWidth": 1440,
+        "scrollWidth": 1425,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 223,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-responsive-review-1440",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 1425,
+        "heading": "Behöver granskas",
+        "innerWidth": 1440,
+        "scrollWidth": 1425,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 287,
+        "failures": []
+      }
+    },
+    {
+      "case": "global-search-arrow-enter-escape-1440",
+      "phase": "accepted-final",
+      "dialog": {
+        "focus": "Stäng dialog",
+        "references": [
+          "2026-10-01",
+          "2026-10-20",
+          "0000599",
+          "0000599",
+          "Inte angivet",
+          "Syntetiskt QA-underlag",
+          "Fakturauppgifter kontrollerade",
+          "Saknas i underlaget",
+          "Saknas i underlaget",
+          "Saknas i underlaget"
+        ],
+        "title": "Faktura 0000599"
+      },
+      "contrast": {
+        "checked": 49,
+        "failures": []
+      },
+      "return": {
+        "focus": "Sök i arbetsytan",
+        "openDialogs": 0,
+        "query": ""
+      }
+    },
+    {
+      "case": "final-review-detail-320",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 305,
+        "heading": "Behöver granskas",
+        "innerWidth": 320,
+        "scrollWidth": 305,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 250,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-invoice-dialog-390",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 390,
+        "heading": "Kundfakturor",
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 49,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-bank-payer-detail-1440",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 1440,
+        "heading": "Bank",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 231,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-bank-connection-1440",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 1425,
+        "heading": "Bankanslutning",
+        "innerWidth": 1440,
+        "scrollWidth": 1425,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 56,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-company-onboarding-390",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Ditt företag. Din bank. En översikt.",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 57,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-error-overview-390",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 31,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-503-retry-not-sign-out",
+      "phase": "accepted-final",
+      "result": {
+        "alerts": [
+          "Uppgifterna kunde inte uppdateras. Beloppen visas inte som noll; försök hämta status igen.Hämta översikten igen"
+        ],
+        "cards": [
+          {
+            "disabled": true,
+            "value": "—"
+          },
+          {
+            "disabled": true,
+            "value": "—"
+          },
+          {
+            "disabled": true,
+            "value": "—"
+          },
+          {
+            "disabled": true,
+            "value": "—"
+          }
+        ],
+        "signInClaim": false
+      }
+    },
+    {
+      "case": "final-loading-overview-390",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 375,
+        "heading": "Ekonomiöversikt",
+        "innerWidth": 390,
+        "scrollWidth": 375,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 30,
+        "failures": []
+      }
+    },
+    {
+      "case": "final-empty-invoices-768",
+      "phase": "accepted-final",
+      "layout": {
+        "clientWidth": 753,
+        "heading": "Kundfakturor",
+        "innerWidth": 768,
+        "scrollWidth": 753,
+        "smallButtons": [],
+        "unlabelledControls": []
+      },
+      "contrast": {
+        "checked": 42,
+        "failures": []
+      }
+    }
+  ],
+  "screenshots": [
+    "desktop-overview-1440.jpg",
+    "mobile-review-detail-320.jpg",
+    "mobile-review-retry-390.jpg",
+    "desktop-payment-detail-1440.jpg",
+    "mobile-invoices-390.jpg",
+    "tablet-overview-768.jpg",
+    "desktop-invoices-1440.jpg",
+    "mobile-bank-onboarding-390.jpg",
+    "desktop-bank-connection-1440.jpg",
+    "mobile-loading-390.jpg",
+    "tablet-empty-invoices-768.jpg",
+    "mobile-invoice-detail-390.jpg",
+    "mobile-overview-error-390.jpg"
+  ],
+  "consoleErrors": [
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:51.492Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:51.547Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:51.627Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:52.321Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:52.328Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:52.391Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:52.487Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:53.158Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:53.165Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:53.227Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:53.299Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:54.038Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:54.041Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:54.096Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:54.184Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:54.810Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:54.810Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:54.879Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:54.954Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:55.529Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:55.540Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:55.619Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:55.682Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:56.347Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:56.361Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:56.415Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:56.486Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:57.259Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:57.264Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:57.324Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:57.401Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:58.145Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:58.154Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:58.216Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:58.313Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:59.082Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:59.107Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:59.167Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:59.271Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:59.987Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:49:59.998Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:00.057Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:00.135Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:00.897Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:00.918Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:00.996Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:01.085Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:18.018Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:18.048Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:18.098Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:18.098Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:25.796Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:25.796Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:25.796Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:25.796Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:26.144Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:26.145Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:54.040Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:54.040Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:54.168Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:54.621Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:54.663Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:54.664Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:55.254Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:55.254Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:55.344Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:55.886Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:55.945Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:55.947Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:56.389Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:50:56.391Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:07.663Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:07.663Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:07.771Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:08.603Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:08.604Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:08.609Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:09.596Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:09.599Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:09.717Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:10.365Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:10.376Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:10.388Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:10.441Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:10.535Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:26.801Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:26.810Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:26.818Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:26.873Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:26.974Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:27.512Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:27.528Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:27.545Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:27.608Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:27.709Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:28.266Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:28.284Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:28.298Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:28.356Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    },
+    {
+      "level": "error",
+      "message": "Error sending browser metadata to extension: Object",
+      "timestamp": "2026-11-05T21:51:28.454Z",
+      "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+    }
+  ],
+  "sourceManifest": "bundle-source-manifest.json",
+  "sourceManifestSha256": "d6c9ed762839d467b103ca8ab4607459283c9e3233e44c121efe437da5991b93",
+  "artifactHashes": {
+    "desktop-overview-1440.jpg": "43045d9cf5eede635e0e54d0a9483d9e38fd2a2961ea8fe10c84c582f3d31ed5",
+    "mobile-review-detail-320.jpg": "6aa3684db62e43c726f1a491e9c61885db03664963937b77e7be27b986b4b651",
+    "mobile-review-retry-390.jpg": "c78d6c93d4e48933d649ebbdfc7128825b72e7b4a7c6bced152d0e2d13007212",
+    "desktop-payment-detail-1440.jpg": "f84931b56652a0615d5579edab108a5daad6ca61c77e5ca3663ea5632ebdef10",
+    "mobile-invoices-390.jpg": "f9c77f0fc45aa669453e1687f098dc7fd6b8251439812672c36ca5d9960f3953",
+    "tablet-overview-768.jpg": "8eafecc8504ced8eb7b5a92d0d29090e632fcf96b79a34fc6c198f7be3ff9072",
+    "desktop-invoices-1440.jpg": "3d09c44b07cad90e884280b5b57b30d55cba554ffb0d356e2c40cd5deb730c53",
+    "mobile-bank-onboarding-390.jpg": "06f6ea13c116ae85088d7ac1741190a94008614dd343917dacedca0250b9ff38",
+    "desktop-bank-connection-1440.jpg": "de7cf06e47ed75c18700350d21f2baba9a8b5a0f58c68841c2b000c8fe92dcc7",
+    "mobile-loading-390.jpg": "7d3a7e74d99e34dd628abfc264c70aee4868418ab99c481f9cfdc5e4043d6e13",
+    "tablet-empty-invoices-768.jpg": "14bafb2a81d45d666fb5fc7194fb2bd025f27ac64aa7df0de5f5aa93f94d171b",
+    "mobile-invoice-detail-390.jpg": "8c9488a96f0fdab52ca3347052a6da3c2e3d3dee230ad57a734fb53e4bf2ed6e",
+    "mobile-overview-error-390.jpg": "c310b598f99be2e3f84bf391250c01b673f63443f91634f0b27972ad1af670a9"
+  },
+  "consoleLogLimitation": "The returned console excerpt contains 100 browser-extension metadata transport errors from chrome-extension://. It is not a complete application JavaScript error audit.",
+  "phaseDefinition": {
+    "accepted-final": "Observed against the final source manifest, with each earlier reproduced failure explicitly rechecked.",
+    "final-bundle": "Intermediate candidate observations; superseded when an accepted-final recheck exists.",
+    "intermediate-regression": "Reproduced defect retained as RED evidence, not accepted."
+  }
+}

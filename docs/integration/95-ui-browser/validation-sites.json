@@ -1,0 +1,58 @@
+{
+  "gates": [
+    {
+      "gate": "check",
+      "command": "npm run check",
+      "exitCode": 0,
+      "seconds": 5.93,
+      "log": "/tmp/mgeorge-ui-acceptance-check.log",
+      "logSha256": "de3f553dc64c9cb80274a231dd42a62d946c447d2b17e0ee76d6b6f386f3cd3c"
+    },
+    {
+      "gate": "build",
+      "command": "npm run build",
+      "exitCode": 0,
+      "seconds": 21.37,
+      "log": "/tmp/mgeorge-ui-acceptance-build.log",
+      "logSha256": "89c9b7d2ff94c2adec65dbf4ff9cd5dd280ce78e4fe3317c2a9c395b98946a8f"
+    },
+    {
+      "gate": "test",
+      "command": "npm run test:isolated",
+      "exitCode": 0,
+      "seconds": 439.18,
+      "log": "/tmp/mgeorge-ui-acceptance-test.log",
+      "logSha256": "420ea7090aeedbc96c3a060d2765c985080ab3f65af8cf96c99f9faada857157"
+    }
+  ],
+  "inputsUnchanged": true,
+  "inputCount": 333,
+  "productCommit": "495de1166292cc141030cac7803f03a5f055d646",
+  "baseCommit": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+  "runtime": {
+    "node": "v24.22.1",
+    "npm": "11.9.0",
+    "os": "Linux x86_64"
+  },
+  "tests": {
+    "total": 3888,
+    "pass": 3888,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "audit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 8,
+    "high": 0,
+    "critical": 0,
+    "total": 8
+  },
+  "minimatch": {
+    "targets": 1,
+    "writes": 0,
+    "status": "verified"
+  }
+}
