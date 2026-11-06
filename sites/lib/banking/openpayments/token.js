@@ -72,7 +72,7 @@ export class OpenPaymentsTokenClient {
       const receipt=await this.#coordinator.access(async({assertBeforeSend})=>{
         await guard();
         const body=new URLSearchParams({client_id:this.#config.clientId,client_secret:this.#config.clientSecret,grant_type:'client_credentials',scope:this.#config.scopes.join(' ')});
-        const response=await this.#http.send({service:'auth',path:'/connect/token',method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString(),assertBeforeSend:async()=>{await guard();await assertBeforeSend();}});
+        const response=await this.#http.send({service:'auth',path:'/connect/token',method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString(),assertBeforeSend:async()=>{await guard();await assertBeforeSend(guard);}});
         await guard();return tokenResult(response.data,this.#config.scopes);
       });
       await guard();return receipt;
@@ -106,7 +106,7 @@ export class OpenPaymentsTokenClient {
     const scope = ['accountinformation', 'corporate'];
     const body = new URLSearchParams({ client_id: this.#config.clientId, client_secret: this.#config.clientSecret, code, redirect_uri: redirectUri, scope: scope.join(' '), grant_type: 'authorization_code' });
     if(this.#coordinator){
-      const guard=async()=>{this.#checkCredentials();assertOpenPaymentsTokenCacheIdentity(this.#identity);await assertCaller();await this.#coordinator.assertIssuerAvailable();};
+      const guard=async()=>{this.#checkCredentials();assertOpenPaymentsTokenCacheIdentity(this.#identity);await assertCaller();await this.#coordinator.assertIssuerAvailable();await assertCaller();this.#checkCredentials();assertOpenPaymentsTokenCacheIdentity(this.#identity);};
       await guard();let response;
       try{response=await this.#http.send({service:'auth',path:'/connect/token',method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','X-consentId':consentId,'X-ConsentAuthorisationId':authorisationId},body:body.toString(),assertBeforeSend:guard});}
       catch(error){await this.#coordinator.recordIssuerFailure(error);throw error;}

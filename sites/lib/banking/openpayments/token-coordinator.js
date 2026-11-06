@@ -109,11 +109,18 @@ export function createOpenPaymentsTokenCoordinator({database,codec,configuration
  }
  async function issueOwned(owned,issue){
   let sent=false;
-  const assertBeforeSend=async()=>{
+  const assertBeforeSend=async(assertCaller)=>{
    if(sent)fail('APPLICATION_TOKEN_LEASE_LOST');
+   if(assertCaller!==undefined&&typeof assertCaller!=='function')fail('PROVIDER_CONFIGURATION_INVALID');
+   const checkedAt=performance.now();
    const value=(await read()).value;
    if(value?.controlRevision!==owned.controlRevision)fail('APPLICATION_TOKEN_RECOVERY_REQUIRED');
    if(!value||value.epoch!==owned.epoch||value.lease_token!==owned.lease_token||value.fence!==owned.fence||value.lease_until<=value.db_now)fail('APPLICATION_TOKEN_LEASE_LOST');
+   // The caller's own tenant authority may change while the global SQL read is
+   // queued. Recheck it afterwards, before acknowledging a possible dispatch.
+   // Monotonic elapsed time conservatively bounds the age of that DB clock.
+   if(assertCaller)await assertCaller();
+   if(value.lease_until-value.db_now<=performance.now()-checkedAt)fail('APPLICATION_TOKEN_LEASE_LOST');
    sent=true;
   };
   try{

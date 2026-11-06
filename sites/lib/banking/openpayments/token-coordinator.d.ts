@@ -14,7 +14,7 @@ export interface OpenPaymentsTokenCoordinator {
  /** Explicit metadata bootstrap for an already authorized server operation. No token HTTP or DDL. */
  ensureRegistered():Promise<void>;
  captureFence():Promise<OpenPaymentsTokenFence>;
- access(issue:(input:{startedAt:number;maxExpiresAt:number;assertBeforeSend():Promise<void>})=>Promise<{value:string;seconds:number}>):Promise<OpenPaymentsIssuedReceipt>;
+ access(issue:(input:{startedAt:number;maxExpiresAt:number;assertBeforeSend(assertCaller?:()=>void|Promise<void>):Promise<void>})=>Promise<{value:string;seconds:number}>):Promise<OpenPaymentsIssuedReceipt>;
  invalidate(receipt:OpenPaymentsIssuedReceipt):Promise<void>;
  assertIssuerAvailable():Promise<void>;
  recordIssuerFailure(error:unknown):Promise<void>;

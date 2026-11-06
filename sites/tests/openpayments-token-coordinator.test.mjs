@@ -162,3 +162,22 @@ test('explicit metadata registration does not issue a token and certificate expi
  await coordinator.ensureRegistered();assert.equal(f.calls(),0);assert.ok(f.row());assert.equal(f.row().token_ciphertext,'');
  const token=await coordinator.access(f.issue);assert.equal(token.expiresAt,until);assert.equal(f.row().expires_at,until);
 });
+
+test('revocation during the last global lease read stops token dispatch without a false uncertain issuance',async t=>{
+ const f=fixture(t),raw=createCompanySyncDatabase(f.db);let active=true,leasedReads=0,revocations=0,calls=0;
+ const database={prepare(query){const statement=raw.prepare(query);const wrap=s=>({bind(...values){return wrap(s.bind(...values));},async first(){const value=await s.first();if(query.startsWith('SELECT *,CAST')&&value?.lease_token&&++leasedReads===2){active=false;revocations++;}return value;},run:()=>s.run()});return wrap(statement);}};
+ const config=validateOpenPaymentsConfig(configuration),http=createOpenPaymentsHttpClient(config,{transport:{kind:'sandbox',async request(_url,init){calls++;return Response.json({access_token:'synthetic-would-be-issued',token_type:'Bearer',expires_in:3600,scope:new URLSearchParams(init.body).get('scope')});}}});
+ const client=new OpenPaymentsTokenClient(config,http,Date.now,{identity:createOpenPaymentsTokenCacheIdentity(),coordinator:f.create({database})});
+ await assert.rejects(client.accessTokenReceipt(async()=>{if(!active)throw new BankProviderError('RESOURCE_SCOPE_MISMATCH',403);}),{code:'RESOURCE_SCOPE_MISMATCH'});
+ assert.equal(revocations,1,'the last stored lease read actually revoked the caller');assert.equal(active,false);assert.equal(calls,0,'revoked caller must not cause a token POST');assert.equal(f.row().uncertain_until,0,'zero dispatch is known before marking the attempt as sent');
+});
+
+test('authorization-code activation rechecks its own caller after the final shared issuer read',async t=>{
+ const f=fixture(t),raw=createCompanySyncDatabase(f.db);let active=true,knownReads=0,revocations=0,calls=0;
+ const database={prepare(query){const statement=raw.prepare(query);const wrap=s=>({bind(...values){return wrap(s.bind(...values));},async first(){const value=await s.first();if(query.startsWith('SELECT *,CAST')&&value&&++knownReads===2){active=false;revocations++;}return value;},run:()=>s.run()});return wrap(statement);}};
+ const configurationWithRedirect={...configuration,redirectUris:['https://app.example/callback']},config=validateOpenPaymentsConfig(configurationWithRedirect);
+ const http=createOpenPaymentsHttpClient(config,{transport:{kind:'sandbox',async request(){calls++;return Response.json({access_token:'synthetic-activation-token',token_type:'Bearer',expires_in:3600,scope:'accountinformation corporate'});}}});
+ const client=new OpenPaymentsTokenClient(config,http,Date.now,{identity:createOpenPaymentsTokenCacheIdentity(),coordinator:f.create({database,configuration:configurationWithRedirect})});
+ await assert.rejects(client.activateAuthorization({code:'synthetic-code',redirectUri:config.redirectUris[0],consentId:'synthetic-consent',authorisationId:'synthetic-authorisation'},async()=>{if(!active)throw new BankProviderError('RESOURCE_SCOPE_MISMATCH',403);}),{code:'RESOURCE_SCOPE_MISMATCH'});
+ assert.equal(revocations,1);assert.equal(calls,0,'a callback whose membership was revoked must not activate provider consent');
+});
