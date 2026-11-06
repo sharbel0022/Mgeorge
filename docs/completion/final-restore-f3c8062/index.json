@@ -1,0 +1,167 @@
+{
+  "format": "MG-final-main-synthetic-restore-index-1",
+  "recordedAt": "2026-11-06T16:35:02.367562+00:00",
+  "sourceCommit": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "sourceTree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+  "sitesTree": "c2feb372a4c0ef121ffe594784684957c14ddac1",
+  "scope": "synthetic-isolated-evidence-only",
+  "accepted": true,
+  "productionRestoreTested": false,
+  "singleDrillAttempt": true,
+  "documentCount": 430,
+  "originalBytes": 185567855,
+  "originalHashesChecked": 430,
+  "backupTableGroups": 27,
+  "comparedBackupTableRows": 456,
+  "negativeCases": [
+    {
+      "case": "wrong_key",
+      "stage": "restore",
+      "rejected": true,
+      "outputCreated": false
+    },
+    {
+      "case": "wrong_owner",
+      "stage": "restore",
+      "rejected": true,
+      "outputCreated": false
+    },
+    {
+      "case": "wrong_company",
+      "stage": "restore",
+      "rejected": true,
+      "outputCreated": false
+    },
+    {
+      "case": "corrupt_original",
+      "stage": "restore",
+      "rejected": true,
+      "outputCreated": false
+    },
+    {
+      "case": "missing_original",
+      "stage": "restore",
+      "rejected": true,
+      "outputCreated": false
+    },
+    {
+      "case": "altered_ledger",
+      "stage": "acceptance",
+      "rejected": true
+    },
+    {
+      "case": "altered_plaintext_original",
+      "stage": "acceptance",
+      "rejected": true
+    },
+    {
+      "case": "foreign_owner_row",
+      "stage": "acceptance",
+      "rejected": true
+    },
+    {
+      "case": "reactivated_application_issuer",
+      "stage": "acceptance",
+      "rejected": true
+    },
+    {
+      "case": "retained_application_token",
+      "stage": "acceptance",
+      "rejected": true
+    }
+  ],
+  "sourceUnchangedBeforeAfter": true,
+  "trackedManifestFilesMatchCommittedGitObjects": true,
+  "restoreModuleCount": 14,
+  "migrationSqlCount": 24,
+  "restoreInputsComparedWithPrevious24390Proof": {
+    "restoreModules": true,
+    "appliedMigrationSql": true,
+    "metadataAndLocks": true
+  },
+  "process": {
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMilliseconds": 12682.838,
+    "peakRssKiB": 776352,
+    "passedEnvironmentVariables": [
+      "LANG",
+      "NODE_ENV",
+      "PATH",
+      "TZ"
+    ]
+  },
+  "timing": {
+    "backupAndResumeMilliseconds": 3132.692,
+    "exportMilliseconds": 3186.402,
+    "restoreAndAcceptanceMilliseconds": 3625.739,
+    "totalDrillMilliseconds": 12473.298,
+    "rtoIncludes": [
+      "authenticated bundle validation",
+      "fresh SQLite evidence database",
+      "original write and readback",
+      "independent row, owner, ledger and SHA-256 acceptance"
+    ],
+    "rtoExcludes": [
+      "operator response",
+      "cloud download or regional outage",
+      "key custody or access recovery",
+      "production application activation"
+    ]
+  },
+  "simulatedRecovery": {
+    "clock": "synthetic scenario, not a production measurement",
+    "recoveryPointAt": "2026-11-05T12:00:00.000Z",
+    "postSnapshotWriteAt": "2026-11-05T12:05:00.000Z",
+    "incidentAt": "2026-11-05T12:15:00.000Z",
+    "rpoMilliseconds": 900000,
+    "postSnapshotWritesExcluded": 1
+  },
+  "rawEvidenceDirectory": "/workspace/scratch/aab0f7dc06f9/security-evidence/final-restore-f3c8062",
+  "acceptanceFlags": {
+    "sourceUnchanged": true,
+    "otherOwnerExcluded": true,
+    "authorizationAndTransientRowsAbsent": true,
+    "workerLeasesInvalidated": true,
+    "applicationTokenRecoveryBlocked": true
+  },
+  "artifacts": [
+    {
+      "file": "README.md",
+      "bytes": 5051,
+      "sha256": "78821f486b76bb75fceb983b1ff2a9f0df32f79f3866b44634416450aa032ad9"
+    },
+    {
+      "file": "process-receipt.json",
+      "bytes": 2459,
+      "sha256": "45254de2ffc5d2a4f250c46535218c620feac45aa4d5aba3363a38c44aedbb56"
+    },
+    {
+      "file": "restore.json",
+      "bytes": 4897,
+      "sha256": "d28b44110364d0f5c96b55d926368f8a1745e2a1e225fb75e16e7b6ea4fc9234"
+    },
+    {
+      "file": "restore.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "source-after.json",
+      "bytes": 11765,
+      "sha256": "8c757b972588de86a5fe28bf0e1225b6b18e84e4cd08ec21d4e70dcfc03b6330"
+    },
+    {
+      "file": "source-before.json",
+      "bytes": 11765,
+      "sha256": "f3a40a2b506eb51fb20d42977fe1f03092570408d939cd20fb33596595ecfc4b"
+    }
+  ],
+  "limitations": [
+    "Synthetic data only; productionRestoreTested=false.",
+    "RTO excludes operator, cloud-transfer, key-custody and production activation steps.",
+    "RPO is a fixed synthetic scenario, not measured production RPO.",
+    "Shared local machine; no exclusive-resource lock.",
+    "Main CI and release decisions remain separate parent-owned gates."
+  ]
+}

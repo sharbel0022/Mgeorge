@@ -1,0 +1,74 @@
+{
+  "format": "MG-final-restore-process-receipt-2",
+  "sourceCommit": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "sourceTree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "sites/scripts/recovery-drill.mjs",
+    "430",
+    "185567855"
+  ],
+  "commandDisplay": "env -i PATH=\"$PATH\" LANG=C.UTF-8 TZ=UTC NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types sites/scripts/recovery-drill.mjs 430 185567855",
+  "workingDirectory": "/workspace/scratch/aab0f7dc06f9/security-final-restore-f3c8062",
+  "startedAt": "2026-11-06T16:33:19.165906+00:00",
+  "completedAt": "2026-11-06T16:33:31.848743+00:00",
+  "elapsedMilliseconds": 12682.838,
+  "exitCode": 0,
+  "signal": null,
+  "processResources": {
+    "peakRssKiB": 776352,
+    "userCpuSeconds": 12.312083,
+    "systemCpuSeconds": 1.805143,
+    "note": "POSIX wait4 resources for the single Node drill process; no heap/test-budget overrides"
+  },
+  "environment": {
+    "passedVariableNames": [
+      "LANG",
+      "NODE_ENV",
+      "PATH",
+      "TZ"
+    ],
+    "NODE_ENV": "test",
+    "LANG": "C.UTF-8",
+    "TZ": "UTC",
+    "inheritedVariables": [
+      "PATH"
+    ],
+    "nodeExecutable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "productionCredentialsInherited": false,
+    "nodeOptionsInherited": false
+  },
+  "resourceCoordination": {
+    "rootAuthorizedImmediateRun": true,
+    "otherLocalTestsStartedByReviewer": false,
+    "globalExclusiveResourceLock": false,
+    "localTimingInformational": true
+  },
+  "sourceUnchanged": true,
+  "singleDrillAttempt": true,
+  "artifacts": [
+    {
+      "file": "restore.json",
+      "bytes": 4897,
+      "sha256": "d28b44110364d0f5c96b55d926368f8a1745e2a1e225fb75e16e7b6ea4fc9234"
+    },
+    {
+      "file": "restore.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "source-before.json",
+      "bytes": 11765,
+      "sha256": "f3a40a2b506eb51fb20d42977fe1f03092570408d939cd20fb33596595ecfc4b"
+    },
+    {
+      "file": "source-after.json",
+      "bytes": 11765,
+      "sha256": "8c757b972588de86a5fe28bf0e1225b6b18e84e4cd08ec21d4e70dcfc03b6330"
+    }
+  ]
+}

@@ -1,0 +1,348 @@
+{
+  "format": "MG-final-restore-source-manifest-2",
+  "recordedAt": "2026-11-06T16:33:19.133761+00:00",
+  "sourceCommit": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "sourceTree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+  "sitesTree": "c2feb372a4c0ef121ffe594784684957c14ddac1",
+  "sourceBranch": "work/security-final-restore-f3c8062",
+  "worktreeClean": true,
+  "runtime": {
+    "node": "v24.22.1",
+    "nodeExecutable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "nodeOptionsPresent": false
+  },
+  "restoreModules": [
+    {
+      "path": "scripts/saas-test-isolation.mjs",
+      "bytes": 1497,
+      "sha256": "9f40b9159a1ad9f4d21c7ecdc76db31fd55d6a0efe793f3f32e7548809affb80"
+    },
+    {
+      "path": "sites/lib/backup-engine.ts",
+      "bytes": 28330,
+      "sha256": "16c9c727c469d7083b917087eae852a07334888748e8d0041e404aca1296fd0c"
+    },
+    {
+      "path": "sites/lib/bank-api-original.js",
+      "bytes": 10075,
+      "sha256": "2868abc1423a942d6eed583cbc14a2ab7b68cba533f1320636d4d5692d993a27"
+    },
+    {
+      "path": "sites/lib/banking/openpayments-normalization.js",
+      "bytes": 5275,
+      "sha256": "13782ec9a42db954153b6bebaf35b8f795d62035d4d6259b0e8b21717ac5185b"
+    },
+    {
+      "path": "sites/lib/company-contract.js",
+      "bytes": 5717,
+      "sha256": "5da17708a61f842002c3d57650679d260bb5142821baf97700353bc467e14c8e"
+    },
+    {
+      "path": "sites/lib/invoice-reference-policy.js",
+      "bytes": 9102,
+      "sha256": "3e3edf1942ec61a518bcef6350a09f1a3a2fabfffb56f0f1c2af9463953d5a9e"
+    },
+    {
+      "path": "sites/lib/payer-evidence.js",
+      "bytes": 3581,
+      "sha256": "6f6e5ac7f331c5fe87d8ed555cb2d908b8d000b26335efba25b8c5200a168661"
+    },
+    {
+      "path": "sites/lib/payment-references.js",
+      "bytes": 10789,
+      "sha256": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c"
+    },
+    {
+      "path": "sites/lib/reference-evidence-compat.js",
+      "bytes": 667,
+      "sha256": "1f01e0e6fbc32edf8449e5972634380a3138ad7fc3adaccf35600871eb961eba"
+    },
+    {
+      "path": "sites/scripts/lib/backup-recovery.mjs",
+      "bytes": 12873,
+      "sha256": "c971322d5d076726d018de1bda011855e0c01404cf17e8dda332d85601ca218d"
+    },
+    {
+      "path": "sites/scripts/lib/recovery-acceptance.mjs",
+      "bytes": 4976,
+      "sha256": "cfd917d15d6a21aed189d85b716b021618e7fb5e2c19eae7f33f29df1c3e708a"
+    },
+    {
+      "path": "sites/scripts/lib/recovery-drill-fixture.mjs",
+      "bytes": 8998,
+      "sha256": "ec7e9b7bef842abedafb601f5dd9ddcd5f42105d3056c02fc903426ad3752ede"
+    },
+    {
+      "path": "sites/scripts/recovery-drill.mjs",
+      "bytes": 12626,
+      "sha256": "dddedc152b49cb08a86906719377d9666ca5a1aacf0142f0b5fd5dcedc2c8f10"
+    },
+    {
+      "path": "sites/scripts/restore-backup-isolated.mjs",
+      "bytes": 15363,
+      "sha256": "fd8bbeaa54ac6a3d07081000e7ef8fd6b2d38bf1aee0f6af1a9c42a289e5e648"
+    }
+  ],
+  "appliedMigrationSql": [
+    {
+      "path": "sites/drizzle/0000_confused_umar.sql",
+      "bytes": 820,
+      "sha256": "8dffbc7c63ce6634a9e38d93ef57ee7d766b9264f8542798f911533644b335b2"
+    },
+    {
+      "path": "sites/drizzle/0001_sudden_whirlwind.sql",
+      "bytes": 1953,
+      "sha256": "334524db0cdd573f926573f87b0fa98826244d54e4361676a8801d801f58fee6"
+    },
+    {
+      "path": "sites/drizzle/0002_brief_chronomancer.sql",
+      "bytes": 250,
+      "sha256": "0bb9e7fda19d3209eae643f4887e14146fc5ee7ce428e16cda169f7a70985078"
+    },
+    {
+      "path": "sites/drizzle/0003_needy_gravity.sql",
+      "bytes": 1245,
+      "sha256": "1cbde57ce4e6c39fa61015539f6ed3dd70e46289cfa54251b6f6d6ee8b6abc26"
+    },
+    {
+      "path": "sites/drizzle/0004_silky_lily_hollister.sql",
+      "bytes": 2457,
+      "sha256": "600c2f1ec4aac72e61c50c0d4778892d7ff62e7f45139952be05047c113f9043"
+    },
+    {
+      "path": "sites/drizzle/0005_ancient_puppet_master.sql",
+      "bytes": 1875,
+      "sha256": "a2a3d3a656ab4d17f6f05f9b664ffd95707dadfa646ca58989f6b0748e9d5ab6"
+    },
+    {
+      "path": "sites/drizzle/0006_needy_namora.sql",
+      "bytes": 182,
+      "sha256": "1df94a683f2297e2eef1704d0472b64b7619fda141870e6f152bf1a386e6b226"
+    },
+    {
+      "path": "sites/drizzle/0007_material_the_spike.sql",
+      "bytes": 803,
+      "sha256": "ded218405539ddb69e309df07d88b12d98b29351826e97085964f300129f501e"
+    },
+    {
+      "path": "sites/drizzle/0008_minor_jazinda.sql",
+      "bytes": 66,
+      "sha256": "6ed90201b4410e45d6932b02f6c16b3aeb1721e17f3283c17af6646573f7c9ec"
+    },
+    {
+      "path": "sites/drizzle/0009_clumsy_rattler.sql",
+      "bytes": 789,
+      "sha256": "0fb48b48a8ad04e04d6a9db4aeb29b5f62812818e365f3c886fe6ef5cabca98d"
+    },
+    {
+      "path": "sites/drizzle/0010_silent_boomerang.sql",
+      "bytes": 298,
+      "sha256": "5f4ce18db5d67f57e8e0e018abeb3ca021da4d38e84e613207e9cb47e62556db"
+    },
+    {
+      "path": "sites/drizzle/0011_sturdy_zeigeist.sql",
+      "bytes": 75,
+      "sha256": "e770a0af994ff1cb8b0c65046ec2ab207aae66b42ce38c2459bda5657ba5ebf5"
+    },
+    {
+      "path": "sites/drizzle/0012_minor_naoko.sql",
+      "bytes": 177,
+      "sha256": "6007c55f4a9ed6b3f659f1073f1bc88a1c094a8fdb8fcea836d29ef56f3a6215"
+    },
+    {
+      "path": "sites/drizzle/0013_real_mindworm.sql",
+      "bytes": 79,
+      "sha256": "7e0d2749b095c688a1d678956a5bc6cfeb9e89066faf3f3f32f6f7aed8f5e22b"
+    },
+    {
+      "path": "sites/drizzle/0014_backup_verification.sql",
+      "bytes": 284,
+      "sha256": "a4ce3ab9299ba701137734ac06bcef23e247d57dacd979bdfaec305a24f44e6f"
+    },
+    {
+      "path": "sites/drizzle/0015_bank_api_evidence.sql",
+      "bytes": 70,
+      "sha256": "99fb870d97c0845bc79b77a9f5297c8f0fafb239bce340ed7501766d9f90aeec"
+    },
+    {
+      "path": "sites/drizzle/0016_agent2_account_read_guard.sql",
+      "bytes": 85,
+      "sha256": "7c12bdb8970c4eb24aaef86f2efc7289ba7dada573404f8b0ae3e925f161bf27"
+    },
+    {
+      "path": "sites/drizzle/0017_bankgiro_auto_ingest.sql",
+      "bytes": 1729,
+      "sha256": "2a142115a8aab1e73a07a7674a1154a23b00629b6e0d736951387a8bf6298b8c"
+    },
+    {
+      "path": "sites/drizzle/0018_bankgiro_source_readiness.sql",
+      "bytes": 1166,
+      "sha256": "cdc854ea5d7dfe44ded1db8110d42e0c1b79113797a41432d7605154c7d56ba0"
+    },
+    {
+      "path": "sites/drizzle/0019_company_boundaries.sql",
+      "bytes": 51153,
+      "sha256": "fdd1bc1cd3f70ea5bcaf2a23dd952a18d81504e553021f2e69920b1de4783e6a"
+    },
+    {
+      "path": "sites/drizzle/0020_bank_consent_context.sql",
+      "bytes": 2065,
+      "sha256": "085e908f3b6b346deef330170e4c361bc09a26c64c464768ba94d6870de88b00"
+    },
+    {
+      "path": "sites/drizzle/0023_saas_bank_sync.sql",
+      "bytes": 2470,
+      "sha256": "aa268f003a156a6661aa5d6fed44757c39a78c425ff4060e554c2f1e54eb6c1e"
+    },
+    {
+      "path": "sites/drizzle/0024_company_sync_boundaries.sql",
+      "bytes": 6103,
+      "sha256": "7547c9aa7b40b0d36eaa2d12b6f86ce3e55befab33f1a3ae5f28547107cc9ac1"
+    },
+    {
+      "path": "sites/drizzle/0025_application_tokens.sql",
+      "bytes": 2721,
+      "sha256": "fd0684ddda32c31fc6c07dd6cc00f5e263269750b08c51aff12ddd03e61de343"
+    }
+  ],
+  "metadataAndLocks": [
+    {
+      "path": "sites/drizzle/meta/_journal.json",
+      "bytes": 3561,
+      "sha256": "a82cf4547d0c020ebeef40c81e40affb9f0f118085da3134016587f6a9546b0a"
+    },
+    {
+      "path": "sites/package.json",
+      "bytes": 2792,
+      "sha256": "296bf119047d447b5a5164855511f00d33684f0656bfdb6ed7c3d985f0e4b0be"
+    },
+    {
+      "path": "sites/package-lock.json",
+      "bytes": 507382,
+      "sha256": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0"
+    },
+    {
+      "path": "package.json",
+      "bytes": 1170,
+      "sha256": "76d3a8af5d4b472cbb278a0e921a1967973184510661ad14f4163cd7e9d39f9e"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 13133,
+      "sha256": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d"
+    }
+  ],
+  "externalImports": [
+    "@noble/hashes/sha2.js",
+    "@noble/hashes/utils.js"
+  ],
+  "dependencyReuse": {
+    "mode": "Sites node_modules symlink to existing byte-identical-lock installation",
+    "candidateSitesLockByteIdentical": true,
+    "package": "@noble/hashes",
+    "version": "2.4.0",
+    "scope": "package.json and all top-level JavaScript module bytes captured, not all node_modules",
+    "files": [
+      {
+        "path": "@noble/hashes/_blake.js",
+        "bytes": 2841,
+        "sha256": "cabbff61d1f373bac45594ad758df7c42e176464ddbb94b44f5533fa977a4f56"
+      },
+      {
+        "path": "@noble/hashes/_md.js",
+        "bytes": 9175,
+        "sha256": "60cf3010fda89e3e4d3f0e7ff1ce249e9c467f34b4fd41b6fd6101d9f69be763"
+      },
+      {
+        "path": "@noble/hashes/_u64.js",
+        "bytes": 4794,
+        "sha256": "b09da8c07fe8187c07649494cdb7cd0bcf13df90b506a9473d19e4d5f8c2e102"
+      },
+      {
+        "path": "@noble/hashes/argon2.js",
+        "bytes": 25707,
+        "sha256": "f39753324bdf2f484150731d24b1d71236f26bf10bedd594f7d190fcdfdefdc9"
+      },
+      {
+        "path": "@noble/hashes/blake1.js",
+        "bytes": 25201,
+        "sha256": "da1d08b4d0702ad4f185a796df8fce3fec2855de53b02190eba3bd8555677b5c"
+      },
+      {
+        "path": "@noble/hashes/blake2.js",
+        "bytes": 22819,
+        "sha256": "03f00237bcc0b4d822a80f7c0ac22e42632c48e246c3b6da584e6452186e32f0"
+      },
+      {
+        "path": "@noble/hashes/blake3.js",
+        "bytes": 12503,
+        "sha256": "bc25a8f6c50acabf3781c44ec55cb364b00f6f3f4349d841813a1057a8af2f20"
+      },
+      {
+        "path": "@noble/hashes/eskdf.js",
+        "bytes": 9911,
+        "sha256": "7ded32d320b0d1d71c59a4a3b493722a13c9c6a66de83f19f8a382b29af7a2f6"
+      },
+      {
+        "path": "@noble/hashes/hkdf.js",
+        "bytes": 7019,
+        "sha256": "ccb942a8008f974018965eeb1e33b8f4739bf767c6f95f2ceb06f5873a302f67"
+      },
+      {
+        "path": "@noble/hashes/hmac.js",
+        "bytes": 3118,
+        "sha256": "fec9f8f3aeda785ea2de91cc4c059d54ef98196261c026c43f48341007ae52c9"
+      },
+      {
+        "path": "@noble/hashes/index.js",
+        "bytes": 1133,
+        "sha256": "b0d908a44e09a1b7c27a43d7b9036a6147a7a32db758bb64d9a668ea5c72d1af"
+      },
+      {
+        "path": "@noble/hashes/legacy.js",
+        "bytes": 12613,
+        "sha256": "690553a41af2fdd1e32ff6b534ba8508e95f1861c09c2d62fe762b6b501e09be"
+      },
+      {
+        "path": "@noble/hashes/pbkdf2.js",
+        "bytes": 7644,
+        "sha256": "62b75b5465a89af052a80bdebe7e0383ba01648b12f64877ce285a2e9896c713"
+      },
+      {
+        "path": "@noble/hashes/scrypt.js",
+        "bytes": 13621,
+        "sha256": "a38a020620776fa5c57c00f151bdc1033c192827c9d841996daaf29122ea82c1"
+      },
+      {
+        "path": "@noble/hashes/sha2.js",
+        "bytes": 18997,
+        "sha256": "471746bba6ec4c6238ca41358d1d3b40b6ff31cf3363f0b4d550c649c1a8e83b"
+      },
+      {
+        "path": "@noble/hashes/sha3-addons.js",
+        "bytes": 38268,
+        "sha256": "e979866a213955afba24c105966bc42afa5d1377d77fe1017dea29a958fddcb7"
+      },
+      {
+        "path": "@noble/hashes/sha3.js",
+        "bytes": 17469,
+        "sha256": "9a81e1edb24eae27b335533220167609cfb58008c5690e140ce478acdc669f32"
+      },
+      {
+        "path": "@noble/hashes/utils.js",
+        "bytes": 26035,
+        "sha256": "037ad49adb78168b6b699598fd33f85f7877456b1d28b4d032e2a1a16807947c"
+      },
+      {
+        "path": "@noble/hashes/webcrypto.js",
+        "bytes": 9633,
+        "sha256": "83f476a634233b999ce6e6cd67dc03e64f07b8d5a826e67ad4a50c940d9ce7ee"
+      },
+      {
+        "path": "@noble/hashes/package.json",
+        "bytes": 2583,
+        "sha256": "3e361734f5269de162fa362483d7f45dee7efb533ec217157945338f7591baaf"
+      }
+    ]
+  }
+}
