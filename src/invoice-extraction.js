@@ -59,6 +59,16 @@ function invoiceDate(value){
   const match=String(value).match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
   return validDate(match?`${match[3]}-${match[2].padStart(2,'0')}-${match[1].padStart(2,'0')}`:value);
 }
+function explicitInvoiceCurrency(value){
+  const prefix=/^(SEK|EUR|USD|GBP|NOK|DKK)(\.?)(?=[ \t]|$)/i.exec(value);
+  if(!prefix)return null;
+  if(prefix[0].length===value.length)return prefix[1].toUpperCase();
+  // A period closes the ISO value. Only one whole known payment instruction
+  // may follow; unknown words, a second sentence or malformed tails stay raw.
+  const mentions=invoiceReferenceMentions(value),instruction=mentions[0];
+  return prefix[2]==='.'&&mentions.length===1&&instruction.start===prefix[0].length
+    &&/^[.!?]?$/.test(value.slice(instruction.end))?prefix[1].toUpperCase():null;
+}
 export function validOrganization(value){
   const s=String(value||'').replace(/[-\s]/g,'');if(!/^\d{10}$/.test(s)||Number(s[2])<2)return false;
   return [...s].reduce((sum,c,i)=>{const n=Number(c)*(i%2?1:2);return sum+Math.floor(n/10)+n%10;},0)%10===0;
@@ -126,7 +136,19 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
       if(monetary)monetaryOccurrences.push(monetary);
       start+=blankLines.length;
       const end=text.indexOf('\n',start),line=text.slice(start,end<0?text.length:end);
-      const boundary=line.search(sibling),value=(boundary<0?line:line.slice(0,boundary)).trim();
+      let boundary=line.search(sibling);
+      if(currencyLabel&&referenceMentions.length){
+        boundary=-1;
+        for(const next of line.matchAll(new RegExp(sibling.source,'giu'))){
+          const position=start+next.index+next[0].length;
+          while(referenceMentions[mentionIndex]?.end<=position)mentionIndex++;
+          // A noun inside a complete known instruction is not a new field.
+          // Real later labels still end this value and keep their own census.
+          if(referenceMentions[mentionIndex]?.start<=position)continue;
+          boundary=next.index;break;
+        }
+      }
+      const value=(boundary<0?line:line.slice(0,boundary)).trim();
       // A bare alphabetic line could be a section heading. Keep it unassigned
       // instead of inventing an invoice identity; same-line IDs may be letters.
       const assigned=invoiceLabel&&blankLines&&!/[0-9]/.test(value)?'':value;
@@ -216,7 +238,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   // token cannot erase an unreadable label or a known prefix followed by junk.
   // One terminal sentence period does not change a complete ISO value. Never
   // accept a prefix followed by another token, punctuation or unreadable data.
-  const explicitCurrency=grabFull('currency','(?:valuta|currency)',value=>/^(?:SEK|EUR|USD|GBP|NOK|DKK)\.?$/i.test(value)?value.replace(/\.$/,'').toUpperCase():null);
+  const explicitCurrency=grabFull('currency','(?:valuta|currency)',explicitInvoiceCurrency);
   const currencies=[...new Set((text.match(/\b(?:SEK|EUR|USD|GBP|NOK|DKK)\b/gi)||[]).map(value=>value.toUpperCase()))];
   if(!explicitCurrency&&currencies.length===1)set('currency',currencies[0],currencies[0]);
   else if(!explicitCurrency&&!currencies.length&&/\bkr\b/i.test(text))set('currency','SEK','kr',.7);
