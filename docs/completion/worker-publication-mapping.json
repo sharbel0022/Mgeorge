@@ -1,0 +1,76 @@
+{
+  "schema": "mgeorge-completion-publication-mapping-v1",
+  "method": "Normal GitHub git-object API publication and compare-and-swap fast-forward ref updates. No force push. Commit metadata differs; every corresponding full tree SHA is identical.",
+  "base": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+  "branch": "feature/final-95-completion",
+  "mapping": [
+    {
+      "local": "3cb6433de1700e2ed4eee544c7e0c56142dd660d",
+      "remote": "7b13d62bfb44f2540c39d5602ac2846237418dcc",
+      "tree": "e33d6e5073d89eabaf2522b33b6c07313a25074e",
+      "message": "docs(review): verify bank status metadata fix independently"
+    },
+    {
+      "local": "795ef46d1e77396bf03d0a4ec4c07096c50cffbd",
+      "remote": "fef2c82adbe9a0e1a6d73d2704899ff72a527ee5",
+      "tree": "54ab8aaa4ce7521ec6178ee706f5f601f4c8f61b",
+      "message": "docs: record final merged-source encrypted restore acceptance"
+    },
+    {
+      "local": "bcc5a01c3d56c3ce4ac4cdff632ef4d6be87d57d",
+      "remote": "c77f0716be9185685ca7a9c62e4a427a356622fe",
+      "tree": "70aa48f530fef277c74276cc7a3870ec37995d21",
+      "message": "docs: propose evidence-bound assessment of all 33 criteria"
+    },
+    {
+      "local": "cfbb48f7e76a824ff81d39e7b85b7637908c9e27",
+      "remote": "e079cbe36a55bf4577131a6482d4202498421ac7",
+      "tree": "75d8337dd2ed2ef81c438de1bfb4f6f88e0ba0c0",
+      "message": "docs: record bounded OCR worker IPC diagnosis"
+    },
+    {
+      "local": "750a1eb491a0dbd8d9764d04aef11bfbcd408a56",
+      "remote": "e81c71fe9962ebcc44dced333c78d5b21bdd7dee",
+      "tree": "e2892f3d183b1426564b3d352d37928988bc5d22",
+      "message": "docs: preserve independent synthetic OCR first-pass evidence"
+    },
+    {
+      "local": "9e87b5d48588966d8c1d000d89e5c9957acb115f",
+      "remote": "4e7c7207940b9c28e95b94247394134dd46bfa33",
+      "tree": "2d70af52fff6e8b488b36f21ef515fa7e13ca2f3",
+      "message": "test: freeze document worker lifecycle boundary regressions"
+    },
+    {
+      "local": "4520ca2f2c9ce1e72e77f37ce41766640580bcc3",
+      "remote": "c581a1b58cfe146586226d9fcfcf9da20484d62a",
+      "tree": "f4959740591245be79c42c22a17da2475e3723d2",
+      "message": "fix(ocr): preserve worker receipts and classify process failures"
+    },
+    {
+      "local": "c4eb3f0ea2e45e54929f87d29159750d63e91240",
+      "remote": "a6a29375398fcefa9e0da00bf0404a81c7168e4d",
+      "tree": "a201cf98443b48d0ad5b9e374d1abe137902bb38",
+      "message": "docs: bind worker lifecycle RED GREEN and integration evidence"
+    },
+    {
+      "local": "801efaeba69bf6450f924b573685fbfa71eb9fb7",
+      "remote": "79b6a6dffd7a56dae8633c2ecf10a2d647e8748c",
+      "tree": "f2d379c733aa03909530952ceed74fc690a3dffc",
+      "message": "docs: record independent worker IPC boundary review"
+    },
+    {
+      "local": "852551480a7160de06a860ff23cd58f91a3afb02",
+      "remote": "6064373fe6a99819ea5d84136e0ed0084738d76a",
+      "tree": "b038c14f7eb07f92e42ad3e57045db2198932d94",
+      "message": "docs: retain exact CI and successful Site 68 release evidence"
+    },
+    {
+      "local": "5bc2627c8889a6252bbc205ec43edea7f8ff1390",
+      "remote": "0d20eb1a8a2ab66345b857be8c45d2e77b9b6da9",
+      "tree": "6ad2895e046018d1e8f47844a1694c03b8ca81d8",
+      "message": "docs(review): clarify load concurrency and token observation scope"
+    }
+  ],
+  "scope": "Mappings through independent release review. Later assessment/holdout documentation commits and final CI/merge identities are recorded in the normal PR timeline.",
+  "sites_tree": "ff078901d22a76ce0d0eac775e405ca50d8bcc6e"
+}

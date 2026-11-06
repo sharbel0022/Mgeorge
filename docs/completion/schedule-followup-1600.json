@@ -1,0 +1,92 @@
+{
+  "schema": "mgeorge-schedule-followup-v1",
+  "observed_at": "2026-11-06T15:59:08Z",
+  "gmail": {
+    "enabled": true,
+    "run": {
+      "id": "2768c043-751c-832b-af5f-84f3323ec191",
+      "recorded_status": "no_update",
+      "scheduled_for": "2026-11-06T16:00:00Z",
+      "started_at": "2026-11-06T15:57:21.149036Z",
+      "completed_at": "2026-11-06T15:57:21.683437Z",
+      "chat_ref": null
+    },
+    "last_successful_fetch": "2026-11-06T14:28:00.627Z",
+    "schedule_observation": {
+      "last_invoked_at": "2026-11-06T14:00:46.717Z",
+      "last_completed_at": "2026-11-06T14:01:01.519Z",
+      "last_outcome": "completed",
+      "source": "system_entrypoint",
+      "external_schedule_verified": false
+    },
+    "counts": {
+      "needs_review": 409,
+      "registered": 2,
+      "waiting_ocr": 54
+    },
+    "sync_eligibility": {
+      "eligible": true,
+      "reason": "eligible",
+      "next_eligible_at": "2026-11-06T15:58:31.761Z"
+    },
+    "fetch_changed_from_1556_baseline": false,
+    "application_invocation_changed_from_1556_baseline": false,
+    "latest_published_result_belongs_to": "2026-11-06T02:00:00Z; a different run ID and not attributed to the16:00 run",
+    "conclusion": "Ordinary dispatch not verified despite a permitted attempt; no task/authorization changes made in this follow-up."
+  },
+  "cloud_ocr": {
+    "configured": true,
+    "latest_completed_at": "2026-11-06T15:05:07.163Z",
+    "recent": false,
+    "latest_scheduled_runs": [
+      {
+        "id": 42204787537,
+        "event": "schedule",
+        "created_at": "2026-11-06T10:43:05Z",
+        "conclusion": "success",
+        "head_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+      },
+      {
+        "id": 42153093698,
+        "event": "schedule",
+        "created_at": "2026-11-06T02:52:50Z",
+        "conclusion": "success",
+        "head_sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1"
+      },
+      {
+        "id": 42083409804,
+        "event": "schedule",
+        "created_at": "2026-11-05T18:21:17Z",
+        "conclusion": "success",
+        "head_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+      },
+      {
+        "id": 42013301104,
+        "event": "schedule",
+        "created_at": "2026-11-05T10:45:08Z",
+        "conclusion": "success",
+        "head_sha": "f75a293f367980cd360eca1886a2728db9c3e1f2"
+      },
+      {
+        "id": 41959053043,
+        "event": "schedule",
+        "created_at": "2026-11-05T03:02:33Z",
+        "conclusion": "success",
+        "head_sha": "f75a293f367980cd360eca1886a2728db9c3e1f2"
+      }
+    ],
+    "latest_schedule": {
+      "run_id": 42204787537,
+      "job_id": 127848589417,
+      "source": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "logged_result_at": "2026-11-06T10:44:46.2805382Z",
+      "result": {
+        "status": "complete",
+        "processed": 6,
+        "failed": 0
+      }
+    },
+    "configured_cron": "7/15 * * * *",
+    "observation_limit": "The filtered GitHub run listing records no newer scheduled OCR run as of this read. The15:05 successful production run was workflow_run-triggered after CI. Configuration and earlier successes do not establish current periodic delivery. The underlying platform scheduling cause is not determined."
+  }
+}

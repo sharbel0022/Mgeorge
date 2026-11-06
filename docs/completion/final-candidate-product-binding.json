@@ -1,0 +1,62 @@
+{
+  "schema": "mgeorge-combined-reviewed-candidate-v1",
+  "observed_at": "2026-11-06T16:18:42.002329+00:00",
+  "reviewed_product_commit": "100f9c3015da34f772ea0cba53d9871e978ebeab",
+  "integrated_local_commit": "f76cd4c527e225a0087c035986e65225057c77a5",
+  "scope": [
+    {
+      "path": "src",
+      "reviewed_object": "5767a0b2cb825ff1ffa4642d285b076161196442",
+      "integrated_object": "5767a0b2cb825ff1ffa4642d285b076161196442",
+      "identical": true
+    },
+    {
+      "path": "sites",
+      "reviewed_object": "c2feb372a4c0ef121ffe594784684957c14ddac1",
+      "integrated_object": "c2feb372a4c0ef121ffe594784684957c14ddac1",
+      "identical": true
+    },
+    {
+      "path": "scripts",
+      "reviewed_object": "cc017f88bace58eeeeb11af01f1ae68669afcd24",
+      "integrated_object": "cc017f88bace58eeeeb11af01f1ae68669afcd24",
+      "identical": true
+    },
+    {
+      "path": "test",
+      "reviewed_object": "15dcdf9750494a0a23b4d8724fe6ac027cd4d635",
+      "integrated_object": "15dcdf9750494a0a23b4d8724fe6ac027cd4d635",
+      "identical": true
+    },
+    {
+      "path": "bridge",
+      "reviewed_object": "745600d2ed8dccfd9c143ff22dbd7e37bfa6be32",
+      "integrated_object": "745600d2ed8dccfd9c143ff22dbd7e37bfa6be32",
+      "identical": true
+    },
+    {
+      "path": ".github",
+      "reviewed_object": "95efa60228291e7a08832423647774618e5ca458",
+      "integrated_object": "95efa60228291e7a08832423647774618e5ca458",
+      "identical": true
+    },
+    {
+      "path": "package.json",
+      "reviewed_object": "ec4a416cc6e55d664879afc262ffc7528e914a5d",
+      "integrated_object": "ec4a416cc6e55d664879afc262ffc7528e914a5d",
+      "identical": true
+    },
+    {
+      "path": "package-lock.json",
+      "reviewed_object": "37952e5226e223208e74d365e94e53c8cd06e8a7",
+      "integrated_object": "37952e5226e223208e74d365e94e53c8cd06e8a7",
+      "identical": true
+    }
+  ],
+  "all_compared_source_and_test_objects_identical": true,
+  "full_pr_ci": "PENDING",
+  "full_main_ci": "PENDING",
+  "new_sites_publication": "PENDING",
+  "existing_live_version": 68,
+  "score_credit_from_future_checks": false
+}

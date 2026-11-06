@@ -59,3 +59,7 @@ NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --test \
 ```
 
 Den tillfälliga beroendelänken i producentens checkout togs bort efter körning; arbetskopian var ren. Granskaren har inte gjort någon ny bred svit-, build- eller produktionskörning. Dessa slutgrindar ägs av integrationsansvarig.
+
+## Raw log storage
+
+The unchanged original `parent-red.tap` is retained as [parent-red.tap.gz](parent-red.tap.gz). Its decompressed bytes and original SHA-256 match the historical review receipt. [Storage mapping](raw-log-storage.json) records both hashes. Compression preserves the original failing assertions and whitespace; no raw result was trimmed or rewritten.

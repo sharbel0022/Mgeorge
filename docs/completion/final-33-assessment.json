@@ -1,9 +1,9 @@
 {
   "schema": "mgeorge-final-33-site68-v1",
-  "assessed_at": "2026-11-06T15:43:48.897501+00:00",
-  "evidence_cutoff": "Published Site68 aftercheck 2026-11-06T15:07Z; first independent OCR report and later reviewed Node worker are explicitly separate sources.",
-  "status": "SITE68_ASSESSED_SECOND_BLIND_SEK_EVALUATION_PENDING",
-  "scope": "Publicerad Sites68 från main24390ef. Inga poäng eller publiceringsanspråk bygger på framtida worker-CI eller det pågående andra OCR-provet.",
+  "assessed_at": "2026-11-06T16:18:42.003052+00:00",
+  "evidence_cutoff": "Published Site68 aftercheck 2026-11-06T15:07Z; two completed independent OCR first results; read-only schedule follow-up2026-11-06T15:59:08Z. Later reviewed product changes are separately pending full CI and publication.",
+  "status": "SITE68_ASSESSED_BOTH_BLIND_OCR_FIRST_RESULTS_PRESERVED_COMBINED_FOLLOWUP_PENDING",
+  "scope": "Publicerad Site 68 från main 24390ef. Båda separata första OCR-prov är slutförda och bevarade. Den senare kombinerade worker-/standardetikettkandidaten väntar på egen full PR-/main-CI och ny Sites-publicering; inga framtida resultat ger poäng.",
   "historical_baseline": {
     "sum": 257.5,
     "maximum": 330,
@@ -187,7 +187,15 @@
       "source": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
       "processed": 6,
       "failed": 0,
-      "cron_or_gmail_scheduler_proof": false
+      "cron_or_gmail_scheduler_proof": false,
+      "recent_as_of_1558": false,
+      "last_observed_schedule": {
+        "run_id": 42204787537,
+        "created_at": "2026-11-06T10:43:05Z",
+        "processed": 6,
+        "failed": 0,
+        "current_periodicity_verified": false
+      }
     },
     "documents": {
       "needs_review": 409,
@@ -221,7 +229,9 @@
       "overdue": 7250,
       "payable": 0,
       "verified_payments": 0
-    }
+    },
+    "gmail_1600_scheduled_result": "no_update",
+    "gmail_1600_application_invocation_verified": false
   },
   "recovery_summary": {
     "source_ref": "RESTORE_RAW",
@@ -269,37 +279,10 @@
       "Detta 9-bildfältsmått är inte direkt jämförbart med känd utvecklingsreplay 74/100 obligatoriska fält med annan population."
     ]
   },
-  "pending_second_blind_supported_sek_cohort_on_f5d178ea": {
-    "status": "PENDING",
-    "must_resolve_before_final_user_report": true,
-    "owner": "root",
-    "purpose": "Nytt första blint prov av giltiga syntetiska SEK-underlag på separat granskad Node-workerfix.",
-    "reviewed_worker_product_commit": "f5d178ea816d276457685fbc0421cf144f7cf655",
-    "independent_review_ref": "WORKER_REVIEW",
-    "corpus_id": null,
-    "freeze_manifest_sha256": null,
-    "executed_source_commit": null,
-    "first_run_report_path": null,
-    "first_run_report_sha256": null,
-    "normal_documents": null,
-    "image_field_tp": null,
-    "image_field_fp": null,
-    "image_field_fn": null,
-    "mandatory_recall": null,
-    "field_precision": null,
-    "worker_failures": null,
-    "fully_correct_documents": null,
-    "green_documents": null,
-    "false_green_documents": null,
-    "precision_98_and_recall_85_met": null,
-    "scope_limitations": null,
-    "criterion10_reassessment": null,
-    "instruction": "Fyll endast det nya frysta provets faktiska första utfall. Bevara första kohortens 37,50 %, fel och nämnare. Räkna om samma 33-raderstabell om poängen ändras."
-  },
   "later_node_worker_followup": {
     "product_commit": "f5d178ea816d276457685fbc0421cf144f7cf655",
     "independent_review_commit": "6fc82525fa091bf775f45b854a6f89ca67abb126",
-    "scope": "Node IPC/error handling only; source diff leaves sites subtree unchanged",
+    "scope": "Historical worker-only source f5d178ea; no longer the full combined candidate. See later_combined_product_followup.",
     "full_pr_ci_status": "PENDING",
     "full_main_ci_status": "PENDING",
     "publication_or_score_credit_in_this_report": false,
@@ -384,8 +367,8 @@
     {
       "ref": "RELEASE",
       "path": "docs/completion/release-site68.md",
-      "sha256": "56daa9446c1e984f2bb3c41e758d56a5fc35361616605512285976a284f473cb",
-      "bytes": 10831
+      "sha256": "a3eb5e5c8d33ee7750bcd7092c55c5d209803f6186cef767bd0c57fe78e4e08c",
+      "bytes": 11272
     },
     {
       "ref": "CLOUD",
@@ -458,6 +441,36 @@
       "path": "docs/completion/worker-review/result.json",
       "sha256": "642e85154a8e6823b771718e499f53f0ece5481667ddd1564bccfb6cbad733e1",
       "bytes": 2399
+    },
+    {
+      "ref": "OCRSUPPORTED",
+      "path": "docs/quality8/independent-supported-20261106/REPORT.md",
+      "sha256": "e92ba18a7c6492432b385f99bc83020e392a9a044709cc5492bad58d4c1f55e2",
+      "bytes": 8391
+    },
+    {
+      "ref": "AUDIT",
+      "path": "docs/completion/sites-development-audit-risk.md",
+      "sha256": "75916fad00731e9af29e80cf8cf0c89c887a1b8b0aea36fb5bba23cf9a9d8014",
+      "bytes": 7472
+    },
+    {
+      "ref": "SCHEDULE",
+      "path": "docs/completion/schedule-followup-1600.json",
+      "sha256": "171437e828caabe0e996991c2141562df5393e9887d6bbccc70354e49cb1a1a0",
+      "bytes": 3233
+    },
+    {
+      "ref": "ALIAS",
+      "path": "docs/quality8/standard-field-alias-census/README.md",
+      "sha256": "00f868f02ceefdf4908a736d42d5a9b0ee6aa790e7637c3895c28eaeb56ad31f",
+      "bytes": 7727
+    },
+    {
+      "ref": "ALIAS_REVIEW",
+      "path": "docs/completion/alias-review/README.md",
+      "sha256": "44ab5eb9045caf305368ec1d8e1d95ae27dbf855d09e6d6aa434df4b8a3d75d6",
+      "bytes": 7910
     }
   ],
   "rows": [
@@ -629,18 +642,18 @@
       "area": "Bild-OCR",
       "criterion": "Fryst representativ rasterkorpus samt separata hållna fall; minst 85 % återfunna obligatoriska fält och minst 98 % fältprecision, utan felaktigt grönt ekonomiskt kritiskt fall. Redovisa även dokumentnivå och svåra fall.",
       "previous_score": 6.5,
-      "test_evidence": "Känd utvecklingsreplay: 74/100 obligatoriska normalfält. Första nya oberoende syntetiska provet: 54/144 bildfält = 37,50 % recall, 0 FP på 54 lämnade värden, 4/16 normala workerfel och 0/16 fullständiga dokument. Andra giltiga SEK-kohorten är uttryckligen PENDING. [OCR] [OCRFIRST]",
+      "test_evidence": "Känd utvecklingsreplay: 74/100 obligatoriska fält. Första frysta oberoende kohorten: 54/144 = 37,50 % recall, 0 FP och fyra workerfel. Separat giltig SEK-kohort: 62 TP / 0 FP / 46 FN av 108 bildfält, 57,41 % recall och 100 % observerad precision; 14/14 workers slutförda och 28 parseranrop utan fel. Inga av de 12 normala dokumenten var fullständiga eller gröna. [OCR] [OCRFIRST] [OCRSUPPORTED]",
       "production_evidence": "Automatisk workflow_run-OCR behandlade 6 med 0 körfel; aktuellt 409 granskning/54 väntande/2 registrerade. Ingen produktionsfacitjämförelse eller ny grön registrering styrks. [CLOUD] [LIVE]",
-      "remaining_risks": "Första provet innehöll avsiktligt ogiltiga organisationsnummer och EUR bland normalfallen; det är inte representativ giltig SEK-acceptans. Det första utfallet bevaras, inklusive fyra tekniska avbrott med okänd orsak. Olika populationer/nämnare gör 74/100 och 54/144 icke direkt jämförbara.",
-      "reason": "Behåll 6,5: 85/98 är inte styrkt. Det första negativa provet redovisas utan omklassning; ett framtida andra resultat ger ingen kredit innan dess första utfall och begränsningar fyllts i.",
+      "remaining_risks": "Första kohorten har ogiltiga organisationsnummer, EUR-dokument och fyra oförklarade workeravbrott. Den andra giltiga SEK-kohorten missar 46/108 bildfält trots att alla workers slutfördes. Små syntetiska mängder med olika populationer och nämnare får inte slås ihop eller beskrivas som verklig driftkvalitet. Noll false green med noll gröna ger inget positivt urval för att bedöma säkra automatiska resultat.",
+      "reason": "Behåll 6,5: det separata giltiga första provet når 57,41 % recall, under 85 %. Observerad precision på 62/62 lämnade fält styrker inte minst 98 % i produktion. Inget första utfall har ändrats.",
       "score": 6.5,
       "evidence_refs": [
         "CLOUD",
         "LIVE",
         "OCR",
-        "OCRFIRST"
+        "OCRFIRST",
+        "OCRSUPPORTED"
       ],
-      "pending_evidence": "pending_second_blind_supported_sek_cohort_on_f5d178ea",
       "delta": 0.0,
       "at_least_8": false
     },
@@ -650,14 +663,15 @@
       "criterion": "Aktuell lyckad hämtning, återförsök/dubblettskydd och synligt genomfört schema; inga mejl skickas av bakgrundsflödet.",
       "previous_score": 8,
       "test_evidence": "127/127 riktade Gmailfall, ny eligibility-projektion och korrupt låsdeadline avvisas säkert; full kandidat-CI passerar. [OCR] [CI]",
-      "production_evidence": "Direktkörningen importerade sju underlag. Senaste framgång är 14:28:00.627Z utan styrkt körkälla. Timuppgiften schemalagd 15:00 registrerades no_update utan nytt appinvokeringskvitto. [LIVE]",
+      "production_evidence": "Direktkörningen importerade sju underlag. Senaste framgång är 14:28:00.627Z utan styrkt körkälla. Timuppgifterna för 15:00 och 16:00 registrerades no_update utan nytt appinvokeringskvitto, trots aktuell försökstillåtlighet. [LIVE] [SCHEDULE]",
       "remaining_risks": "Kriteriet kräver uttryckligen synligt genomfört schema. Klarlagd prompt, heartbeat och manuell körning räcker inte.",
       "reason": "Behåll 7,5: befintligt kriterium kräver synligt genomfört schema. Ny sync_eligibility och en lyckad direktkörning visar inte att dispatchbristen är löst.",
       "score": 7.5,
       "evidence_refs": [
         "CI",
         "LIVE",
-        "OCR"
+        "OCR",
+        "SCHEDULE"
       ],
       "delta": -0.5,
       "at_least_8": false
@@ -960,7 +974,7 @@
       "criterion": "Befintliga scheman fungerar och minst en faktisk körning observeras; överlapp, paus och sen körning hanteras; ingen grön status från enbart konfiguration.",
       "previous_score": 6.5,
       "test_evidence": "Lås, väntetider, leaseåterhämtning och eligibility är förstärkta och passerar CI. [OCR] [CI]",
-      "production_evidence": "Automatisk moln-OCR via workflow_run 42239375434 gav 6/0 på 24390ef. Gmail-tillfället 15:00 gav no_update utan appinvokeringskvitto. Backupens fulla automatiska återupptagningskedja är inte nyverifierad. [LIVE] [CLOUD]",
+      "production_evidence": "Periodisk OCR-run 42204787537 gav 6/0 klockan 10:44; ingen senare schedule-run visas vid läsningen 15:58. Automatisk workflow_run 42239375434 gav 6/0 efter CI. Gmail-tillfällena 15:00 och 16:00 gav no_update utan nytt appinvokeringskvitto. Backupens fulla automatiska återupptagningskedja är inte nyverifierad. [LIVE] [CLOUD] [SCHEDULE]",
       "remaining_risks": "workflow_run efter CI är automatisk exekvering men bevisar varken cron-periodicitet eller Gmail-timdispatch. Den kvarvarande dispatch-/driftintegrationen är inte ett BankID- eller bankavtalsberoende.",
       "reason": "Behåll 6,5: ett konkret automatiskt OCR-kvitto tillkommer, men det löser inte de återstående kriteriekraven för ordinarie Gmail- och backupkedjor.",
       "score": 6.5,
@@ -968,7 +982,8 @@
         "CI",
         "CLOUD",
         "LIVE",
-        "OCR"
+        "OCR",
+        "SCHEDULE"
       ],
       "delta": 0.0,
       "at_least_8": false
@@ -1064,5 +1079,123 @@
       "delta": 0,
       "at_least_8": true
     }
-  ]
+  ],
+  "second_independent_supported_sek_evaluation": {
+    "status": "COMPLETED_TARGET_NOT_MET",
+    "must_resolve_before_final_user_report": false,
+    "owner": "root",
+    "purpose": "Nytt första blint prov av giltiga syntetiska SEK-underlag på separat granskad Node-workerfix.",
+    "reviewed_worker_product_commit": "f5d178ea816d276457685fbc0421cf144f7cf655",
+    "independent_review_ref": "WORKER_REVIEW",
+    "corpus_id": "independent-supported-20261106",
+    "freeze_manifest_sha256": "0fd6c4de10ad0b4e8c883b727aa9c3a5a5a7a2a9d272957cee11469b9cb44758",
+    "executed_source_commit": "cb83472359927adadf99cb50b54f9e9aeaded19a",
+    "first_run_report_path": "docs/quality8/independent-supported-20261106/REPORT.md",
+    "first_run_report_sha256": "e92ba18a7c6492432b385f99bc83020e392a9a044709cc5492bad58d4c1f55e2",
+    "normal_documents": 12,
+    "image_field_tp": 62,
+    "image_field_fp": 0,
+    "image_field_fn": 46,
+    "mandatory_recall": 0.5740740740740741,
+    "field_precision": 1.0,
+    "worker_failures": 0,
+    "fully_correct_documents": 0,
+    "green_documents": 0,
+    "false_green_documents": 0,
+    "precision_98_and_recall_85_met": false,
+    "scope_limitations": [
+      "Small controlled synthetic cohort: six Swedish and six English invoices, SEK, three balanced layout families, one recipient and one VAT rate. Not production-wide quality.",
+      "Organization numbers have validated format and Luhn; no actual legal entity or company-register verification.",
+      "Direction is supplied metadata, excluded from nine image-field metrics.",
+      "Node and Sites share the same14 OCR observations and are not independent document populations.",
+      "Observed100% precision62/62 does not establish true population precision>=98%; zero green predictions gives no green-accuracy sample.",
+      "The different cohorts cannot establish a causal effect of the worker fix on the first cohort's four unexplained failures."
+    ],
+    "criterion10_reassessment": "Retain 6.5. The actual supported-normal first pass has 57.41% recall, below 85%. Successful worker completion does not justify an accuracy score increase.",
+    "calls": {
+      "worker": 14,
+      "node": 14,
+      "sites": 14
+    },
+    "stress": {
+      "documents": 2,
+      "TP": 10,
+      "FP": 0,
+      "FN": 8,
+      "recall": 0.5555555555555556,
+      "precision": 1.0
+    },
+    "per_field": {
+      "invoice_number": {
+        "TP": 4,
+        "FP": 0,
+        "FN": 8
+      },
+      "party": {
+        "TP": 2,
+        "FP": 0,
+        "FN": 10
+      },
+      "organization_number": {
+        "TP": 8,
+        "FP": 0,
+        "FN": 4
+      },
+      "issued_at": {
+        "TP": 6,
+        "FP": 0,
+        "FN": 6
+      },
+      "due_at": {
+        "TP": 6,
+        "FP": 0,
+        "FN": 6
+      },
+      "total_cents": {
+        "TP": 12,
+        "FP": 0,
+        "FN": 0
+      },
+      "net_cents": {
+        "TP": 12,
+        "FP": 0,
+        "FN": 0
+      },
+      "vat_cents": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 12
+      },
+      "currency": {
+        "TP": 12,
+        "FP": 0,
+        "FN": 0
+      }
+    },
+    "document_levels": {
+      "red": 8,
+      "yellow": 4
+    }
+  },
+  "later_combined_product_followup": {
+    "reviewed_product_commit": "100f9c3015da34f772ea0cba53d9871e978ebeab",
+    "integrated_local_commit": "f76cd4c527e225a0087c035986e65225057c77a5",
+    "sites_tree": "c2feb372a4c0ef121ffe594784684957c14ddac1",
+    "binding": "docs/completion/final-candidate-product-binding.json",
+    "full_pr_ci": "PENDING",
+    "full_main_ci": "PENDING",
+    "sites_publication": "PENDING",
+    "publication_or_score_credit_in_this_report": false,
+    "focused_node": 574,
+    "focused_sites": 464,
+    "independent_review": 120,
+    "development_replay": {
+      "commit": "0132d4537c5fd24e6a0af7f3cadf499a73706ed0",
+      "normal_correct_before": 62,
+      "normal_correct_after": 66,
+      "normal_expected": 108,
+      "optical_calls": 0,
+      "final_product_measurement": false
+    }
+  }
 }
