@@ -70,7 +70,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   const confidence=method==='ocr'?Math.min(.85,Math.max(0,ocrConfidence/100)):.96;
   const set=(key,value,evidence,score=confidence)=>{fields[key]={value,confidence:value==null?0:score,evidence:evidence?.slice(0,300)||null,warning:score<.9?'Kräver kontroll':null};};
   const record=(key,matches,convert=s=>s.trim(),invalid=false)=>{
-    const values=matches.map(m=>convert(m.value,m.label));
+    const values=matches.map(m=>{const value=convert(m.value,m.label);if(m.monetary)m.monetary.valid=value!==null;return value;});
     if(invalid||values.some(value=>value==null)){
       issues.push(`Ogiltigt värde för ${titles[key]}. Kontrollera samtliga märkta värden i originalet.`);
       return;
@@ -120,15 +120,16 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
       // summaries. An identity, reference, account or date must stay on its
       // labelled line or the immediately adjacent line, never a later block.
       const monetaryField=['total_cents','vat_cents','net_cents'].includes(key);
-      if(monetaryField)monetaryOccurrences.push({key,start:match.index,end:match.index+match[0].length});
       const blankLines=monetaryField?(text.slice(start).match(/^(?:\n[ \t]*)+/)?.[0]||''):(text[start]==='\n'?'\n':'');
+      const monetary=monetaryField?{key,start:match.index,end:match.index+match[0].length,wrapped:!!blankLines}:null;
+      if(monetary)monetaryOccurrences.push(monetary);
       start+=blankLines.length;
       const end=text.indexOf('\n',start),line=text.slice(start,end<0?text.length:end);
       const boundary=line.search(sibling),value=(boundary<0?line:line.slice(0,boundary)).trim();
       // A bare alphabetic line could be a section heading. Keep it unassigned
       // instead of inventing an invoice identity; same-line IDs may be letters.
       const assigned=invoiceLabel&&blankLines&&!/[0-9]/.test(value)?'':value;
-      matches.push({label:match[0],value:assigned,evidence:match[0]+blankLines+value});
+      matches.push({label:match[0],value:assigned,evidence:match[0]+blankLines+value,...(monetary?{monetary}:{})});
     }
     record(key,matches,convert);
     return matches.length>0;
@@ -167,10 +168,17 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   // column ownership. The last heading must not borrow the first net/VAT
   // number merely because earlier headings already failed validation.
   monetaryOccurrences.sort((a,b)=>a.start-b.start);
-  const ambiguousAmounts=new Set();
+  const ambiguousAmounts=new Set();let unownedSummary=false;
   for(let index=1;index<monetaryOccurrences.length;index++){
     const previous=monetaryOccurrences[index-1],current=monetaryOccurrences[index];
-    if(previous.key!==current.key&&previous.end<=current.start&&/^[ \t\r\n]*$/.test(text.slice(previous.end,current.start))){ambiguousAmounts.add(previous.key);ambiguousAmounts.add(current.key);}
+    // An unreadable same-line VAT/rate tail is still part of an unresolved
+    // heading stack. A real intervening row/page ends that stack; a valid
+    // directly labelled value supplies its own ownership and ends it too.
+    const consecutive=previous.end<=current.start&&/^[^\r\n\f]*[ \t\r\n]*$/.test(text.slice(previous.end,current.start));
+    if(!consecutive){unownedSummary=false;continue;}
+    unownedSummary=!previous.valid||!!previous.ambiguous;
+    if(current.valid&&!current.wrapped){unownedSummary=false;continue;}
+    if(unownedSummary&&current.wrapped){current.ambiguous=true;ambiguousAmounts.add(current.key);}
   }
   for(const key of ambiguousAmounts)set(key,null,fields[key].evidence,0);
   if(ambiguousAmounts.size)issues.push('Beloppsrubriker utan egna värden kan inte kopplas till efterföljande tal utan tydliga celler. Kontrollera originalets summering.');
