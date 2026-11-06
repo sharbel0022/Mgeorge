@@ -55,6 +55,7 @@ const suites = [
       'tests/bank-account-consent.test.mjs', 'tests/bank-account-commit.test.mjs',
       'tests/bank-state-integrity-q8.test.mjs', 'tests/mcp-security-q8.test.mjs',
       'tests/bankgiro-authority.test.mjs', 'tests/backup-recovery.test.mjs',
+      'tests/recovery-drill.test.mjs',
       'tests/seven-agent-0599-joined.test.mjs',
     ],
   },
