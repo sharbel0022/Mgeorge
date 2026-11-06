@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "base": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+  "status": "FROZEN_RED_CANDIDATE_NOT_EXECUTED",
+  "scope": "Three test files and evidence only; manifest excludes itself.",
+  "unchangedProduct": {
+    "srcTree": "e4b8955617924e0d22c4123d0a6dc5b27097b2e6",
+    "sitesTree": "4feabc128c5f677103232d1cad1e4406083e8f19",
+    "dbBlob": "e6808bb65b6c0c159f360db211f755a23b7c74b4",
+    "existingConcurrencyBlob": "5f27bd1ce8dbd88f8bce2d5b1ff05c55ff6e1e23"
+  },
+  "files": [
+    {
+      "path": "test/database-startup-contention.test.js",
+      "utf8Bytes": 4990,
+      "sha256": "bc3993f782d4b60aca869318bf5c5f099cb02937f994e854969f404f72a058b3",
+      "gitBlobSha1": "1266ce35d658fff2d364e3d021d5fbcfccdfa53f"
+    },
+    {
+      "path": "test/helpers/startup-test-resources.js",
+      "utf8Bytes": 958,
+      "sha256": "2a6779f2495cb281a60c872e969d58f2540a76f40acf4ea546ae825ce9e62f67",
+      "gitBlobSha1": "60736d340c935002d54638f8999756916108975b"
+    },
+    {
+      "path": "test/database-startup-cancellation.test.js",
+      "utf8Bytes": 6824,
+      "sha256": "fd40426a5c40481d7516d6840dc26d3d0572fc28c025c9b57e25f3973bad046d",
+      "gitBlobSha1": "0d337415be3689f71f217f1d5ea88cf3d688a595"
+    },
+    {
+      "path": "docs/quality8/startup-cancellation-repair-20261106/RED.md",
+      "utf8Bytes": 4475,
+      "sha256": "72e59792e470703ebcfd467a4643542b7bd755f1493ab35dca89f98b3a659646",
+      "gitBlobSha1": "c9b3a7ff98097d1d1bbc9226d186e779e5d15091"
+    },
+    {
+      "path": "docs/quality8/startup-cancellation-repair-20261106/red-evidence.json",
+      "utf8Bytes": 3369,
+      "sha256": "9eb2500e619950ca0f82ad1c4b61029ec20605f3f57965f02dd0b0a894c19d4b",
+      "gitBlobSha1": "49a197f6c971911e1c627b5903db2e2a93aa3016"
+    },
+    {
+      "path": "docs/quality8/startup-cancellation-repair-20261106/red-readbacks.json",
+      "utf8Bytes": 1326,
+      "sha256": "97f7ac04257ad97ff9a0a30545b69ff93ad34f5e82a3c51f5d9bcd77deb6e03b",
+      "gitBlobSha1": "47fbd222253ef4b64c686a009d402082d405305e"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "status": "FROZEN_RED_CANDIDATE_NOT_EXECUTED",
+  "frozenBase": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+  "baseTree": "9eeed8e9a840352c48987a66314a6a22e082a60e",
+  "srcTree": "e4b8955617924e0d22c4123d0a6dc5b27097b2e6",
+  "sitesTree": "4feabc128c5f677103232d1cad1e4406083e8f19",
+  "productDb": {
+    "path": "src/db.js",
+    "utf8Bytes": 61306,
+    "sha256": "a16d97a6a6a71dcd84449ae6f21ec6690808b25e08d523d229a2523c561ebb93",
+    "gitBlobSha1": "e6808bb65b6c0c159f360db211f755a23b7c74b4",
+    "gitHubBlob": "e6808bb65b6c0c159f360db211f755a23b7c74b4"
+  },
+  "existingConcurrency": {
+    "path": "test/payment-concurrency.test.js",
+    "utf8Bytes": 8625,
+    "sha256": "2b8e3cc1f9a784097a0ea804de522951bd7f244327b62491b955654d7c1f555c",
+    "gitBlobSha1": "5f27bd1ce8dbd88f8bce2d5b1ff05c55ff6e1e23",
+    "gitHubBlob": "5f27bd1ce8dbd88f8bce2d5b1ff05c55ff6e1e23",
+    "entireFileUnchanged": true,
+    "bothOriginalTestBodiesAndChildSourceUnchanged": true
+  },
+  "contention": {
+    "originalGitBlob": "83336dd98ce332633ff7d4d9520f1ecce96b1bdd",
+    "originalAssertions": {
+      "utf8Bytes": 1367,
+      "sha256": "4d9ad53b7e5ac358995762607f1bd70903d0739a7ed029ac549608b88ca21fa6",
+      "gitBlobSha1": "75f988cb1766ed80fff18e3a4f752c6cc5989f55",
+      "lines": 14,
+      "assertionCalls": 18,
+      "exactStringEqual": true
+    },
+    "originalContender": {
+      "utf8Bytes": 918,
+      "sha256": "19d4fe63c5fe927348d65c13a158a29bb93bb651fc687f58335d757da6d4e0f1",
+      "gitBlobSha1": "b85ce9db030bb6f359db65b2b91705abbefc6945",
+      "exactStringEqual": true
+    },
+    "originalFinancialRecoveryBlock": {
+      "utf8Bytes": 907,
+      "sha256": "e35b6313239607feb636a5c3a6501614dee4ae0886a73371a722bcc825781ea2",
+      "gitBlobSha1": "8d8be3a190f9219f2143660c1723657f960c81c7",
+      "exactStringPresent": true
+    },
+    "timeoutMs": 15000,
+    "busyPolicyMs": 5000,
+    "minimumWaitMs": 4500
+  },
+  "preflight": {
+    "nodeExecution": false,
+    "orchestrationJavaScriptParseOnly": true,
+    "importsNotExecuted": true,
+    "fixtureGeneratedAndParseChecked": true
+  },
+  "redExecution": {
+    "status": "NOT_YET_EXECUTED",
+    "expectedFailure": "SYNTHETIC_STARTUP_CANCELLATION_WATCHDOG after real contender-ready cancellation, with bounded outer teardown",
+    "moduleNotFoundDoesNotCountAsRed": true
+  },
+  "codeFiles": [
+    {
+      "path": "test/database-startup-contention.test.js",
+      "utf8Bytes": 4990,
+      "sha256": "bc3993f782d4b60aca869318bf5c5f099cb02937f994e854969f404f72a058b3",
+      "gitBlobSha1": "1266ce35d658fff2d364e3d021d5fbcfccdfa53f"
+    },
+    {
+      "path": "test/helpers/startup-test-resources.js",
+      "utf8Bytes": 958,
+      "sha256": "2a6779f2495cb281a60c872e969d58f2540a76f40acf4ea546ae825ce9e62f67",
+      "gitBlobSha1": "60736d340c935002d54638f8999756916108975b"
+    },
+    {
+      "path": "test/database-startup-cancellation.test.js",
+      "utf8Bytes": 6824,
+      "sha256": "fd40426a5c40481d7516d6840dc26d3d0572fc28c025c9b57e25f3973bad046d",
+      "gitBlobSha1": "0d337415be3689f71f217f1d5ea88cf3d688a595"
+    }
+  ],
+  "reviewCommit": "819bc206f7c21c0f6f8ce0a490c36fbfb4047579",
+  "priorGreenArchive": "93b39c641a542cf8add015b63b253de2926059e5",
+  "workflowChanges": false,
+  "productChanges": false,
+  "regressionTimeoutMs": 15000,
+  "outerFailureBudgetMs": 10000,
+  "watchdogUseAlwaysFails": true
+}

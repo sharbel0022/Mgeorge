@@ -1,6 +1,6 @@
 {
   "schema": "mgeorge-quality8-current-assessment-v1",
-  "assessed_at": "2026-11-06T04:13:56.874121+00:00",
+  "assessed_at": "2026-11-06T06:21:26Z",
   "published_site_version": 66,
   "published_main": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
   "status": "current_evidence_assessment_goal_not_yet_met",
@@ -39,7 +39,14 @@
     "docs/quality8/release-wave4.json",
     "docs/quality8/wave4-postpublication-observations.json",
     "docs/quality8/wave4-main-ci/ci-receipt.json",
-    "docs/quality8/party-boundary-repair/known-ocr-replay-comparison.json"
+    "docs/quality8/party-boundary-repair/known-ocr-replay-comparison.json",
+    "https://github.com/sharbel0022/Mgeorge/tree/3a2184929aaf65bfa67ac7426cf8045f2cbda8a9/docs/quality8/runtime-interruption-20261106",
+    "https://github.com/sharbel0022/Mgeorge/tree/6848bdc1fdb98c98405caca67fafd2e3a203d752/docs/quality8/remote-recovery-wave5-20261106",
+    "https://github.com/sharbel0022/Mgeorge/tree/93b39c641a542cf8add015b63b253de2926059e5/docs/quality8/pr60-ci-recovery-20261106",
+    "https://github.com/sharbel0022/Mgeorge/tree/819bc206f7c21c0f6f8ce0a490c36fbfb4047579/docs/quality8/startup-independent-review-20261106",
+    "https://github.com/sharbel0022/Mgeorge/tree/d5e9451ceff439ff7ae60799de58e8ff00971eb8/docs/quality8/ocr-analysis-recovery-20261106",
+    "https://github.com/sharbel0022/Mgeorge/tree/5cd67b18792505139234de68533516fc33067ace/docs/quality8/gmail-schedule-0600-20261106",
+    "https://github.com/sharbel0022/Mgeorge/tree/fe7195ae1d6ffeb6ac52c37131c6b062f7c9f24d/docs/quality8/gmail-schedule-diagnostic-20261106"
   ],
   "rows": [
     {
@@ -124,7 +131,7 @@
       "score": 6.5,
       "at_least_8": false,
       "criterion": "Säkra normalfall går igenom den avsedda kön; avvikelser har konkreta granskningsskäl och återupptagning; verklig köprogress observeras.",
-      "evidence": "Site 66: nio nya Gmail-underlag importerade; den vanliga kön flyttades till OCR. Två fullständigt lästa dokumentregistreringsrader är oförändrade; inget nytt normalt registreringskvitto.",
+      "evidence": "Site 66: ett ägt normalunderlag återköades en gång genom den vanliga spärrade övergången och väntar på OCR. Två fullständigt lästa registreringsrader är oförändrade; inget nytt registreringskvitto. Ekonomiska läsningar behåller revision 52 och noll nya bokningar.",
       "remaining_for_8": "Verifiera ett godtagbart normalunderlag genom hela avsedda kedjan, konkret faktisk köprogress och säker återupptagning. Periodicitet bedöms separat i område28.",
       "scope_and_limitations": "Gmailframgång är inte OCR-/registreringsframgång. Ingen scoreökning enbart av felavstående eller att granskning är säker.",
       "prior_independent_evidence_refs": [
@@ -186,7 +193,7 @@
       "score": 6.5,
       "at_least_8": false,
       "criterion": "Fryst representativ rasterkorpus samt separata hållna fall; minst 85 % återfunna obligatoriska fält och minst 98 % fältprecision, utan felaktigt grönt ekonomiskt kritiskt fall. Redovisa även dokumentnivå och svåra fall.",
-      "evidence": "Första V2 kvar underkänt: 100% precision/60% mandatory recall. Känd textreplay på levererad 96d1404: 57/100 mandatory och 79/130 All13, 0 falska fältvärden i lagrad PSM3-grupp; ingen ny optik.",
+      "evidence": "Första V2 är fortsatt underkänt. Levererad parser har känd lagrad PSM3-replay 57/100 mandatory, 79/130 All13. Separat opublicerad c5-kandidat fick i en auktoriserad känd optisk utvecklingsrunda 69/100 mandatory och 91/130 All13, 0 FP, 12 worker- och 24 parseranrop utan körfel. Recallkravet 85% nås inte; V3 är fortfarande förseglad.",
       "remaining_for_8": "Nytt fryst oberoende första OCR-prov ska nå förregistrerade precision-/recallkrav utan falskt grönt.",
       "scope_and_limitations": "V2 får inte finjusteras eller beskrivas som ett nytt blint förstaprov efter omtolkning. Riktning är metadata, inte bildigenkänning.",
       "prior_independent_evidence_refs": [
@@ -469,7 +476,7 @@
       "score": 6.5,
       "at_least_8": false,
       "criterion": "Befintliga scheman fungerar och minst en faktisk körning observeras; överlapp, paus och sen körning hanteras; ingen grön status från enbart konfiguration.",
-      "evidence": "Faktisk periodisk OCR-run 42153093698 gav 6 behandlade/0 fel. Gmails tidigare schemakörningar importerade underlag, men senaste no_update saknade färsk appinvokering. Prompten kräver nu färska kontrollanrop och är återläst. Backupens nya instruktion är ännu inte prövad automatiskt från ofärdig snapshot.",
+      "evidence": "Tidigare periodisk OCR-körningen 42153093698 gav 6 behandlade och 0 fel. Gmail-schematillfällena 05:00 och06:00 gav no_update utan ny verifierad appinvokering; senaste lyckade hämtning är 04:06. Ordinarie 07:00-körning har en återläst engångsinstruktion om körkvitto. Backupens nya budget är fortfarande inte prövad automatiskt från ofärdig snapshot.",
       "remaining_for_8": "Bekräfta en faktisk Gmail-schemakörning med den korrigerade instruktionen. Observera automatisk backup från ofärdig snapshot till separat bekräftad fullständig verifiering, eller en verklig automatisk återupptagningskedja som når samma slutläge. Periodisk OCR är redan verifierad.",
       "scope_and_limitations": "Den observerade OCR-körningen har faktiskt event=schedule och behandlar väntande jobb. Ingen generell schema-SLA är uppmätt. Dagens manuellt färdigställda backup och senare complete-no-op provar inte den korrigerade anropsbudgeten.",
       "prior_independent_evidence_refs": [

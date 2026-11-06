@@ -1,0 +1,181 @@
+{
+  "schema": "quality8-runtime-interruption-checkpoint-v1",
+  "createdAtUtc": "2026-11-06T05:29:17Z",
+  "goal": "Every one of 33 areas at least 8, not merely the average",
+  "assessment": {
+    "atLeast8": 28,
+    "total": 33,
+    "sum": 257.5,
+    "average": 7.803030303030303,
+    "below8": [
+      6,
+      10,
+      15,
+      16,
+      28
+    ],
+    "scoresForBelow": 6.5,
+    "goalMet": false
+  },
+  "actualProduction": {
+    "id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "status": "active",
+    "latest_version_number": 66,
+    "current_live_url": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site",
+    "access_mode": "public",
+    "automations": [
+      {
+        "id": "Automation_42c8434b303c819199621e83f4b8fec1",
+        "title": "Uppdatera Swedbank i MG Fakturakoll",
+        "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261027T210600\nRRULE:FREQ=DAILY;BYHOUR=3,9,15,21;BYMINUTE=6;BYSECOND=0\nEND:VEVENT",
+        "timezone": "Europe/Stockholm",
+        "is_enabled": true
+      },
+      {
+        "id": "Automation_6efa3aafab4081918c48001acc562f96",
+        "title": "Hämta och tolka Gmail i MG Fakturakoll",
+        "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261028T010000\nRRULE:FREQ=HOURLY;BYMINUTE=0;BYSECOND=0\nEND:VEVENT",
+        "timezone": "Europe/Stockholm",
+        "is_enabled": true
+      },
+      {
+        "id": "Automation_c8747435cd908191bc323aabc2a5704d",
+        "title": "Säkerhetskopiera MG Fakturakoll",
+        "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261029T021500\nRRULE:FREQ=DAILY;BYHOUR=2;BYMINUTE=15;BYSECOND=0\nEND:VEVENT",
+        "timezone": "Europe/Stockholm",
+        "is_enabled": true
+      }
+    ],
+    "updated_at": "2026-11-06T04:01:53.648673+00:00"
+  },
+  "currentGithubMain": {
+    "sha": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+    "tree": "2fcd7736a029663e7519d31ed91be1e2db24cf17",
+    "requiredRun": 42164894222,
+    "conclusion": "failure",
+    "passed": 7604,
+    "total": 7605,
+    "failedNodeTest": "two real processes import and reconcile one bank payment once, then replay safely after restart",
+    "publicationHeld": true
+  },
+  "greenPrecedingPR": {
+    "number": 59,
+    "head": "501de72c079a6b41593356f027990bc24b0aac8c",
+    "passed": 7605,
+    "total": 7605,
+    "requiredRuns": [
+      42163947263,
+      42163947178
+    ]
+  },
+  "localOnlyDocumentationCommit": {
+    "sha": "a01767a",
+    "branch": "codex/rating8-post-wave5-20261106",
+    "files": 52,
+    "remoteEquivalentClaimed": false,
+    "recoveryRequiresFilesystem": true
+  },
+  "pendingNativePreparation": {
+    "source": "1f43f8823fce845d137bc5a1b0844c99f0d37922",
+    "siteTree": "4feabc128c5f677103232d1cad1e4406083e8f19",
+    "native": {
+      "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+      "checkout_path": "/workspace/scratch/4d79ab4bea8e/site-source",
+      "commit_sha": "d30b1e2518e3765b15fba28cbd306addf142da38",
+      "archive": "/tmp/rating8-wave5-site67-bank-diagnostic.tar.gz"
+    },
+    "archive": {
+      "path": "/tmp/rating8-wave5-site67-bank-diagnostic.tar.gz",
+      "bytes": 18607635,
+      "sha256": "0edf980d1d397decd171164d4d867463486c0e968acd0282a620d28609842e00"
+    },
+    "copiedTrackedFiles": 629,
+    "projectIdPreserved": true,
+    "publishOnPushAccepted": false,
+    "savedVersion": false,
+    "deployed": false,
+    "reviewAndFullCI": "pending"
+  },
+  "area6": {
+    "retryCalls": 1,
+    "requeued": true,
+    "retryFinishedAt": "2026-11-06T04:52:16.518Z",
+    "processorCalls": 1,
+    "processed": 0,
+    "registrationsBefore": 2,
+    "registrationsAfter": 2,
+    "registrationsUnchanged": true,
+    "targetRegistrationReceipt": false,
+    "financialRevisionBefore": 52,
+    "financialRevisionAfter": 52,
+    "newBookings": 0,
+    "jobReadAfter": {
+      "found": true,
+      "observedAt": "2026-11-06 04:59:17 UTC",
+      "pages": 7,
+      "rowsExamined": 49,
+      "state": "waiting_ocr",
+      "engine": "local",
+      "attempts": 0,
+      "available_at": "2026-11-06T04:52:16.386Z",
+      "leasePresent": false,
+      "lease_until": "",
+      "error_code": "",
+      "invoicePresent": false,
+      "automatic": 0,
+      "updated_at": "2026-11-06T04:52:38.410Z",
+      "pageProjection": {
+        "truncated": true,
+        "truncated_values": 5,
+        "omitted_columns": 0,
+        "omitted_rows": 18,
+        "next_offset": 49
+      }
+    },
+    "extractionClaimed": false
+  },
+  "knownOcr": {
+    "source": "c5cdd0fe57d300ba40f6572cbbe39c7fce9397e7",
+    "archiveCommitLocal": "2ca47860bd1dc587e0fec0a3dfbcedac8477a6fb",
+    "resultSha256": "8957731b7f0f1ed9fed6bb53683b65cf352138e4b1f3f7fa0ee8f5980dfa2756",
+    "workers": 12,
+    "parserCalls": 24,
+    "processingErrors": 0,
+    "normalPerParser": {
+      "all13": {
+        "tp": 91,
+        "fp": 0,
+        "fn": 39
+      },
+      "mandatory10": {
+        "tp": 69,
+        "fp": 0,
+        "fn": 31
+      },
+      "image9": {
+        "tp": 59,
+        "fp": 0,
+        "fn": 31
+      },
+      "documentsReview": 10,
+      "documentsGreen": 0
+    },
+    "stress": {
+      "processed": 2,
+      "falseGreen": 0
+    },
+    "purpose": "Known development only, not blind acceptance",
+    "recallRequirementMet": false,
+    "v3ReadOrRun": false,
+    "fullResultAndJournalCurrentlyOnlyInUnavailableEnvironment": true
+  },
+  "executionEnvironment": {
+    "status": "unavailable",
+    "firstObservedUtc": "2026-11-06T05:14Z",
+    "error": "No usable execution environment is available",
+    "productPatchGreenClaimed": false
+  },
+  "financialWrites": false,
+  "emailsSent": false,
+  "scoreIncreases": false
+}

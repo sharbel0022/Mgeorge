@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "codeCommit": "82cda2ec692e1b3a976d3ee1711cd0ab2072ad01",
+  "redCommit": "f0e845bb87ee08d15fa96cb75879849493aeb1fd",
+  "verifiedAt": "2026-11-06T06:41:52.471Z",
+  "method": "Each exact UTF-8 code string is fetched by its immutable Git blob ID and compared in full; the two newly created blobs matched the independently calculated Git object IDs. The unchanged regression reuses the RED blob.",
+  "files": [
+    {
+      "path": "test/database-startup-contention.test.js",
+      "gitBlobSha1": "7a20e4135f5c0a1b2ad7a9504a5128ec821b118e",
+      "sha256": "ee7653e3af8f411064338805ba61c2c1d593b3f11b2b7a4409d130c360a38ea7",
+      "utf8Bytes": 5262,
+      "contentEqual": true,
+      "readbackAt": "2026-11-06T06:39:55.211Z"
+    },
+    {
+      "path": "test/helpers/startup-test-resources.js",
+      "gitBlobSha1": "b6bd733d547351c7ec871605ccf05e006ccc0a60",
+      "sha256": "e54af9e6548bf27907dc1c281247bcb0ddcb1fe2464326a10faa832f1d70d430",
+      "utf8Bytes": 1214,
+      "contentEqual": true,
+      "readbackAt": "2026-11-06T06:39:55.232Z"
+    },
+    {
+      "path": "test/database-startup-cancellation.test.js",
+      "gitBlobSha1": "0d337415be3689f71f217f1d5ea88cf3d688a595",
+      "sha256": "fd40426a5c40481d7516d6840dc26d3d0572fc28c025c9b57e25f3973bad046d",
+      "utf8Bytes": 6824,
+      "contentEqual": true,
+      "readbackAt": "2026-11-06T06:39:55.199Z"
+    }
+  ]
+}

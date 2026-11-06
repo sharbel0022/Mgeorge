@@ -30,8 +30,14 @@ process.send({ready:true});
 function worker(path,t){
   const child=spawn(process.execPath,['--input-type=module','--eval',childSource,path],{stdio:['ignore','ignore','pipe','ipc'],windowsHide:true});
   t.after(()=>{if(child.exitCode===null)child.kill();});
-  const ready=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.ready)resolve();});child.once('error',reject);child.once('exit',code=>{if(code)reject(new Error('Synthetic concurrency worker failed before ready'));});});
-  const done=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.done)resolve(m);if(m.error)reject(new Error(m.error));});child.once('error',reject);child.once('exit',code=>{if(code)reject(new Error('Synthetic concurrency worker failed'));});});
+  let stderr=Buffer.alloc(0),stderrTruncated=false;
+  child.stderr.on('data',bytes=>{const room=8192-stderr.length;if(bytes.length>room)stderrTruncated=true;if(room>0)stderr=Buffer.concat([stderr,bytes.subarray(0,room)]);});
+  const failure=(stage,code,signal)=>new Error(`Synthetic concurrency worker failed${stage} (exit=${code}, signal=${signal}, stderr${stderrTruncated?' truncated':''}=${stderr.toString('utf8')})`);
+  const ready=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.ready)resolve();});child.once('error',reject);child.once('close',(code,signal)=>{if(code!==0)reject(failure(' before ready',code,signal));});});
+  const done=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.done)resolve(m);if(m.error)reject(new Error(m.error));});child.once('error',reject);child.once('close',(code,signal)=>{if(code!==0)reject(failure('',code,signal));});});
+  // Observe an early startup rejection while ready is awaited. Awaiting the
+  // original done promise below still rejects on every worker/import failure.
+  done.catch(()=>{});
   return {child,ready,done};
 }
 

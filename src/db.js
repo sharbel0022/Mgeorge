@@ -20,7 +20,7 @@ import {companyInvoiceReview} from '../sites/lib/company-reconciliation-policy.j
 export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sqlite') {
   const path=resolve(filename); mkdirSync(dirname(path),{recursive:true,mode:0o700});
   const db=new DatabaseSync(path);
-  db.exec('PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;');
+  db.exec('PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL;');
   db.exec(`
     CREATE TABLE IF NOT EXISTS admins(id INTEGER PRIMARY KEY, password_hash TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS sessions(id_hash TEXT PRIMARY KEY,expires_at INTEGER NOT NULL);

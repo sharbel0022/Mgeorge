@@ -1,0 +1,265 @@
+{
+  "schema": "periodic-readonly-followup-v1",
+  "observedWindowUtc": [
+    "2026-11-06T05:09:19Z",
+    "2026-11-06T05:11:53Z"
+  ],
+  "liveSiteVersion": 66,
+  "gmailAutomation": {
+    "id": "Automation_6efa3aafab4081918c48001acc562f96",
+    "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261028T010000\nRRULE:FREQ=HOURLY;BYMINUTE=0;BYSECOND=0\nEND:VEVENT",
+    "enabled": true,
+    "updated_at": "2026-11-06T05:03:55.946902+00:00",
+    "prompt": "Uppdatera MG Fakturakoll med den anslutna ägarens Gmail-underlag. Varje schemakörning ska göra nya verktygsanrop: börja med gmail_sync_status och använd det färska svaret, inte tidigare chattresultat, för att kontrollera anslutning, paus och väntetid. Om hämtning är aktiverad, ansluten och tillåten nu: anropa gmail_auto_sync en gång och invänta dess verkliga resultat. Verktyget hämtar nya relevanta bilagor och behåller sina egna spärrar. Vid saknad anslutning, krävd användaråtgärd, paus, busy, fel eller framtida retry_after/next_eligible_sync: respektera stoppet; försök inte kringgå det eller göra upprepade hämtningar. Om dokumentbearbetning är aktiverad och inget fel eller busy hindrar den: anropa process_invoice_documents en gång för den beständiga kön. Läs därefter gmail_sync_status separat och jämför last_successful_fetch, schedule_observation och dokumentstatus med körningens första svar. Ett no_update-resultat får endast användas efter dessa färska kontrollanrop och ett faktiskt oförändrat resultat; ett uteblivet anrop är inte en lyckad hämtning. Bekräfta aldrig offline OCR enbart för att lokal worker saknas: beakta cloud_ocr_configured, cloud_worker_recent och cloud_last_completed. Respektera verifierade motparter, original, dubbletter och alla registreringskontroller. Använd endast vanlig behörig avstämning av registrerade fakturor mot redan sparade verifierbara bankunderlag och förbered vid behov mejlförslag. Skicka aldrig mejl; användaren måste granska och godkänna. Ändra inte det separata bankschemat eller åtkomstinställningar. Var tyst vid ett verifierat oförändrat läge; uppmärksamma betydelsefulla fel, saknade verktyg eller nödvändig användaråtgärd.",
+    "last_run": {
+      "id": "2214d43c-79d0-832f-afd4-292def500e63",
+      "recorded_status": "no_update",
+      "scheduled_for": "2026-11-06T05:00:00Z",
+      "started_at": "2026-11-06T05:03:31.281164Z",
+      "completed_at": "2026-11-06T05:03:33.498522Z"
+    },
+    "latest_result_from_different_run": true,
+    "environment_selection": "inherited",
+    "environments": null
+  },
+  "gmailAppStatus": {
+    "configured": true,
+    "send_enabled": true,
+    "connection": {
+      "last_synced": "",
+      "status": "connected",
+      "last_attempt": "2026-11-06T04:05:49.061Z",
+      "retry_after": "",
+      "sync_failures": 0,
+      "blocked": false,
+      "postprocess_warning": null
+    },
+    "processing": {
+      "enabled": true,
+      "auto_register": true,
+      "worker_last_seen": "2026-11-03T10:48:46.890Z",
+      "worker_online": false,
+      "cloud_ocr_configured": true,
+      "cloud_worker_last_seen": "2026-11-06T03:55:08.200Z",
+      "cloud_worker_recent": false,
+      "cloud_last_completed": "2026-11-06T03:55:13.630Z",
+      "last_processed": "2026-11-06T04:52:38.516Z",
+      "counts": {
+        "needs_review": 385,
+        "registered": 2,
+        "waiting_ocr": 64
+      },
+      "registered": 5,
+      "aftercheck_pending": 0,
+      "review_reasons": {
+        "basis": "stored_extraction",
+        "total": 385,
+        "analyzed": 385,
+        "limit": 500,
+        "truncated": false,
+        "counts": {
+          "uninterpreted": 0,
+          "missing_invoice_number": 124,
+          "missing_party": 174,
+          "missing_dates": 221,
+          "missing_organization": 280,
+          "missing_amount": 144,
+          "missing_vat_or_net": 177,
+          "unverified_counterparty": 384,
+          "possible_duplicate": 0,
+          "low_confidence": 321,
+          "other_review": 0
+        }
+      },
+      "messages_waiting": 2,
+      "scheduler_configured": true,
+      "schedule_minutes": 60,
+      "ocr_mode": "cloud",
+      "limits": {
+        "file_bytes": 15000000,
+        "pdf_cloud_bytes": 5000000,
+        "pages": 10,
+        "local_concurrency": 1,
+        "cloud_concurrency": 1
+      }
+    },
+    "last_successful_fetch": "2026-11-06T04:06:01.714Z",
+    "sync_health": {
+      "state": "recent",
+      "reason": "En lyckad Gmail-hämtning har verifierats nyligen.",
+      "interval_minutes": 60,
+      "stale_after_minutes": 120,
+      "schedule_verified": false
+    },
+    "schedule_observation": {
+      "last_invoked_at": "2026-11-06T04:05:48.841Z",
+      "last_completed_at": "2026-11-06T04:06:04.143Z",
+      "last_outcome": "completed",
+      "source": "system_entrypoint",
+      "external_schedule_verified": false
+    },
+    "attachment_rejections": {
+      "total": 0,
+      "reasons": []
+    },
+    "fetch_ready": true,
+    "background_ready": false,
+    "background_health": {
+      "state": "needs_attention",
+      "reasons": [
+        "external_schedule_unverified",
+        "ocr_worker_unavailable"
+      ]
+    },
+    "scheduler_configured": true,
+    "next_eligible_sync": "2026-11-06T05:09:49.233Z"
+  },
+  "recentWorkflowRuns": [
+    {
+      "id": 42165382962,
+      "name": "Sites cloud OCR",
+      "event": "workflow_run",
+      "head_sha": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2026-11-06T04:55:58Z",
+      "updated_at": "2026-11-06T04:55:59Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42165382962"
+    },
+    {
+      "id": 42164894222,
+      "name": "Payment control checks",
+      "event": "push",
+      "head_sha": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-06T04:50:51Z",
+      "updated_at": "2026-11-06T04:55:55Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42164894222"
+    },
+    {
+      "id": 42163947263,
+      "name": "Payment control checks",
+      "event": "pull_request",
+      "head_sha": "501de72c079a6b41593356f027990bc24b0aac8c",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T04:41:02Z",
+      "updated_at": "2026-11-06T04:48:44Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42163947263"
+    },
+    {
+      "id": 42163947178,
+      "name": "SaaS security acceptance",
+      "event": "pull_request",
+      "head_sha": "501de72c079a6b41593356f027990bc24b0aac8c",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T04:41:02Z",
+      "updated_at": "2026-11-06T04:43:13Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42163947178"
+    },
+    {
+      "id": 42159152074,
+      "name": "Sites cloud OCR",
+      "event": "workflow_run",
+      "head_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T03:52:42Z",
+      "updated_at": "2026-11-06T03:55:18Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42159152074"
+    },
+    {
+      "id": 42158636715,
+      "name": "Payment control checks",
+      "event": "push",
+      "head_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T03:47:22Z",
+      "updated_at": "2026-11-06T03:52:39Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42158636715"
+    },
+    {
+      "id": 42157715038,
+      "name": "SaaS security acceptance",
+      "event": "pull_request",
+      "head_sha": "f488841afccdefba17a6b584320347581f60c3f4",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T03:37:51Z",
+      "updated_at": "2026-11-06T03:40:36Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42157715038"
+    },
+    {
+      "id": 42157715027,
+      "name": "Payment control checks",
+      "event": "pull_request",
+      "head_sha": "f488841afccdefba17a6b584320347581f60c3f4",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T03:37:51Z",
+      "updated_at": "2026-11-06T03:45:11Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42157715027"
+    },
+    {
+      "id": 42153187307,
+      "name": "SaaS security acceptance",
+      "event": "pull_request",
+      "head_sha": "364232a393fe96257a2579aac77dfb8dcfb87999",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T02:53:47Z",
+      "updated_at": "2026-11-06T02:56:08Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42153187307"
+    },
+    {
+      "id": 42153187290,
+      "name": "Payment control checks",
+      "event": "pull_request",
+      "head_sha": "364232a393fe96257a2579aac77dfb8dcfb87999",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-06T02:53:47Z",
+      "updated_at": "2026-11-06T03:00:43Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42153187290"
+    },
+    {
+      "id": 42153093698,
+      "name": "Sites cloud OCR",
+      "event": "schedule",
+      "head_sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T02:52:50Z",
+      "updated_at": "2026-11-06T02:54:40Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42153093698"
+    },
+    {
+      "id": 42145805217,
+      "name": "SaaS security acceptance",
+      "event": "pull_request",
+      "head_sha": "d4c0d624b3316fd7ce53381e344e0ce01307966f",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T01:44:18Z",
+      "updated_at": "2026-11-06T01:47:28Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42145805217"
+    }
+  ],
+  "conclusions": {
+    "gmail_new_periodic_fetch_proven": false,
+    "gmail_actual_fetch_last_seen": "2026-11-06T04:06:01.714Z",
+    "gmail_no_update_does_not_prove_no_tools_called": true,
+    "gmail_invocation_cause": "Unknown. The task record provides no tool trace; its 05:00 run has no corresponding fresh app invocation.",
+    "gmail_ordinary_eligibility": "Current source uses 15 minutes after last_attempt plus provider retry_after. It does not require 60 minutes after the last fetch.",
+    "ocr_latest_workflow_run_skipped_after_failed_main": true,
+    "ocr_new_periodic_after_site66_seen": false,
+    "ocr_last_observed_periodic_run": 42153093698,
+    "queue_claim_order": "available_at, document_id",
+    "area6_retry_remains_waiting_ocr": true,
+    "database_or_schedule_mutations": false,
+    "no_numeric_score_change": true
+  }
+}
