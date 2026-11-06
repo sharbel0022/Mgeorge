@@ -184,3 +184,36 @@ test('a domain-rejected contradictory report preserves evidence holds before the
  const after=f.read();assert.ok(after.state.bankEvidenceHold||after.state.transactions.some(row=>row.bankEvidenceConflicts?.length));assert.deepEqual(after.state.allocations,before.state.allocations);assert.deepEqual(after.state.invoices,before.state.invoices);assert.deepEqual(after.state.transactions.map(row=>[row.id,row.amount,row.parentId]),before.state.transactions.map(row=>[row.id,row.amount,row.parentId]));assert.equal(f.objects.size,2);assert.equal(f.audits().length,2);assert.ok(f.audits().some(row=>row.action==='bank.import_rejected'));
  await f.service.runBankgiroSource(f.owner);assert.deepEqual(f.read(),after);assert.equal(f.audits().length,2);
 });
+
+
+// All documents and authorizations below are synthetic. Hash integrity does
+// not erase a disagreement with the authorized recipient.
+const authorityRecipientBytes=(format,recipient)=>{
+ if(format==='csv')return Buffer.from('Datum;Belopp;Betalare;Betalningsreferens;Valuta;Konto;Mottagarens bankgiro\n2026-10-26;625,00;Synthetic customer AB;0599;SEK;'+account+';'+recipient);
+ if(format==='xlsx')return makeBankgiroXLSX({currency:'SEK',account,recipientBankgiro:recipient,date:'2026-10-26',sequence:'83',payments:[{party:'Synthetic customer AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]});
+ return Buffer.from(new TextDecoder().decode(reportBytes()).replace('</RltdPties>','<CdtrAcct><Id><Othr><Id>'+recipient+'</Id><SchmeNm><Prtry>BGNR</Prtry></SchmeNm></Othr></Id></CdtrAcct></RltdPties>'));
+};
+for(const format of ['csv','xml','xlsx'])test('Sites source rejects an explicitly different recipient in retained '+format,async t=>{
+ const f=await ingestFixture(t),bytes=authorityRecipientBytes(format,'076-5432'),input=await f.prepare(bytes,{filename:'Synthetic.'+format});
+ input.authorization.bankgiro='0123456';const before=f.read(),auditBefore=f.audits();
+ await assert.rejects(()=>f.sink.importReport(input),{code:'ACCOUNT_MISMATCH'});
+ assert.deepEqual(f.read(),before);assert.deepEqual(f.audits(),auditBefore);
+ assert.equal(hash(f.objects.get(f.owner+'/'+input.documentId)),hash(bytes));
+ assert.equal(f.sql.prepare('SELECT count(*) n FROM documents').get().n,1);
+ assert.equal(f.read().state.allocations.length,0);
+});
+for(const format of ['csv','xml','xlsx'])test('Sites source retains exact bytes and permits matching formatted recipient in '+format,async t=>{
+ const f=await ingestFixture(t),bytes=authorityRecipientBytes(format,'012-3456'),input=await f.prepare(bytes,{filename:'Synthetic.'+format});
+ input.authorization.bankgiro='0123456';
+ const result=await f.sink.importReport(input);assert.ok(['IMPORTED','REVIEW'].includes(result.status));
+ assert.equal(hash(f.objects.get(f.owner+'/'+input.documentId)),hash(bytes));
+ assert.equal(f.read().state.allocations.length,0);
+});
+test('Sites hash replay rechecks recipient authority before adopting the earlier import',async t=>{
+ const f=await ingestFixture(t),input=await f.prepare(authorityRecipientBytes('csv','012-3456'),{filename:'Synthetic.csv'});
+ input.authorization.bankgiro='0123456';await f.sink.importReport(input);
+ const before=f.read(),auditBefore=f.audits();
+ await assert.rejects(()=>f.sink.importReport({...input,authorization:{...input.authorization,bankgiro:'0765432'}}),{code:'ACCOUNT_MISMATCH'});
+ assert.deepEqual(f.read(),before);assert.deepEqual(f.audits(),auditBefore);
+ assert.equal(f.read().state.allocations.length,0);
+});
