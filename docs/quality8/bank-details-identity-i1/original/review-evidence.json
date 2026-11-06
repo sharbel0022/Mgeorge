@@ -1,0 +1,280 @@
+{
+  "schema": "independent-bank-details-review-v1",
+  "recordedAt": "2026-11-06T01:54:25.116691+00:00",
+  "reviewer": "/root/bank_details_review_resume",
+  "commit": "638c77365dbf8f4c73db6b23816a37f577da5689",
+  "baseline": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+  "decision": "IMPORTANT_FINDING_NOT_READY",
+  "node": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+  "nodeVersion": "v24.22.1",
+  "findings": [
+    {
+      "id": "I1",
+      "severity": "Important",
+      "title": "Contradictory primary identifiers can yield a complete observed usage diagnosis",
+      "source": "snapshot/sites/lib/bank-consent-policy.js",
+      "lines": [
+        147,
+        184
+      ],
+      "ordinaryServiceReproduction": true,
+      "original409Preserved": true,
+      "financialOrActivationBypassDemonstrated": false
+    }
+  ],
+  "runs": [
+    {
+      "log": "logs/policy-59.tap",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/snapshot",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test-concurrency=1 --test sites/tests/bank-usage-details-policy.test.mjs",
+      "exitCode": 0,
+      "tests": 59,
+      "pass": 59,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 274.233243,
+      "reporter": "spec (default despite .tap suffix)"
+    },
+    {
+      "log": "logs/service-regression.tap",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/snapshot",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap --test-name-pattern='usage details diagnostic|usage diagnostic|scope diagnostic|independent scope review|revalidation|consent recovery|consent commit reply|legacy selected scope|company selected scope' sites/tests/banking-security.test.mjs",
+      "exitCode": 0,
+      "tests": 120,
+      "pass": 120,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 39136.421493
+    },
+    {
+      "log": "logs/policy-adapters-provider.tap",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/snapshot",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap sites/tests/bank-consent-policy.test.mjs sites/tests/bank-usage-diagnostic.test.mjs sites/tests/bank-usage-details-policy.test.mjs sites/tests/bank-account-consent.test.mjs sites/tests/bank-account-evidence.test.mjs sites/tests/bank-account-evidence-provider.test.mjs sites/tests/account-read-cooldown.test.mjs test/bank-consent-api.test.js test/api-account-consent.test.js",
+      "exitCode": 0,
+      "tests": 286,
+      "pass": 286,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 24966.157299
+    },
+    {
+      "log": "logs/reviewer-service-probes.tap",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/snapshot",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap sites/tests/reviewer-usage-details.test.mjs",
+      "exitCode": 0,
+      "tests": 6,
+      "pass": 6,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 3464.576699,
+      "sourceAtRunPreservedAs": "snapshot/sites/tests/reviewer-usage-details-six.test.mjs"
+    },
+    {
+      "log": "logs/reviewer-service-identity-conflict.tap",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/snapshot",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap --test-name-pattern='reviewer: actual provider adapter must reject' sites/tests/reviewer-usage-details.test.mjs",
+      "exitCode": 1,
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 1315.497694
+    },
+    {
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/snapshot/sites",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ../scripts/saas-test-isolation.mjs scripts/run-verified-tool.mjs check",
+      "exitCode": 0,
+      "log": "logs/sites-typecheck-physical-deps.log"
+    },
+    {
+      "file": "policy-identity-conflicts.test.mjs",
+      "log": "policy-probes/policy-identity-conflicts.tap",
+      "reporter": "spec (default, despite .tap filename)",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./snapshot/scripts/saas-test-isolation.mjs --experimental-strip-types --test-concurrency=1 --test policy-probes/policy-identity-conflicts.test.mjs",
+      "exitCode": 1,
+      "tests": 5,
+      "pass": 2,
+      "fail": 3,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 138.444752,
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume",
+      "reviewer": "policy_static"
+    },
+    {
+      "file": "adapter-primary-conflict.test.mjs",
+      "log": "policy-probes/adapter-primary-conflict.tap",
+      "reporter": "tap",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./snapshot/scripts/saas-test-isolation.mjs --experimental-strip-types --test-concurrency=1 --test --test-reporter=tap policy-probes/adapter-primary-conflict.test.mjs",
+      "exitCode": 1,
+      "tests": 2,
+      "pass": 1,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 285.144307,
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume",
+      "reviewer": "policy_static"
+    }
+  ],
+  "files": [
+    {
+      "path": "REVIEW.md",
+      "sha256": "d10c714f4871529bf2a10c7fbb14bebc1f04e759c64bfd8aa7194c3fbcc484fa",
+      "bytes": 8765
+    },
+    {
+      "path": "product.diff",
+      "sha256": "de77a85487f935cbaa922d6abb2343d90b20d00fe06caeecb567d5aa0269a952",
+      "bytes": 26121
+    },
+    {
+      "path": "source-verification.json",
+      "sha256": "6b992e2df9ecc63f53ecd317b32183a34c146bfb7636922d82bd139a4edae805",
+      "bytes": 1000
+    },
+    {
+      "path": "logs/policy-59.tap",
+      "sha256": "9a412529b802298ceeaac7a46e0d34ea8f4ff7b17cfcc0477ce4b73a799bb9ef",
+      "bytes": 6074
+    },
+    {
+      "path": "logs/policy-adapters-provider.tap",
+      "sha256": "67ebee12d9375fb64e3fc710fa236be3a5005a06bcacc0de3ae5eaad057b4205",
+      "bytes": 67716
+    },
+    {
+      "path": "logs/reviewer-service-identity-conflict.tap",
+      "sha256": "230c72ec50e45812a8ac826e2ebfd1be678640ef5c21eee13272ced48147e60a",
+      "bytes": 2015
+    },
+    {
+      "path": "logs/reviewer-service-probes.tap",
+      "sha256": "16b8552f1c87dc7e78a901fd9954ba8b927bf5e8f4e70eab8275717bf67af1a1",
+      "bytes": 1637
+    },
+    {
+      "path": "logs/service-regression.tap",
+      "sha256": "c3bff180c9ff3dbca0551187cab693e28023ab3a074e53458203e5dac845f106",
+      "bytes": 30578
+    },
+    {
+      "path": "logs/sites-typecheck-physical-deps.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/sites-typecheck.log",
+      "sha256": "37f3c36d768e1fc45d4b8611be350c1502e1e4f9e0be1f12a55ce7c93e2abf99",
+      "bytes": 1280
+    },
+    {
+      "path": "policy-probes/adapter-primary-conflict.tap",
+      "sha256": "c73f7a0a124359ab84d66afc95ee16312ba7fa872cdc951a5775320575ebd3d4",
+      "bytes": 1476
+    },
+    {
+      "path": "policy-probes/adapter-primary-conflict.test.mjs",
+      "sha256": "0f7b661d0f7e4e5738f9c3d8b840b38ddebe78e0d45781f0d5a0a5b5e45116ed",
+      "bytes": 2704
+    },
+    {
+      "path": "policy-probes/policy-identity-conflicts.tap",
+      "sha256": "b0dff3d70c69bc630e0435fb5de1537f2baf97eab13326edc82ed2cde0a19c43",
+      "bytes": 4210
+    },
+    {
+      "path": "policy-probes/policy-identity-conflicts.test.mjs",
+      "sha256": "f576fefdf22dbff194b16e856efffbd70f855f27b761e2b3d3e0621460009c23",
+      "bytes": 3421
+    },
+    {
+      "path": "policy-probes/policy-review-evidence.json",
+      "sha256": "027b52723155c3379d0184d07903df52b2e446eb65f421632e8ab6b26ffdc1f1",
+      "bytes": 3955
+    },
+    {
+      "path": "policy-probes/policy-review.md",
+      "sha256": "39a21dfaae555ba531c89d829a791ab53e0bdd84590e89f3a033c1cfbc58f621",
+      "bytes": 4142
+    },
+    {
+      "path": "snapshot/sites/tests/reviewer-usage-details.test.mjs",
+      "sha256": "e5c8e36b4eb9ba9997e6bb5f87e3c55c8283e09e79bfae4c94640d211845c510",
+      "bytes": 21516
+    },
+    {
+      "path": "snapshot/sites/tests/reviewer-usage-details-six.test.mjs",
+      "sha256": "239f6dcf2fa4bf555a05dfbe64cac70a55c5d07092c40e8b4eb76b94d45c1776",
+      "bytes": 20744
+    },
+    {
+      "path": "snapshot/sites/lib/bank-consent-policy.js",
+      "sha256": "612f167c21180bd4f008ee28925d01221780c13b0c5a3d224c0ee05254208d6c",
+      "bytes": 27006
+    },
+    {
+      "path": "snapshot/sites/lib/bank-consent-policy.d.ts",
+      "sha256": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280",
+      "bytes": 8389
+    },
+    {
+      "path": "snapshot/sites/lib/banking/service.ts",
+      "sha256": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24",
+      "bytes": 87400
+    },
+    {
+      "path": "snapshot/sites/lib/banking/account-evidence.ts",
+      "sha256": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f",
+      "bytes": 18700
+    },
+    {
+      "path": "snapshot/sites/lib/banking/enable-banking.ts",
+      "sha256": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6",
+      "bytes": 32645
+    },
+    {
+      "path": "snapshot/sites/lib/banking/account-read-guard.ts",
+      "sha256": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837",
+      "bytes": 3409
+    }
+  ],
+  "setupFailures": [
+    {
+      "stage": "initial sites check",
+      "exitCode": 1,
+      "reason": "minimatch dependency guard rejected symlinked node_modules",
+      "log": "logs/sites-typecheck.log",
+      "productFailure": false
+    },
+    {
+      "stage": "attempt after dependency copy",
+      "exitCode": 1,
+      "reason": "wrong shell working directory caused ../../logs redirection to fail before Node/check execution",
+      "productFailure": false,
+      "checkExecuted": false
+    }
+  ],
+  "transportDisconnectionsInReportedRuns": 0,
+  "productionCalls": 0,
+  "liveBankRequests": 0,
+  "productEdits": 0,
+  "scoreChanges": 0,
+  "limits": [
+    "Previous lost review is not counted.",
+    "59-case first policy run is repeated within 286-case regression, not 59 additional unique cases.",
+    "Full CI and 48 import-consumer cases were not run in this review.",
+    "No actual bank continuity or fresh bank facts are inferred.",
+    "Producer workspace was not modified; dependency copies and additional tests exist only in review snapshot."
+  ]
+}

@@ -1,0 +1,545 @@
+✔ document quality: consistent explicit invoice evidence retains leading zeroes (46.831986ms)
+✔ document quality: an invalid additional fakturadatum blocks automatic eligibility (4.830631ms)
+✔ document quality: an invalid additional förfallodatum blocks automatic eligibility (3.796691ms)
+✖ document quality: an invalid additional organisationsnummer blocks automatic eligibility (6.244875ms)
+✔ document quality: an invalid additional fakturadatum blocks automatic eligibility (2.257041ms)
+✔ document quality: an invalid additional förfallodatum blocks automatic eligibility (1.899001ms)
+✖ document quality: an invalid additional organisationsnummer blocks automatic eligibility (1.341576ms)
+✔ document quality: an invalid additional Bankgiro blocks automatic eligibility (3.05334ms)
+✔ document quality: malformed labelled total 1,250.00 SEK cannot be silently ignored (2.080024ms)
+✔ document quality: malformed labelled total 1.250,001 SEK cannot be silently ignored (1.063305ms)
+✔ document quality: malformed labelled total 1 250,00oops SEK cannot be silently ignored (0.968073ms)
+✔ document quality: malformed labelled total okänt SEK cannot be silently ignored (0.861956ms)
+✔ document quality: subject label Faktura nummer NUMBER is compared exactly (2.328557ms)
+✔ document quality: subject label FakturanrNUMBER is compared exactly (3.126759ms)
+✔ document quality: filename label Invoice_no_NUMBER.pdf is compared exactly (1.41854ms)
+✔ document quality: filename label Faktura_nummer_NUMBER.png is compared exactly (1.154539ms)
+✔ document quality: conflicting filename and subject remain explicit when PDF number is unreadable (0.368766ms)
+✔ document quality: invoice identifier letters and separators are never eaten as label prefixes (0.191544ms)
+✔ document quality: terms heading with an explicit invoice number remains reviewable (1 250,00 SEK) (0.124384ms)
+✔ document quality: terms heading with an explicit invoice number remains reviewable (oläsligt) (0.049012ms)
+✔ document quality: clear terms and payroll still stay outside the invoice queue (0.372862ms)
+✔ document quality: conflicting document context requires review: Betalningspåminnelse för faktura 0594 (0.812683ms)
+✔ document quality: conflicting document context requires review: Payment confirmation for invoice 0594 (0.577505ms)
+✔ document quality: conflicting document context requires review: Receipt for invoice 0594 (0.51972ms)
+✔ document quality: conflicting document context requires review: Lön oktober (0.506059ms)
+✔ document quality: an unreadable standalone logo-named scan remains reviewable (0.664804ms)
+✔ document quality: known supplier with changed Bankgiro remains reviewable without a new debt (60.146616ms)
+✔ document quality: a known supplier does not make missing VAT and net amounts verified (33.036093ms)
+✔ document quality: an unaudited invoice identity cannot authorize automatic registration (31.144084ms)
+✔ document queue: invoice number AB0594 stays distinct from reviewed AB-0594 (38.023917ms)
+✔ document queue: invoice number AB_0594 stays distinct from reviewed AB/0594 (36.471138ms)
+✔ document quality: original corruption blocks extraction and retains the original row (28.444256ms)
+✔ document quality: every interpretation retains its evidence in audit history (30.517109ms)
+✔ document quality: Gmail retains uncertain supported attachments and skips only inline decoration (11.94268ms)
+✔ Q8 synthetic invoice identity: explicit separately labelled invoice and OCR (61.160071ms)
+✔ Q8 synthetic invoice identity: explicit inline values separate invoice and OCR headings (4.51214ms)
+✔ Q8 synthetic invoice identity: invoice and OCR columns need spatial review (1.931419ms)
+✔ Q8 synthetic invoice identity: reversed OCR and invoice columns need spatial review (1.273655ms)
+✔ Q8 synthetic invoice identity: column identifiers are never guessed from text order (1.394785ms)
+✔ Q8 synthetic invoice identity: separate next-line invoice number (1.303329ms)
+✔ Q8 synthetic invoice identity: legitimate OCR-prefixed invoice identity (0.89184ms)
+✔ Q8 synthetic invoice identity: legitimate slashed invoice identity (1.314526ms)
+✔ Q8 synthetic invoice identity: legitimate slashed OCR-prefixed invoice identity (1.177793ms)
+✔ Q8 synthetic invoice identity: maximum supported identifier is complete (1.203061ms)
+✔ Q8 synthetic invoice identity: missing value cannot consume the OCR label (0.929206ms)
+✔ Q8 synthetic invoice identity: missing value cannot consume a supplier label (0.937698ms)
+✔ Q8 synthetic invoice identity: an incomplete column pair stays unresolved (0.936566ms)
+✔ Q8 synthetic invoice identity: an extra column value stays unresolved (0.731683ms)
+✔ Q8 synthetic invoice identity: non-numeric OCR column stays unresolved (2.459661ms)
+✔ Q8 synthetic invoice identity: combined invoice/OCR heading stays unresolved (0.732474ms)
+✔ Q8 synthetic invoice identity: long identifier cannot be truncated (0.741398ms)
+✔ Q8 synthetic invoice identity: unsupported punctuation cannot create an identifier prefix (0.730982ms)
+✔ Q8 synthetic invoice identity: valid occurrence cannot erase an unreadable second invoice number (0.87731ms)
+✔ Q8 synthetic invoice identity: valid occurrence cannot erase an overlong second invoice number (0.91861ms)
+✔ Q8 synthetic invoice identity: a conflicting direct number and column number remain held (0.740185ms)
+✔ Q8 synthetic invoice identity: punctuated OCR and invoice columns (0.855797ms)
+✔ Q8 synthetic invoice identity: abbreviated dotted invoice heading (0.846313ms)
+✔ Q8 synthetic invoice identity: three column headings do not establish identity (0.865471ms)
+✔ Q8 synthetic invoice identity: customer heading between invoice and OCR columns (0.562993ms)
+✔ Q8 synthetic invoice identity: page heading between invoice and OCR columns (0.801507ms)
+✔ Q8 synthetic invoice identity: invoice and OCR heading list across lines (0.846163ms)
+✔ Q8 synthetic invoice identity: punctuated heading list across lines (0.780084ms)
+✔ Q8 synthetic invoice identity: spaced slash between OCR and invoice headings (0.780195ms)
+✔ Q8 synthetic invoice identity: unspaced slash between OCR and invoice headings (0.603514ms)
+✔ Q8 synthetic invoice identity: pipe between OCR and invoice headings (1.043354ms)
+✔ Q8 synthetic invoice identity: semicolon between OCR and invoice headings (0.814646ms)
+✔ Q8 synthetic Swedish invoice date: explicit Swedish hyphen dates (1.118466ms)
+✔ Q8 synthetic Swedish invoice date: padded Swedish hyphen dates (0.753606ms)
+✔ Q8 synthetic Swedish invoice date: leap day remains a real calendar date (0.748137ms)
+✔ Q8 synthetic Swedish invoice date: invalid leap day stays unknown (0.814896ms)
+✔ Q8 synthetic Swedish invoice date: invalid month stays unknown (0.750731ms)
+✔ Q8 synthetic Swedish invoice date: mixed date delimiters stay unknown (0.768859ms)
+✔ Q8 synthetic Swedish invoice date: trailing year digits cannot be truncated (2.30365ms)
+✔ Q8 synthetic Swedish invoice date: a valid date cannot erase another invalid labelled date (0.890408ms)
+✔ Q8 synthetic invoice money unit: spaced VAT percentage cannot masquerade as a monetary amount (1.031547ms)
+✔ Q8 synthetic invoice money unit: unspaced VAT percentage remains unresolved (0.738603ms)
+✔ Q8 synthetic invoice money unit: decimal VAT percentage cannot masquerade as a monetary amount (0.721759ms)
+✔ exact invoice field must remain reviewable: date label census prefix -Fakturadatum retains ambiguity (0.87827ms)
+✔ exact invoice field must remain reviewable: date label census prefix _Fakturadatum retains ambiguity (0.665244ms)
+✔ exact invoice field must remain reviewable: date label census prefix AFakturadatum retains ambiguity (0.836818ms)
+✔ exact invoice field must remain reviewable: date label census prefix 1Fakturadatum retains ambiguity (0.776039ms)
+✔ exact invoice field must remain reviewable: date label census prefix /Fakturadatum retains ambiguity (0.735428ms)
+✔ exact invoice field must remain reviewable: date label census prefix -Förfallodatum retains ambiguity (0.751903ms)
+✔ exact invoice field must remain reviewable: date label census prefix _Förfallodatum retains ambiguity (1.126508ms)
+✔ exact invoice field must remain reviewable: date label census prefix AFörfallodatum retains ambiguity (1.254237ms)
+✔ exact invoice field must remain reviewable: date label census prefix 1Förfallodatum retains ambiguity (0.79711ms)
+✔ exact invoice field must remain reviewable: date label census prefix /Förfallodatum retains ambiguity (0.613487ms)
+✔ exact invoice field must remain reviewable: date label census Fakturadatum retains 2026-11-09 ??? (0.74282ms)
+✔ exact invoice field must remain reviewable: date label census Fakturadatum retains - 2026-11-09 ??? (0.677433ms)
+✔ exact invoice field must remain reviewable: date label census Fakturadatum retains ??? (0.739574ms)
+✔ exact invoice field must remain reviewable: date label census Invoice date retains 2026-11-09 ??? (0.546589ms)
+✔ exact invoice field must remain reviewable: date label census Invoice date retains - 2026-11-09 ??? (0.572267ms)
+✔ exact invoice field must remain reviewable: date label census Invoice date retains ??? (0.488212ms)
+✔ exact invoice field must remain reviewable: date label census Förfallodatum retains 2026-11-09 ??? (1.135036ms)
+✔ exact invoice field must remain reviewable: date label census Förfallodatum retains - 2026-11-09 ??? (0.845352ms)
+✔ exact invoice field must remain reviewable: date label census Förfallodatum retains ??? (1.02042ms)
+✔ exact invoice field must remain reviewable: date label census Due date retains 2026-11-09 ??? (0.929326ms)
+✔ exact invoice field must remain reviewable: date label census Due date retains - 2026-11-09 ??? (0.992841ms)
+✔ exact invoice field must remain reviewable: date label census Due date retains ??? (0.981347ms)
+✔ exact invoice field must remain reviewable: date label census Betalas senast retains 2026-11-09 ??? (0.990736ms)
+✔ exact invoice field must remain reviewable: date label census Betalas senast retains - 2026-11-09 ??? (0.81117ms)
+✔ exact invoice field must remain reviewable: date label census Betalas senast retains ??? (1.38487ms)
+✔ exact invoice field must remain reviewable: complete date issued_at rejects suffix ; 2026-11-09 (0.896928ms)
+✔ exact invoice field must remain reviewable: complete date issued_at rejects suffix , 2026-11-09 (0.722981ms)
+✔ exact invoice field must remain reviewable: complete date issued_at rejects suffix  ??? (0.78355ms)
+✔ exact invoice field must remain reviewable: complete date issued_at rejects a malformed duplicate ; 2026-11-09 (0.875486ms)
+✔ exact invoice field must remain reviewable: complete date issued_at rejects a malformed duplicate , 2026-11-09 (0.860604ms)
+✔ exact invoice field must remain reviewable: complete date issued_at rejects a malformed duplicate  ??? (0.784332ms)
+✔ exact invoice field must remain reviewable: complete date due_at rejects suffix ; 2026-11-09 (0.780205ms)
+✔ exact invoice field must remain reviewable: complete date due_at rejects suffix , 2026-11-09 (0.703581ms)
+✔ exact invoice field must remain reviewable: complete date due_at rejects suffix  ??? (0.867535ms)
+✔ exact invoice field must remain reviewable: complete date due_at rejects a malformed duplicate ; 2026-11-09 (0.825902ms)
+✔ exact invoice field must remain reviewable: complete date due_at rejects a malformed duplicate , 2026-11-09 (0.762199ms)
+✔ exact invoice field must remain reviewable: complete date due_at rejects a malformed duplicate  ??? (0.77697ms)
+✔ exact invoice field must remain reviewable: complete evidence integer amount columns (0.790771ms)
+✔ exact invoice field must remain reviewable: complete evidence character-spaced integer amount (0.866523ms)
+✔ exact invoice field must remain reviewable: complete evidence incorrect monetary thousand groups (0.768448ms)
+✔ exact invoice field must remain reviewable: complete evidence consistent integer amount columns (0.863578ms)
+✔ exact invoice field must remain reviewable: complete evidence Bankgiro numeric suffix (0.905691ms)
+✖ exact invoice field must remain reviewable: complete evidence organization numeric suffix (2.70264ms)
+✔ exact invoice field must remain reviewable: complete evidence unreadable duplicate Bankgiro (0.968093ms)
+✖ exact invoice field must remain reviewable: complete evidence unreadable duplicate organization (1.237881ms)
+✔ exact invoice field must remain reviewable: complete evidence formatted organization checksum (21.954876ms)
+✔ exact invoice field must remain reviewable: unreadable explicit currency label (1.22955ms)
+✔ exact invoice field must remain reviewable: known explicit currency prefix with junk (1.061462ms)
+✔ exact invoice field must remain reviewable: unreadable hyphen-delimited duplicate invoice identity (0.811391ms)
+✔ exact invoice field must remain reviewable: unreadable same-line explicit VAT label (0.762389ms)
+✔ exact invoice field must remain reviewable: unreadable same-line explicit net label (0.84443ms)
+✔ exact invoice field must remain reviewable: two invoice identities on one line (0.813124ms)
+✔ exact invoice field must remain reviewable: two invoice identities in adjacent columns (0.752354ms)
+✔ exact invoice field must remain reviewable: unreadable second OCR (0.77025ms)
+✔ exact invoice field must remain reviewable: unreadable first OCR (0.775228ms)
+✔ exact invoice field must remain reviewable: literal unreadable OCR (0.720697ms)
+✔ exact invoice field must remain reviewable: OCR with alphabetic suffix (0.85763ms)
+✔ exact invoice field must remain reviewable: OCR with decimal suffix (0.826593ms)
+✔ exact invoice field must remain reviewable: OCR with slash suffix (0.773696ms)
+✔ exact invoice field must remain reviewable: OCR with unsupported punctuation (0.730932ms)
+✔ exact invoice field must remain reviewable: OCR exceeding complete token limit (0.731463ms)
+✔ exact invoice field must remain reviewable: two OCR values without distinct labels (0.874786ms)
+✔ exact invoice field must remain reviewable: malformed generic reference suffix (1.574991ms)
+✔ exact invoice field must remain reviewable: two totals without distinct labels (0.999685ms)
+✔ exact invoice field must remain reviewable: two totals in adjacent columns (0.741889ms)
+✔ exact invoice field must remain reviewable: mixed-case conflicting currency (0.526059ms)
+✔ exact invoice field preserves ordinary evidence: date label census prefix -Fakturadatum retains a direct date (0.691264ms)
+✔ exact invoice field preserves ordinary evidence: date label census prefix _Fakturadatum retains a direct date (0.504577ms)
+✔ exact invoice field preserves ordinary evidence: date label census prefix AFakturadatum retains a direct date (0.487481ms)
+✔ exact invoice field preserves ordinary evidence: date label census prefix 1Fakturadatum retains a direct date (0.56073ms)
+✔ exact invoice field preserves ordinary evidence: date label census prefix /Fakturadatum retains a direct date (0.505338ms)
+✔ exact invoice field preserves ordinary evidence: date label census prefix -Förfallodatum retains a direct date (0.65494ms)
+✔ exact invoice field preserves ordinary evidence: date label census prefix _Förfallodatum retains a direct date (0.637504ms)
+✔ exact invoice field preserves ordinary evidence: date label census prefix AFörfallodatum retains a direct date (3.866273ms)
+✔ exact invoice field preserves ordinary evidence: date label census prefix 1Förfallodatum retains a direct date (0.565387ms)
+✔ exact invoice field preserves ordinary evidence: date label census prefix /Förfallodatum retains a direct date (0.552558ms)
+✔ exact invoice field preserves ordinary evidence: date label census Fakturadatum supports a direct value (0.502734ms)
+✔ exact invoice field preserves ordinary evidence: date label census Invoice date supports a direct value (0.538457ms)
+✔ exact invoice field preserves ordinary evidence: date label census Förfallodatum supports a direct value (0.490887ms)
+✔ exact invoice field preserves ordinary evidence: date label census Due date supports a direct value (0.573518ms)
+✔ exact invoice field preserves ordinary evidence: date label census Betalas senast supports a direct value (0.489684ms)
+✔ exact invoice field preserves ordinary evidence: date label census supports direct dates in semicolon-separated fields (0.478439ms)
+✔ exact invoice field preserves ordinary evidence: complete date inline labelled fields (0.578426ms)
+✔ exact invoice field preserves ordinary evidence: complete date values immediately below labels (0.522814ms)
+✔ exact invoice field preserves ordinary evidence: complete date character-spaced Swedish values (0.674789ms)
+✔ exact invoice field preserves ordinary evidence: complete date Swedish dot values (0.600319ms)
+✔ exact invoice field preserves ordinary evidence: complete date known alternate inline labels (0.566138ms)
+✔ exact invoice field preserves ordinary evidence: complete date invoice date and number column layout (0.593478ms)
+✔ exact invoice field preserves ordinary evidence: complete evidence proper monetary integer thousand groups (0.56719ms)
+✔ exact invoice field preserves ordinary evidence: complete evidence proper monetary plain integers (0.538497ms)
+✔ exact invoice field preserves ordinary evidence: complete evidence proper monetary decimal dots (0.954774ms)
+✔ exact invoice field preserves ordinary evidence: complete evidence proper monetary dotted groups (0.5201ms)
+✔ exact invoice field preserves ordinary evidence: complete evidence formatted identifiers preserve raw evidence (0.749499ms)
+✖ exact invoice field preserves ordinary evidence: complete evidence identical identifier duplicates (0.826254ms)
+✔ exact invoice field preserves ordinary evidence: complete evidence same-line known identifier labels (0.643874ms)
+✔ exact invoice field preserves ordinary evidence: net label before VAT word is one field (0.511076ms)
+✔ exact invoice field preserves ordinary evidence: net-exclusive label before VAT word is one field (1.706726ms)
+✔ exact invoice field preserves ordinary evidence: total label including VAT word is one field (0.602291ms)
+✔ exact invoice field preserves ordinary evidence: hyphen-delimited invoice identity (0.450888ms)
+✔ exact invoice field preserves ordinary evidence: explicit valid currency label (0.504698ms)
+✔ exact invoice field preserves ordinary evidence: ordinary inline VAT rates and net prose (0.453161ms)
+✔ exact invoice field preserves ordinary evidence: character-spaced invoice digits (0.477066ms)
+✔ exact invoice field preserves ordinary evidence: character-spaced OCR digits (0.428955ms)
+✔ exact invoice field preserves ordinary evidence: OCR before semicolon-delimited Bankgiro label (0.442815ms)
+✔ exact invoice field preserves ordinary evidence: OCR before pipe-delimited Bankgiro label (0.482303ms)
+✔ exact invoice field preserves ordinary evidence: OCR before same-line Bankgiro label (0.497576ms)
+✔ exact invoice field preserves ordinary evidence: generic reference preserves separators (0.76976ms)
+✔ exact invoice field preserves ordinary evidence: same total before same-line OCR label (0.454904ms)
+✔ exact invoice field preserves ordinary evidence: lowercase SEK is the same currency (0.458299ms)
+✔ complete metadata identifier remains exact: filename complete 82-character identifier (2.41152ms)
+✔ complete metadata identifier remains exact: filename exact 80-character identifier (0.584365ms)
+✔ complete metadata identifier remains exact: filename exact leading zeros (0.542453ms)
+✔ complete metadata identifier remains exact: filename missing leading zeros is a conflict (0.660547ms)
+✔ complete metadata identifier remains exact: subject complete 82-character identifier (0.536774ms)
+✔ complete metadata identifier remains exact: subject exact 80-character identifier (0.521241ms)
+✔ complete metadata identifier remains exact: subject exact leading zeros (0.569774ms)
+✔ complete metadata identifier remains exact: subject missing leading zeros is a conflict (0.525788ms)
+✔ Q8 actual PDF with explicit Swedish dates registers exact labelled identity once and rejects a second copy (2507.830247ms)
+✔ Q8 identical visible PDF columns remain held regardless of content-stream value order (4241.712475ms)
+✔ Q8 actual PDFs with punctuated or multiline heading lists remain unregistered (8727.285908ms)
+✔ Q8 actual PDF with contradictory VAT cannot auto-register using the percentage as its amount (1497.222228ms)
+✔ Q8 actual PDF cannot automatically register the next OCR label as a missing invoice number (1490.986736ms)
+✔ Q8 actual Swedish PNG OCR keeps the same invoice/OCR facts but never becomes automatic evidence (4556.352587ms)
+✔ Q8 improved identity parsing does not admit unknown counterparties, credits or contradictory totals (3230.728835ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census prefix -Fakturadatum retains ambiguity (1543.338466ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census prefix _Fakturadatum retains ambiguity (1583.020731ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census prefix AFakturadatum retains ambiguity (1552.778392ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census prefix 1Fakturadatum retains ambiguity (1444.746639ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census prefix /Fakturadatum retains ambiguity (1519.563164ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census prefix -Förfallodatum retains ambiguity (1563.366318ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census prefix _Förfallodatum retains ambiguity (1368.703129ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census prefix AFörfallodatum retains ambiguity (1534.499218ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census prefix 1Förfallodatum retains ambiguity (1365.723526ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census prefix /Förfallodatum retains ambiguity (1323.843451ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Fakturadatum retains 2026-11-09 ??? (1368.581191ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Fakturadatum retains - 2026-11-09 ??? (1334.42735ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Fakturadatum retains ??? (1377.251582ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Invoice date retains 2026-11-09 ??? (1333.686145ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Invoice date retains - 2026-11-09 ??? (1399.93442ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Invoice date retains ??? (1419.157956ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Förfallodatum retains 2026-11-09 ??? (1409.662505ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Förfallodatum retains - 2026-11-09 ??? (1406.54822ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Förfallodatum retains ??? (1389.278608ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Due date retains 2026-11-09 ??? (1446.713519ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Due date retains - 2026-11-09 ??? (1428.948608ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Due date retains ??? (1514.563563ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Betalas senast retains 2026-11-09 ??? (1359.525998ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Betalas senast retains - 2026-11-09 ??? (1348.202201ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: date label census Betalas senast retains ??? (1408.01684ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete date issued_at rejects suffix ; 2026-11-09 (1361.218717ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete date issued_at rejects suffix , 2026-11-09 (1344.519284ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete date issued_at rejects suffix  ??? (1406.725947ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete date issued_at rejects a malformed duplicate ; 2026-11-09 (1390.155819ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete date issued_at rejects a malformed duplicate , 2026-11-09 (1393.273935ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete date issued_at rejects a malformed duplicate  ??? (1364.113101ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete date due_at rejects suffix ; 2026-11-09 (1420.22475ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete date due_at rejects suffix , 2026-11-09 (1410.407881ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete date due_at rejects suffix  ??? (1401.071411ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete date due_at rejects a malformed duplicate ; 2026-11-09 (1374.717715ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete date due_at rejects a malformed duplicate , 2026-11-09 (1290.737798ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete date due_at rejects a malformed duplicate  ??? (1518.817981ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete evidence integer amount columns (1438.908236ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete evidence character-spaced integer amount (1356.520386ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete evidence incorrect monetary thousand groups (1316.502595ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete evidence consistent integer amount columns (1516.903917ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete evidence Bankgiro numeric suffix (1268.87215ms)
+✖ actual Node PDF cannot auto-register uncertain full fields: complete evidence organization numeric suffix (1352.126674ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete evidence unreadable duplicate Bankgiro (1352.045164ms)
+✖ actual Node PDF cannot auto-register uncertain full fields: complete evidence unreadable duplicate organization (1377.2584ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: complete evidence formatted organization checksum (1502.293005ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: unreadable explicit currency label (1500.865837ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: known explicit currency prefix with junk (1499.282758ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: unreadable hyphen-delimited duplicate invoice identity (1744.589477ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: unreadable same-line explicit VAT label (1483.51623ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: unreadable same-line explicit net label (1566.051586ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: two invoice identities on one line (1411.869035ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: two invoice identities in adjacent columns (1403.638532ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: unreadable second OCR (1417.602643ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: unreadable first OCR (1448.959206ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: literal unreadable OCR (1414.565355ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: OCR with alphabetic suffix (1437.486784ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: OCR with decimal suffix (1399.074109ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: OCR with slash suffix (1392.606208ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: OCR with unsupported punctuation (1425.592ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: OCR exceeding complete token limit (1397.549894ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: two OCR values without distinct labels (1428.612541ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: malformed generic reference suffix (1279.880044ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: two totals without distinct labels (1300.827364ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: two totals in adjacent columns (1264.961299ms)
+✔ actual Node PDF cannot auto-register uncertain full fields: mixed-case conflicting currency (1325.265189ms)
+✔ actual Node PDF registers exact full fields: date label census prefix -Fakturadatum retains a direct date (1332.131506ms)
+✔ actual Node PDF registers exact full fields: date label census prefix _Fakturadatum retains a direct date (1392.485642ms)
+✔ actual Node PDF registers exact full fields: date label census prefix AFakturadatum retains a direct date (1384.632623ms)
+✔ actual Node PDF registers exact full fields: date label census prefix 1Fakturadatum retains a direct date (1442.925909ms)
+✔ actual Node PDF registers exact full fields: date label census prefix /Fakturadatum retains a direct date (1388.225782ms)
+✔ actual Node PDF registers exact full fields: date label census prefix -Förfallodatum retains a direct date (1472.988947ms)
+✔ actual Node PDF registers exact full fields: date label census prefix _Förfallodatum retains a direct date (1524.515592ms)
+✔ actual Node PDF registers exact full fields: date label census prefix AFörfallodatum retains a direct date (1428.564075ms)
+✔ actual Node PDF registers exact full fields: date label census prefix 1Förfallodatum retains a direct date (1341.54168ms)
+✔ actual Node PDF registers exact full fields: date label census prefix /Förfallodatum retains a direct date (1370.091179ms)
+✔ actual Node PDF registers exact full fields: date label census Fakturadatum supports a direct value (1371.569844ms)
+✔ actual Node PDF registers exact full fields: date label census Invoice date supports a direct value (1310.860924ms)
+✔ actual Node PDF registers exact full fields: date label census Förfallodatum supports a direct value (1343.352053ms)
+✔ actual Node PDF registers exact full fields: date label census Due date supports a direct value (1399.302853ms)
+✔ actual Node PDF registers exact full fields: date label census Betalas senast supports a direct value (1300.089727ms)
+✔ actual Node PDF registers exact full fields: date label census supports direct dates in semicolon-separated fields (1557.528684ms)
+✔ actual Node PDF registers exact full fields: complete date inline labelled fields (1445.043158ms)
+✔ actual Node PDF registers exact full fields: complete date values immediately below labels (1329.208963ms)
+✔ actual Node PDF registers exact full fields: complete date character-spaced Swedish values (1292.383651ms)
+✔ actual Node PDF registers exact full fields: complete date Swedish dot values (1324.988408ms)
+✔ actual Node PDF registers exact full fields: complete date known alternate inline labels (1369.409447ms)
+✔ actual Node PDF registers exact full fields: complete date invoice date and number column layout (1336.252922ms)
+✔ actual Node PDF registers exact full fields: complete evidence proper monetary integer thousand groups (1350.20492ms)
+✔ actual Node PDF registers exact full fields: complete evidence proper monetary plain integers (1389.542073ms)
+✔ actual Node PDF registers exact full fields: complete evidence proper monetary decimal dots (1628.340058ms)
+✔ actual Node PDF registers exact full fields: complete evidence proper monetary dotted groups (1833.315204ms)
+✔ actual Node PDF registers exact full fields: complete evidence formatted identifiers preserve raw evidence (1566.695155ms)
+✖ actual Node PDF registers exact full fields: complete evidence identical identifier duplicates (1791.590822ms)
+✔ actual Node PDF registers exact full fields: complete evidence same-line known identifier labels (1443.083989ms)
+✔ actual Node PDF registers exact full fields: net label before VAT word is one field (1502.009977ms)
+✔ actual Node PDF registers exact full fields: net-exclusive label before VAT word is one field (1415.925696ms)
+✔ actual Node PDF registers exact full fields: total label including VAT word is one field (1423.38664ms)
+✔ actual Node PDF registers exact full fields: hyphen-delimited invoice identity (1396.189461ms)
+✔ actual Node PDF registers exact full fields: explicit valid currency label (1315.009975ms)
+✔ actual Node PDF registers exact full fields: ordinary inline VAT rates and net prose (1509.192397ms)
+✔ actual Node PDF registers exact full fields: character-spaced invoice digits (1450.497014ms)
+✔ actual Node PDF registers exact full fields: character-spaced OCR digits (1452.148232ms)
+✔ actual Node PDF registers exact full fields: OCR before semicolon-delimited Bankgiro label (1580.909748ms)
+✔ actual Node PDF registers exact full fields: OCR before pipe-delimited Bankgiro label (1459.10374ms)
+✔ actual Node PDF registers exact full fields: OCR before same-line Bankgiro label (1474.878309ms)
+✔ actual Node PDF registers exact full fields: generic reference preserves separators (1425.639611ms)
+✔ actual Node PDF registers exact full fields: same total before same-line OCR label (1530.004666ms)
+✔ actual Node PDF registers exact full fields: lowercase SEK is the same currency (1459.284396ms)
+✔ actual Node PDF checks complete metadata identity: filename complete 82-character identifier (1427.337859ms)
+✔ actual Node PDF checks complete metadata identity: filename exact 80-character identifier (1419.426979ms)
+✔ actual Node PDF checks complete metadata identity: filename exact leading zeros (1466.286057ms)
+✔ actual Node PDF checks complete metadata identity: filename missing leading zeros is a conflict (1677.567835ms)
+✔ actual Node PDF checks complete metadata identity: subject complete 82-character identifier (1636.886705ms)
+✔ actual Node PDF checks complete metadata identity: subject exact 80-character identifier (1592.416077ms)
+✔ actual Node PDF checks complete metadata identity: subject exact leading zeros (1645.899203ms)
+✔ actual Node PDF checks complete metadata identity: subject missing leading zeros is a conflict (1543.100601ms)
+✔ invoice reads derive the intended reference without changing stored leading zeros or historical balances (88.213401ms)
+✔ exact company invoice reference 0001 can use independently verified bank evidence (49.260926ms)
+✔ exact company invoice reference 0599 can use independently verified bank evidence (45.088978ms)
+✔ payer and amount cannot promote nonexact reference "1" for 0001 (38.964038ms)
+✔ payer and amount cannot promote nonexact reference "001" for 0001 (37.817571ms)
+✔ payer and amount cannot promote nonexact reference "00-01" for 0001 (31.631059ms)
+✔ payer and amount cannot promote nonexact reference "0 0 0 1" for 0001 (33.869574ms)
+✔ payer and amount cannot promote nonexact reference "00010" for 0001 (37.982093ms)
+✔ payer and amount cannot promote nonexact reference "599" for 0599 (33.791238ms)
+✔ payer and amount cannot promote nonexact reference "05-99" for 0599 (39.425825ms)
+✔ payer and amount cannot promote nonexact reference "059" for 0599 (41.425855ms)
+✔ payer and amount cannot promote nonexact reference "0600" for 0599 (39.01234ms)
+✔ payer and amount cannot promote nonexact reference "" for 0599 (37.626077ms)
+✔ conflicting historical declared reference blocks new matching without rewriting old money (40.620371ms)
+✔ a blocked invoice reference withholds current payment proof while preserving historical reconciliation and balances (33.254654ms)
+✔ same-company duplicate invoice number remains ambiguous across customers, closed=false (28.623416ms)
+✔ same-company duplicate invoice number remains ambiguous across customers, closed=true (33.935582ms)
+✔ a blocked invoice keeps its conflicting declared identifier reserved against another invoice (28.813507ms)
+✔ all linked originals reserve conflicting identifiers even when the latest original agrees (34.502291ms)
+✔ an explicit original contradiction blocks a stored company invoice: {"number":"0600"} (37.636262ms)
+✔ an explicit original contradiction blocks a stored company invoice: {"reference":"0600"} (27.142863ms)
+✔ an explicit original contradiction blocks a stored company invoice: {"issuer":"Different synthetic issuer AB"} (27.801228ms)
+✔ other-company and supplier invoices retain their distinct explicit reference semantics (72.681927ms)
+✔ a supplier identifier does not become a duplicate of the issuing company invoice namespace (35.395915ms)
+✔ explicit context activates policy while context-free analyzer calls retain generic behavior (0.753997ms)
+✔ explicit context preserves linked-original conflicts and reserved identifiers for 0599 (39.765223ms)
+✔ explicit context preserves linked-original conflicts and reserved identifiers for 0600 (34.630477ms)
+✔ policy configuration rejects invalid input without changing saved settings (26.203276ms)
+✔ document analysis exposes an original reference conflict instead of making it registration-ready (64.470818ms)
+✖ automatic registration rechecks the company policy instead of trusting an older green extraction (40.006593ms)
+✔ a blocked reference policy prepares only a cautious confirmation without directing a reference correction (56.348986ms)
+✔ a blocked reference policy invalidates an older correction draft even when its snapshot is current (40.29921ms)
+✔ direct message generation cannot prescribe an intended reference while its policy is blocked (27.145482ms)
+✔ manual reference correction cannot override preserved bank references, typed candidates=true (28.269111ms)
+✔ manual reference correction cannot override preserved bank references, typed candidates=false (30.801942ms)
+✔ raw bank reference checks preserve the recorded extraction profile ais-null-schema-v1 / 0599 (0.619998ms)
+✔ raw bank reference checks preserve the recorded extraction profile ais-null-schema-v1 / 0600 (0.223852ms)
+✔ raw bank reference checks preserve the recorded extraction profile legacy / 0599 (0.179385ms)
+✔ invoice API reads preserve historical rows and allocation API enforces exact company references (213.196082ms)
+ℹ tests 357
+ℹ suites 0
+ℹ pass 348
+ℹ fail 9
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 197398.208937
+
+✖ failing tests:
+
+test at test/document-quality-cycle.test.js:41:3
+✖ document quality: an invalid additional organisationsnummer blocks automatic eligibility (6.244875ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(result.issues.some(issue=>issue.includes(field)))
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/test/document-quality-cycle.test.js:45:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/document-quality-cycle.test.js:41:3
+✖ document quality: an invalid additional organisationsnummer blocks automatic eligibility (1.341576ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(result.issues.some(issue=>issue.includes(field)))
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/test/document-quality-cycle.test.js:45:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/invoice-parser-corpus-q8.test.js:32:35
+✖ exact invoice field must remain reviewable: complete evidence organization numeric suffix (2.70264ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '5560160680'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/test/invoice-parser-corpus-q8.test.js:34:92)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '5560160680',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/invoice-parser-corpus-q8.test.js:32:35
+✖ exact invoice field must remain reviewable: complete evidence unreadable duplicate organization (1.237881ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '5560160680'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/test/invoice-parser-corpus-q8.test.js:34:92)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '5560160680',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/invoice-parser-corpus-q8.test.js:36:43
+✖ exact invoice field preserves ordinary evidence: complete evidence identical identifier duplicates (0.826254ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'yellow' !== 'green'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/test/invoice-parser-corpus-q8.test.js:38:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'yellow',
+    expected: 'green',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/invoice-parser-corpus-q8.test.js:118:35
+✖ actual Node PDF cannot auto-register uncertain full fields: complete evidence organization numeric suffix (1352.126674ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '5560160680'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/test/invoice-parser-corpus-q8.test.js:120:126)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '5560160680',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/invoice-parser-corpus-q8.test.js:118:35
+✖ actual Node PDF cannot auto-register uncertain full fields: complete evidence unreadable duplicate organization (1377.2584ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '5560160680'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/test/invoice-parser-corpus-q8.test.js:120:126)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '5560160680',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/invoice-parser-corpus-q8.test.js:123:43
+✖ actual Node PDF registers exact full fields: complete evidence identical identifier duplicates (1791.590822ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(invoice)
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/test/invoice-parser-corpus-q8.test.js:125:80)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/invoice-reference-integration.test.js:188:1
+✖ automatic registration rechecks the company policy instead of trusting an older green extraction (40.006593ms)
+  Error: En nödvändig fakturauppgift saknas.
+      at failure (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/src/invoice-review.js:6:51)
+      at approveDocument (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/src/invoice-review.js:84:28)
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/test/invoice-reference-integration.test.js:195:47)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    status: 400
+  }

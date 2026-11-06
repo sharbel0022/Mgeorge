@@ -1,0 +1,52 @@
+{
+  "sourceCommit": "a19e0a8ce7a7ddedb85de1a8f9e21b617ba90b77",
+  "runtime": "v24.22.1",
+  "opticalCalls": 0,
+  "independentReview": false,
+  "reports": [
+    {
+      "suite": "node",
+      "exitCode": 1,
+      "tests": 357,
+      "pass": 348,
+      "fail": 9,
+      "cancelled": 0,
+      "skipped": 0,
+      "file": "docs/quality8/a19-parser-regression/node-red.log",
+      "sha256": "b73719d6301404006d0b4312689461be5c6201d3f0ecb28b0f67224114114154"
+    },
+    {
+      "suite": "sites",
+      "exitCode": 1,
+      "tests": 352,
+      "pass": 343,
+      "fail": 9,
+      "cancelled": 0,
+      "skipped": 0,
+      "file": "docs/quality8/a19-parser-regression/sites-red.log",
+      "sha256": "0a1b1607ba65a70cc519f09bb9a9c9f731d49b8d3d4053b87ab506b5b39180b8"
+    },
+    {
+      "suite": "name-grammar",
+      "exitCode": 1,
+      "tests": 48,
+      "pass": 20,
+      "fail": 28,
+      "cancelled": 0,
+      "skipped": 0,
+      "file": "docs/quality8/a19-parser-regression/name-grammar-red.log",
+      "sha256": "06900199cbf9d3ddb88f28bf1596bef2a803792e3a634f79f648ebb97513b5ca"
+    }
+  ],
+  "testFileSha256": "d7c764aa007c5e1738649d45a819e5aa15471f86f53aeef74d87712ef2e5943d",
+  "commands": [
+    "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 --test-name-pattern='^(?!Q8 actual Swedish PNG OCR)' test/document-quality-cycle.test.js test/invoice-parser-corpus-q8.test.js test/invoice-reference-integration.test.js",
+    "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 sites/tests/document-quality-cycle.test.mjs sites/tests/invoice-parser-corpus-q8.test.mjs sites/tests/gmail-preview-q8.test.mjs",
+    "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --test sites/tests/party-role-name-grammar.test.mjs"
+  ],
+  "limits": [
+    "Native-text PDF tests run their actual extraction/registration paths; the optical PNG case was explicitly excluded.",
+    "Existing test assertions and original fixture facts are unchanged.",
+    "A and B observation product changes are absent from this a19-based branch."
+  ]
+}

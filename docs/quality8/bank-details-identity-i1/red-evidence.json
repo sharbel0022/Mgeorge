@@ -1,0 +1,218 @@
+{
+  "schema": "bank-details-identity-i1-red-v1",
+  "baseline": "638c77365dbf8f4c73db6b23816a37f577da5689",
+  "nodeVersion": "v24.22.1",
+  "runs": [
+    {
+      "name": "red-additional-controls",
+      "baseline": "638c77365dbf8f4c73db6b23816a37f577da5689",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test-concurrency=1",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern=^usage details identity I1:",
+        "sites/tests/bank-usage-details-policy.test.mjs",
+        "sites/tests/banking-security.test.mjs"
+      ],
+      "exitCode": 1,
+      "counts": {
+        "tests": 7,
+        "pass": 2,
+        "fail": 5,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "failedTests": [
+        "usage details identity I1: conflicting live IBANs survive omitted fresh identifiers",
+        "usage details identity I1: conflicting live IBANs survive different scheme fresh identifiers",
+        "usage details identity I1: saved/live BBAN conflict survives a noncomparable fresh IBAN",
+        "usage details identity I1: saved/live BBAN conflict survives missing fresh account_id through the actual adapter",
+        "usage details identity I1: saved internal IBAN conflict survives missing fresh account_id through the actual adapter"
+      ],
+      "log": "docs/quality8/bank-details-identity-i1/red-additional-controls.tap",
+      "logSha256": "78797fac00cbb64fb11d84383d326ab7102c437ff2b9cb05748617ac1d54f100",
+      "elapsedSeconds": 1.988
+    },
+    {
+      "name": "red-independent-adapter",
+      "baseline": "638c77365dbf8f4c73db6b23816a37f577da5689",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test-concurrency=1",
+        "--test",
+        "--test-reporter=tap",
+        "sites/tests/bank-usage-details-identity-adapter.test.mjs"
+      ],
+      "exitCode": 1,
+      "counts": {
+        "tests": 2,
+        "pass": 1,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "failedTests": [
+        "actual details adapter to observer, internally contradictory primary IBAN"
+      ],
+      "log": "docs/quality8/bank-details-identity-i1/red-independent-adapter.tap",
+      "logSha256": "85119a8fbcc7c7a9c909fabce331e1f40f6094f58a514cc6b95f264648f44e93",
+      "elapsedSeconds": 0.488
+    },
+    {
+      "name": "red-independent-policy",
+      "baseline": "638c77365dbf8f4c73db6b23816a37f577da5689",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test-concurrency=1",
+        "--test",
+        "--test-reporter=tap",
+        "sites/tests/bank-usage-details-identity-policy.test.mjs"
+      ],
+      "exitCode": 1,
+      "counts": {
+        "tests": 5,
+        "pass": 2,
+        "fail": 3,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "failedTests": [
+        "contradictory IBAN fields inside fresh primary account_id must prevent an observation",
+        "saved and live primary BBAN disagreement must survive omitted fresh account_id",
+        "contradictory cached primary IBANs cannot be erased by omitted fresh account_id"
+      ],
+      "log": "docs/quality8/bank-details-identity-i1/red-independent-policy.tap",
+      "logSha256": "e82bbba4e42b7e05479aee9905a8458a4d12be800253bd883db74aac0cf8032e",
+      "elapsedSeconds": 0.307
+    },
+    {
+      "name": "red-independent-service",
+      "baseline": "638c77365dbf8f4c73db6b23816a37f577da5689",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test-concurrency=1",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern=^reviewer:",
+        "sites/tests/banking-security.test.mjs"
+      ],
+      "exitCode": 1,
+      "counts": {
+        "tests": 7,
+        "pass": 6,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "failedTests": [
+        "reviewer: actual provider adapter must reject contradictory fresh primary IBAN values"
+      ],
+      "log": "docs/quality8/bank-details-identity-i1/red-independent-service.tap",
+      "logSha256": "f116d9175ffaf2ef02a56f183722f96b31138f33b00feec67eff55eb56b91df7",
+      "elapsedSeconds": 4.458
+    }
+  ],
+  "frozenTestFiles": [
+    {
+      "path": "sites/tests/bank-usage-details-identity-policy.test.mjs",
+      "sha256": "dac97f1f5d1933f4abdb4b6e773648d16fd01cb44ea6777983f42cb388dc6db5"
+    },
+    {
+      "path": "sites/tests/bank-usage-details-identity-adapter.test.mjs",
+      "sha256": "bd1fd5940d45fea7a603b5469f38dca5f15c62bcbecb1625625da94b85a2105d"
+    },
+    {
+      "path": "sites/tests/bank-usage-details-policy.test.mjs",
+      "sha256": "ec02badb28e1588efcc55a0ee80e04e78ef94c79aec2d43e559edbfc1ec92f75"
+    },
+    {
+      "path": "sites/tests/banking-security.test.mjs",
+      "sha256": "efcd72fc157e4a73d549c3511309599c13d689d146a36d4f40c4e3a7db825730"
+    }
+  ],
+  "unchangedProductFiles": [
+    {
+      "path": "sites/lib/bank-consent-policy.js",
+      "sha256": "612f167c21180bd4f008ee28925d01221780c13b0c5a3d224c0ee05254208d6c"
+    },
+    {
+      "path": "sites/lib/bank-consent-policy.d.ts",
+      "sha256": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280"
+    },
+    {
+      "path": "sites/lib/banking/service.ts",
+      "sha256": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24"
+    },
+    {
+      "path": "sites/lib/banking/enable-banking.ts",
+      "sha256": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6"
+    },
+    {
+      "path": "sites/lib/banking/account-evidence.ts",
+      "sha256": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f"
+    },
+    {
+      "path": "sites/lib/banking/account-read-guard.ts",
+      "sha256": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837"
+    }
+  ],
+  "totals": {
+    "tests": 21,
+    "pass": 11,
+    "fail": 10,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "independentRegressionBodyChanges": 0,
+  "productEdits": 0,
+  "liveBankRequests": 0,
+  "productionCalls": 0,
+  "whitespaceCheck": {
+    "allFilesExitCode": 2,
+    "rawTapReporterWhitespacePreserved": true,
+    "sourceTestsAndAuthoredEvidenceExitCode": 0,
+    "command": [
+      "git",
+      "diff",
+      "--cached",
+      "--check",
+      "--",
+      ".",
+      ":(exclude)**/*.tap"
+    ]
+  }
+}

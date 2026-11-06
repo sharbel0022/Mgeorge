@@ -1,0 +1,692 @@
+✖ Node pdf a colon-labelled name keeps literal role words: Original supplier AB (51.502265ms)
+✖ Node pdf a colon-labelled name keeps literal role words: Synthetic customer AB (4.295151ms)
+✖ Node pdf a colon-labelled name keeps literal role words: Nord Customer Service AB (1.305242ms)
+✖ Node pdf a colon-labelled name keeps literal role words: Svenska Supplier Support AB (1.246175ms)
+✖ Node pdf a colon-labelled name keeps literal role words: Original supplier AB (1.703562ms)
+✖ Node pdf a colon-labelled name keeps literal role words: Kund AB (1.174649ms)
+✔ Node pdf literal-name grammar keeps bare conflicting roles unresolved (1.310861ms)
+✔ Node pdf literal-name grammar keeps unresolved heading columns unresolved (1.084596ms)
+✔ Node pdf literal-name grammar keeps unknown explicit inline label unresolved (1.221079ms)
+✔ Node pdf literal-name grammar keeps tab-delimited bare role column unresolved (1.20203ms)
+✔ Node pdf literal-name grammar keeps space-delimited bare role column unresolved (0.982035ms)
+✖ Node pdf a second explicit colon role remains an independent party (1.211104ms)
+✖ Node ocr a colon-labelled name keeps literal role words: Original supplier AB (1.853935ms)
+✖ Node ocr a colon-labelled name keeps literal role words: Synthetic customer AB (1.618557ms)
+✖ Node ocr a colon-labelled name keeps literal role words: Nord Customer Service AB (0.999891ms)
+✖ Node ocr a colon-labelled name keeps literal role words: Svenska Supplier Support AB (0.92483ms)
+✖ Node ocr a colon-labelled name keeps literal role words: Original supplier AB (1.253846ms)
+✖ Node ocr a colon-labelled name keeps literal role words: Kund AB (1.052298ms)
+✔ Node ocr literal-name grammar keeps bare conflicting roles unresolved (0.902646ms)
+✔ Node ocr literal-name grammar keeps unresolved heading columns unresolved (0.905451ms)
+✔ Node ocr literal-name grammar keeps unknown explicit inline label unresolved (0.988554ms)
+✔ Node ocr literal-name grammar keeps tab-delimited bare role column unresolved (0.865831ms)
+✔ Node ocr literal-name grammar keeps space-delimited bare role column unresolved (0.995274ms)
+✖ Node ocr a second explicit colon role remains an independent party (1.172277ms)
+✖ Sites pdf a colon-labelled name keeps literal role words: Original supplier AB (8.606925ms)
+✖ Sites pdf a colon-labelled name keeps literal role words: Synthetic customer AB (1.522445ms)
+✖ Sites pdf a colon-labelled name keeps literal role words: Nord Customer Service AB (1.346043ms)
+✖ Sites pdf a colon-labelled name keeps literal role words: Svenska Supplier Support AB (1.360664ms)
+✖ Sites pdf a colon-labelled name keeps literal role words: Original supplier AB (1.597035ms)
+✖ Sites pdf a colon-labelled name keeps literal role words: Kund AB (1.159086ms)
+✔ Sites pdf literal-name grammar keeps bare conflicting roles unresolved (1.044798ms)
+✔ Sites pdf literal-name grammar keeps unresolved heading columns unresolved (1.078998ms)
+✔ Sites pdf literal-name grammar keeps unknown explicit inline label unresolved (1.27665ms)
+✔ Sites pdf literal-name grammar keeps tab-delimited bare role column unresolved (2.757934ms)
+✔ Sites pdf literal-name grammar keeps space-delimited bare role column unresolved (0.984539ms)
+✖ Sites pdf a second explicit colon role remains an independent party (1.692415ms)
+✖ Sites ocr a colon-labelled name keeps literal role words: Original supplier AB (1.336058ms)
+✖ Sites ocr a colon-labelled name keeps literal role words: Synthetic customer AB (0.995314ms)
+✖ Sites ocr a colon-labelled name keeps literal role words: Nord Customer Service AB (1.279304ms)
+✖ Sites ocr a colon-labelled name keeps literal role words: Svenska Supplier Support AB (1.258062ms)
+✖ Sites ocr a colon-labelled name keeps literal role words: Original supplier AB (1.105648ms)
+✖ Sites ocr a colon-labelled name keeps literal role words: Kund AB (1.287436ms)
+✔ Sites ocr literal-name grammar keeps bare conflicting roles unresolved (1.061862ms)
+✔ Sites ocr literal-name grammar keeps unresolved heading columns unresolved (1.069073ms)
+✔ Sites ocr literal-name grammar keeps unknown explicit inline label unresolved (2.503567ms)
+✔ Sites ocr literal-name grammar keeps tab-delimited bare role column unresolved (1.047951ms)
+✔ Sites ocr literal-name grammar keeps space-delimited bare role column unresolved (1.204443ms)
+✖ Sites ocr a second explicit colon role remains an independent party (1.365562ms)
+ℹ tests 48
+ℹ suites 0
+ℹ pass 20
+ℹ fail 28
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 838.424334
+
+✖ failing tests:
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Node pdf a colon-labelled name keeps literal role words: Original supplier AB (51.502265ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Original supplier AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Original supplier AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Node pdf a colon-labelled name keeps literal role words: Synthetic customer AB (4.295151ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Synthetic customer AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Synthetic customer AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Node pdf a colon-labelled name keeps literal role words: Nord Customer Service AB (1.305242ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Nord Customer Service AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Nord Customer Service AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Node pdf a colon-labelled name keeps literal role words: Svenska Supplier Support AB (1.246175ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Svenska Supplier Support AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Svenska Supplier Support AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Node pdf a colon-labelled name keeps literal role words: Original supplier AB (1.703562ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Original supplier AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Original supplier AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Node pdf a colon-labelled name keeps literal role words: Kund AB (1.174649ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  null !== 'Kund AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Kund AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:32:2
+✖ Node pdf a second explicit colon role remains an independent party (1.211104ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Nord Customer Service AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:34:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Nord Customer Service AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Node ocr a colon-labelled name keeps literal role words: Original supplier AB (1.853935ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Original supplier AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Original supplier AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Node ocr a colon-labelled name keeps literal role words: Synthetic customer AB (1.618557ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Synthetic customer AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Synthetic customer AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Node ocr a colon-labelled name keeps literal role words: Nord Customer Service AB (0.999891ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Nord Customer Service AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Nord Customer Service AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Node ocr a colon-labelled name keeps literal role words: Svenska Supplier Support AB (0.92483ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Svenska Supplier Support AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Svenska Supplier Support AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Node ocr a colon-labelled name keeps literal role words: Original supplier AB (1.253846ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Original supplier AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Original supplier AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Node ocr a colon-labelled name keeps literal role words: Kund AB (1.052298ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  null !== 'Kund AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Kund AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:32:2
+✖ Node ocr a second explicit colon role remains an independent party (1.172277ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Nord Customer Service AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:34:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Nord Customer Service AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Sites pdf a colon-labelled name keeps literal role words: Original supplier AB (8.606925ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Original supplier AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Original supplier AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Sites pdf a colon-labelled name keeps literal role words: Synthetic customer AB (1.522445ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Synthetic customer AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Synthetic customer AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Sites pdf a colon-labelled name keeps literal role words: Nord Customer Service AB (1.346043ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Nord Customer Service AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Nord Customer Service AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Sites pdf a colon-labelled name keeps literal role words: Svenska Supplier Support AB (1.360664ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Svenska Supplier Support AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Svenska Supplier Support AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Sites pdf a colon-labelled name keeps literal role words: Original supplier AB (1.597035ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Original supplier AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Original supplier AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Sites pdf a colon-labelled name keeps literal role words: Kund AB (1.159086ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  null !== 'Kund AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Kund AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:32:2
+✖ Sites pdf a second explicit colon role remains an independent party (1.692415ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Nord Customer Service AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:34:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Nord Customer Service AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Sites ocr a colon-labelled name keeps literal role words: Original supplier AB (1.336058ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Original supplier AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Original supplier AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Sites ocr a colon-labelled name keeps literal role words: Synthetic customer AB (0.995314ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Synthetic customer AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Synthetic customer AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Sites ocr a colon-labelled name keeps literal role words: Nord Customer Service AB (1.279304ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Nord Customer Service AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Nord Customer Service AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Sites ocr a colon-labelled name keeps literal role words: Svenska Supplier Support AB (1.258062ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Svenska Supplier Support AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Svenska Supplier Support AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Sites ocr a colon-labelled name keeps literal role words: Original supplier AB (1.105648ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Original supplier AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Original supplier AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:24:45
+✖ Sites ocr a colon-labelled name keeps literal role words: Kund AB (1.287436ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  null !== 'Kund AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Kund AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/party-role-name-grammar.test.mjs:32:2
+✖ Sites ocr a second explicit colon role remains an independent party (1.365562ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Nord Customer Service AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/.quality8-parser-fix/sites/tests/party-role-name-grammar.test.mjs:34:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Nord Customer Service AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -1,0 +1,32 @@
+{
+  "method": "GET",
+  "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/workflows/399932780",
+  "requestedAt": "2026-11-06T02:24:52.821792+00:00",
+  "authentication": "none",
+  "authorizationHeaderSent": false,
+  "kind": "workflow",
+  "observedAt": "2026-11-06T02:24:58.097451+00:00",
+  "httpStatus": 200,
+  "headers": {
+    "Date": "Fri, 06 Nov 2026 02:24:58 GMT",
+    "ETag": "W/\"6cc2acb76ce638381f511006428de168b763264b48f53dca848aee30c7991aaf\"",
+    "Age": null,
+    "X-GitHub-Request-Id": "AC5A:FDDBD:8B3C2:CD6B8:6AED3A79",
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "58",
+    "X-RateLimit-Reset": "1793935497",
+    "Link": null
+  },
+  "responseBytes": 494,
+  "responseSha256": "482c4f769f92488ae5a1f567550303b44af6c2e98e6070c6cc1cd0d6256ec117",
+  "data": {
+    "id": 399932780,
+    "name": "Sites cloud OCR",
+    "path": ".github/workflows/sites-cloud-ocr.yml",
+    "state": "active",
+    "created_at": "2026-10-28T21:36:09.000Z",
+    "updated_at": "2026-10-28T21:36:09.000Z",
+    "html_url": "https://github.com/sharbel0022/Mgeorge/blob/main/.github/workflows/sites-cloud-ocr.yml",
+    "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/workflows/399932780"
+  }
+}

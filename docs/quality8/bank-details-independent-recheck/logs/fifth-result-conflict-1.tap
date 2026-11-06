@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: reviewer I1 followup: conflict on the fifth actual-adapter result withholds every usage category
+ok 1 - reviewer I1 followup: conflict on the fifth actual-adapter result withholds every usage category
+  ---
+  duration_ms: 866.511133
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1430.288012

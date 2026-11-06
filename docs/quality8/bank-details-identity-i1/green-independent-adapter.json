@@ -1,0 +1,33 @@
+{
+  "name": "green-independent-adapter",
+  "redCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+  "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+  "env": {
+    "NODE_ENV": "test"
+  },
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "--test-concurrency=1",
+    "--test",
+    "--test-reporter=tap",
+    "sites/tests/bank-usage-details-identity-adapter.test.mjs"
+  ],
+  "exitCode": 0,
+  "counts": {
+    "tests": 2,
+    "pass": 2,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "failedTests": [],
+  "log": "docs/quality8/bank-details-identity-i1/green-independent-adapter.tap",
+  "logSha256": "2a21a1daaf8988d1f86b8c8d8fdfd69216b20caeb0ccabde37d75c61d800bffc",
+  "elapsedSeconds": 0.493,
+  "policySha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+  "testFilesMatchFrozenRed": true
+}

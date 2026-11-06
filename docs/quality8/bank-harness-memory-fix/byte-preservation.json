@@ -1,0 +1,10 @@
+{
+  "baseline": "d294fd87b04d1bf65b124be5ad3dd1bd2654fd73",
+  "path": "sites/tests/banking-security.test.mjs",
+  "beforeSha256": "f94dc9bfa6cb223bc5bb85da2ec334a4c639aa7f64056e87058c02e8f6826948",
+  "afterSha256": "4bfafdbbf08c9c2eaa61c61a37b10571abf5fe23caa8cbdfcf28a43cff48efd0",
+  "fromLocalD1ToEofByteIdentical": true,
+  "unchangedSuffixBytes": 179426,
+  "unchangedSuffixSha256": "a270e84103371a0896d2a18fe881a2a341d5399a0f5994e39839123dc945e4d5",
+  "compiledModuleByteIdentical": true
+}

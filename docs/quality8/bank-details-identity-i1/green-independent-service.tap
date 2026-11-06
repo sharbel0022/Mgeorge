@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: reviewer: complete maximum-sized mixed batch preserves the original denial and row
+ok 1 - reviewer: complete maximum-sized mixed batch preserves the original denial and row
+  ---
+  duration_ms: 822.555699
+  type: 'test'
+  ...
+# Subtest: reviewer: provider failure on the fifth result withholds all partial usage
+ok 2 - reviewer: provider failure on the fifth result withholds all partial usage
+  ---
+  duration_ms: 575.133915
+  type: 'test'
+  ...
+# Subtest: reviewer: app metadata changes atomically at final failed audit suppress the five-result diagnosis
+ok 3 - reviewer: app metadata changes atomically at final failed audit suppress the five-result diagnosis
+  ---
+  duration_ms: 555.859402
+  type: 'test'
+  ...
+# Subtest: reviewer: a committed failed audit with lost acknowledgement cannot publish completed categories
+ok 4 - reviewer: a committed failed audit with lost acknowledgement cannot publish completed categories
+  ---
+  duration_ms: 534.150236
+  type: 'test'
+  ...
+# Subtest: reviewer: connection mutation after the failed audit commits suppresses completed categories
+ok 5 - reviewer: connection mutation after the failed audit commits suppresses completed categories
+  ---
+  duration_ms: 380.758647
+  type: 'test'
+  ...
+# Subtest: reviewer: deadline expiry after all results but before audit acknowledgement suppresses categories
+ok 6 - reviewer: deadline expiry after all results but before audit acknowledgement suppresses categories
+  ---
+  duration_ms: 381.186721
+  type: 'test'
+  ...
+# Subtest: reviewer: actual provider adapter must reject contradictory fresh primary IBAN values
+ok 7 - reviewer: actual provider adapter must reject contradictory fresh primary IBAN values
+  ---
+  duration_ms: 410.947244
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4403.357028

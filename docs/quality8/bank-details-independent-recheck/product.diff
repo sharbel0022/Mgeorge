@@ -1,0 +1,20 @@
+diff --git a/sites/lib/bank-consent-policy.js b/sites/lib/bank-consent-policy.js
+index 93f5d49..ba2d05a 100644
+--- a/sites/lib/bank-consent-policy.js
++++ b/sites/lib/bank-consent-policy.js
+@@ -181,7 +181,14 @@ export function observeAccountUsageDetails(plan, uid, details) {
+       if (account.currency !== undefined && account.currency !== currency) return unavailableDetails('DETAILS_ACCOUNT_CONFLICT');
+       const priorIdentifiers = primaryIdentifiers(account);
+       if (!priorIdentifiers) return unavailableDetails('DETAILS_RESOURCE_INVALID');
+-      if (priorIdentifiers.some(([scheme, value]) => identifiers.some(([freshScheme, fresh]) => scheme === freshScheme && value !== fresh))) return unavailableDetails('DETAILS_ACCOUNT_CONFLICT');
++      identifiers.push(...priorIdentifiers);
++    }
++    // Equal hashes cannot resolve explicit same-scheme conflicts within or
++    // between resources, even when the fresh response has no account_id.
++    const valuesByScheme = new Map();
++    for (const [scheme, value] of identifiers) {
++      if (valuesByScheme.has(scheme) && valuesByScheme.get(scheme) !== value) return unavailableDetails('DETAILS_ACCOUNT_CONFLICT');
++      valuesByScheme.set(scheme, value);
+     }
+     const category = usage === undefined ? 'omitted' : usage === 'ORGA' ? 'orga' : usage === 'PRIV' ? 'priv'
+       : usage === null ? 'explicitNull' : typeof usage === 'string' ? 'otherString' : 'wrongType';

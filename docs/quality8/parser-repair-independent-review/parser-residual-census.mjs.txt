@@ -1,0 +1,11 @@
+import {pathToFileURL} from 'node:url';
+const root=process.cwd();
+const {interpretInvoice:nodeParse}=await import(pathToFileURL(root+'/src/invoice-extraction.js'));
+const {loadInvoiceParser}=await import(pathToFileURL(root+'/sites/tests/helpers/invoice-module-loader.mjs'));
+const {interpretInvoice:sitesParse}=await loadInvoiceParser();
+const head='FAKTURA\nLeverantör: Syntetiska Utställaren AB\nKundens organisationsnummer: 556016-0680\n\nOrganisationsnummer: 556016-0681';
+const tail='\nFakturanummer: INDEPENDENT-702\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK';
+for(const [engine,parse] of [['Node',nodeParse],['Sites',sitesParse]]){
+ const r=parse(head+tail,{direction:'customer',direction_confident:true,method:'pdf'});
+ console.log(JSON.stringify({engine,party:r.fields.party.value,organization:r.fields.organization_number.value,supplier:r.details.supplier.organization_number,recipient:r.details.recipient.organization_number,issues:r.issues,level:r.level}));
+}

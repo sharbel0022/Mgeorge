@@ -1,0 +1,38 @@
+{
+  "label": "focused-consumers",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "--test-name-pattern=rating8: bank authorization rejects a page|recovered bank history retains one financial receipt|independent scope review: HTTP MCP",
+    "sites/tests/banking-security.test.mjs"
+  ],
+  "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-d294fd8/worktree",
+  "env": {
+    "NODE_ENV": "test"
+  },
+  "startedAt": "2026-11-06T02:35:54.573899+00:00",
+  "completedAt": "2026-11-06T02:35:57.432185+00:00",
+  "exitCode": 0,
+  "elapsedSeconds": 2.858293,
+  "maxRssKb": 252056,
+  "counts": {
+    "tests": 6,
+    "pass": 6,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "node": "v24.22.1",
+  "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-d294fd8/logs/focused-consumers.tap",
+  "logSha256": "974fd90b941084e0a8a765bdd4e86f14114447a082b9673eddf910f01960b888",
+  "testSourceSha256": "ac61bed8f76ad5cb605e135ab19da350db2c031f942d1d8a5364f049726ee8cc",
+  "testSourceUnchangedDuringRun": true,
+  "newTemporaryModuleDirectoriesRemaining": [],
+  "transportDisconnection": false
+}

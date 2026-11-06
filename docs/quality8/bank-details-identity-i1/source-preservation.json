@@ -1,0 +1,92 @@
+{
+  "schema": "bank-details-identity-i1-source-preservation-v1",
+  "baseline": "638c77365dbf8f4c73db6b23816a37f577da5689",
+  "reviewRoot": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume",
+  "originalEvidence": [
+    {
+      "source": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/REVIEW.md",
+      "path": "docs/quality8/bank-details-identity-i1/original/REVIEW.md",
+      "bytes": 8765,
+      "sha256": "d10c714f4871529bf2a10c7fbb14bebc1f04e759c64bfd8aa7194c3fbcc484fa"
+    },
+    {
+      "source": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/review-evidence.json",
+      "path": "docs/quality8/bank-details-identity-i1/original/review-evidence.json",
+      "bytes": 11494,
+      "sha256": "b373bac292402b69b9aa75b544eb9d8612d3db46f84a7bc4dbc0108ffb76e33e"
+    },
+    {
+      "source": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/source-verification.json",
+      "path": "docs/quality8/bank-details-identity-i1/original/source-verification.json",
+      "bytes": 1000,
+      "sha256": "6b992e2df9ecc63f53ecd317b32183a34c146bfb7636922d82bd139a4edae805"
+    },
+    {
+      "source": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/policy-probes/policy-review.md",
+      "path": "docs/quality8/bank-details-identity-i1/original/policy-probes/policy-review.md",
+      "bytes": 4142,
+      "sha256": "39a21dfaae555ba531c89d829a791ab53e0bdd84590e89f3a033c1cfbc58f621"
+    },
+    {
+      "source": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/policy-probes/policy-review-evidence.json",
+      "path": "docs/quality8/bank-details-identity-i1/original/policy-probes/policy-review-evidence.json",
+      "bytes": 3955,
+      "sha256": "027b52723155c3379d0184d07903df52b2e446eb65f421632e8ab6b26ffdc1f1"
+    },
+    {
+      "source": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/policy-probes/policy-identity-conflicts.tap",
+      "path": "docs/quality8/bank-details-identity-i1/original/policy-probes/policy-identity-conflicts.tap",
+      "bytes": 4210,
+      "sha256": "b0dff3d70c69bc630e0435fb5de1537f2baf97eab13326edc82ed2cde0a19c43"
+    },
+    {
+      "source": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/policy-probes/adapter-primary-conflict.tap",
+      "path": "docs/quality8/bank-details-identity-i1/original/policy-probes/adapter-primary-conflict.tap",
+      "bytes": 1476,
+      "sha256": "c73f7a0a124359ab84d66afc95ee16312ba7fa872cdc951a5775320575ebd3d4"
+    },
+    {
+      "source": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/logs/reviewer-service-identity-conflict.tap",
+      "path": "docs/quality8/bank-details-identity-i1/original/logs/reviewer-service-identity-conflict.tap",
+      "bytes": 2015,
+      "sha256": "230c72ec50e45812a8ac826e2ebfd1be678640ef5c21eee13272ced48147e60a"
+    },
+    {
+      "source": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/logs/reviewer-service-probes.tap",
+      "path": "docs/quality8/bank-details-identity-i1/original/logs/reviewer-service-probes.tap",
+      "bytes": 1637,
+      "sha256": "16b8552f1c87dc7e78a901fd9954ba8b927bf5e8f4e70eab8275717bf67af1a1"
+    }
+  ],
+  "importedTests": [
+    {
+      "source": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/policy-probes/policy-identity-conflicts.test.mjs",
+      "sourceSha256": "f576fefdf22dbff194b16e856efffbd70f855f27b761e2b3d3e0621460009c23",
+      "path": "sites/tests/bank-usage-details-identity-policy.test.mjs",
+      "sha256": "dac97f1f5d1933f4abdb4b6e773648d16fd01cb44ea6777983f42cb388dc6db5",
+      "transformation": "Only ../snapshot/sites/lib/ -> ../lib/ import paths; all test bodies and assertions unchanged."
+    },
+    {
+      "source": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/policy-probes/adapter-primary-conflict.test.mjs",
+      "sourceSha256": "0f7b661d0f7e4e5738f9c3d8b840b38ddebe78e0d45781f0d5a0a5b5e45116ed",
+      "path": "sites/tests/bank-usage-details-identity-adapter.test.mjs",
+      "sha256": "bd1fd5940d45fea7a603b5469f38dca5f15c62bcbecb1625625da94b85a2105d",
+      "transformation": "Only ../snapshot/sites/lib/ -> ../lib/ import paths; all test bodies and assertions unchanged."
+    },
+    {
+      "source": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/snapshot/sites/tests/reviewer-usage-details.test.mjs",
+      "sourceSha256": "e5c8e36b4eb9ba9997e6bb5f87e3c55c8283e09e79bfae4c94640d211845c510",
+      "path": "sites/tests/banking-security.test.mjs",
+      "preservedSegment": "function assertNoFinancialEffects(f) { through EOF",
+      "preservedSegmentSha256": "7f0c60c7f02b277f0b68519eb1d331b386b27750e424a2a5da206c581f49d8cd",
+      "originalPrefixSha256": "cbc2af59c509b08d85367d1e3d33aa828322bf312e9ec7342f71535f3647b6ec",
+      "transformation": "Append the seven reviewer cases and their two helpers unchanged; both fixture blocks already existed byte-identically."
+    }
+  ],
+  "independentExpectedRed": {
+    "tests": 14,
+    "pass": 9,
+    "fail": 5
+  },
+  "productChanges": 0
+}

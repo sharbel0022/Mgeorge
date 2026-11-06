@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: rating8: bank authorization rejects a page on another origin before contacting the provider
+ok 1 - rating8: bank authorization rejects a page on another origin before contacting the provider
+  ---
+  duration_ms: 480.521776
+  type: 'test'
+  ...
+# Subtest: recovered bank history retains one financial receipt and truthful evidence in the paginated payment view
+ok 2 - recovered bank history retains one financial receipt and truthful evidence in the paginated payment view
+  ---
+  duration_ms: 630.081858
+  type: 'test'
+  ...
+# Subtest: independent scope review: HTTP MCP preserves empty saved selection reason and safe denial
+ok 3 - independent scope review: HTTP MCP preserves empty saved selection reason and safe denial
+  ---
+  duration_ms: 298.251378
+  type: 'test'
+  ...
+# Subtest: independent scope review: HTTP MCP preserves non-array saved selection reason and safe denial
+ok 4 - independent scope review: HTTP MCP preserves non-array saved selection reason and safe denial
+  ---
+  duration_ms: 253.773208
+  type: 'test'
+  ...
+# Subtest: independent scope review: HTTP MCP preserves live account usage reason and safe denial
+ok 5 - independent scope review: HTTP MCP preserves live account usage reason and safe denial
+  ---
+  duration_ms: 204.657598
+  type: 'test'
+  ...
+# Subtest: independent scope review: HTTP MCP suppresses forged allowed reason and private error text
+ok 6 - independent scope review: HTTP MCP suppresses forged allowed reason and private error text
+  ---
+  duration_ms: 192.458526
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2799.085444

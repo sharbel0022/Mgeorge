@@ -30,6 +30,8 @@ const ACCOUNT_SCOPE_REASONS = new Set([
 // here may be serialized; arbitrary fields/getters on other errors are ignored.
 const accountScopeReasons = new WeakMap();
 const accountUsageDiagnostics = new WeakMap();
+const accountUsageReadInputs = new WeakMap();
+const accountUsageReadPlans = new WeakMap();
 
 export class ConsentError extends Error {
   constructor(code, status = 400, safeMessage) {
@@ -55,6 +57,143 @@ export function bankAccountScopeReason(error) {
  * expose it. The caller must additionally bind it to its authenticated request. */
 export function bankAccountUsageDiagnostic(error) {
   return accountUsageDiagnostics.get(error) ?? null;
+}
+
+// Diagnostic capabilities retain only immutable JSON data. Unknown properties
+// cannot run getters/toJSON or change what an earlier policy error attested.
+// Bounds are deliberately independent of the provider's HTTP response limit.
+function diagnosticInputSnapshot(input) {
+  let nodes = 0, characters = 0;
+  const visiting = new Set();
+  const copy = (value, depth = 0) => {
+    if (++nodes > 20000 || depth > 20) throw Error('DIAGNOSTIC_INPUT_LIMIT');
+    if (value === null || value === undefined || typeof value === 'boolean') return [value, [typeof value, value]];
+    if (typeof value === 'string') {
+      characters += value.length;
+      if (characters > 8 * 1024 * 1024) throw Error('DIAGNOSTIC_INPUT_LIMIT');
+      return [value, ['string', value]];
+    }
+    if (typeof value === 'number' && Number.isFinite(value)) return [value, ['number', value]];
+    if (typeof value !== 'object' || visiting.has(value)) throw Error('DIAGNOSTIC_INPUT_INVALID');
+    const array = Array.isArray(value), prototype = Object.getPrototypeOf(value);
+    if (prototype !== (array ? Array.prototype : Object.prototype) && prototype !== null) throw Error('DIAGNOSTIC_INPUT_INVALID');
+    visiting.add(value);
+    const properties = Object.getOwnPropertyDescriptors(value), result = array ? [] : Object.create(null), entries = [];
+    for (const key of Reflect.ownKeys(properties)) {
+      const property = properties[key];
+      if (typeof key !== 'string' || !Object.hasOwn(property, 'value')) throw Error('DIAGNOSTIC_INPUT_INVALID');
+      characters += key.length;
+      if (characters > 8 * 1024 * 1024) throw Error('DIAGNOSTIC_INPUT_LIMIT');
+      const [child, encoded] = copy(property.value, depth + 1);
+      if (array && key === 'length') result.length = child;
+      else Object.defineProperty(result, key, { value: child, enumerable: true });
+      entries.push([key, encoded]);
+    }
+    visiting.delete(value);
+    return [Object.freeze(result), [array ? 'array' : 'object', entries]];
+  };
+  const [snapshot, encoded] = copy(input);
+  return { snapshot, fingerprint: JSON.stringify(encoded) };
+}
+
+const notRead = reason => Object.freeze({ status: 'not_read', reason });
+const unavailableDetails = reason => Object.freeze({ status: 'unavailable', reason });
+const INVALID_FIELD = Symbol('invalid diagnostic field');
+function dataField(value, key) {
+  if (!object(value)) return INVALID_FIELD;
+  const property = Object.getOwnPropertyDescriptor(value, key);
+  return property ? Object.hasOwn(property, 'value') ? property.value : INVALID_FIELD : key in value ? INVALID_FIELD : undefined;
+}
+
+/** A separate, narrower read capability. It cannot approve a consent or repair
+ * its cached resources: the caller must keep and rethrow the original error. */
+export function planAccountUsageDetailsRead(error, input, now = Date.now()) {
+  try {
+    const bound = accountUsageReadInputs.get(error);
+    if (!bound || bound.input !== input || bankAccountScopeReason(error) !== 'ACCOUNT_USAGE_INVALID' ||
+      dataField(error, 'code') !== 'BANK_ACCOUNT_SCOPE_INVALID' || dataField(error, 'status') !== 409 ||
+      diagnosticInputSnapshot(input).fingerprint !== bound.fingerprint) return notRead('INPUT_NOT_BOUND');
+    const value = bound.snapshot;
+    const deadlines = [value.session.access.valid_until, value.checked.access.valid_until, value.requestedValidUntil].map(timestamp);
+    if (!Number.isFinite(now) || deadlines.some(deadline => !Number.isFinite(deadline) || deadline <= now)) return notRead('CONSENT_EXPIRED');
+    // Recheck the unchanged frozen input, including the full UID inventory. This
+    // also prevents executable input behavior from masquerading as JSON data.
+    let originalDenial = false;
+    try { validateLegacyEnableSelection(value); }
+    catch (checkedError) { originalDenial = bankAccountScopeReason(checkedError) === 'ACCOUNT_USAGE_INVALID'; }
+    if (!originalDenial) return notRead('INPUT_NOT_BOUND');
+    if (validateReadScopes(value.requestedScopes).includes('bankgiro:read')) return notRead('SCOPE_UNAVAILABLE');
+    const saved = new Map(value.session.accounts.map(account => [account.uid, account]));
+    const live = new Map(value.checked.accounts_data.map(account => [account.uid, account]));
+    const targets = [], identities = new Map();
+    for (const uid of value.selectedAccountUids) {
+      const prior = saved.get(uid), current = live.get(uid);
+      if (![undefined, null, 'ORGA'].includes(prior.usage) || ![undefined, 'ORGA'].includes(current.usage)) return notRead('USAGE_NOT_ELIGIBLE');
+      const originalHash = prior.identification_hash, currentHash = current.identification_hash;
+      if (originalHash === undefined || currentHash === undefined) return notRead('PRIMARY_IDENTITY_MISSING');
+      if (!clean(originalHash, 4096) || !clean(currentHash, 4096)) return notRead('PRIMARY_IDENTITY_INVALID');
+      if (originalHash !== currentHash) return notRead('PRIMARY_IDENTITY_CHANGED');
+      if (prior.usage === null) { targets.push(Object.freeze({ uid })); identities.set(uid, { hash: originalHash, prior, current }); }
+    }
+    if (!targets.length) return notRead('USAGE_NOT_ELIGIBLE');
+    if (targets.length > 5) return notRead('READ_LIMIT_EXCEEDED');
+    const plan = Object.freeze({ status: 'ready', selectedCount: value.selectedAccountUids.length,
+      validUntil: new Date(Math.min(...deadlines)).toISOString(), targets: Object.freeze(targets) });
+    accountUsageReadPlans.set(plan, identities);
+    return plan;
+  } catch { return notRead('INPUT_NOT_BOUND'); }
+}
+
+function primaryIdentifiers(account) {
+  const primary = dataField(account, 'account_id');
+  if (primary === undefined || primary === null) return [];
+  const iban = dataField(primary, 'iban'), other = dataField(primary, 'other'), result = [];
+  if (iban === INVALID_FIELD || other === INVALID_FIELD || iban === undefined && other === undefined) return null;
+  if (iban !== undefined) {
+    if (!clean(iban, 34) || !/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(iban)) return null;
+    result.push(['IBAN', iban]);
+  }
+  if (other !== undefined) {
+    const scheme = dataField(other, 'scheme_name'), identification = dataField(other, 'identification');
+    if (!clean(scheme, 35) || !/^[A-Z][A-Z0-9_]{0,34}$/.test(scheme) || !clean(identification, 80)) return null;
+    result.push([scheme, identification]);
+  }
+  return result;
+}
+
+/** Observe only the exact requested resource under an authentic read plan.
+ * The service separately fences live ownership, expiry and completion. */
+export function observeAccountUsageDetails(plan, uid, details) {
+  try {
+    const expected = accountUsageReadPlans.get(plan)?.get(uid);
+    if (!expected) return unavailableDetails('DETAILS_INPUT_NOT_BOUND');
+    const responseUid = dataField(details, 'uid'), hash = dataField(details, 'identification_hash');
+    if (responseUid !== undefined && (!clean(responseUid) || responseUid === INVALID_FIELD)) return unavailableDetails('DETAILS_IDENTITY_INVALID');
+    if (responseUid !== undefined && responseUid !== uid) return unavailableDetails('DETAILS_IDENTITY_CHANGED');
+    if (hash === undefined) return unavailableDetails('DETAILS_IDENTITY_MISSING');
+    if (!clean(hash, 4096)) return unavailableDetails('DETAILS_IDENTITY_INVALID');
+    if (hash !== expected.hash) return unavailableDetails('DETAILS_IDENTITY_CHANGED');
+    const currency = dataField(details, 'currency'), type = dataField(details, 'cash_account_type'), usage = dataField(details, 'usage');
+    const identifiers = primaryIdentifiers(details);
+    if (typeof currency !== 'string' || !/^[A-Z]{3}$/.test(currency) || typeof type !== 'string' || !/^[A-Z0-9]{1,35}$/.test(type) ||
+      usage === INVALID_FIELD || dataField(details, 'account_id') === null || !identifiers) return unavailableDetails('DETAILS_RESOURCE_INVALID');
+    for (const account of [expected.prior, expected.current]) {
+      if (account.currency !== undefined && account.currency !== currency) return unavailableDetails('DETAILS_ACCOUNT_CONFLICT');
+      const priorIdentifiers = primaryIdentifiers(account);
+      if (!priorIdentifiers) return unavailableDetails('DETAILS_RESOURCE_INVALID');
+      identifiers.push(...priorIdentifiers);
+    }
+    // Equal hashes cannot resolve explicit same-scheme conflicts within or
+    // between resources, even when the fresh response has no account_id.
+    const valuesByScheme = new Map();
+    for (const [scheme, value] of identifiers) {
+      if (valuesByScheme.has(scheme) && valuesByScheme.get(scheme) !== value) return unavailableDetails('DETAILS_ACCOUNT_CONFLICT');
+      valuesByScheme.set(scheme, value);
+    }
+    const category = usage === undefined ? 'omitted' : usage === 'ORGA' ? 'orga' : usage === 'PRIV' ? 'priv'
+      : usage === null ? 'explicitNull' : typeof usage === 'string' ? 'otherString' : 'wrongType';
+    return Object.freeze({ status: 'observed', category });
+  } catch { return unavailableDetails('DETAILS_RESOURCE_INVALID'); }
 }
 
 function selectedUsageCounts(accounts) {
@@ -237,6 +376,7 @@ export function validateLegacyEnableSelection(input) {
         if (saved && live) accountUsageDiagnostics.set(error, Object.freeze({
           version: 'selected-account-usage-v1', selectedCount: selected.length, saved, live,
         }));
+        if (saved && live) accountUsageReadInputs.set(error, { input, ...diagnosticInputSnapshot(input) });
       } catch { /* Keep the original denial without diagnostic evidence. */ }
     }
     throw error;

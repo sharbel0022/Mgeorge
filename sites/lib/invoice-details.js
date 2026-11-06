@@ -40,7 +40,7 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1,s
     const source=lines[n],line=normalized(source.text);
     if(source.page!==page){page=source.page;section=null;}
     if(!line){section=null;continue;}
-    const names=[...line.matchAll(namePattern)].map(match=>({kind:'name',role:isSupplier(match[1])?'supplier':'recipient',index:match.index,end:match.index+match[0].length}));
+    const names=[...line.matchAll(namePattern)].map(match=>({kind:'name',role:isSupplier(match[1])?'supplier':'recipient',index:match.index,end:match.index+match[0].length,explicit:true}));
     const orgs=[...line.matchAll(orgPattern)].map(match=>({kind:'organization',role:match[2]?'supplier':match[3]?'recipient':null,index:match.index,end:match.index+match[0].length}));
     const heading=line.match(headingPattern);
     // Only these explicit roles at the beginning of a source line may omit
@@ -88,10 +88,11 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1,s
         if(next&&scalarBoundary(next)!==0&&!knownField.test(next)&&!partyRoleStart.test(next)&&![...next.matchAll(namePattern)].length&&![...next.matchAll(orgPattern)].length&&!headingPattern.test(next)&&!/[|:]/.test(next)){value=next;evidence.push(following);}
       }
       if(event.kind==='name'){
-        // Do not turn a second role, an unknown labelled field or unresolved
-        // columns into a name, regardless of whether its first label has a
-        // colon. Keep the invalid occurrence in the complete role census.
-        const ambiguous=competingRole.test(value)||/[:|]/.test(value);
+        // A colon explicitly introduces a name value. An ordinary word inside
+        // that value is not another role label (e.g. "Original supplier AB").
+        // Explicit sibling labels are separate events above; unknown colons,
+        // pipes and unresolved bare/column headings still cannot become names.
+        const ambiguous=(!event.explicit||/\t| {2,}/.test(value))&&competingRole.test(value)||/[:|]/.test(value);
         section=event.role;records[event.role].names.push({value:ambiguous?null:nameValue(value),evidence});
       }else{
         const record={value:organizations(value,validOrganization),evidence},role=event.role||(rowRoles.size>1?null:section);
@@ -103,13 +104,24 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1,s
     }
     if(rowRoles.size>1||sectionBoundary(events.at(-1).end,line.length))section=null;
   }
-  const namedRoles=Object.keys(records).filter(role=>records[role].names.length);
+  const namedRoles=Object.keys(records).filter(role=>records[role].names.length),unassignedConflicts=new Set();
   if(unassigned.length){
     // A single named role does not own every unassigned number elsewhere in
     // the document. Explicit owner labels and uninterrupted local sections
     // already assigned their evidence above; do not adopt across boundaries.
     if(!namedRoles.length&&['supplier','customer'].includes(direction))records[direction==='customer'?'recipient':'supplier'].organizations.push(...unassigned);
-    else issues.push('Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.');
+    else{
+      // An unowned occurrence cannot supply a party identity. It must still
+      // participate in the complete conflict census: a corrupt/different late
+      // value cannot leave an earlier owned number eligible. Equal duplicates
+      // only confirm an already independently owned value; no owner is added.
+      const role=namedRoles.length===1?namedRoles[0]:null,owned=role?records[role].organizations:[];
+      const duplicate=owned.length>0&&owned[0].value!==null&&owned.every(item=>item.value===owned[0].value)&&unassigned.every(item=>item.value===owned[0].value);
+      if(!duplicate){
+        issues.push(unassigned.some(item=>item.value===null)?'Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.':'Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.');
+        if(role&&owned.length)unassignedConflicts.add(role);
+      }
+    }
   }
   const resolve=(items,label)=>{
     if(!items.length)return null;
@@ -121,7 +133,8 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1,s
   const parties={};
   for(const role of ['supplier','recipient']){
     const name=resolve(records[role].names,role==='supplier'?'leverantörsnamn':'mottagarnamn');
-    const organization_number=resolve(records[role].organizations,role==='supplier'?'leverantörens organisationsnummer':'mottagarens organisationsnummer');
+    const ownedOrganization=resolve(records[role].organizations,role==='supplier'?'leverantörens organisationsnummer':'mottagarens organisationsnummer');
+    const organization_number=unassignedConflicts.has(role)?null:ownedOrganization;
     parties[role]={name,organization_number,evidence:dedupeEvidence([...records[role].names,...records[role].organizations].flatMap(item=>item.evidence))};
   }
   if(unassigned.length&&namedRoles.length>1){parties.supplier.organization_number=null;parties.recipient.organization_number=null;}

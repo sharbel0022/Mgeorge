@@ -1,0 +1,20 @@
+✔ Node independent table census: Artikel/Antal cannot make quantity and price a document amount (45.551632ms)
+✔ Node independent table census: Item/Quantity cannot make quantity and price a document amount (4.03741ms)
+✔ Node independent table census: Beskrivning/Kvantitet cannot make quantity and price a document amount (2.854017ms)
+✔ Node independent table census: Beskrivning/Antal cannot make quantity and price a document amount (1.545809ms)
+✔ Node independent table census: Description/Qty cannot make quantity and price a document amount (1.387124ms)
+✔ Node independent table control: a unique field above a later article table still pairs (1.23601ms)
+✔ Sites independent table census: Artikel/Antal cannot make quantity and price a document amount (6.956443ms)
+✔ Sites independent table census: Item/Quantity cannot make quantity and price a document amount (1.260437ms)
+✔ Sites independent table census: Beskrivning/Kvantitet cannot make quantity and price a document amount (1.230372ms)
+✔ Sites independent table census: Beskrivning/Antal cannot make quantity and price a document amount (1.394746ms)
+✔ Sites independent table census: Description/Qty cannot make quantity and price a document amount (1.284433ms)
+✔ Sites independent table control: a unique field above a later article table still pairs (1.027692ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 640.032247

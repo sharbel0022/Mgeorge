@@ -1,0 +1,69 @@
+{
+  "schema": "wave4-source-assembly-audit-v1",
+  "changes": [
+    {
+      "purpose": "bank design",
+      "originalCommit": "23b4d71ae21d745471ac60c82e8b081f25731cb9",
+      "integratedCommit": "6607283dec55f3c3acbcaad53324df644b1ff0a8",
+      "patchBytesIdentical": true
+    },
+    {
+      "purpose": "bank RED",
+      "originalCommit": "d874f686cdc38439647a5e3621228f97bdd3242a",
+      "integratedCommit": "fe2d50cbe3ad67a3d769bfa6c9b2a339ceabd1b9",
+      "patchBytesIdentical": true
+    },
+    {
+      "purpose": "bank diagnostic",
+      "originalCommit": "638c77365dbf8f4c73db6b23816a37f577da5689",
+      "integratedCommit": "0d0ed27213a9c42a43e617657c1ae57afd20c3b5",
+      "patchBytesIdentical": true
+    },
+    {
+      "purpose": "bank I1 RED",
+      "originalCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+      "integratedCommit": "1971b564b6e7bbc05bd0ef4e32b41d92bd758dea",
+      "patchBytesIdentical": true
+    },
+    {
+      "purpose": "bank I1 product",
+      "originalCommit": "e66cde6767ebd232e2b966eb2b002193ea0a0999",
+      "integratedCommit": "b44a7b7702fc862f4c1bab7309df78ac5098c680",
+      "patchBytesIdentical": true
+    },
+    {
+      "purpose": "parser RED",
+      "originalCommit": "69f13839a83c77bec1e5e2e73c194d832b5de2f9",
+      "integratedCommit": "2bcda8d04a6c664180de164387ea1e38e7a1214a",
+      "patchBytesIdentical": true
+    },
+    {
+      "purpose": "parser repair",
+      "originalCommit": "63edd9fa97bc0475237133021313963e402efc76",
+      "integratedCommit": "da78c0eb1bac9dc66b423fedaaecbe7767b8624a",
+      "patchBytesIdentical": true
+    },
+    {
+      "purpose": "parser verification",
+      "originalCommit": "ae354424e5bd1613c805e1c66283c2a437459f2d",
+      "integratedCommit": "13b6c5fa03440ba15338b0ecdb0dde4eeccf0054",
+      "patchBytesIdentical": true
+    },
+    {
+      "purpose": "known replay",
+      "originalCommit": "dd968c1fd10b4e21c2479a939df548e390f5c6d6",
+      "integratedCommit": "18bb111e60ba45a062924190ab0bc19144babcb8",
+      "patchBytesIdentical": true
+    },
+    {
+      "purpose": "test-only bank harness memory",
+      "originalCommit": "7a5a397c6543fd762d86005369d6740448876cfe",
+      "integratedCommit": "60204887b358171bcedd53c91af7e6f924c750ea",
+      "patchBytesIdentical": true
+    }
+  ],
+  "reviewArtifactsIndependentlyHashVerified": 33,
+  "fullIntegratedCI": "pending on final repaired PR head and merged main",
+  "scoresChanged": false,
+  "bankHarnessIndependentArtifactsVerified": 30
+}

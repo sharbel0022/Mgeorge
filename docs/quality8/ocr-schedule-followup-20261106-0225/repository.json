@@ -1,0 +1,34 @@
+{
+  "method": "GET",
+  "url": "https://api.github.com/repos/sharbel0022/Mgeorge",
+  "requestedAt": "2026-11-06T02:24:52.818513+00:00",
+  "authentication": "none",
+  "authorizationHeaderSent": false,
+  "kind": "repo",
+  "observedAt": "2026-11-06T02:24:58.188105+00:00",
+  "httpStatus": 200,
+  "headers": {
+    "Date": "Fri, 06 Nov 2026 02:24:58 GMT",
+    "ETag": "W/\"6727a764cbf49352215c444527ab5622306a5bc02d0c9a4259089bb8d5b8be62\"",
+    "Age": null,
+    "X-GitHub-Request-Id": "AC5A:FDDBD:8B3D7:CD6E6:6AED3A79",
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "57",
+    "X-RateLimit-Reset": "1793935497",
+    "Link": null
+  },
+  "responseBytes": 5101,
+  "responseSha256": "daec515814ef230f32ec6c803e808de21c4e4b107c879e69fc2fe5c267f24338",
+  "data": {
+    "id": 1434733412,
+    "full_name": "sharbel0022/Mgeorge",
+    "private": false,
+    "default_branch": "main",
+    "archived": false,
+    "disabled": false,
+    "created_at": "2026-10-26T17:47:06Z",
+    "updated_at": "2026-11-05T23:40:01Z",
+    "pushed_at": "2026-11-06T01:44:13Z",
+    "html_url": "https://github.com/sharbel0022/Mgeorge"
+  }
+}

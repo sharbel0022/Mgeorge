@@ -1,0 +1,110 @@
+{
+  "schema": "mgeorge-a19-parser-regression-own-verification-v1",
+  "sourceCommit": "63edd9fa97bc0475237133021313963e402efc76",
+  "baselineCommit": "a19e0a8ce7a7ddedb85de1a8f9e21b617ba90b77",
+  "redFreezeCommit": "69f13839a83c77bec1e5e2e73c194d832b5de2f9",
+  "recordedAt": "2026-11-06T02:12:53.023775+00:00",
+  "runtime": "v24.22.1",
+  "opticalCalls": 0,
+  "independentReview": false,
+  "readinessOrScoreClaim": false,
+  "checks": [
+    {
+      "check": "node",
+      "exitCode": 0,
+      "tests": 357,
+      "pass": 357,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "file": "docs/quality8/a19-parser-regression/node-green.log",
+      "sha256": "0dbee01944326671bb569010442d4ea90562fad082529248f92ccf4cf0022005"
+    },
+    {
+      "check": "sites",
+      "exitCode": 0,
+      "tests": 352,
+      "pass": 352,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "file": "docs/quality8/a19-parser-regression/sites-green.log",
+      "sha256": "ad531df1e1cd9a71beec08cfbd1a5a5ec96d2e2707b54add598f68586ec10760"
+    },
+    {
+      "check": "boundaries",
+      "exitCode": 0,
+      "tests": 312,
+      "pass": 312,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "file": "docs/quality8/a19-parser-regression/boundaries-green.log",
+      "sha256": "4023c21fd0a153eb0540e4f86863076036a57003bb5deb57f12f91290ecf1d8f"
+    },
+    {
+      "check": "focused",
+      "exitCode": 0,
+      "tests": 142,
+      "pass": 142,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "file": "docs/quality8/a19-parser-regression/focused-green.log",
+      "sha256": "dac88f83fd10aa81fbf949777a68d8115670d5c51d813f369a745c210fdadc83"
+    },
+    {
+      "check": "mcp-read",
+      "exitCode": 0,
+      "tests": 34,
+      "pass": 34,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "file": "docs/quality8/a19-parser-regression/mcp-read-green.log",
+      "sha256": "84f70a0a2bee77e3657460e865a6a47b1e63a76af90d95589a5ca05f418672c9"
+    },
+    {
+      "check": "typecheck",
+      "exitCode": 1,
+      "meaning": "Precondition refusal: compiler did not run; repair checkout intentionally shared dependency directory by symlink.",
+      "file": "docs/quality8/a19-parser-regression/typecheck-initial-symlink-denied.log",
+      "sha256": "a8fa793d6f131150970cf81f2395ddb3990802e8349b7f0e43d731c05d315cc9"
+    },
+    {
+      "check": "typecheck",
+      "exitCode": 0,
+      "meaning": "Verified runner at the actual installed dependency root compiled the repair project through its supported --project option. No guard was changed.",
+      "file": "docs/quality8/a19-parser-regression/typecheck-verified-project.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "commands": [
+    "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 --test-name-pattern='^(?!Q8 actual Swedish PNG OCR)' test/document-quality-cycle.test.js test/invoice-parser-corpus-q8.test.js test/invoice-reference-integration.test.js",
+    "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 sites/tests/document-quality-cycle.test.mjs sites/tests/invoice-parser-corpus-q8.test.mjs sites/tests/gmail-preview-q8.test.mjs",
+    "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 sites/tests/party-role-name-grammar.test.mjs sites/tests/organization-event-context.test.mjs sites/tests/review-organization-source-order-independent.test.mjs sites/tests/review-organization-inline-context-independent.test.mjs sites/tests/review-organization-owner-boundaries.test.mjs sites/tests/ocr-explicit-role-boundary-positive.test.mjs sites/tests/ocr-layout-role-parity.test.mjs test/invoice-scalar-layout-regression.test.js sites/tests/invoice-scalar-layout-regression.test.mjs",
+    "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 --test-name-pattern='^(?:document quality:|exact invoice field|automatic registration rechecks)' test/document-quality-cycle.test.js test/invoice-parser-corpus-q8.test.js test/invoice-reference-integration.test.js",
+    "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --test sites/tests/mcp-evidence-read.test.mjs",
+    "cwd=/workspace/scratch/4d79ab4bea8e/security/sites: NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node scripts/run-verified-tool.mjs check --project ../.quality8-parser-fix/sites/tsconfig.json"
+  ],
+  "sourceHashes": {
+    "src/invoice-details.js": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7",
+    "sites/lib/invoice-details.js": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7",
+    "sites/tests/party-role-name-grammar.test.mjs": "d7c764aa007c5e1738649d45a819e5aa15471f86f53aeef74d87712ef2e5943d",
+    "test/document-quality-cycle.test.js": "8ba95025da219a2c053b996fca5b45bfee35fe279eb7d9e484833106a0e0ac9b",
+    "test/invoice-parser-corpus-q8.test.js": "67ddb7de588aef36f82c4eb4718972fdb2df20b67befc061daa575b35e898d2a",
+    "test/invoice-reference-integration.test.js": "640eaa07d0518014a6ee37f66787a20248891ece22790003935be19c998f6854",
+    "sites/tests/document-quality-cycle.test.mjs": "364dd7cf05ea4c0ed121bc7d0fac816677c3bef3a1fd93e2808eba04fc01f351",
+    "sites/tests/invoice-parser-corpus-q8.test.mjs": "601276a0aeefabab18f88cd1fe196ca26966ed1fa800376e4604144da9f876ca",
+    "sites/tests/gmail-preview-q8.test.mjs": "35c2a31482e2de105cb40520762a4902168656f6be043eed3294ca1a58f06343",
+    "sites/tests/mcp-evidence-read.test.mjs": "9f61fd97c6feac2e85b0b59882846f63bdeb21715d7330c4058014d3ce067431",
+    "scripts/saas-test-isolation.mjs": "9f40b9159a1ad9f4d21c7ecdc76db31fd55d6a0efe793f3f32e7548809affb80"
+  },
+  "limits": [
+    "Only the selected affected suites and named boundary suites were run, not a new full-repository or optical gate.",
+    "The optical PNG corpus test was excluded explicitly; actual native-text PDF extraction and registration paths were executed.",
+    "A/B product changes are absent from this a19-based branch.",
+    "Existing assertions and source fixture facts are unchanged.",
+    "MCP/banking candidate guards and the 50k extraction budget were not changed."
+  ]
+}

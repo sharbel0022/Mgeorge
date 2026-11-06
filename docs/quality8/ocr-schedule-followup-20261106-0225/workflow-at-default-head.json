@@ -1,0 +1,33 @@
+{
+  "method": "GET",
+  "url": "https://api.github.com/repos/sharbel0022/Mgeorge/contents/.github/workflows/sites-cloud-ocr.yml?ref=41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+  "requestedAt": "2026-11-06T02:26:23.507098+00:00",
+  "authentication": "none",
+  "authorizationHeaderSent": false,
+  "kind": "content",
+  "observedAt": "2026-11-06T02:26:28.115302+00:00",
+  "httpStatus": 200,
+  "headers": {
+    "Date": "Fri, 06 Nov 2026 02:26:28 GMT",
+    "ETag": "\"7a4b3931d69c6250a3a091b52f5a12a211061578\"",
+    "Age": null,
+    "X-GitHub-Request-Id": "ACF7:44DD4:2C9FB9:2FE89B:6AED3AD3",
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "57",
+    "X-RateLimit-Reset": "1793935531",
+    "Link": null
+  },
+  "responseBytes": 4143,
+  "responseSha256": "55657da22ea66e54325ed72526977dc6213254cf4518fdf3f4a762d87d5aa927",
+  "data": {
+    "name": "sites-cloud-ocr.yml",
+    "path": ".github/workflows/sites-cloud-ocr.yml",
+    "sha": "7a4b3931d69c6250a3a091b52f5a12a211061578",
+    "size": 2184,
+    "type": "file",
+    "html_url": "https://github.com/sharbel0022/Mgeorge/blob/41aadcef5fc6f65cc73979997b195c7b4f12eec1/.github/workflows/sites-cloud-ocr.yml",
+    "sha256": "bce2b361de0bec0053a0defa460216b5db1e57f6cb639e592b6ccd549c39cfa8",
+    "gitBlobShaVerified": true,
+    "text": "name: Sites cloud OCR\n\non:\n  schedule:\n    # Equivalent minutes 7,22,37,52. Refresh cron registration after an\n    # observed scheduling gap; a future actual scheduled run is still needed.\n    - cron: '7/15 * * * *'\n  workflow_dispatch:\n  workflow_run:\n    workflows: [Payment control checks]\n    types: [completed]\n    branches: [main]\n\n# Only reviewed default-branch code may receive the OCR credential. Resume the\n# durable queue after successful checks of the exact current main commit too;\n# the external periodic schedule may be delayed. Keep existing activation.\npermissions:\n  contents: read\nconcurrency:\n  group: sites-cloud-ocr\n  cancel-in-progress: false\n\njobs:\n  ocr:\n    if: >-\n      github.ref == 'refs/heads/main' && vars.MG_CLOUD_OCR_ENABLED == 'true' &&\n      (github.event_name != 'workflow_run' ||\n      (github.event.workflow_run.conclusion == 'success' &&\n      github.event.workflow_run.event == 'push' &&\n      github.event.workflow_run.head_branch == 'main' &&\n      github.event.workflow_run.head_repository.full_name == github.repository &&\n      github.event.workflow_run.head_sha == github.sha))\n    runs-on: ubuntu-latest\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4\n        with:\n          persist-credentials: false\n          ref: ${{ github.sha }}\n      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4\n        with:\n          node-version: '22'\n      - name: Verify reviewed main before dependency installation\n        run: node scripts/verify-cloud-ocr-trigger.mjs\n        env:\n          GITHUB_TOKEN: ${{ github.token }}\n      - name: Install locked OCR dependencies\n        run: npm ci --ignore-scripts --no-audit --no-fund\n      - name: Recheck current main before OCR credential use\n        run: node scripts/verify-cloud-ocr-trigger.mjs\n        env:\n          GITHUB_TOKEN: ${{ github.token }}\n      - name: Process at most six leased documents\n        run: node scripts/run-sites-cloud-ocr.mjs\n        env:\n          MG_SITES_ORIGIN: ${{ vars.MG_SITES_ORIGIN || secrets.MG_SITES_ORIGIN }}\n          MG_SITES_OCR_TOKEN: ${{ secrets.MG_SITES_OCR_TOKEN }}\n"
+  }
+}

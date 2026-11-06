@@ -1,0 +1,24 @@
+{
+  "schema": "quality8-wave4-repair-source-history-v1",
+  "refs": {
+    "refs/quality8/wave4-repair-bank": "e66cde6767ebd232e2b966eb2b002193ea0a0999",
+    "refs/quality8/wave4-repair-parser": "dd968c1fd10b4e21c2479a939df548e390f5c6d6",
+    "refs/quality8/wave4-repair-harness": "7a5a397c6543fd762d86005369d6740448876cfe"
+  },
+  "excludedAlreadyPublishedSources": [
+    "d4c0d624b3316fd7ce53381e344e0ce01307966f",
+    "623d370fdf0d491e1122a2f2831ce15ff9e0c1c3",
+    "a19e0a8ce7a7ddedb85de1a8f9e21b617ba90b77",
+    "638c77365dbf8f4c73db6b23816a37f577da5689"
+  ],
+  "requires": [
+    "Initial PR 58 commit d4c0d624b3316fd7ce53381e344e0ce01307966f (normal GitHub history)",
+    "Wave 3 original history bundle before wave 4 when original producer objects are absent",
+    "Wave 4 source history bundle and its exact original refs"
+  ],
+  "bytes": 7159759,
+  "sha256": "bab30601c207c3c8d366f74114c9cd9b4595e75b420cc36a986943139347ddf4",
+  "gitBlobSha": "c5e3d97ca0bf0d8a9c11b12c9b0ea1dc88d685cc",
+  "verification": "/workspace/scratch/4d79ab4bea8e/release-docs/docs/quality8/wave4-repair-source-history.bundle is okay\nThe bundle contains these 3 refs:\ne66cde6767ebd232e2b966eb2b002193ea0a0999 refs/quality8/wave4-repair-bank\ndd968c1fd10b4e21c2479a939df548e390f5c6d6 refs/quality8/wave4-repair-parser\n7a5a397c6543fd762d86005369d6740448876cfe refs/quality8/wave4-repair-harness\nThe bundle requires these 3 refs:\n623d370fdf0d491e1122a2f2831ce15ff9e0c1c3 \n638c77365dbf8f4c73db6b23816a37f577da5689 \na19e0a8ce7a7ddedb85de1a8f9e21b617ba90b77 \nThe bundle uses this hash algorithm: sha1",
+  "scope": "Original bank, parser repair, known replay and test-only harness commits. Later root operational receipt history is deliberately not bundled; the final GitHub tree carries the sanitized current receipts. OCR A/B and V3 are excluded."
+}

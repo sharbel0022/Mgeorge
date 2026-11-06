@@ -80,6 +80,23 @@ export type BankAccountUsageDiagnostic = Readonly<{
 /** Private, immutable selected-resource counts. A caller must still establish
  * request/owner provenance before exposing them; public error fields are ignored. */
 export function bankAccountUsageDiagnostic(error: unknown): BankAccountUsageDiagnostic | null;
+export type AccountUsageDetailsReadReason = 'INPUT_NOT_BOUND' | 'CONSENT_EXPIRED' | 'SCOPE_UNAVAILABLE' |
+  'USAGE_NOT_ELIGIBLE' | 'PRIMARY_IDENTITY_MISSING' | 'PRIMARY_IDENTITY_INVALID' | 'PRIMARY_IDENTITY_CHANGED' | 'READ_LIMIT_EXCEEDED';
+export type AccountUsageDetailsObservationReason = 'DETAILS_INPUT_NOT_BOUND' | 'DETAILS_IDENTITY_MISSING' |
+  'DETAILS_IDENTITY_INVALID' | 'DETAILS_IDENTITY_CHANGED' | 'DETAILS_ACCOUNT_CONFLICT' | 'DETAILS_RESOURCE_INVALID';
+export type AccountUsageDetailsReadPlan = Readonly<{
+  status: 'ready'; selectedCount: number; validUntil: string; targets: readonly Readonly<{uid: string}>[];
+}>;
+/** Private input-bound diagnostic capability, never an approved consent. Only
+ * the exact error/input pair from validateLegacyEnableSelection may plan reads.
+ * All selected primary hashes must be present and identical before any read. */
+export function planAccountUsageDetailsRead(error: unknown, input: unknown, now?: number):
+  AccountUsageDetailsReadPlan | Readonly<{status: 'not_read'; reason: AccountUsageDetailsReadReason}>;
+/** Accepts only a privately branded plan and one of its exact target UIDs.
+ * The caller must still enforce current owner/context/deadline/lease guards. */
+export function observeAccountUsageDetails(plan: unknown, uid: string, details: unknown):
+  Readonly<{status: 'observed'; category: keyof BankAccountUsageCounts}> |
+  Readonly<{status: 'unavailable'; reason: AccountUsageDetailsObservationReason}>;
 export function legacyCompanyContext(actorId: string, requestedCompanyId?: unknown): CompanyBankContext;
 export function assertCompanyBankAccess(context: CompanyBankContext, input: {
   actorId: string; companyId: string; action: 'read' | 'manage';

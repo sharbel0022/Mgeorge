@@ -1,6 +1,9 @@
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { createHash, generateKeyPairSync } from 'node:crypto';
 import ts from 'typescript';
@@ -20,7 +23,18 @@ import { provisionCompany } from '../lib/company-storage.js';
 // Exercise the real route services, encryption, domain and SQL. Only the identity
 // provider and banking HTTP boundary are replaced. No test can call a live bank.
 const source = path => readFileSync(new URL(path, import.meta.url), 'utf8');
-const jsUrl = value => 'data:text/javascript;base64,' + Buffer.from(value).toString('base64');
+// Short file URLs keep dependent source out of each ESM cache key. Content
+// addressing preserves the old loader's identity for identical module text.
+const moduleDirectory = mkdtempSync(join(tmpdir(), 'mg-bank-security-'));
+after(() => rmSync(moduleDirectory, { recursive: true, force: true }));
+const jsUrl = value => {
+  const bytes = Buffer.from(value);
+  const file = join(moduleDirectory, createHash('sha256').update(bytes).digest('hex') + '.mjs');
+  if (existsSync(file)) {
+    if (!readFileSync(file).equals(bytes)) throw new Error('Synthetic module hash collision');
+  } else writeFileSync(file, bytes, { mode: 0o600, flag: 'wx' });
+  return pathToFileURL(file).href;
+};
 function compiledModule(path, imports, jsx = ts.JsxEmit.Preserve) {
   imports = { '../bank-consent-policy.js': new URL('../lib/bank-consent-policy.js', import.meta.url).href, '../bank-company-authority.js': new URL('../lib/bank-company-authority.js', import.meta.url).href, './account-read-cooldown': new URL('../lib/banking/account-read-cooldown.ts', import.meta.url).href, './sync-periods': new URL('../lib/banking/sync-periods.ts', import.meta.url).href, '../payer-evidence.js': new URL('../lib/payer-evidence.js', import.meta.url).href, ...imports };
   let js = ts.transpileModule(source(path), { fileName: path, compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, jsx } }).outputText;
@@ -92,7 +106,7 @@ async function fixture(t, environment = 'PRODUCTION', { actualProvider = false }
   const runtimeConfig = new URL('../lib/banking/runtime-config.ts', import.meta.url).href;
   const normalizerUrl = compiledModule('../lib/banking/transactions.ts', { '../domain': domain, '../payment-references.js': new URL('../lib/payment-references.js', import.meta.url).href });
   const storeUrl = compiledModule('../lib/banking/store.ts', { 'cloudflare:workers': cloudflare, '@/lib/server': serverUrl, './security': security, './runtime-config': runtimeConfig, './transactions': normalizerUrl });
-  const providerFunctions = ['getApplication', 'listBusinessBanks', 'startAuth', 'createSession', 'getSession', 'deleteSession', 'getTransactions'];
+  const providerFunctions = ['getApplication', 'listBusinessBanks', 'startAuth', 'createSession', 'getSession', 'getAccountDetails', 'deleteSession', 'getTransactions'];
   const providerUrl = actualProvider ? new URL('../lib/banking/enable-banking.ts', import.meta.url).href : jsUrl(`export {ProviderError,providerCooldownDiagnostic,providerErrorCode} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
   const readGuardUrl = compiledModule('../lib/banking/account-read-guard.ts', { '../server': serverUrl, './store': storeUrl, './enable-banking': providerUrl });
   const openPaymentsSchedulerUrl = compiledModule('../lib/banking/openpayments-scheduler.ts', { 'cloudflare:workers': cloudflare, '../server': serverUrl });
@@ -1812,7 +1826,8 @@ for(const [name,saved,live,wanted] of [
  const f=await fixture(t);await f.seedApp();f.account.usage=saved;f.live.accounts_data[0].usage=live;await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
  const before={...f.connection()},route=await independentScopeRoute(t,f),response=await route.POST(independentScopeRequest()),body=await response.json();
  assert.equal(response.status,200);assert.equal(body.result.isError,true);
- assert.deepEqual(body.result.structuredContent,{error:new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message,code:'BANK_ACCOUNT_SCOPE_INVALID',reason:'ACCOUNT_USAGE_INVALID',usageDiagnostic:wanted});
+ assert.deepEqual(body.result.structuredContent,{error:new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message,code:'BANK_ACCOUNT_SCOPE_INVALID',reason:'ACCOUNT_USAGE_INVALID',usageDiagnostic:wanted,
+  ...(saved===null?{usageDetailsDiagnostic:{version:'selected-account-usage-details-v1',status:'not_read',reason:'PRIMARY_IDENTITY_MISSING',targetCount:1,attemptedCount:0,observedCount:0}}:{})});
  assert.deepEqual(JSON.parse(body.result.content[0].text),body.result.structuredContent);assert.equal(response.headers.get('cache-control'),'private, no-store');
  assert.deepEqual(f.calls.map(c=>c.name),['getSession']);assert.deepEqual({...f.connection()},before);assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);assert.equal(financialAuditCount(f),2);
  const audit=f.sql.prepare("SELECT detail FROM audit_events WHERE action='bank.consent.revalidation.failed'").get();assert.equal(JSON.parse(audit.detail).error_code,'BANK_ACCOUNT_SCOPE_INVALID');assert.ok(!audit.detail.includes('usageDiagnostic'));
@@ -1828,4 +1843,289 @@ test('usage diagnostic: real service counts only the persisted selection on both
  assert.deepEqual(body.usageDiagnostic,usageDiagnostic({explicitNull:1},{omitted:1}));assert.deepEqual({...f.connection()},before);
  assert.deepEqual(f.calls.map(c=>c.name),['getSession']);assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);
  for(const value of [accountUid,extraLegacyUid,'PRIVATE_UNSELECTED'])assert.ok(!JSON.stringify(body).includes(value));
+});
+
+const usageDetailsVersion='selected-account-usage-details-v1';
+const usageDetailsObserved=(patch,amount=1)=>({version:usageDetailsVersion,status:'observed',reason:'EXACT_SELECTED_DETAILS_OBSERVED',targetCount:amount,attemptedCount:amount,observedCount:amount,usage:usageCounts(patch)});
+async function usageDetailsFixture(t,size=1,{actualProvider=false}={}){
+ const f=await fixture(t,'PRODUCTION',{actualProvider});
+ if(actualProvider)f.env.ENABLE_BANKING_PRIVATE_KEY=generateKeyPairSync('rsa',{modulusLength:2048,privateKeyEncoding:{format:'pem',type:'pkcs8'},publicKeyEncoding:{format:'pem',type:'spki'}}).privateKey;
+ await f.seedApp();
+ const values=Array.from({length:size},(_,i)=>({...f.account,uid:i===0?accountUid:`${String(i+4).padStart(8,'0')}-4444-4444-8444-444444444444`,usage:null,identification_hash:'SYNTHETIC_PRIMARY_'+i,account_id:{other:{identification:'SYNTHETIC_ACCOUNT_'+i,scheme_name:'BBAN'}}}));
+ f.account=values[0];const id=await f.seedConnection();f.retainedUsageAccounts=values;f.usageDetails=new Map(values.map(value=>[value.uid,{...structuredClone(value),usage:'ORGA',cash_account_type:'CACC'}]));
+ const encrypted=await f.store.encrypt(f.owner,`accounts:${id}`,values);
+ f.sql.prepare("UPDATE bank_connections SET encrypted_accounts=?,selected_accounts=?,status='reauth_required'").run(encrypted,JSON.stringify(values.map(value=>value.uid)));
+ f.live.accounts=values.map(value=>value.uid);f.live.accounts_data=values.map(value=>({uid:value.uid,identification_hash:value.identification_hash}));
+ f.provider.getAccountDetails=async(_config,uid)=>structuredClone(f.usageDetails.get(uid));
+ f.setRetainedUsageAccounts=async(values,selection=JSON.parse(f.connection().selected_accounts))=>{
+  const encrypted=await f.store.encrypt(f.owner,`accounts:${id}`,values);f.sql.prepare('UPDATE bank_connections SET encrypted_accounts=?,selected_accounts=?').run(encrypted,JSON.stringify(selection));f.retainedUsageAccounts=values;
+ };
+ if(actualProvider)t.mock.method(globalThis,'fetch',async(address,options)=>{
+  const target=new URL(address);assert.equal(target.origin,'https://api.enablebanking.com');assert.equal(options.method,'GET');assert.equal(options.redirect,'manual');
+  if(target.pathname==='/sessions/'+remoteSession){f.calls.push({name:'getSession',args:[null,remoteSession]});return Response.json(f.live);}
+  const match=/^\/accounts\/([a-f0-9-]+)\/details$/.exec(target.pathname);assert.ok(match,'Only the retained session and selected account details may be read');
+  f.calls.push({name:'getAccountDetails',args:[null,match[1]]});return f.detailsResponse?f.detailsResponse(match[1]):Response.json(f.usageDetails.get(match[1]));
+ });
+ return f;
+}
+async function usageDetailsDenial(f){let error;try{await f.service.revalidateConsent(post('revalidate'));}catch(caught){error=caught;}assert.ok(error instanceof ConsentError);const response=f.service.bankFailure(error),body=await response.json();assert.equal(response.status,409);assert.equal(body.code,'BANK_ACCOUNT_SCOPE_INVALID');assert.equal(body.reason,'ACCOUNT_USAGE_INVALID');return {error,body};}
+
+for(const [name,mutate]of [
+ ['unauthenticated',f=>{f.user=null;}],['other owner',f=>{f.user={userId:'foreign-owner'};}],
+ ['company adoption',f=>f.sql.prepare("INSERT INTO company_bank_sync_scopes(company_id,owner,evidence_id,created_at) VALUES('synthetic-company',?,'evidence',?)").run(f.owner,Date.now())],
+ ['cooldown',f=>f.sql.prepare('UPDATE bank_connections SET retry_after=?').run(future())],
+])test('usage details diagnostic: '+name+' is rejected before any provider read',async t=>{
+ const f=await usageDetailsFixture(t);mutate(f);const before={...f.connection()},route=await independentScopeRoute(t,f),body=await(await route.POST(independentScopeRequest())).json();
+ assert.equal(body.result.isError,true);assert.ok(!('usageDetailsDiagnostic' in body.result.structuredContent));assert.deepEqual(f.calls,[]);assert.deepEqual({...f.connection()},before);assert.equal(f.workspace(),null);
+});
+
+for(const args of [{accountUids:[extraLegacyUid]},{force:true},{usageDetailsDiagnostic:{status:'observed'}},{refreshUsage:true}])test('usage details diagnostic: client '+Object.keys(args)[0]+' cannot enable or select a detail read',async t=>{
+ const f=await usageDetailsFixture(t),route=await independentScopeRoute(t,f),body=await(await route.POST(independentScopeRequest(args))).json();assert.equal(body.error.code,-32602);assert.deepEqual(f.calls,[]);
+});
+
+for(const [name,mutate]of [
+ ['missing later primary hash',f=>{delete f.live.accounts_data[1].identification_hash;}],
+ ['conflicting later primary hash',f=>{f.live.accounts_data[1].identification_hash='SYNTHETIC_CHANGED_HASH';}],
+ ['fuzzy later primary hash overlap',f=>{const saved=f.live.accounts_data[1].identification_hash;f.live.accounts_data[1].identification_hash='CHANGED';f.live.accounts_data[1].identification_hashes=[saved];}],
+ ['explicit live PRIV',f=>{f.live.accounts_data[1].usage='PRIV';}],
+ ['explicit live null',f=>{f.live.accounts_data[1].usage=null;}],
+])test('usage details diagnostic: '+name+' prevents the first details GET for every selected resource',async t=>{
+ const f=await usageDetailsFixture(t,2);mutate(f);const before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assert.deepEqual(f.calls.map(c=>c.name),['getSession']);assert.equal(body.usageDetailsDiagnostic?.status,'not_read');assert.equal(body.usageDetailsDiagnostic?.attemptedCount,0);assert.ok(!('usage' in body.usageDetailsDiagnostic));assert.deepEqual({...f.connection()},before);
+});
+
+for(const [name,mutate]of [
+ ['duplicate saved UID',async f=>f.setRetainedUsageAccounts([...f.retainedUsageAccounts,{...f.account,usage:'ORGA'}])],
+ ['invalid unselected UID',async f=>f.setRetainedUsageAccounts([...f.retainedUsageAccounts,{...f.account,uid:'PRIVATE_INVALID_UID',usage:'ORGA'}])],
+ ['duplicate live UID',async f=>{f.live.accounts.push(accountUid);}],
+ ['revoked session',async f=>{f.live.status='REVOKED';}],
+ ['personal session',async f=>{f.live.psu_type='personal';}],
+ ['wrong bank',async f=>{f.live.aspsp.name='Other bank';}],
+ ['wrong country',async f=>{f.live.aspsp.country='NO';}],
+ ['expired live',async f=>{f.live.access.valid_until='2000-01-01T00:00:00.000Z';}],
+ ['transactions denied',async f=>{f.live.access.transactions=false;}],
+])test('usage details diagnostic: '+name+' never reaches account details',async t=>{
+ const f=await usageDetailsFixture(t);await mutate(f);let error;try{await f.service.revalidateConsent(post('revalidate'));}catch(caught){error=caught;}assert.ok(error);const body=await f.service.bankFailure(error).json();
+ assert.deepEqual(f.calls.map(c=>c.name),['getSession']);assert.ok(!('usageDetailsDiagnostic' in body));assert.equal(f.connection().status,'reauth_required');assert.equal(f.workspace(),null);
+});
+
+for(const size of [1,5,6])test('usage details diagnostic: '+size+' selected null accounts preserve the denial and the exact read limit',async t=>{
+ const f=await usageDetailsFixture(t,size),before={...f.connection()},{body}=await usageDetailsDenial(f);
+ const detailCalls=f.calls.filter(c=>c.name==='getAccountDetails');assert.equal(detailCalls.length,size<=5?size:0);assert.equal(f.calls.filter(c=>c.name==='getSession').length,1);
+ if(size<=5){assert.deepEqual(body.usageDetailsDiagnostic,usageDetailsObserved({orga:size},size));assert.deepEqual(detailCalls.map(c=>c.args[1]),f.retainedUsageAccounts.map(a=>a.uid));}
+ else{assert.equal(body.usageDetailsDiagnostic?.status,'not_read');assert.equal(body.usageDetailsDiagnostic?.reason,'READ_LIMIT_EXCEEDED');}
+ assert.deepEqual({...f.connection()},before);assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidated'").get().n,0);
+ assert.ok(!('revalidated' in body));assert.equal(body.usageDiagnostic.saved.explicitNull,size);
+ for(const value of [accountUid,remoteSession,'SYNTHETIC_PRIMARY_','SYNTHETIC_ACCOUNT_','Swedbank'])assert.ok(!JSON.stringify(body).includes(value));
+});
+
+test('usage details diagnostic: unselected accounts and already permitted selected resources are never refreshed',async t=>{
+ const f=await usageDetailsFixture(t,3),values=structuredClone(f.retainedUsageAccounts);values[1].usage='ORGA';values[2].usage='PRIV';await f.setRetainedUsageAccounts(values,[values[0].uid,values[1].uid]);
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);assert.deepEqual(f.calls.filter(c=>c.name==='getAccountDetails').map(c=>c.args[1]),[accountUid]);assert.deepEqual(body.usageDetailsDiagnostic,usageDetailsObserved({orga:1}));assert.deepEqual({...f.connection()},before);
+});
+
+for(const [name,value,category]of [['omitted',undefined,'omitted'],['null',null,'explicitNull'],['private','PRIV','priv'],['unknown','PRIVATE_RAW_USAGE','otherString'],['wrong type',{secret:'PRIVATE_RAW_VALUE'},'wrongType']])test('usage details diagnostic: real HTTP MCP reports fresh '+name+' without approving or reflecting it',async t=>{
+ const f=await usageDetailsFixture(t);if(value===undefined)delete f.usageDetails.get(accountUid).usage;else f.usageDetails.get(accountUid).usage=value;
+ const before={...f.connection()},route=await independentScopeRoute(t,f),response=await route.POST(independentScopeRequest()),body=await response.json();assert.equal(response.status,200);assert.equal(body.result.isError,true);
+ assert.equal(body.result.structuredContent.code,'BANK_ACCOUNT_SCOPE_INVALID');assert.deepEqual(body.result.structuredContent.usageDetailsDiagnostic,usageDetailsObserved({[category]:1}));assert.deepEqual(JSON.parse(body.result.content[0].text),body.result.structuredContent);
+ assert.equal(response.headers.get('cache-control'),'private, no-store');assert.deepEqual({...f.connection()},before);assert.equal(f.workspace(),null);assert.ok(!JSON.stringify(body).includes('PRIVATE_RAW_'));
+});
+
+for(const [name,mutate]of [
+ ['wrong UID',value=>value.uid=extraLegacyUid],['missing primary hash',value=>delete value.identification_hash],
+ ['changed primary hash',value=>value.identification_hash='PRIVATE_OTHER_HASH'],['currency conflict',value=>value.currency='EUR'],
+ ['primary number conflict',value=>value.account_id.other.identification='PRIVATE_OTHER_ACCOUNT'],
+])test('usage details diagnostic: fresh '+name+' stops the batch and withholds partial categories',async t=>{
+ const f=await usageDetailsFixture(t,3);mutate(f.usageDetails.get(f.retainedUsageAccounts[1].uid));const before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assert.equal(f.calls.filter(c=>c.name==='getAccountDetails').length,2);assert.equal(body.usageDetailsDiagnostic?.status,'unavailable');assert.equal(body.usageDetailsDiagnostic?.attemptedCount,2);assert.equal(body.usageDetailsDiagnostic?.observedCount,1);assert.ok(!('usage' in body.usageDetailsDiagnostic));assert.deepEqual({...f.connection()},before);assert.ok(!JSON.stringify(body).includes('PRIVATE_'));
+});
+
+for(const [name,change]of [
+ ['owner',f=>{f.user={userId:'foreign-owner'};}],['adoption',f=>f.sql.prepare("INSERT INTO company_bank_sync_scopes(company_id,owner,evidence_id,created_at) VALUES('company',?,'evidence',?)").run(f.owner,Date.now())],
+ ['app generation',f=>f.sql.prepare("UPDATE bank_applications SET generation='replacement'").run()],
+ ['session',f=>f.sql.prepare("UPDATE bank_connections SET encrypted_session='replacement'").run()],
+ ['cache',f=>f.sql.prepare("UPDATE bank_connections SET encrypted_accounts='replacement'").run()],
+ ['selection',f=>f.sql.prepare("UPDATE bank_connections SET selected_accounts='[]'").run()],
+ ['status',f=>f.sql.prepare("UPDATE bank_connections SET status='revocation_pending'").run()],
+ ['expiry',f=>f.sql.prepare("UPDATE bank_connections SET valid_until='2000-01-01T00:00:00.000Z'").run()],
+ ['lease',f=>f.sql.prepare("UPDATE bank_locks SET token='replacement'").run()],
+])test('usage details diagnostic: changed '+name+' during a details GET cannot yield positive evidence or another read',async t=>{
+ const f=await usageDetailsFixture(t,2);f.provider.getAccountDetails=async(_config,uid)=>{change(f);return structuredClone(f.usageDetails.get(uid));};let body;
+ if(name==='owner'){
+  // The existing lock cleanup is itself owner-scoped and refuses the changed
+  // actor. Preserve that stronger boundary instead of requiring old-owner data.
+  let error;try{await f.service.revalidateConsent(post('revalidate'));}catch(caught){error=caught;}
+  assert.equal(error?.message,'COMPANY_BOUNDARY_VIOLATION');const response=f.service.bankFailure(error);assert.equal(response.status,500);body=await response.json();
+  assert.ok(!('usageDiagnostic' in body));
+ }else ({body}=await usageDetailsDenial(f));
+ assert.equal(f.calls.filter(c=>c.name==='getAccountDetails').length,1);assert.ok(!('usageDetailsDiagnostic' in body));assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidated'").get().n,0);
+});
+
+for(const name of ['failed audit','context shift at audit'])test('usage details diagnostic: '+name+' after the last response suppresses the completed result',async t=>{
+ const f=await usageDetailsFixture(t),batch=f.d1.batch.bind(f.d1);
+ f.d1.batch=async statements=>{if(statements.some(s=>s.values.includes('bank.consent.revalidation.failed'))){if(name==='failed audit')throw Error('PRIVATE_AUDIT_FAILURE');f.sql.prepare("UPDATE bank_connections SET selected_accounts='[]'").run();}return batch(statements);};
+ const {body}=await usageDetailsDenial(f);assert.equal(f.calls.filter(c=>c.name==='getAccountDetails').length,1);assert.ok(!('usageDetailsDiagnostic' in body));assert.equal(f.connection().status,'reauth_required');assert.equal(f.workspace(),null);
+});
+
+for(const retry of [null,'120'])test('usage details diagnostic: actual provider 429 '+(retry===null?'unknown':'known')+' cooldown persists and stops further requests',async t=>{
+ const f=await usageDetailsFixture(t,2,{actualProvider:true});f.detailsResponse=()=>new Response(JSON.stringify({error:'RATE_LIMIT',private:'PRIVATE_PROVIDER_BODY'}),{status:429,headers:retry===null?{}:{'Retry-After':retry}});
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);assert.equal(f.calls.filter(c=>c.name==='getAccountDetails').length,1);assert.equal(f.connection().status,'reauth_required');assert.equal(f.connection().encrypted_accounts,before.encrypted_accounts);assert.ok(accountReadCooldown(f.connection().account_evidence_retry).blocked);assert.notEqual(body.usageDetailsDiagnostic?.status,'observed');assert.ok(!JSON.stringify(body).includes('PRIVATE_PROVIDER_BODY'));
+ const calls=f.calls.length;await assert.rejects(f.service.revalidateConsent(post('revalidate')));assert.equal(f.calls.length,calls);assert.equal(f.workspace(),null);
+});
+
+test('usage details diagnostic: failure to resolve the persistent read marker retains uncertainty',async t=>{
+ const f=await usageDetailsFixture(t),batch=f.d1.batch.bind(f.d1);let detailsReturned=false;
+ f.provider.getAccountDetails=async(_config,uid)=>{detailsReturned=true;return structuredClone(f.usageDetails.get(uid));};
+ f.d1.batch=async statements=>{if(detailsReturned&&statements.some(s=>/UPDATE bank_connections SET account_evidence_retry=/.test(s.sql)))throw Error('PRIVATE_GUARD_FAILURE');return batch(statements);};
+ const {body}=await usageDetailsDenial(f);assert.equal(f.calls.filter(c=>c.name==='getAccountDetails').length,1);assert.ok(accountReadCooldown(f.connection().account_evidence_retry).blocked);assert.notEqual(body.usageDetailsDiagnostic?.status,'observed');assert.equal(f.connection().status,'reauth_required');assert.equal(f.workspace(),null);
+});
+
+test('usage details diagnostic: the actual provider adapter reports ORGA while retaining the original 409',async t=>{
+ const f=await usageDetailsFixture(t,1,{actualProvider:true}),before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assert.deepEqual(f.calls.map(c=>c.name),['getSession','getAccountDetails']);assert.deepEqual(body.usageDetailsDiagnostic,usageDetailsObserved({orga:1}));assert.deepEqual({...f.connection()},before);assert.equal(f.workspace(),null);
+});
+
+test('usage details diagnostic: the live deadline expiring during the first details read stops the batch',async t=>{
+ const f=await usageDetailsFixture(t,2);let clock=Date.now();t.mock.method(Date,'now',()=>clock);f.live.access.valid_until=new Date(clock+30000).toISOString();
+ f.provider.getAccountDetails=async(_config,uid)=>{clock+=31000;return structuredClone(f.usageDetails.get(uid));};
+ const {body}=await usageDetailsDenial(f);assert.equal(f.calls.filter(c=>c.name==='getAccountDetails').length,1);assert.ok(!('usageDetailsDiagnostic' in body));assert.equal(f.connection().status,'reauth_required');assert.equal(f.workspace(),null);
+});
+
+for(const [name,change]of [
+ ['cache',f=>f.sql.prepare("UPDATE bank_connections SET encrypted_accounts='replacement'").run()],
+ ['selection',f=>f.sql.prepare("UPDATE bank_connections SET selected_accounts='[]'").run()],
+ ['bank',f=>f.sql.prepare("UPDATE bank_connections SET bank_name='Other bank'").run()],
+ ['application metadata',f=>f.sql.prepare("UPDATE bank_applications SET metadata='{}'").run()],
+ ['runtime generation',f=>{f.env.ENABLE_BANKING_PRIVATE_KEY=f.env.ENABLE_BANKING_PRIVATE_KEY.replace('VEVTVC1PTkxZLU5PVC1SRUFM','U1lOVEhFVElDLVJFUExBQ0VNRU5U');}],
+])test('usage details diagnostic: changed '+name+' during the session read prevents the first details GET',async t=>{
+ const f=await usageDetailsFixture(t);f.provider.getSession=async()=>{change(f);return structuredClone(f.live);};
+ const {body}=await usageDetailsDenial(f);assert.deepEqual(f.calls.map(c=>c.name),['getSession']);assert.ok(!('usageDetailsDiagnostic' in body));assert.equal(f.workspace(),null);
+});
+
+test('usage details diagnostic: a foreign privately branded usage error at the provider boundary cannot authorize reads',async t=>{
+ const f=await usageDetailsFixture(t),other=structuredClone(f.live),values=structuredClone(f.retainedUsageAccounts);let foreignError,reads=0;
+ try{validateLegacyEnableSelection({session:{accounts:values,aspsp:other.aspsp,psu_type:'business',access:other.access},checked:other,bankName:'Swedbank',country:'SE',requestedValidUntil:other.access.valid_until,selectedAccountUids:values.map(a=>a.uid)});}catch(error){foreignError=error;}
+ assert.ok(foreignError instanceof ConsentError);Object.defineProperty(foreignError,'usageDetailsDiagnostic',{get(){reads++;throw Error('PRIVATE');}});f.provider.getSession=async()=>{throw foreignError;};
+ const {body}=await usageDetailsDenial(f);assert.deepEqual(f.calls.map(c=>c.name),['getSession']);assert.equal(reads,0);assert.ok(!('usageDetailsDiagnostic' in body));assert.equal(f.workspace(),null);
+});
+
+for(const [name,patch]of [['inactive',{active:false}],['wrong application',{kid:extraLegacyUid}],['string services',{services:'AIS'}],['string countries',{countries:'SE'}],['missing AIS',{services:[]}]])test('usage details diagnostic: '+name+' metadata cannot attest the selected read',async t=>{
+ const f=await usageDetailsFixture(t);f.sql.prepare('UPDATE bank_applications SET metadata=?').run(JSON.stringify({...f.info,...patch}));
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);assert.deepEqual(f.calls.map(c=>c.name),['getSession']);assert.ok(!('usageDetailsDiagnostic' in body));assert.deepEqual({...f.connection()},before);assert.equal(f.workspace(),null);
+});
+
+test('usage details diagnostic: a provider timeout stops the batch without exposing partial usage',async t=>{
+ const f=await usageDetailsFixture(t,2);f.provider.getAccountDetails=async()=>{throw new ProviderError('BANK_TIMEOUT','PRIVATE_TIMEOUT',504,true);};
+ const {body}=await usageDetailsDenial(f);assert.equal(f.calls.filter(c=>c.name==='getAccountDetails').length,1);assert.equal(body.usageDetailsDiagnostic?.status,'unavailable');assert.equal(body.usageDetailsDiagnostic?.observedCount,0);assert.ok(!('usage' in body.usageDetailsDiagnostic));assert.ok(!JSON.stringify(body).includes('PRIVATE_TIMEOUT'));assert.equal(f.connection().status,'reauth_required');assert.equal(f.workspace(),null);
+});
+
+// Independent I1 review cases; reuse the existing synthetic service fixture.
+function assertNoFinancialEffects(f) {
+ assert.equal(f.connection().status,'reauth_required');
+ assert.equal(f.workspace(),null);
+ assert.equal(count(f,'bank_sync_runs'),0);
+ assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidated'").get().n,0);
+}
+const failedAuditBatch = statements => statements.some(s=>s.values?.includes('bank.consent.revalidation.failed'));
+
+test('reviewer: complete maximum-sized mixed batch preserves the original denial and row',async t=>{
+ const f=await usageDetailsFixture(t,5);
+ const values=[ 'ORGA','PRIV',null,'PRIVATE_UNKNOWN',undefined ];
+ f.retainedUsageAccounts.forEach((account,index)=>{
+  const details=f.usageDetails.get(account.uid);details.usage=values[index];
+  if(index===0)delete details.uid;
+  if(index===4)delete details.usage;
+ });
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assert.deepEqual(body.usageDetailsDiagnostic,usageDetailsObserved({orga:1,priv:1,explicitNull:1,otherString:1,omitted:1},5));
+ assert.deepEqual(f.calls.filter(c=>c.name==='getAccountDetails').map(c=>c.args[1]),f.retainedUsageAccounts.map(a=>a.uid));
+ assert.deepEqual({...f.connection()},before);assertNoFinancialEffects(f);
+ for(const value of ['PRIVATE_UNKNOWN',...f.retainedUsageAccounts.map(a=>a.uid),'SYNTHETIC_PRIMARY_'])assert.ok(!JSON.stringify(body).includes(value));
+});
+
+test('reviewer: provider failure on the fifth result withholds all partial usage',async t=>{
+ const f=await usageDetailsFixture(t,5),before={...f.connection()};let calls=0;
+ f.provider.getAccountDetails=async(_config,uid)=>{if(++calls===5)throw new ProviderError('BANK_TIMEOUT','PRIVATE_LAST_RESULT',504,true);return structuredClone(f.usageDetails.get(uid));};
+ const {body}=await usageDetailsDenial(f);
+ assert.deepEqual(body.usageDetailsDiagnostic,{version:usageDetailsVersion,status:'unavailable',reason:'DETAILS_PROVIDER_UNAVAILABLE',targetCount:5,attemptedCount:5,observedCount:4});
+ assert.equal(calls,5);assert.ok(!JSON.stringify(body).includes('PRIVATE_LAST_RESULT'));
+ assert.deepEqual({...f.connection()},before);assertNoFinancialEffects(f);
+});
+
+test('reviewer: app metadata changes atomically at final failed audit suppress the five-result diagnosis',async t=>{
+ const f=await usageDetailsFixture(t,5),batch=f.d1.batch.bind(f.d1);
+ f.d1.batch=async statements=>{if(failedAuditBatch(statements))f.sql.prepare('UPDATE bank_applications SET metadata=?').run(JSON.stringify({...f.info,countries:['NO']}));return batch(statements);};
+ const {body}=await usageDetailsDenial(f);
+ assert.equal(f.calls.filter(c=>c.name==='getAccountDetails').length,5);
+ assert.ok(!('usageDetailsDiagnostic' in body));assert.ok(!('usageDiagnostic' in body));
+ assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidation.failed'").get().n,0);
+ assertNoFinancialEffects(f);
+});
+
+test('reviewer: a committed failed audit with lost acknowledgement cannot publish completed categories',async t=>{
+ const f=await usageDetailsFixture(t,5),batch=f.d1.batch.bind(f.d1),before={...f.connection()};
+ f.d1.batch=async statements=>{const result=await batch(statements);if(failedAuditBatch(statements))throw Error('PRIVATE_LOST_AUDIT_ACK');return result;};
+ const {body}=await usageDetailsDenial(f);
+ assert.equal(f.calls.filter(c=>c.name==='getAccountDetails').length,5);
+ assert.ok(!('usageDetailsDiagnostic' in body));assert.ok(!('usageDiagnostic' in body));
+ assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidation.failed'").get().n,1);
+ assert.ok(!JSON.stringify(body).includes('PRIVATE_LOST_AUDIT_ACK'));assert.deepEqual({...f.connection()},before);assertNoFinancialEffects(f);
+});
+
+test('reviewer: connection mutation after the failed audit commits suppresses completed categories',async t=>{
+ const f=await usageDetailsFixture(t,5),batch=f.d1.batch.bind(f.d1);
+ f.d1.batch=async statements=>{const result=await batch(statements);if(failedAuditBatch(statements))f.sql.prepare("UPDATE bank_connections SET date_from='2001-01-01'").run();return result;};
+ const {body}=await usageDetailsDenial(f);
+ assert.equal(f.calls.filter(c=>c.name==='getAccountDetails').length,5);
+ assert.ok(!('usageDetailsDiagnostic' in body));assert.ok(!('usageDiagnostic' in body));
+ assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidation.failed'").get().n,1);
+ assertNoFinancialEffects(f);
+});
+
+test('reviewer: deadline expiry after all results but before audit acknowledgement suppresses categories',async t=>{
+ const f=await usageDetailsFixture(t,5),batch=f.d1.batch.bind(f.d1);let clock=Date.now();
+ t.mock.method(Date,'now',()=>clock);f.live.access.valid_until=new Date(clock+60000).toISOString();
+ f.d1.batch=async statements=>{const result=await batch(statements);if(failedAuditBatch(statements))clock+=61000;return result;};
+ const {body}=await usageDetailsDenial(f);
+ assert.equal(f.calls.filter(c=>c.name==='getAccountDetails').length,5);
+ assert.ok(!('usageDetailsDiagnostic' in body));assert.ok(!('usageDiagnostic' in body));
+ assertNoFinancialEffects(f);
+});
+
+test('reviewer: actual provider adapter must reject contradictory fresh primary IBAN values',async t=>{
+ const f=await usageDetailsFixture(t,1,{actualProvider:true});
+ const details=f.usageDetails.get(f.retainedUsageAccounts[0].uid);
+ details.account_id={iban:'SE4550000000058398257466',other:{scheme_name:'IBAN',identification:'SE4550000000058398257474'}};
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assert.deepEqual(f.calls.map(call=>call.name),['getSession','getAccountDetails']);
+ assert.deepEqual({...f.connection()},before);assertNoFinancialEffects(f);
+ assert.deepEqual(body.usageDetailsDiagnostic,{version:usageDetailsVersion,status:'unavailable',reason:'DETAILS_ACCOUNT_CONFLICT',targetCount:1,attemptedCount:1,observedCount:0});
+});
+
+for(const conflict of ['saved/live BBAN','saved internal IBAN'])test('usage details identity I1: '+conflict+' conflict survives missing fresh account_id through the actual adapter',async t=>{
+ const f=await usageDetailsFixture(t,1,{actualProvider:true});
+ if(conflict==='saved/live BBAN'){
+  f.live.accounts_data[0].account_id={other:{scheme_name:'BBAN',identification:'SYNTHETIC_DIFFERENT_LIVE_ACCOUNT'}};
+ }else{
+  const retained=structuredClone(f.retainedUsageAccounts);
+  retained[0].account_id={iban:'SE4550000000058398257466',other:{scheme_name:'IBAN',identification:'SE3550000000054910000003'}};
+  await f.setRetainedUsageAccounts(retained);
+ }
+ delete f.usageDetails.get(f.retainedUsageAccounts[0].uid).account_id;
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assert.deepEqual(f.calls.map(call=>call.name),['getSession','getAccountDetails']);
+ assert.deepEqual({...f.connection()},before);assertNoFinancialEffects(f);
+ assert.deepEqual(body.usageDetailsDiagnostic,{version:usageDetailsVersion,status:'unavailable',reason:'DETAILS_ACCOUNT_CONFLICT',targetCount:1,attemptedCount:1,observedCount:0});
+});
+
+test('reviewer I1 followup: conflict on the fifth actual-adapter result withholds every usage category',async t=>{
+ const f=await usageDetailsFixture(t,5,{actualProvider:true});
+ const lastUid=f.retainedUsageAccounts[4].uid;
+ f.usageDetails.get(lastUid).account_id={iban:'SE4550000000058398257466',other:{scheme_name:'IBAN',identification:'SE4550000000058398257474'}};
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assert.deepEqual(f.calls.map(call=>call.name),['getSession',...Array(5).fill('getAccountDetails')]);
+ assert.deepEqual({...f.connection()},before);assertNoFinancialEffects(f);
+ assert.deepEqual(body.usageDetailsDiagnostic,{version:usageDetailsVersion,status:'unavailable',reason:'DETAILS_ACCOUNT_CONFLICT',targetCount:5,attemptedCount:5,observedCount:4});
+ assert.ok(!('usage' in body.usageDetailsDiagnostic));
+ for(const account of f.retainedUsageAccounts)assert.ok(!JSON.stringify(body).includes(account.uid));
 });

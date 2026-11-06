@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: actual details adapter to observer, internally consistent primary IBAN
+ok 1 - actual details adapter to observer, internally consistent primary IBAN
+  ---
+  duration_ms: 24.578828
+  type: 'test'
+  ...
+# Subtest: actual details adapter to observer, internally contradictory primary IBAN
+ok 2 - actual details adapter to observer, internally contradictory primary IBAN
+  ---
+  duration_ms: 6.275065
+  type: 'test'
+  ...
+# Subtest: hash-bound resource with no primary identifiers remains observable
+ok 3 - hash-bound resource with no primary identifiers remains observable
+  ---
+  duration_ms: 5.628788
+  type: 'test'
+  ...
+# Subtest: contradictory IBAN fields inside fresh primary account_id must prevent an observation
+ok 4 - contradictory IBAN fields inside fresh primary account_id must prevent an observation
+  ---
+  duration_ms: 1.387466
+  type: 'test'
+  ...
+# Subtest: saved and live primary BBAN disagreement must survive omitted fresh account_id
+ok 5 - saved and live primary BBAN disagreement must survive omitted fresh account_id
+  ---
+  duration_ms: 2.69344
+  type: 'test'
+  ...
+# Subtest: contradictory cached primary IBANs cannot be erased by omitted fresh account_id
+ok 6 - contradictory cached primary IBANs cannot be erased by omitted fresh account_id
+  ---
+  duration_ms: 0.98538
+  type: 'test'
+  ...
+# Subtest: fresh BBAN disagreement is rejected when the same scheme is present
+ok 7 - fresh BBAN disagreement is rejected when the same scheme is present
+  ---
+  duration_ms: 1.265685
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 469.887524

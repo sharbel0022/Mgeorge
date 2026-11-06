@@ -1,0 +1,43 @@
+{
+  "name": "green-policy-adapters-provider",
+  "redCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+  "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+  "env": {
+    "NODE_ENV": "test"
+  },
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "--test-concurrency=1",
+    "--test",
+    "--test-reporter=tap",
+    "sites/tests/bank-consent-policy.test.mjs",
+    "sites/tests/bank-usage-diagnostic.test.mjs",
+    "sites/tests/bank-usage-details-policy.test.mjs",
+    "sites/tests/bank-usage-details-identity-policy.test.mjs",
+    "sites/tests/bank-usage-details-identity-adapter.test.mjs",
+    "sites/tests/bank-account-consent.test.mjs",
+    "sites/tests/bank-account-evidence.test.mjs",
+    "sites/tests/bank-account-evidence-provider.test.mjs",
+    "sites/tests/account-read-cooldown.test.mjs",
+    "test/bank-consent-api.test.js",
+    "test/api-account-consent.test.js"
+  ],
+  "exitCode": 0,
+  "counts": {
+    "tests": 298,
+    "pass": 298,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "failedTests": [],
+  "log": "docs/quality8/bank-details-identity-i1/green-policy-adapters-provider.tap",
+  "logBytes": 70548,
+  "logSha256": "9ae64d9c09aac87e18cfbaddc2284ac5dbe60ccadf049161a7acae667cf1e678",
+  "elapsedSeconds": 24.48,
+  "policySha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43"
+}

@@ -1,0 +1,39 @@
+{
+  "name": "red-additional-controls",
+  "baseline": "638c77365dbf8f4c73db6b23816a37f577da5689",
+  "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+  "env": {
+    "NODE_ENV": "test"
+  },
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "--test-concurrency=1",
+    "--test",
+    "--test-reporter=tap",
+    "--test-name-pattern=^usage details identity I1:",
+    "sites/tests/bank-usage-details-policy.test.mjs",
+    "sites/tests/banking-security.test.mjs"
+  ],
+  "exitCode": 1,
+  "counts": {
+    "tests": 7,
+    "pass": 2,
+    "fail": 5,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "failedTests": [
+    "usage details identity I1: conflicting live IBANs survive omitted fresh identifiers",
+    "usage details identity I1: conflicting live IBANs survive different scheme fresh identifiers",
+    "usage details identity I1: saved/live BBAN conflict survives a noncomparable fresh IBAN",
+    "usage details identity I1: saved/live BBAN conflict survives missing fresh account_id through the actual adapter",
+    "usage details identity I1: saved internal IBAN conflict survives missing fresh account_id through the actual adapter"
+  ],
+  "log": "docs/quality8/bank-details-identity-i1/red-additional-controls.tap",
+  "logSha256": "78797fac00cbb64fb11d84383d326ab7102c437ff2b9cb05748617ac1d54f100",
+  "elapsedSeconds": 1.988
+}

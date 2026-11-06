@@ -1,0 +1,55 @@
+{
+  "schema": "bank-details-identity-i1-source-verification-v1",
+  "baseline": "638c77365dbf8f4c73db6b23816a37f577da5689",
+  "redCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+  "changedProductFiles": [
+    "sites/lib/bank-consent-policy.js"
+  ],
+  "onlyObserveAccountUsageDetailsChanged": true,
+  "policyPrefixSha256": "7e9d2423bf53e5eb01b969ba7a7b74dfb88a4221dd8bffa8350d5f6213fa163d",
+  "policySuffixSha256": "64d154a68e3feae2c37814d70ba62a57bcf05e8fa5cec6456172a14e7e3a19e9",
+  "policySha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+  "unchangedProductFiles": [
+    {
+      "path": "sites/lib/bank-consent-policy.d.ts",
+      "sha256": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280"
+    },
+    {
+      "path": "sites/lib/banking/service.ts",
+      "sha256": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24"
+    },
+    {
+      "path": "sites/lib/banking/enable-banking.ts",
+      "sha256": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6"
+    },
+    {
+      "path": "sites/lib/banking/account-evidence.ts",
+      "sha256": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f"
+    },
+    {
+      "path": "sites/lib/banking/account-read-guard.ts",
+      "sha256": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837"
+    }
+  ],
+  "frozenTestFilesUnchanged": [
+    {
+      "path": "sites/tests/bank-usage-details-identity-policy.test.mjs",
+      "sha256": "dac97f1f5d1933f4abdb4b6e773648d16fd01cb44ea6777983f42cb388dc6db5"
+    },
+    {
+      "path": "sites/tests/bank-usage-details-identity-adapter.test.mjs",
+      "sha256": "bd1fd5940d45fea7a603b5469f38dca5f15c62bcbecb1625625da94b85a2105d"
+    },
+    {
+      "path": "sites/tests/bank-usage-details-policy.test.mjs",
+      "sha256": "ec02badb28e1588efcc55a0ee80e04e78ef94c79aec2d43e559edbfc1ec92f75"
+    },
+    {
+      "path": "sites/tests/banking-security.test.mjs",
+      "sha256": "efcd72fc157e4a73d549c3511309599c13d689d146a36d4f40c4e3a7db825730"
+    }
+  ],
+  "originalEvidenceCopiesUnchanged": 9,
+  "originalReviewWorkspaceHashesUnchanged": 24,
+  "productDiffSha256": "cf6a8aa1456aaec655f6d0f3a11959e743c7cf6f52fea929816079ab819ee438"
+}

@@ -1,0 +1,1237 @@
+{
+  "schema": "mgeorge-known-replay-parser-repair-comparison-v1",
+  "recordedAt": "2026-11-06T02:17:39.130061+00:00",
+  "sourceCommit": "63edd9fa97bc0475237133021313963e402efc76",
+  "baselineSourceCommit": "a19e0a8ce7a7ddedb85de1a8f9e21b617ba90b77",
+  "baselineArtifactPath": "docs/quality8/ocr-field-a19-baseline.json",
+  "baselineArtifactSha256": "15e1c73339c6bcaf505d1dc89d24fb29685bd58de009a52e35831d8352a2f1a7",
+  "baselinePreserved": true,
+  "independentHoldout": false,
+  "acceptanceMeasurement": false,
+  "opticalCalls": 0,
+  "parserCalls": 52,
+  "identicalInputCases": 26,
+  "uniqueInputImages": 12,
+  "normalImages": 10,
+  "stressImages": 2,
+  "runnerSha256": "92dd331faa793273feab7638091eb5e668653710d8834d318d5771b356078542",
+  "metricHelperSha256": "e799e8e7b759f1cc20aeae946d479b7bae4c730fef45fd015a5c809c42cc0ada",
+  "firstResultSha256": "13557c3012331fa0101fbe3e6fe498fd2fbf3346b8740cfe5fe4b83e8393b6e7",
+  "psm6ResultSha256": "a8f4c44973ea42eedbac1878ef5c145fad8ae823227de6ceff6dd7364f9ab9ea",
+  "goldSha256": "943a3f9039726d50817de5ad5e913c85aa5210f52e70db487be18e4bb5840af0",
+  "sourceUnchanged": true,
+  "sourceHashes": {
+    "sites/lib/bank-api-original.js": "2868abc1423a942d6eed583cbc14a2ab7b68cba533f1320636d4d5692d993a27",
+    "sites/lib/bank-company-authority.js": "530620cfd84c964600e214ca8841d820069300a63771d07d68a356c0af8f78b0",
+    "sites/lib/bank-consent-policy.js": "452cff5e328f931a5f1e81ab57fcd47a9b935f542146b1045de3b3e838d90538",
+    "sites/lib/bankgiro-deposit-identity.js": "46e1135ba45750e5c06f7c6a2e662ec462dc839218a2d5d707adafc95bec7ac4",
+    "sites/lib/bankgiro-openpayments-capture.js": "200a4b91315b3dadb6acdcc96d03e375763748515a850991630af01221f6a9d1",
+    "sites/lib/bankgiro-openpayments.js": "3942d5e5f9e16974ce5c02407db5cf0a5f46c3d790453de6a501a8d067d35245",
+    "sites/lib/bankgiro-parser.js": "f28b9d2ecaa98c28ea78679ec5f6db55fc5706a8aac05a2abfc96fc433210622",
+    "sites/lib/bankgiro-service.ts": "80d61986e7a41b5d9638553ee45284b99253d76082b60294235758c4a4bacd0e",
+    "sites/lib/bankgiro-source-evidence.js": "495ea7b21d978011cfef8b3f319f1ba5b68b4d04c7df3315b30e10527efff1e7",
+    "sites/lib/bankgiro-xlsx.js": "cca184605ad533867daa1f5486e27071c3c5551894e05feb161e313d2320c384",
+    "sites/lib/banking/bank-data-provider.js": "34ca42995a258393fcecadcefec13f54ba831d839eb0ffe303ac62b54c321ab9",
+    "sites/lib/banking/enable-banking.ts": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6",
+    "sites/lib/banking/openpayments-account-state.ts": "313f013c477ddfd64c7bd76dce1879cd8966dfc1902741cd57b1e51e07bc7fcf",
+    "sites/lib/banking/openpayments-normalization.js": "13782ec9a42db954153b6bebaf35b8f795d62035d4d6259b0e8b21717ac5185b",
+    "sites/lib/banking/openpayments/config.js": "c72a70d543ab1aad7c8f197939b98c8a8024d3e40cd64aa454e311965fa7bcda",
+    "sites/lib/banking/runtime-config.ts": "ec798899fd5bad427cb0a3512c92ac253a8c6079e388eb459373a10bac447786",
+    "sites/lib/banking/security.ts": "9da6a6c534e6b16cb89a59dd5233f9b8975d3fda24aa5d3e66c39fb45ca1337f",
+    "sites/lib/banking/store.ts": "3fdda2b5fbefb06debaf64cf5daab43e8204b673dc208dcd394b11d4680f1105",
+    "sites/lib/banking/transactions.ts": "192c93904d456d193a1dbb5d6776fc84dba99fedab3dc90bb4f80f01b5621d6a",
+    "sites/lib/camt-payer.js": "4525b7fa52fd4ff8dc336d79fb8fa46d13986c0a6458840b2f0ba0c5cf472827",
+    "sites/lib/camt-xml.js": "a517eb363c4029a3bb9cb5870da32dfd3b32c2de722dfcb921ed81407342889e",
+    "sites/lib/company-contract.js": "5da17708a61f842002c3d57650679d260bb5142821baf97700353bc467e14c8e",
+    "sites/lib/company-storage.js": "f374fdb070f3fe3ada217de084a78c494ed0ccf84d410b80279f5a22e1cca2c0",
+    "sites/lib/customer-message-text.js": "b6b3cbbc1e177d3591d4f980bb96c3dade5d56325f236fed118838821cc5b53c",
+    "sites/lib/customer-messages.ts": "6d785faa974cab97cc4a5c07437111162256d10f2744016cf9e9ba1eb17313f8",
+    "sites/lib/document-processing.ts": "452662775e7e85428c9cba5d16c555e215a75f0ece81bf826db3db8040ba357e",
+    "sites/lib/document-triage.js": "28e2e0b8bda7d3e57705f26ba269164255acfbad315f0c3a7f96c2efb58db6fb",
+    "sites/lib/domain.ts": "55cadd62982e5d9cbb7e15f90add09dea77307f2881e7d05bda0d8608ef25932",
+    "sites/lib/gmail-adapter.js": "a4a9a5fa302120bbdc2921321aded8ce1cb4a9459044ca3c294cb30f5bedab17",
+    "sites/lib/imports.ts": "36212e72b7d8e7be6ff4aecb3fccfb35e4101a7995e8f2b9066c36331e88523c",
+    "sites/lib/invoice-details.js": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7",
+    "sites/lib/invoice-fields.js": "e7f2ecd75e56cd82f1296234daf1bb11886f743a2ee84d233119f7588ba9b4e2",
+    "sites/lib/invoice-reference-policy.js": "3e3edf1942ec61a518bcef6350a09f1a3a2fabfffb56f0f1c2af9463953d5a9e",
+    "sites/lib/local-ocr.ts": "760b5ada21de6dbc6658ed0fd5a95f38e7d6e963ba7e6f7ded0fec268b9207c3",
+    "sites/lib/ocr-bankgiro-evidence.js": "d47149b163ae2c7dd4344253747938184b27714164fbb2b3a3025baf4e92198a",
+    "sites/lib/ocr-layout.js": "b9c22df11bf317e7d0c3cb880f3c810c73b948fa6f694214c07ac80e1a066d76",
+    "sites/lib/payer-evidence.js": "6f6e5ac7f331c5fe87d8ed555cb2d908b8d000b26335efba25b8c5200a168661",
+    "sites/lib/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+    "sites/lib/pdf-text.js": "110571c642b071404aae9ff02e95af162f104af345b80c6b492aded0fc9bc2e4",
+    "sites/lib/reconciliation-engine.js": "0a77b474b124405bff188a1a2fd5e122c849ae50c2687c6c1a4cc51345104f8c",
+    "sites/lib/reconciliation-evidence.ts": "b04a9087e90237065cdb5028c1fa8476d8357a5e5b11dffbda96a3ecdc760b06",
+    "sites/lib/reconciliation.ts": "310220550016c21b9fc04402402a11798e412e48c4e4333e4c9f81f94cd72b48",
+    "sites/lib/reference-evidence-compat.js": "1f01e0e6fbc32edf8449e5972634380a3138ad7fc3adaccf35600871eb961eba",
+    "sites/lib/server-pdf.ts": "5a212c15b669969022522dbabda2d04bdc222bc8f1cf61c477c54cf2d3a04167",
+    "sites/lib/server.ts": "cc521f005418076529fee10d9086ddfe053787b8ff458cee6e5eb3a55ae93d73",
+    "sites/lib/uuid.js": "352477ae6f4696ea9095284a5d7eac186bcd06c321f7fa44b66ccc29f2fd6ca4",
+    "src/document-triage.js": "28e2e0b8bda7d3e57705f26ba269164255acfbad315f0c3a7f96c2efb58db6fb",
+    "src/image-dimensions.js": "57e1db355914c6f30190f591a1459b4a0ca25acee5a9b88d060cba2213aa9eec",
+    "src/importers.js": "ba5a6c489c1a0f2836d1c132f304b050a3c3fa26b9aa119f12654c1e331c3252",
+    "src/invoice-details.js": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7",
+    "src/invoice-extraction.js": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e",
+    "src/invoice-worker.js": "e14496922f70a62038b0ff24dcc61026d0c11a85192d3abff3a9105114952fef",
+    "src/ocr-raster-size.js": "feeca5b3c51d0607420cbee2a23a6431a938bdf3cefcf580493464a1f32a5b8f",
+    "src/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+    "src/pdf-text.js": "110571c642b071404aae9ff02e95af162f104af345b80c6b492aded0fc9bc2e4",
+    "src/sites-ocr-pull.js": "08614eda1904c02324d02607f00050cbd688d51f42ca2fae3480de031d894eb2"
+  },
+  "changedFieldOutcomes": 0,
+  "changedFieldEvidence": 0,
+  "changedLevels": 0,
+  "changedParties": 0,
+  "changedIssueLists": 22,
+  "issueOnlyChanges": [
+    {
+      "id": "holdout-v2-normal-04",
+      "variant": "stored-psm3-text",
+      "engine": "node",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Saknade uppgifter: kund eller leverantör, belopp exklusive moms, moms, valuta, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, belopp exklusive moms, moms, valuta, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "variant": "stored-psm3-text",
+      "engine": "sites",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Saknade uppgifter: kund eller leverantör, belopp exklusive moms, moms, valuta, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, belopp exklusive moms, moms, valuta, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "variant": "stored-psm3-text",
+      "engine": "node",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, moms, valuta, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, moms, valuta, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "variant": "stored-psm3-text",
+      "engine": "sites",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, moms, valuta, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, moms, valuta, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "variant": "stored-psm3-text",
+      "engine": "node",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för totalbelopp. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, totalbelopp, belopp exklusive moms, moms, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för totalbelopp. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, totalbelopp, belopp exklusive moms, moms, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "variant": "stored-psm3-text",
+      "engine": "sites",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för totalbelopp. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, totalbelopp, belopp exklusive moms, moms, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för totalbelopp. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, totalbelopp, belopp exklusive moms, moms, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "variant": "stored-psm3-text",
+      "engine": "node",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för fakturadatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, moms, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för fakturadatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, moms, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "variant": "stored-psm3-text",
+      "engine": "sites",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för fakturadatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, moms, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för fakturadatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, moms, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "variant": "known-psm6-raw",
+      "engine": "node",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Saknade uppgifter: kund eller leverantör, belopp exklusive moms, moms, valuta, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, belopp exklusive moms, moms, valuta, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "variant": "known-psm6-raw",
+      "engine": "sites",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Saknade uppgifter: kund eller leverantör, belopp exklusive moms, moms, valuta, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, belopp exklusive moms, moms, valuta, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "variant": "known-psm6-raw",
+      "engine": "node",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Saknade uppgifter: moms, valuta, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: moms, valuta, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "variant": "known-psm6-raw",
+      "engine": "sites",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Saknade uppgifter: moms, valuta, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: moms, valuta, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "variant": "known-psm6-raw",
+      "engine": "node",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för totalbelopp. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, totalbelopp, belopp exklusive moms, moms, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för totalbelopp. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, totalbelopp, belopp exklusive moms, moms, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "variant": "known-psm6-raw",
+      "engine": "sites",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för totalbelopp. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, totalbelopp, belopp exklusive moms, moms, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för totalbelopp. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, totalbelopp, belopp exklusive moms, moms, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "variant": "known-psm6-raw",
+      "engine": "node",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för fakturadatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, moms, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för fakturadatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, moms, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "variant": "known-psm6-raw",
+      "engine": "sites",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för fakturadatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, moms, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för fakturadatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, moms, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-09",
+      "variant": "known-psm6-raw",
+      "engine": "node",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, belopp exklusive moms, moms, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, belopp exklusive moms, moms, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-09",
+      "variant": "known-psm6-raw",
+      "engine": "sites",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, belopp exklusive moms, moms, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: kund eller leverantör, belopp exklusive moms, moms, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "variant": "known-psm6-raw",
+      "engine": "node",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för fakturadatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Saknade uppgifter: fakturanummer, fakturadatum, förfallodatum, moms, valuta, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för fakturadatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: fakturanummer, fakturadatum, förfallodatum, moms, valuta, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "variant": "known-psm6-raw",
+      "engine": "sites",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för fakturadatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Saknade uppgifter: fakturanummer, fakturadatum, förfallodatum, moms, valuta, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för fakturadatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: fakturanummer, fakturadatum, förfallodatum, moms, valuta, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "variant": "known-psm3-two-raw",
+      "engine": "node",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Saknade uppgifter: moms, valuta, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: moms, valuta, organisationsnummer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "variant": "known-psm3-two-raw",
+      "engine": "sites",
+      "changes": {
+        "issues": {
+          "before": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+            "Saknade uppgifter: moms, valuta, organisationsnummer"
+          ],
+          "after": [
+            "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+            "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+            "Saknade uppgifter: moms, valuta, organisationsnummer"
+          ]
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "stored-psm3-text/node/normal-readable": {
+      "falseGreenCritical": 0,
+      "all13": {
+        "documents": 10,
+        "counts": {
+          "tp": 79,
+          "fp": 0,
+          "fn": 51,
+          "expectedNonNull": 130,
+          "returnedNonNull": 79,
+          "correctNull": 0,
+          "reviewedFields": 130
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.6076923076923076,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 10
+      },
+      "mandatory10": {
+        "documents": 10,
+        "counts": {
+          "tp": 57,
+          "fp": 0,
+          "fn": 43,
+          "expectedNonNull": 100,
+          "returnedNonNull": 57,
+          "correctNull": 0,
+          "reviewedFields": 100
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.57,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 10
+      },
+      "image9": {
+        "documents": 10,
+        "counts": {
+          "tp": 47,
+          "fp": 0,
+          "fn": 43,
+          "expectedNonNull": 90,
+          "returnedNonNull": 47,
+          "correctNull": 0,
+          "reviewedFields": 90
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.5222222222222223,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 10
+      }
+    },
+    "stored-psm3-text/node/stress": {
+      "falseGreenCritical": 0,
+      "all13": {
+        "documents": 2,
+        "counts": {
+          "tp": 9,
+          "fp": 0,
+          "fn": 17,
+          "expectedNonNull": 26,
+          "returnedNonNull": 9,
+          "correctNull": 0,
+          "reviewedFields": 26
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.34615384615384615,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      },
+      "mandatory10": {
+        "documents": 2,
+        "counts": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 13,
+          "expectedNonNull": 20,
+          "returnedNonNull": 7,
+          "correctNull": 0,
+          "reviewedFields": 20
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.35,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      },
+      "image9": {
+        "documents": 2,
+        "counts": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 13,
+          "expectedNonNull": 18,
+          "returnedNonNull": 5,
+          "correctNull": 0,
+          "reviewedFields": 18
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.2777777777777778,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      }
+    },
+    "stored-psm3-text/sites/normal-readable": {
+      "falseGreenCritical": 0,
+      "all13": {
+        "documents": 10,
+        "counts": {
+          "tp": 79,
+          "fp": 0,
+          "fn": 51,
+          "expectedNonNull": 130,
+          "returnedNonNull": 79,
+          "correctNull": 0,
+          "reviewedFields": 130
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.6076923076923076,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 10
+      },
+      "mandatory10": {
+        "documents": 10,
+        "counts": {
+          "tp": 57,
+          "fp": 0,
+          "fn": 43,
+          "expectedNonNull": 100,
+          "returnedNonNull": 57,
+          "correctNull": 0,
+          "reviewedFields": 100
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.57,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 10
+      },
+      "image9": {
+        "documents": 10,
+        "counts": {
+          "tp": 47,
+          "fp": 0,
+          "fn": 43,
+          "expectedNonNull": 90,
+          "returnedNonNull": 47,
+          "correctNull": 0,
+          "reviewedFields": 90
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.5222222222222223,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 10
+      }
+    },
+    "stored-psm3-text/sites/stress": {
+      "falseGreenCritical": 0,
+      "all13": {
+        "documents": 2,
+        "counts": {
+          "tp": 9,
+          "fp": 0,
+          "fn": 17,
+          "expectedNonNull": 26,
+          "returnedNonNull": 9,
+          "correctNull": 0,
+          "reviewedFields": 26
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.34615384615384615,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      },
+      "mandatory10": {
+        "documents": 2,
+        "counts": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 13,
+          "expectedNonNull": 20,
+          "returnedNonNull": 7,
+          "correctNull": 0,
+          "reviewedFields": 20
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.35,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      },
+      "image9": {
+        "documents": 2,
+        "counts": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 13,
+          "expectedNonNull": 18,
+          "returnedNonNull": 5,
+          "correctNull": 0,
+          "reviewedFields": 18
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.2777777777777778,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      }
+    },
+    "known-psm6-raw/node/normal-readable": {
+      "falseGreenCritical": 0,
+      "all13": {
+        "documents": 10,
+        "counts": {
+          "tp": 60,
+          "fp": 2,
+          "fn": 70,
+          "expectedNonNull": 130,
+          "returnedNonNull": 62,
+          "correctNull": 0,
+          "reviewedFields": 130
+        },
+        "fieldPrecision": 0.967741935483871,
+        "fieldRecall": 0.46153846153846156,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 10
+      },
+      "mandatory10": {
+        "documents": 10,
+        "counts": {
+          "tp": 50,
+          "fp": 0,
+          "fn": 50,
+          "expectedNonNull": 100,
+          "returnedNonNull": 50,
+          "correctNull": 0,
+          "reviewedFields": 100
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.5,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 10
+      },
+      "image9": {
+        "documents": 10,
+        "counts": {
+          "tp": 40,
+          "fp": 0,
+          "fn": 50,
+          "expectedNonNull": 90,
+          "returnedNonNull": 40,
+          "correctNull": 0,
+          "reviewedFields": 90
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.4444444444444444,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 10
+      }
+    },
+    "known-psm6-raw/node/stress": {
+      "falseGreenCritical": 0,
+      "all13": {
+        "documents": 2,
+        "counts": {
+          "tp": 9,
+          "fp": 0,
+          "fn": 17,
+          "expectedNonNull": 26,
+          "returnedNonNull": 9,
+          "correctNull": 0,
+          "reviewedFields": 26
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.34615384615384615,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      },
+      "mandatory10": {
+        "documents": 2,
+        "counts": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 13,
+          "expectedNonNull": 20,
+          "returnedNonNull": 7,
+          "correctNull": 0,
+          "reviewedFields": 20
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.35,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      },
+      "image9": {
+        "documents": 2,
+        "counts": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 13,
+          "expectedNonNull": 18,
+          "returnedNonNull": 5,
+          "correctNull": 0,
+          "reviewedFields": 18
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.2777777777777778,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      }
+    },
+    "known-psm6-raw/sites/normal-readable": {
+      "falseGreenCritical": 0,
+      "all13": {
+        "documents": 10,
+        "counts": {
+          "tp": 60,
+          "fp": 2,
+          "fn": 70,
+          "expectedNonNull": 130,
+          "returnedNonNull": 62,
+          "correctNull": 0,
+          "reviewedFields": 130
+        },
+        "fieldPrecision": 0.967741935483871,
+        "fieldRecall": 0.46153846153846156,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 10
+      },
+      "mandatory10": {
+        "documents": 10,
+        "counts": {
+          "tp": 50,
+          "fp": 0,
+          "fn": 50,
+          "expectedNonNull": 100,
+          "returnedNonNull": 50,
+          "correctNull": 0,
+          "reviewedFields": 100
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.5,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 10
+      },
+      "image9": {
+        "documents": 10,
+        "counts": {
+          "tp": 40,
+          "fp": 0,
+          "fn": 50,
+          "expectedNonNull": 90,
+          "returnedNonNull": 40,
+          "correctNull": 0,
+          "reviewedFields": 90
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.4444444444444444,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 10
+      }
+    },
+    "known-psm6-raw/sites/stress": {
+      "falseGreenCritical": 0,
+      "all13": {
+        "documents": 2,
+        "counts": {
+          "tp": 9,
+          "fp": 0,
+          "fn": 17,
+          "expectedNonNull": 26,
+          "returnedNonNull": 9,
+          "correctNull": 0,
+          "reviewedFields": 26
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.34615384615384615,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      },
+      "mandatory10": {
+        "documents": 2,
+        "counts": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 13,
+          "expectedNonNull": 20,
+          "returnedNonNull": 7,
+          "correctNull": 0,
+          "reviewedFields": 20
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.35,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      },
+      "image9": {
+        "documents": 2,
+        "counts": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 13,
+          "expectedNonNull": 18,
+          "returnedNonNull": 5,
+          "correctNull": 0,
+          "reviewedFields": 18
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.2777777777777778,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      }
+    },
+    "known-psm3-two-raw/node/normal-readable": {
+      "falseGreenCritical": 0,
+      "all13": {
+        "documents": 2,
+        "counts": {
+          "tp": 18,
+          "fp": 0,
+          "fn": 8,
+          "expectedNonNull": 26,
+          "returnedNonNull": 18,
+          "correctNull": 0,
+          "reviewedFields": 26
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.6923076923076923,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      },
+      "mandatory10": {
+        "documents": 2,
+        "counts": {
+          "tp": 13,
+          "fp": 0,
+          "fn": 7,
+          "expectedNonNull": 20,
+          "returnedNonNull": 13,
+          "correctNull": 0,
+          "reviewedFields": 20
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.65,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      },
+      "image9": {
+        "documents": 2,
+        "counts": {
+          "tp": 11,
+          "fp": 0,
+          "fn": 7,
+          "expectedNonNull": 18,
+          "returnedNonNull": 11,
+          "correctNull": 0,
+          "reviewedFields": 18
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.6111111111111112,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      }
+    },
+    "known-psm3-two-raw/sites/normal-readable": {
+      "falseGreenCritical": 0,
+      "all13": {
+        "documents": 2,
+        "counts": {
+          "tp": 18,
+          "fp": 0,
+          "fn": 8,
+          "expectedNonNull": 26,
+          "returnedNonNull": 18,
+          "correctNull": 0,
+          "reviewedFields": 26
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.6923076923076923,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      },
+      "mandatory10": {
+        "documents": 2,
+        "counts": {
+          "tp": 13,
+          "fp": 0,
+          "fn": 7,
+          "expectedNonNull": 20,
+          "returnedNonNull": 13,
+          "correctNull": 0,
+          "reviewedFields": 20
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.65,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      },
+      "image9": {
+        "documents": 2,
+        "counts": {
+          "tp": 11,
+          "fp": 0,
+          "fn": 7,
+          "expectedNonNull": 18,
+          "returnedNonNull": 11,
+          "correctNull": 0,
+          "reviewedFields": 18
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.6111111111111112,
+        "exactDocuments": 0,
+        "greenCount": 0,
+        "falseGreenCount": 0,
+        "manualReviewCount": 2
+      }
+    }
+  },
+  "artifacts": {
+    "known-ocr-replay-63edd9f.json": "3a4650bd2011b7aa5d8ad79815304f0d6b695e28803ff2d2baa41e068fa14dc3",
+    "known-ocr-replay-runner-63edd9f.mjs.txt": "92dd331faa793273feab7638091eb5e668653710d8834d318d5771b356078542",
+    "known-ocr-replay-63edd9f.log": "9afe53b993081eee75e7cdbb73c7d049d07260b2f060a8cd2b55d3ba3998311c"
+  },
+  "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs scripts/quality8/replay-ocr-field-observations.mjs --source-commit 63edd9fa97bc0475237133021313963e402efc76 --output docs/quality8/a19-parser-regression/known-ocr-replay-63edd9f.json",
+  "runnerSetup": "The byte-identical baseline runner was temporarily copied to its original scripts/quality8 path in this repair checkout. Its captured bytes are retained as evidence. The temporary copy was removed after execution; product, metric helper and fixtures were not edited.",
+  "limits": [
+    "All data were previously observed V2 development inputs; this is a regression replay, not blind acceptance.",
+    "The stored PSM3 text population has no general word graph; only the preserved 05/09 PSM3 raw pages are separately replayed.",
+    "PSM6 remains a separate known diagnostic population; no fusion or optical mode change.",
+    "Normal PSM6 wrong kind outputs for 08 and 10 remain red.",
+    "V3 was not read or run.",
+    "B remains paused."
+  ]
+}

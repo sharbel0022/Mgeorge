@@ -1,0 +1,1020 @@
+{
+  "schema": "mgeorge-null-usage-details-evidence-v1",
+  "recordedAt": "2026-11-06T00:46:15.457628+00:00",
+  "publishedBaseline": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+  "approvedDesign": "23b4d71ae21d745471ac60c82e8b081f25731cb9",
+  "initialTestFreezeCommit": "d874f686cdc38439647a5e3621228f97bdd3242a",
+  "implementationParent": "d874f686cdc38439647a5e3621228f97bdd3242a",
+  "runtime": {
+    "node": "v24.22.1",
+    "executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "networkGuard": "scripts/saas-test-isolation.mjs"
+  },
+  "sourceAndTestSha256": {
+    "sites/lib/bank-consent-policy.js": "612f167c21180bd4f008ee28925d01221780c13b0c5a3d224c0ee05254208d6c",
+    "sites/lib/bank-consent-policy.d.ts": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280",
+    "sites/lib/banking/service.ts": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24",
+    "sites/lib/banking/account-evidence.ts": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f",
+    "sites/tests/bank-usage-details-policy.test.mjs": "bafd1acf5ca70737c09dc7d7d80fa970ef5a216925c3b3ab60512bda50df4228",
+    "sites/tests/banking-security.test.mjs": "cbc2af59c509b08d85367d1e3d33aa828322bf312e9ec7342f71535f3647b6ec",
+    "sites/tests/bank-account-evidence.test.mjs": "e960340c5cb80f031292bda4691894169f4f0fb7dc25c159e8073a1d86945fd7",
+    "sites/tests/company-bank-sync.test.mjs": "d1d30f9a68506087441a5e41e71eea739cd608819d2bc3d68e8487ab9544c15e",
+    "sites/tests/bank-sync-integrity-q8.test.mjs": "194f8f1ce1c8d55c6c5def2ead86f7ec055f8e82018841534b66bb1ed5711535"
+  },
+  "byteInvariants": {
+    "businessAccountData": {
+      "byteIdentical": true,
+      "sha256": "d86422b342d7bfe718e7beee761f418ed4ad230668c6e6217f03905fea050d31"
+    },
+    "validateEnableConsent": {
+      "byteIdentical": true,
+      "sha256": "c0e729950b0c1a8a460e00b94c9ea62b549683bb45b559ffc559640abfd16da9"
+    },
+    "entireAccountEvidenceFile": {
+      "byteIdentical": true,
+      "sha256": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f"
+    }
+  },
+  "frozenPureAndActiveTestsByteIdentical": true,
+  "allServiceTestsByteIdenticalBetweenInitialRedAndFinalGreen": false,
+  "originalRedRecord": "docs/quality8/bank-null-usage-details-red.json",
+  "runs": {
+    "pureGreen": {
+      "path": "/tmp/mgeorge-null-usage-details-policy-green.tap",
+      "sha256": "50c9011394252586a66a5292a9f8889a29433cf70dd01424f69b61e600bcbd34",
+      "tests": 59,
+      "pass": 59,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 250.506896,
+      "failedTests": []
+    },
+    "initialServiceImplementation": {
+      "path": "/tmp/mgeorge-null-usage-details-service-first-green.tap",
+      "sha256": "fe960628ab8852c15e30dd63f2b8b5c80a58dce26ea209d6143436d8f84416c5",
+      "tests": 58,
+      "pass": 56,
+      "fail": 2,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 20454.199777,
+      "failedTests": [
+        "usage details diagnostic: changed owner during a details GET cannot yield positive evidence or another read",
+        "usage details diagnostic: changed runtime generation during the session read prevents the first details GET"
+      ]
+    },
+    "correctedServiceBaseline": {
+      "path": "/tmp/mgeorge-null-usage-details-corrected-red-service.tap",
+      "sha256": "7d4233672424e48773405978924b874310d47686e65637c84145294030d7d4c3",
+      "tests": 58,
+      "pass": 23,
+      "fail": 35,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 17617.083309,
+      "failedTests": [
+        "usage details diagnostic: missing later primary hash prevents the first details GET for every selected resource",
+        "usage details diagnostic: conflicting later primary hash prevents the first details GET for every selected resource",
+        "usage details diagnostic: fuzzy later primary hash overlap prevents the first details GET for every selected resource",
+        "usage details diagnostic: explicit live PRIV prevents the first details GET for every selected resource",
+        "usage details diagnostic: explicit live null prevents the first details GET for every selected resource",
+        "usage details diagnostic: 1 selected null accounts preserve the denial and the exact read limit",
+        "usage details diagnostic: 5 selected null accounts preserve the denial and the exact read limit",
+        "usage details diagnostic: 6 selected null accounts preserve the denial and the exact read limit",
+        "usage details diagnostic: unselected accounts and already permitted selected resources are never refreshed",
+        "usage details diagnostic: real HTTP MCP reports fresh omitted without approving or reflecting it",
+        "usage details diagnostic: real HTTP MCP reports fresh null without approving or reflecting it",
+        "usage details diagnostic: real HTTP MCP reports fresh private without approving or reflecting it",
+        "usage details diagnostic: real HTTP MCP reports fresh unknown without approving or reflecting it",
+        "usage details diagnostic: real HTTP MCP reports fresh wrong type without approving or reflecting it",
+        "usage details diagnostic: fresh wrong UID stops the batch and withholds partial categories",
+        "usage details diagnostic: fresh missing primary hash stops the batch and withholds partial categories",
+        "usage details diagnostic: fresh changed primary hash stops the batch and withholds partial categories",
+        "usage details diagnostic: fresh currency conflict stops the batch and withholds partial categories",
+        "usage details diagnostic: fresh primary number conflict stops the batch and withholds partial categories",
+        "usage details diagnostic: changed owner during a details GET cannot yield positive evidence or another read",
+        "usage details diagnostic: changed adoption during a details GET cannot yield positive evidence or another read",
+        "usage details diagnostic: changed app generation during a details GET cannot yield positive evidence or another read",
+        "usage details diagnostic: changed session during a details GET cannot yield positive evidence or another read",
+        "usage details diagnostic: changed cache during a details GET cannot yield positive evidence or another read",
+        "usage details diagnostic: changed selection during a details GET cannot yield positive evidence or another read",
+        "usage details diagnostic: changed status during a details GET cannot yield positive evidence or another read",
+        "usage details diagnostic: changed expiry during a details GET cannot yield positive evidence or another read",
+        "usage details diagnostic: changed lease during a details GET cannot yield positive evidence or another read",
+        "usage details diagnostic: failed audit after the last response suppresses the completed result",
+        "usage details diagnostic: context shift at audit after the last response suppresses the completed result",
+        "usage details diagnostic: actual provider 429 unknown cooldown persists and stops further requests",
+        "usage details diagnostic: actual provider 429 known cooldown persists and stops further requests",
+        "usage details diagnostic: failure to resolve the persistent read marker retains uncertainty",
+        "usage details diagnostic: the actual provider adapter reports ORGA while retaining the original 409",
+        "usage details diagnostic: the live deadline expiring during the first details read stops the batch"
+      ]
+    },
+    "correctedServiceGreen": {
+      "path": "/tmp/mgeorge-null-usage-details-service-green.tap",
+      "sha256": "563c8b56635a59ef88f904cf736427a86251daefbdcdf719daef851db1276a9b",
+      "tests": 58,
+      "pass": 58,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 22128.491325,
+      "failedTests": []
+    },
+    "additionalMetadataAndTimeoutRed": {
+      "path": "/tmp/mgeorge-null-usage-details-metadata-red.tap",
+      "sha256": "021a253da25db5076fa8c19140675303bbfec061923ce9a6b87f56830b81ab23",
+      "tests": 6,
+      "pass": 4,
+      "fail": 2,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 4120.487227,
+      "failedTests": [
+        "usage details diagnostic: string services metadata cannot attest the selected read",
+        "usage details diagnostic: string countries metadata cannot attest the selected read"
+      ]
+    },
+    "oldAdditiveResponseAssertionRed": {
+      "path": "/tmp/mgeorge-null-usage-details-additive-contract-red.tap",
+      "sha256": "e5ddf626b3e1918100c6ef74ab6655ec3f63ef303c8fbdbe831ede91c8c7be5f",
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 1238.553611,
+      "failedTests": [
+        "usage diagnostic: ordinary HTTP MCP revalidation distinguishes saved null and omitted live without bank or financial mutations"
+      ]
+    },
+    "finalServiceRegression": {
+      "path": "/tmp/mgeorge-null-usage-details-service-regression.tap",
+      "sha256": "fb4c4df5c183f1232c25a6280d268c796d14d258a882304d1bdcbffb08d296f1",
+      "tests": 120,
+      "pass": 120,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 40356.065791,
+      "failedTests": []
+    },
+    "finalPolicyAdaptersProviderRegression": {
+      "path": "/tmp/mgeorge-null-usage-details-policy-adapter-regression.tap",
+      "sha256": "fb5353eec3ff77224127190a825bc532b933c45a04544918cdc6f8d2bb2ef8d6",
+      "tests": 286,
+      "pass": 286,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 26770.829104,
+      "failedTests": []
+    },
+    "importConsumerRed": {
+      "path": "/tmp/mgeorge-null-usage-details-import-consumers-red.tap",
+      "sha256": "ff5a1afca70df4582dec6bcd091f839e1e4f119d5b0cf48ba14f0bad0d8295a5",
+      "tests": 48,
+      "pass": 3,
+      "fail": 45,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 5692.53074,
+      "failedTests": [
+        "Q8: a rejected bank sync persists observed contradictions without new money or a successful run",
+        "Q8: evidence-only bank failure cannot overwrite a concurrent workspace revision",
+        "Q8: evidence-only bank failure cannot write after its lease is replaced",
+        "Q8 review: capped bank sync retains raw conflict evidence and a bounded hold without new financial rows",
+        "Q8 review: a capped sync conflict audit and hold are fenced by the workspace revision",
+        "Q8 review: a capped sync conflict audit and hold are fenced by a replacement lease",
+        "company scheduler imports with two live consent checks and one atomic durable receipt",
+        "durably bound company owner fails closed without its authorization runtime",
+        "documented optional transaction flag may be omitted by a currently authorized session",
+        "present malformed transaction access null blocks before account data",
+        "present malformed transaction access \"true\" blocks before account data",
+        "present malformed transaction access 0 blocks before account data",
+        "unbound owner retains the existing automatic sync entrypoint",
+        "remote revoked after page fetch prevents all financial writes",
+        "remote account after page fetch prevents all financial writes",
+        "remote permission after page fetch prevents all financial writes",
+        "same provider response replay has one original, one financial import and one receipt",
+        "atomic workspace fence rolls back import and receipt together",
+        "atomic owner lease fence rolls back import and receipt together",
+        "atomic membership fence rolls back import and receipt together",
+        "atomic scope fence rolls back import and receipt together",
+        "atomic connection fence rolls back import and receipt together",
+        "provider quota is durable and cannot be spent by the second page beyond its allowance",
+        "enabled Bankgiro without company source adapter reports partial and never complete payments",
+        "stale trusted consent ID cannot borrow a different encrypted provider session",
+        "lost acknowledgement recovers the committed import count from its durable receipt",
+        "successful receipt replays do not accumulate interrupted legacy attempts",
+        "company wrapper persists exact-policy allocation with originals and all payment fences",
+        "policy changed at allocation commit preserves accepted AIS but rolls back money and audit",
+        "429 persists supplier cooldown and cannot be retried through another scheduler call",
+        "successful company sync preserves the independent unknown account-evidence wait",
+        "ambiguous duplicate account selection is blocked before provider reads",
+        "ambiguous duplicate account resource is blocked before provider reads",
+        "two concurrent scheduler jobs cannot fetch or write the same owner and account",
+        "contradictory provider original retains evidence without new money or successful checkpoint",
+        "unparseable provider retry advice remains blocked even if legacy retry fields are reset",
+        "bound company cannot use legacy sync to bypass company authority",
+        "bound company cannot use legacy syncControl to bypass company authority",
+        "company binding installed at legacy commit fences the financial write atomically",
+        "caller chosen account key cannot reset the authoritative account quota",
+        "company-bound owner cannot run legacy autonomous reconciliation and draft creation",
+        "legacy reconciliation remains available to unbound owners",
+        "legacy reconciliation fences concurrent company enrollment",
+        "renewed session and account UID retain the original quota and financial receipt",
+        "an explicitly earlier configured start date reopens history beyond the prior account checkpoint"
+      ]
+    },
+    "importConsumerGreen": {
+      "path": "/tmp/mgeorge-null-usage-details-import-consumers-green.tap",
+      "sha256": "ca26c32ecb8d1673d5ce5c2bbf842206cb581be647e26338d924d009c783820b",
+      "tests": 48,
+      "pass": 48,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 15021.133292,
+      "failedTests": []
+    }
+  },
+  "finalUniqueTests": 454,
+  "newServiceCases": 64,
+  "existingServiceCases": 56,
+  "correctedBaselineArchive": "/tmp/mgeorge-null-usage-details-before-j0bjqqdm",
+  "testCorrections": [
+    {
+      "case": "runtime generation",
+      "before": "synthetic PEM += '\\n'",
+      "after": "replace synthetic Base64 payload with different normalized key material",
+      "basis": "sites/lib/banking/runtime-config.ts:11,33 trim configuration strings; original assertion remains no details GET and no diagnostics",
+      "rootApproved": true
+    },
+    {
+      "case": "owner changes during details GET",
+      "before": "require original ConsentError, HTTP409 and usage reason",
+      "after": "require existing COMPANY_BOUNDARY_VIOLATION and generic500, no old/new diagnostics, one detail GET total, zero activation/sync/workspace",
+      "basis": "sites/lib/banking/store.ts:153-154 owner-scoped finally cleanup",
+      "rootApproved": true
+    },
+    {
+      "case": "existing saved-null/no-hash full response assertion",
+      "before": "exact old fields only",
+      "after": "all old fields plus exact not_read / PRIMARY_IDENTITY_MISSING counts; old denials and no-mutation assertions retained",
+      "basis": "new additive metadata only, with unmodified assertion RED preserved"
+    }
+  ],
+  "scopeParity": {
+    "cases": 54,
+    "allowed": 7,
+    "denied": 47,
+    "decisionMismatches": 0,
+    "whitelistedReasons": 11,
+    "rejectedUntrustedReasonForms": 9
+  },
+  "usageParity": {
+    "schema": "mgeorge-bank-usage-diagnostic-parity-v1",
+    "node": "v24.22.1",
+    "beforeSourceSha256": "bc9da88933c98ba1ad11aff9c2c34d0654387fef68f10da613d534a05138aba2",
+    "afterSourceSha256": "612f167c21180bd4f008ee28925d01221780c13b0c5a3d224c0ee05254208d6c",
+    "strictValidatorByteIdentical": true,
+    "businessPredicateByteIdentical": true,
+    "cases": 62,
+    "accepted": 15,
+    "rejected": 47,
+    "decisionMismatches": 0,
+    "inputMutations": 0,
+    "bankRequests": 0,
+    "productionDataReads": 0,
+    "productionWrites": 0,
+    "rows": [
+      {
+        "label": "saved:omitted",
+        "method": "validateEnableConsent",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "saved:explicit_undefined",
+        "method": "validateEnableConsent",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "saved:ORGA",
+        "method": "validateEnableConsent",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "saved:PRIV",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:null",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:empty_string",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:lowercase_orga",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:padded_ORGA",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:business_string",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:other_string",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:number",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:boolean",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:array",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:object",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:omitted",
+        "method": "validateEnableConsent",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "live:explicit_undefined",
+        "method": "validateEnableConsent",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "live:ORGA",
+        "method": "validateEnableConsent",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "live:PRIV",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:null",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:empty_string",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:lowercase_orga",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:padded_ORGA",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:business_string",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:other_string",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:number",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:boolean",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:array",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:object",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:omitted",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "saved:explicit_undefined",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "saved:ORGA",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "saved:PRIV",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:null",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:empty_string",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:lowercase_orga",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:padded_ORGA",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:business_string",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:other_string",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:number",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:boolean",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:array",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:object",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:omitted",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "live:explicit_undefined",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "live:ORGA",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "live:PRIV",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:null",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:empty_string",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:lowercase_orga",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:padded_ORGA",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:business_string",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:other_string",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:number",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:boolean",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:array",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:object",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "unselected_saved_private",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "unselected_live_private",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "unselected_both_null",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "selected_second_private",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "unselected_UID_mismatch",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "LIVE_ACCOUNT_SET_MISMATCH"
+      },
+      {
+        "label": "unselected_invalid_UID",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godk\u00e4nda konton kunde inte verifieras.",
+        "reason": "LIVE_ACCOUNTS_INVALID"
+      }
+    ]
+  },
+  "existingReviewerMatrixRerunByImplementer": {
+    "baseline": "b020d020ad7ab8d4ca7417959d01ceb1613a5709",
+    "combinations": 256,
+    "allowed": 4,
+    "denied": 252,
+    "strictDenialsWithoutDiagnostic": 252,
+    "unusualValues": 3,
+    "throwingReflectionPreservesOriginalDenial": true
+  },
+  "typecheck": {
+    "exitCode": 0,
+    "log": "/tmp/mgeorge-null-usage-details-typecheck-final.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diffCheck": {
+    "exitCode": 0
+  },
+  "realBankRequests": 0,
+  "productionDataReads": 0,
+  "productionWrites": 0,
+  "credentialInspection": false,
+  "commands": {
+    "policy": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap sites/tests/bank-usage-details-policy.test.mjs",
+    "serviceRegression": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap --test-name-pattern='usage details diagnostic|usage diagnostic|scope diagnostic|independent scope review|revalidation|consent recovery|consent commit reply|legacy selected scope|company selected scope' sites/tests/banking-security.test.mjs",
+    "policyAdaptersProviderRegression": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap sites/tests/bank-consent-policy.test.mjs sites/tests/bank-usage-diagnostic.test.mjs sites/tests/bank-usage-details-policy.test.mjs sites/tests/bank-account-consent.test.mjs sites/tests/bank-account-evidence.test.mjs sites/tests/bank-account-evidence-provider.test.mjs sites/tests/account-read-cooldown.test.mjs test/bank-consent-api.test.js test/api-account-consent.test.js",
+    "scopeParity": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs scripts/quality8/review-bank-scope-parity.mjs BEFORE_CHECKOUT AFTER_CHECKOUT",
+    "usageParity": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs scripts/quality8/review-bank-usage-diagnostic-parity.mjs BEFORE_CHECKOUT AFTER_CHECKOUT NEW_OUTPUT_JSON",
+    "existingReviewerMatrix": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs docs/quality8/bank-usage-diagnostic-review/probe.mjs",
+    "typecheckFromSites": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ../scripts/saas-test-isolation.mjs scripts/run-verified-tool.mjs check",
+    "importConsumers": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap sites/tests/company-bank-sync.test.mjs sites/tests/bank-sync-integrity-q8.test.mjs"
+  },
+  "limits": [
+    "Actual selected primary-hash continuity and fresh account details remain unobserved.",
+    "Any observed ORGA remains an original409 denial; no cache correction or connection activation is implemented.",
+    "Full CI, independent final review, publication and real follow-up belong to root.",
+    "No score is assigned from synthetic test counts."
+  ],
+  "importFixtureChanges": {
+    "reason": "Two existing consumers mock the service provider module and need its new static getAccountDetails export. The explicit fixture export throws on any unexpected call.",
+    "red": {
+      "tests": 48,
+      "pass": 3,
+      "fail": 45
+    },
+    "green": {
+      "tests": 48,
+      "pass": 48,
+      "fail": 0
+    },
+    "productionFilesChanged": false,
+    "existingAssertionsRemoved": 0
+  }
+}

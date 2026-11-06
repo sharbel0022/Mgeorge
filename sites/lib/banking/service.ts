@@ -2,13 +2,13 @@ import { db, identity, readWorkspace, response, currentCompanyContext } from '@/
 import { applyCommand, BankImportEvidenceError, bankImportEvidenceError, prepareBankImportFailure, canonicalBankAccount, emptyState, now, uid, validDate } from '@/lib/domain';
 import {
   ProviderError, providerErrorCode, getApplication, listBusinessBanks, startAuth, createSession,
-  getSession, deleteSession, getTransactions, providerCooldownDiagnostic,
+  getSession, getAccountDetails, deleteSession, getTransactions, providerCooldownDiagnostic,
   type ProviderAccount, type ProviderApplication, type ProviderPsu,
 } from './enable-banking';
 import { normalizeTransactions, stableAccountKey } from './transactions';
 import {
   accounts, application, connection, encrypt, metadata, providerConfig, configurationStatus, saveApplicationMetadata,
-  sessionId, storageReady, withBankLock, type BankConnectionRow, type BankFlowRow, type BankLease,
+  sessionId, storageReady, withBankLock, type BankApplicationRow, type BankConnectionRow, type BankFlowRow, type BankLease,
   bankCompanyContext, corporateAccountEvidence, consentMetadata, currentCompanyAuthorization, assertCompanyConsent,
   revocationSessionId, bankRedirectUrl, type ConsentMetadata,
 } from './store';
@@ -17,11 +17,53 @@ import { RuntimeBankError } from './runtime-config';
 import { BankPeriodError, bankSyncRange, bankUtcDate, fetchBankPeriods } from './sync-periods';
 import { accountReadCooldown, mergeAccountReadCooldown } from './account-read-cooldown';
 import { guardedBankRead } from './account-read-guard';
-import { ConsentError, bankAccountScopeError, bankAccountScopeReason, bankAccountUsageDiagnostic, validateCallbackParameters, validateReadScopes, validateEnableConsent, validateLegacyEnableSelection, type BankAccountUsageDiagnostic } from '../bank-consent-policy.js';
+import { ConsentError, bankAccountScopeError, bankAccountScopeReason, bankAccountUsageDiagnostic, planAccountUsageDetailsRead, observeAccountUsageDetails, validateCallbackParameters, validateReadScopes, validateEnableConsent, validateLegacyEnableSelection, type BankAccountUsageDiagnostic, type BankAccountUsageCounts, type AccountUsageDetailsReadReason, type AccountUsageDetailsObservationReason } from '../bank-consent-policy.js';
 
 // Only the exact revalidation attempt may publish its selected-usage snapshot,
 // after the existing failed-event write has rechecked ownership and the lease.
 const revalidationUsageDiagnostics = new WeakMap<ConsentError, BankAccountUsageDiagnostic>();
+type UsageDetailsDiagnostic = Readonly<{
+  version: 'selected-account-usage-details-v1'; targetCount: number; attemptedCount: number; observedCount: number;
+} & ({status: 'observed'; reason: 'EXACT_SELECTED_DETAILS_OBSERVED'; usage: BankAccountUsageCounts} |
+  {status: 'not_read'; reason: AccountUsageDetailsReadReason} |
+  {status: 'unavailable'; reason: AccountUsageDetailsObservationReason | 'DETAILS_PROVIDER_UNAVAILABLE'})>;
+const revalidationUsageDetailsDiagnostics = new WeakMap<ConsentError, UsageDetailsDiagnostic>();
+
+/** This lease authorizes only diagnostic reads under an unchanged retained
+ * grant. The account-read guard owns its pending/cooldown marker; every other
+ * connection field and the active application's metadata remain fixed. */
+function usageDetailsLease(owner:string,app:BankApplicationRow,conn:BankConnectionRow,base:BankLease,validUntil:string) {
+  const fields:readonly (keyof BankConnectionRow)[] = ['id','owner','app_generation','environment','bank_name','country',
+    'encrypted_session','encrypted_accounts','selected_accounts','valid_until','date_from','status','last_synced_at','last_error',
+    'created_at','updated_at','auto_sync_enabled','auto_last_attempt_at','auto_next_at','control_last_attempt_at','retry_after','sync_failures','consent_metadata'];
+  let requireRestoredMarker=false;
+  const expected=(key:keyof BankConnectionRow)=>conn[key]??null;
+  const assert=async()=>{
+    await base.assert();
+    const currentApp=await application(owner),current=await connection(owner);
+    if(!currentApp||!current||currentApp.owner!==app.owner||currentApp.application_id!==app.application_id||currentApp.generation!==app.generation||currentApp.metadata!==app.metadata||
+      fields.some(key=>(current[key]??null)!==expected(key))||requireRestoredMarker&&current.account_evidence_retry!==conn.account_evidence_retry)throw Error('BANK_USAGE_DETAILS_CONTEXT_CHANGED');
+    const info=metadata(currentApp);
+    if(info.active!==true||info.kid!==app.application_id||info.environment!==conn.environment||!Array.isArray(info.services)||!info.services.includes('AIS')||!Array.isArray(info.countries)||!info.countries.includes(conn.country))throw Error('BANK_USAGE_DETAILS_CONTEXT_CHANGED');
+    await providerConfig(currentApp);
+    if(!Number.isFinite(Date.parse(validUntil))||Date.parse(validUntil)<=Date.now())throw Error('BANK_USAGE_DETAILS_EXPIRED');
+  };
+  const lease:BankLease={
+    assert,
+    async write(statements){
+      await assert();
+      // Recheck the same context and deadline inside the atomic write, including
+      // the final failed-audit. A successful response alone is not publishable.
+      const fence=db().prepare(`SELECT CASE WHEN EXISTS(SELECT 1 FROM bank_connections WHERE ${fields.map(key=>`${key} IS ?`).join(' AND ')}${requireRestoredMarker?' AND account_evidence_retry=?':''}) AND EXISTS(SELECT 1 FROM bank_applications WHERE owner=? AND application_id=? AND generation=? AND metadata=?) AND ?>strftime('%Y-%m-%dT%H:%M:%fZ','now') THEN 1 ELSE json('BANK_USAGE_DETAILS_CONTEXT_CHANGED') END`)
+        .bind(...fields.map(expected),...(requireRestoredMarker?[conn.account_evidence_retry]:[]),owner,app.application_id,app.generation,app.metadata,validUntil);
+      const result=(await base.write([fence,...statements])).slice(1);
+      await assert();
+      return result;
+    },
+    async run(statement){return (await lease.write([statement]))[0];},
+  };
+  return {lease,requireCompletedRead(){requireRestoredMarker=true;}};
+}
 
 type FlowContext = {
   version: 1; companyId: string; actorId: string; membershipVersion: string; mode: 'company' | 'legacy';
@@ -123,7 +165,8 @@ export function bankFailure(error: unknown): Response {
   if (error instanceof ConsentError) {
     const consentCode=error.code,reason=bankAccountScopeReason(error);
     const usageDiagnostic=consentCode==='BANK_ACCOUNT_SCOPE_INVALID'&&error.status===409&&reason==='ACCOUNT_USAGE_INVALID'?revalidationUsageDiagnostics.get(error):undefined;
-    return response({error:consentCode==='BANK_ACCOUNT_SCOPE_INVALID'?new ConsentError(consentCode).message:error.message,code:consentCode,...(reason?{reason}:{}),...(usageDiagnostic?{usageDiagnostic}:{})},error.status);
+    const usageDetailsDiagnostic=usageDiagnostic?revalidationUsageDetailsDiagnostics.get(error):undefined;
+    return response({error:consentCode==='BANK_ACCOUNT_SCOPE_INVALID'?new ConsentError(consentCode).message:error.message,code:consentCode,...(reason?{reason}:{}),...(usageDiagnostic?{usageDiagnostic}:{}),...(usageDetailsDiagnostic?{usageDetailsDiagnostic}:{})},error.status);
   }
   if (error instanceof BankPeriodError) return response({error: error.message, code: error.code}, error.code === 'BANK_DATE_RANGE_INVALID' ? 400 : 409);
   if (error instanceof ProviderError) {
@@ -664,12 +707,55 @@ export async function revalidateConsent(request?: Request): Promise<Response> {
     const event=(action:string,errorCode?:string)=>db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) VALUES(?,?,COALESCE((SELECT revision FROM workspaces WHERE owner=?),0),?,?,?)').bind(uid(),owner,owner,action,JSON.stringify({run_id:runId,...(errorCode?{error_code:errorCode}:{})}),now());
     await lease.run(event('bank.consent.revalidation.started'));
     let commitAttempted=false,receiptId='',contextDigest='',validationError:unknown;
+    let detailsLease:BankLease|undefined,detailsDiagnostic:UsageDetailsDiagnostic|undefined;
     try{
       const config=await providerConfig(app);
       const live=await guardedBankRead(owner,conn,lease,async()=>getSession(config,await sessionId(conn)),undefined,{strictCooldown:true});
       let grant:ReturnType<typeof validateLegacyEnableSelection>;
-      try{grant=validateLegacyEnableSelection({session:{accounts:savedAccounts,access:{valid_until:conn.valid_until},aspsp:{name:conn.bank_name,country:conn.country},psu_type:'business'},checked:live,bankName:conn.bank_name,country:conn.country,requestedValidUntil:conn.valid_until,requestedScopes:consentMetadata(conn)?.requestedScopes,selectedAccountUids:selected});}
-      catch(error){validationError=error;throw error;}
+      const consentInput={session:{accounts:savedAccounts,access:{valid_until:conn.valid_until},aspsp:{name:conn.bank_name,country:conn.country},psu_type:'business'},checked:live,bankName:conn.bank_name,country:conn.country,requestedValidUntil:conn.valid_until,requestedScopes:consentMetadata(conn)?.requestedScopes,selectedAccountUids:selected};
+      try{grant=validateLegacyEnableSelection(consentInput);}
+      catch(error){
+        validationError=error;
+        const diagnostic=bankAccountUsageDiagnostic(error);
+        if(diagnostic&&diagnostic.saved.explicitNull>0){
+          // Only this original failure/input pair may plan reads. Nothing is
+          // substituted in the saved or fresh snapshots to make policy pass.
+          const plan=planAccountUsageDetailsRead(error,consentInput);
+          const validUntil=plan.status==='ready'?plan.validUntil:new Date(Math.min(Date.parse(conn.valid_until),Date.parse(live.access.valid_until))).toISOString();
+          const guarded=usageDetailsLease(owner,app,conn,lease,validUntil);detailsLease=guarded.lease;
+          const counts={omitted:0,orga:0,priv:0,explicitNull:0,otherString:0,wrongType:0};
+          const progress={version:'selected-account-usage-details-v1' as const,targetCount:diagnostic.saved.explicitNull,attemptedCount:0,observedCount:0};
+          try{
+            await detailsLease.assert();
+            if(plan.status==='not_read'){
+              guarded.requireCompletedRead();
+              detailsDiagnostic=Object.freeze({...progress,status:'not_read',reason:plan.reason});
+            }else{
+              for(const target of plan.targets){
+                const fresh=await guardedBankRead(owner,conn,detailsLease,async()=>{
+                  await detailsLease!.assert();progress.attemptedCount++;
+                  return getAccountDetails(config,target.uid);
+                },undefined,{strictCooldown:true});
+                await detailsLease.assert();
+                const observed=observeAccountUsageDetails(plan,target.uid,fresh);
+                if(observed.status==='unavailable'){
+                  detailsDiagnostic=Object.freeze({...progress,status:'unavailable',reason:observed.reason});break;
+                }
+                counts[observed.category]++;progress.observedCount++;
+              }
+              if(!detailsDiagnostic){
+                guarded.requireCompletedRead();await detailsLease.assert();
+                detailsDiagnostic=Object.freeze({...progress,status:'observed',reason:'EXACT_SELECTED_DETAILS_OBSERVED',usage:Object.freeze(counts)});
+              }
+            }
+          }catch{
+            // Provider text and partial usage counts never escape. A subsequent
+            // context/audit failure also suppresses this fixed unavailable result.
+            detailsDiagnostic=Object.freeze({...progress,status:'unavailable',reason:'DETAILS_PROVIDER_UNAVAILABLE'});
+          }
+        }
+        throw error;
+      }
       await lease.assert();await providerConfig(app);
       const fence=db().prepare(`SELECT CASE WHEN EXISTS(SELECT 1 FROM bank_connections WHERE owner=? AND id=? AND app_generation=? AND encrypted_session=? AND encrypted_accounts=? AND selected_accounts=? AND environment=? AND bank_name=? AND country=? AND COALESCE(consent_metadata,'')=? AND status='reauth_required' AND valid_until=? AND retry_after=? AND sync_failures=? AND account_evidence_retry=? AND ?>strftime('%Y-%m-%dT%H:%M:%fZ','now')) THEN 1 ELSE json('BANK_CONSENT_CONTEXT_CHANGED') END`).bind(owner,conn.id,conn.app_generation,conn.encrypted_session,conn.encrypted_accounts,conn.selected_accounts,conn.environment,conn.bank_name,conn.country,conn.consent_metadata||'',conn.valid_until,conn.retry_after,conn.sync_failures,conn.account_evidence_retry,grant.validUntil);
       receiptId=uid();contextDigest=await fingerprint(conn,grant.validUntil);const checkedAt=now();
@@ -695,10 +781,11 @@ export async function revalidateConsent(request?: Request): Promise<Response> {
       }
       // Diagnostics contain only canonical codes and never clear a cooldown.
       try{
-        await lease.run(event('bank.consent.revalidation.failed',bankJobErrorCode(error)));
+        await (detailsLease??lease).run(event('bank.consent.revalidation.failed',bankJobErrorCode(error)));
         if(error===validationError&&error instanceof ConsentError){
           const diagnostic=bankAccountUsageDiagnostic(error);
           if(diagnostic)revalidationUsageDiagnostics.set(error,diagnostic);
+          if(diagnostic&&detailsDiagnostic)revalidationUsageDetailsDiagnostics.set(error,detailsDiagnostic);
         }
       }catch{}
       throw error;

@@ -1,3 +1,13 @@
+## 2026-11-06 — sammansatt PR 58-kandidat klar för ny full CI
+
+Parser63, MCP-återköning, bankdiagnos e66 och testharnessens minnesrättning 7a5a397 är sammanförda med oberoende READY. Två separata fulla banksviter passerar samma 273 fall med oförändrade assertions och max-RSS 783 912 respektive 807 608 KiB. Alla tidigare underkända CI-/harnesskörningar är bevarade; [aktuell avgränsning](docs/quality8/wave4-invoice-release-readiness.md). Nytt native-paket är byggt, men full PR-/main-CI och publicering återstår. Produktionsläget är fortfarande Site 65 och 28/33 minst 8. OCR A/B och förseglad V3 är separata.
+
+## 2026-11-06 — PR 58 rättad efter full CI, omverifiering pågår
+
+Den första fulla PR-körningen gav 23 fel och blockerade publicering. [Ursprungliga fel och råloggar](docs/quality8/wave4-initial-ci/README.md) är bevarade. Exakt parserreparation 63edd9f och bankdiagnosens I1-rättning e66cde6 har nu oberoende READY och är sammanförda med den granskade MCP-återköningen. Gamla assertions är oförändrade; egna oberoende motprov tillkommer utan dubbletter. [Aktuell kandidat och avgränsningar](docs/quality8/wave4-invoice-release-readiness.md).
+
+Känd OCR-replay på reparerad kod behåller 57/100 mandatory och 79/130 All13, utan nya optiska anrop. Ny full CI, exakt main och nytt native-bygge återstår före leverans. Site 65 och 28/33 minst 8 är fortfarande aktuellt produktionsläge. OCR A/B utvecklas separat; V3 är förseglat.
+
 ## 2026-11-06 — kompletterad produktionsverifiering: 28/33 minst 8
 
 Område 33 höjs från 7 till 8 efter [oberoende granskning av 28 och 33](docs/quality8/area28-33-independent-read-review.md) mot oförändrad PLAN. Site 65:s exakta källkedja kompletteras nu av avslutad schemalagd Gmail-körning, verklig OCR-behandling, fullständigt verifierad backup och ekonomiska före-/efterläsningar. Den säkert avvisade bankrevalideringen är ett relevant driftbevis men ingen giltig bankanslutning.

@@ -1,0 +1,90 @@
+{
+  "schema": "independent-policy-review-v1",
+  "agent": "/root/bank_details_review_resume/policy_static",
+  "commit": "638c77365dbf8f4c73db6b23816a37f577da5689",
+  "node": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+  "nodeVersion": "v24.22.1",
+  "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume",
+  "decision": "IMPORTANT_FINDING",
+  "findings": [
+    {
+      "id": "P1",
+      "severity": "Important",
+      "title": "Contradictory primary identifiers can yield a complete usage observation",
+      "source": "snapshot/sites/lib/bank-consent-policy.js",
+      "lines": [
+        147,
+        184
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "file": "policy-identity-conflicts.test.mjs",
+      "log": "policy-identity-conflicts.tap",
+      "reporter": "spec (default, despite .tap filename)",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./snapshot/scripts/saas-test-isolation.mjs --experimental-strip-types --test-concurrency=1 --test policy-probes/policy-identity-conflicts.test.mjs",
+      "exitCode": 1,
+      "tests": 5,
+      "pass": 2,
+      "fail": 3,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 138.444752
+    },
+    {
+      "file": "adapter-primary-conflict.test.mjs",
+      "log": "adapter-primary-conflict.tap",
+      "reporter": "tap",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./snapshot/scripts/saas-test-isolation.mjs --experimental-strip-types --test-concurrency=1 --test --test-reporter=tap policy-probes/adapter-primary-conflict.test.mjs",
+      "exitCode": 1,
+      "tests": 2,
+      "pass": 1,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 285.144307
+    }
+  ],
+  "files": [
+    {
+      "path": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/snapshot/sites/lib/bank-consent-policy.js",
+      "sha256": "612f167c21180bd4f008ee28925d01221780c13b0c5a3d224c0ee05254208d6c"
+    },
+    {
+      "path": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/snapshot/sites/lib/bank-consent-policy.d.ts",
+      "sha256": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280"
+    },
+    {
+      "path": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/snapshot/sites/lib/banking/enable-banking.ts",
+      "sha256": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6"
+    },
+    {
+      "path": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/policy-probes/policy-identity-conflicts.test.mjs",
+      "sha256": "f576fefdf22dbff194b16e856efffbd70f855f27b761e2b3d3e0621460009c23"
+    },
+    {
+      "path": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/policy-probes/policy-identity-conflicts.tap",
+      "sha256": "b0dff3d70c69bc630e0435fb5de1537f2baf97eab13326edc82ed2cde0a19c43"
+    },
+    {
+      "path": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/policy-probes/adapter-primary-conflict.test.mjs",
+      "sha256": "0f7b661d0f7e4e5738f9c3d8b840b38ddebe78e0d45781f0d5a0a5b5e45116ed"
+    },
+    {
+      "path": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/policy-probes/adapter-primary-conflict.tap",
+      "sha256": "c73f7a0a124359ab84d66afc95ee16312ba7fa872cdc951a5775320575ebd3d4"
+    }
+  ],
+  "liveBankRequests": 0,
+  "productionCalls": 0,
+  "productionWrites": 0,
+  "productEdits": 0,
+  "transportDisconnections": 0,
+  "notes": [
+    "No inference is made about the previous lost review.",
+    "The policy source SHA was independently matched to git show of exact reviewed commit.",
+    "The adapter test generates an ephemeral RSA key in memory and stubs fetch; no secret or authorization header is printed or saved.",
+    "Parent reviewer is separately reproducing the finding through the ordinary service."
+  ]
+}

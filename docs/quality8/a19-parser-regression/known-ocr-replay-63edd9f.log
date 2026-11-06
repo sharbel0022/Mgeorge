@@ -1,0 +1,227 @@
+{
+  "sourceCommit": "63edd9fa97bc0475237133021313963e402efc76",
+  "opticalCalls": 0,
+  "parserCalls": 52,
+  "summaries": {
+    "stored-psm3-text/node/normal-readable": {
+      "all13": {
+        "tp": 79,
+        "fp": 0,
+        "fn": 51,
+        "expectedNonNull": 130,
+        "returnedNonNull": 79,
+        "correctNull": 0,
+        "reviewedFields": 130
+      },
+      "mandatory10": {
+        "tp": 57,
+        "fp": 0,
+        "fn": 43,
+        "expectedNonNull": 100,
+        "returnedNonNull": 57,
+        "correctNull": 0,
+        "reviewedFields": 100
+      },
+      "exact": 0,
+      "falseGreenCritical": 0
+    },
+    "stored-psm3-text/node/stress": {
+      "all13": {
+        "tp": 9,
+        "fp": 0,
+        "fn": 17,
+        "expectedNonNull": 26,
+        "returnedNonNull": 9,
+        "correctNull": 0,
+        "reviewedFields": 26
+      },
+      "mandatory10": {
+        "tp": 7,
+        "fp": 0,
+        "fn": 13,
+        "expectedNonNull": 20,
+        "returnedNonNull": 7,
+        "correctNull": 0,
+        "reviewedFields": 20
+      },
+      "exact": 0,
+      "falseGreenCritical": 0
+    },
+    "stored-psm3-text/sites/normal-readable": {
+      "all13": {
+        "tp": 79,
+        "fp": 0,
+        "fn": 51,
+        "expectedNonNull": 130,
+        "returnedNonNull": 79,
+        "correctNull": 0,
+        "reviewedFields": 130
+      },
+      "mandatory10": {
+        "tp": 57,
+        "fp": 0,
+        "fn": 43,
+        "expectedNonNull": 100,
+        "returnedNonNull": 57,
+        "correctNull": 0,
+        "reviewedFields": 100
+      },
+      "exact": 0,
+      "falseGreenCritical": 0
+    },
+    "stored-psm3-text/sites/stress": {
+      "all13": {
+        "tp": 9,
+        "fp": 0,
+        "fn": 17,
+        "expectedNonNull": 26,
+        "returnedNonNull": 9,
+        "correctNull": 0,
+        "reviewedFields": 26
+      },
+      "mandatory10": {
+        "tp": 7,
+        "fp": 0,
+        "fn": 13,
+        "expectedNonNull": 20,
+        "returnedNonNull": 7,
+        "correctNull": 0,
+        "reviewedFields": 20
+      },
+      "exact": 0,
+      "falseGreenCritical": 0
+    },
+    "known-psm6-raw/node/normal-readable": {
+      "all13": {
+        "tp": 60,
+        "fp": 2,
+        "fn": 70,
+        "expectedNonNull": 130,
+        "returnedNonNull": 62,
+        "correctNull": 0,
+        "reviewedFields": 130
+      },
+      "mandatory10": {
+        "tp": 50,
+        "fp": 0,
+        "fn": 50,
+        "expectedNonNull": 100,
+        "returnedNonNull": 50,
+        "correctNull": 0,
+        "reviewedFields": 100
+      },
+      "exact": 0,
+      "falseGreenCritical": 0
+    },
+    "known-psm6-raw/node/stress": {
+      "all13": {
+        "tp": 9,
+        "fp": 0,
+        "fn": 17,
+        "expectedNonNull": 26,
+        "returnedNonNull": 9,
+        "correctNull": 0,
+        "reviewedFields": 26
+      },
+      "mandatory10": {
+        "tp": 7,
+        "fp": 0,
+        "fn": 13,
+        "expectedNonNull": 20,
+        "returnedNonNull": 7,
+        "correctNull": 0,
+        "reviewedFields": 20
+      },
+      "exact": 0,
+      "falseGreenCritical": 0
+    },
+    "known-psm6-raw/sites/normal-readable": {
+      "all13": {
+        "tp": 60,
+        "fp": 2,
+        "fn": 70,
+        "expectedNonNull": 130,
+        "returnedNonNull": 62,
+        "correctNull": 0,
+        "reviewedFields": 130
+      },
+      "mandatory10": {
+        "tp": 50,
+        "fp": 0,
+        "fn": 50,
+        "expectedNonNull": 100,
+        "returnedNonNull": 50,
+        "correctNull": 0,
+        "reviewedFields": 100
+      },
+      "exact": 0,
+      "falseGreenCritical": 0
+    },
+    "known-psm6-raw/sites/stress": {
+      "all13": {
+        "tp": 9,
+        "fp": 0,
+        "fn": 17,
+        "expectedNonNull": 26,
+        "returnedNonNull": 9,
+        "correctNull": 0,
+        "reviewedFields": 26
+      },
+      "mandatory10": {
+        "tp": 7,
+        "fp": 0,
+        "fn": 13,
+        "expectedNonNull": 20,
+        "returnedNonNull": 7,
+        "correctNull": 0,
+        "reviewedFields": 20
+      },
+      "exact": 0,
+      "falseGreenCritical": 0
+    },
+    "known-psm3-two-raw/node/normal-readable": {
+      "all13": {
+        "tp": 18,
+        "fp": 0,
+        "fn": 8,
+        "expectedNonNull": 26,
+        "returnedNonNull": 18,
+        "correctNull": 0,
+        "reviewedFields": 26
+      },
+      "mandatory10": {
+        "tp": 13,
+        "fp": 0,
+        "fn": 7,
+        "expectedNonNull": 20,
+        "returnedNonNull": 13,
+        "correctNull": 0,
+        "reviewedFields": 20
+      },
+      "exact": 0,
+      "falseGreenCritical": 0
+    },
+    "known-psm3-two-raw/sites/normal-readable": {
+      "all13": {
+        "tp": 18,
+        "fp": 0,
+        "fn": 8,
+        "expectedNonNull": 26,
+        "returnedNonNull": 18,
+        "correctNull": 0,
+        "reviewedFields": 26
+      },
+      "mandatory10": {
+        "tp": 13,
+        "fp": 0,
+        "fn": 7,
+        "expectedNonNull": 20,
+        "returnedNonNull": 13,
+        "correctNull": 0,
+        "reviewedFields": 20
+      },
+      "exact": 0,
+      "falseGreenCritical": 0
+    }
+  }
+}

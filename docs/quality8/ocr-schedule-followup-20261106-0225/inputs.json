@@ -1,0 +1,31 @@
+{
+  "schema": "ocr-schedule-followup-inputs-v1",
+  "recordedAt": "2026-11-06T02:25:59.940447+00:00",
+  "sourceFiles": [
+    {
+      "path": "/workspace/scratch/4d79ab4bea8e/release-docs/docs/quality8/ocr-schedule-independent-read-diagnosis.md",
+      "bytes": 5552,
+      "sha256": "09289727522941139b57b985a32e2fdd4b67a68316c9beba5cc1fc3f64dfbf6c"
+    },
+    {
+      "path": "/workspace/scratch/4d79ab4bea8e/release-docs/docs/quality8/ocr-schedule-independent-public-api.json",
+      "bytes": 479844,
+      "sha256": "114759d9bc3d1aa499fdde76db68c2dbacca46745bc8f00c3f626c375902dc2c"
+    },
+    {
+      "path": "/workspace/scratch/4d79ab4bea8e/release-docs/docs/quality8/release-wave3.json",
+      "bytes": 5302,
+      "sha256": "bfc170dee4cec9d19fd233e97484221b0e2a2b8f8ba424d085c8f60b2e0f2408"
+    }
+  ],
+  "site65": {
+    "publishedAt": "2026-11-05T23:48:25.739259+00:00",
+    "status": "succeeded"
+  },
+  "previousDiagnosisWindowUtc": [
+    "2026-11-06T01:16:35Z",
+    "2026-11-06T01:16:42Z"
+  ],
+  "previousLatestScheduleId": 42083409804,
+  "writesRestrictedTo": "/workspace/scratch/4d79ab4bea8e/reviews/ocr-schedule-followup-20261106-0225"
+}
