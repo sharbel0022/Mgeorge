@@ -1,4 +1,5 @@
 import {isInvoiceTableHeader} from './invoice-details.js';
+import {planOcrSummaryCells} from './ocr-summary-layout.js';
 
 const MAX_TEXT=150000,MAX_ROWS=2000,MAX_WORDS=6000,MAX_SEGMENTS=3000,MAX_COMPARISONS=1_000_000;
 const object=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
@@ -79,7 +80,7 @@ export function reconstructOcrLayout(text,blocks){
       if(segments.length>MAX_SEGMENTS)return raw;
     }
 
-    const proposed=[],claims=new Map();
+    const proposed=[],claims=new Map(),claimOwners=new Map();
     for(const label of segments.filter(segment=>segment.label||segment.explicitLabel)){
       const candidates=[];
       for(const value of segments){
@@ -100,7 +101,11 @@ export function reconstructOcrLayout(text,blocks){
         // candidates. One label casts at most one claim on a value.
         const verticalClaim=below&&value.box.x0>=label.box.x0-scale/2&&value.box.x0<=label.box.x1+scale/2;
         const horizontalClaim=right&&value.box.y0<label.box.y1+scale/2&&value.box.y1>label.box.y0-scale/2;
-        if(verticalClaim||horizontalClaim)claims.set(value.id,(claims.get(value.id)||0)+1);
+        if(verticalClaim||horizontalClaim){
+          claims.set(value.id,(claims.get(value.id)||0)+1);
+          if(!claimOwners.has(value.id))claimOwners.set(value.id,new Set());
+          claimOwners.get(value.id).add(label.id);
+        }
       }
       // Never choose a closest/first value among plausible alternatives.
       if(!label.label||label.row.excluded||candidates.length!==1)continue;
@@ -116,25 +121,58 @@ export function reconstructOcrLayout(text,blocks){
       }
       if(!intervening)proposed.push({label,value});
     }
-    let pairs=proposed.filter(pair=>claims.get(pair.value.id)===1);
-    const disabled=new Set(lines.filter(row=>row.excluded));
+    const summary=planOcrSummaryCells(segments,words,lines.filter((row,index)=>tableRows[index]),claimOwners,()=>{if(++comparisons>MAX_COMPARISONS)throw new Error('layout budget');});
+    const summaryMembers=new Set(summary.pairs.flatMap(pair=>[pair.label.id,pair.value.id]));
+    // A typed VAT heading (including its untouched unreadable rate) is not
+    // the preceding net heading's generic downward value candidate.
+    let pairs=[...proposed.filter(pair=>claims.get(pair.value.id)===1&&!summaryMembers.has(pair.label.id)&&!summaryMembers.has(pair.value.id)),...summary.pairs];
+    const disabled=new Set(lines.filter(row=>row.excluded&&!summary.rows.has(row)));
     // A split raw row is indivisible unless every segment has an explicit
     // role. Cancelling one pairing can expose another unresolved segment in
     // a different raw row, so repeat until no dependency remains.
     for(let repeat=0;repeat<=lines.length;repeat++){
       const resolved=new Set(pairs.flatMap(pair=>[pair.label.id,pair.value.id]));let changed=false;
-      for(const row of lines)if(!disabled.has(row)&&row.segments.length>1&&row.segments.some(segment=>!segment.complete&&!resolved.has(segment.id))){disabled.add(row);changed=true;}
+      for(const row of lines)if(!disabled.has(row)&&row.segments.length>1&&row.segments.some(segment=>!segment.complete&&!resolved.has(segment.id)&&!summary.asides.has(segment.id))){disabled.add(row);changed=true;}
       const kept=pairs.filter(pair=>!disabled.has(pair.label.row)&&!disabled.has(pair.value.row));
       if(kept.length!==pairs.length)changed=true;pairs=kept;
       if(!changed)break;
     }
     const outgoing=new Map(pairs.map(pair=>[pair.label.id,pair.value])),incoming=new Set(pairs.map(pair=>pair.value.id));
+    // OCR paragraph breaks are not physical address boundaries. Preserve a
+    // role only when an already proved explicit party/name pair is followed
+    // by one street row, one Swedish postcode row and a labelled organization
+    // in the same short, unobstructed column. Unlabelled letterheads, prose,
+    // footers, other entities and detached identifiers cannot create a role.
+    const partyHeading=/^(?:leverantör|utställare|säljare|supplier|seller|kund|customer|faktureras till)\s*:?$/iu;
+    const orgHeading=/^(?:org(?:anisations)?\.?\s*(?:nr|nummer)|org\.?\s*number|organi[sz]ation\s+number)(?=[\s.:#]|$)\s*[:.#]?\s*\S/iu;
+    const addressBoundary=new RegExp('^(?:'+labelSource+'|buyer|recipient|bill[ \\t]+to|företag|company|konto|account)(?=[\\s.:#]|$)','iu');
+    const streetRow=/^(?:[\p{L}][\p{L} .’'\-]{1,90}\s+\d{1,5}[A-Za-z]?|\d{1,5}[A-Za-z]?\s+[\p{L}][\p{L} .’'\-]{1,90})$/u;
+    const postcodeRow=/^(?:SE[- ]?)?\d{3}\s?\d{2}\s+[\p{L}][\p{L} .’'\-]{1,70}$/u;
+    const joinedPartyRows=new Set();
+    for(const {label,value} of pairs){
+      if(!partyHeading.test(normalized(label.text))||value.row.index!==label.row.index+1)continue;
+      const body=[value.row,...lines.slice(value.row.index+1,value.row.index+4)];
+      if(body.length!==4||[label.row,...body].some(row=>disabled.has(row)||row.segments.length!==1))continue;
+      const [name,street,postcode,organization]=body;
+      if(!streetRow.test(normalized(street.source.text))||addressBoundary.test(normalized(street.source.text))||!postcodeRow.test(normalized(postcode.source.text))||!orgHeading.test(normalized(organization.source.text)))continue;
+      const sequence=[label.row,...body],scale=Math.min(...sequence.map(row=>row.segments[0].glyphHeight));
+      if(sequence.some(row=>Math.abs(row.box.x0-label.box.x0)>scale/2))continue;
+      if(sequence.slice(1).some((row,index)=>row.box.y0<sequence[index].box.y1||row.box.y0-sequence[index].box.y1>2*scale))continue;
+      const members=new Set(sequence.flatMap(row=>row.words)),region=union([...members]);
+      let obstructed=false;
+      for(const word of words){
+        if(++comparisons>MAX_COMPARISONS)return raw;
+        if(!members.has(word)&&intersects(word.bbox,region)){obstructed=true;break;}
+      }
+      if(obstructed)continue;
+      for(const row of [label.row,name,street,postcode])joinedPartyRows.add(row);
+    }
     let rebuilt=text.slice(0,chunks[0].index);const output=[];
     for(const row of lines){
       const chunk=chunks[row.index],following=row.index+1<chunks.length?chunks[row.index+1].index:text.length;
       const gap=text.slice(chunk.index+chunk[0].length,following);
       const active=!disabled.has(row)&&(row.segments.length>1||row.segments.some(segment=>outgoing.has(segment.id)||incoming.has(segment.id)));
-      if(!active){rebuilt+=chunk[0]+gap;output.push(row.source);continue;}
+      if(!active){rebuilt+=chunk[0]+(joinedPartyRows.has(row)?'\n':gap);output.push(row.source);continue;}
       const parts=[];
       for(const segment of row.segments){
         if(incoming.has(segment.id))continue;
@@ -144,7 +182,7 @@ export function reconstructOcrLayout(text,blocks){
       // Reconstructed fields are independent paragraphs. Their output order
       // must not transfer a party section to a following unowned raw field.
       const paired=row.segments.some(segment=>outgoing.has(segment.id));
-      rebuilt+=parts.join('\n\n')+(paired&&parts.length?'\n':'')+gap;
+      rebuilt+=joinedPartyRows.has(row)?parts.join('\n')+(parts.length?'\n':''):parts.join('\n\n')+(paired&&parts.length?'\n':'')+gap;
     }
     if(rebuilt===text)return raw;
     const retained=output.flatMap(row=>row.words),originals=new Set(words);

@@ -67,7 +67,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   const originalInput=String(text||''),layout=normalizeInvoiceLayout(text);text=layout.text;
   text=text.replace(/Fakturadatum[ \t]+Fakturanummer[ \t]*\n[ \t]*(\d{4}-\d{2}-\d{2})[ \t]+([A-Za-z0-9/_-]+)/gi,(_,date,number)=>`Fakturadatum: ${date}\nFakturanummer: ${number}`);
   const fields=Object.fromEntries(fieldNames.map(k=>[k,{value:null,confidence:0,evidence:null,warning:null}])),issues=[...layout.warnings];
-  const scalarLabels=[],referenceMentions=invoiceReferenceMentions(text);
+  const scalarLabels=[],monetaryOccurrences=[],referenceMentions=invoiceReferenceMentions(text);
   const confidence=method==='ocr'?Math.min(.85,Math.max(0,ocrConfidence/100)):.96;
   const set=(key,value,evidence,score=confidence)=>{fields[key]={value,confidence:value==null?0:score,evidence:evidence?.slice(0,300)||null,warning:score<.9?'Kräver kontroll':null};};
   const record=(key,matches,convert=s=>s.trim(),invalid=false)=>{
@@ -121,6 +121,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
       // summaries. An identity, reference, account or date must stay on its
       // labelled line or the immediately adjacent line, never a later block.
       const monetaryField=['total_cents','vat_cents','net_cents'].includes(key);
+      if(monetaryField)monetaryOccurrences.push({key,start:match.index,end:match.index+match[0].length});
       const blankLines=monetaryField?(text.slice(start).match(/^(?:\n[ \t]*)+/)?.[0]||''):(text[start]==='\n'?'\n':'');
       start+=blankLines.length;
       const end=text.indexOf('\n',start),line=text.slice(start,end<0?text.length:end);
@@ -163,6 +164,17 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     if(/^net[ \t]*[:.#]?$/iu.test(label.trim())&&/^-?\d+(?: \d{3})*$/u.test(value))return null;
     return money(value);
   });
+  // A stack of empty summary headings followed by values has no text-only
+  // column ownership. The last heading must not borrow the first net/VAT
+  // number merely because earlier headings already failed validation.
+  monetaryOccurrences.sort((a,b)=>a.start-b.start);
+  const ambiguousAmounts=new Set();
+  for(let index=1;index<monetaryOccurrences.length;index++){
+    const previous=monetaryOccurrences[index-1],current=monetaryOccurrences[index];
+    if(previous.key!==current.key&&previous.end<=current.start&&/^[ \t\r\n]*$/.test(text.slice(previous.end,current.start))){ambiguousAmounts.add(previous.key);ambiguousAmounts.add(current.key);}
+  }
+  for(const key of ambiguousAmounts)set(key,null,fields[key].evidence,0);
+  if(ambiguousAmounts.size)issues.push('Beloppsrubriker utan egna värden kan inte kopplas till efterföljande tal utan tydliga celler. Kontrollera originalets summering.');
   const hasReference=grabFull('reference',referenceLabel,(value,label)=>{
     const token=compactDigits(value);
     if(/^OCR/i.test(label))return /^\d{1,120}$/.test(token)?token:null;
