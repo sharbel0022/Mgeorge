@@ -962,6 +962,60 @@ test('three failed or interrupted automatic bank attempts remain blocked until a
 });
 
 
+for(const [label,raw,retained] of [
+ ['invalid JSON','{',[]],['null','null',[]],['object','{"private":"PRIVATE_METADATA"}',[]],
+ ['string','"PRIVATE_METADATA"',[]],['mixed array','["Behåll denna varning",null,{"private":"PRIVATE_METADATA"}]',['Behåll denna varning']],
+])test('bank status metadata: malformed run warnings remain visible and read-only: '+label,async t=>{
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();
+ await f.service.status(new Request(origin+'/api/bank/status'));
+ f.sql.prepare('INSERT INTO bank_sync_runs (id,owner,connection_id,imported,skipped,warnings,test,created_at) VALUES (?,?,?,?,?,?,?,?)').run('metadata-run',f.owner,id,1,0,raw,0,new Date().toISOString());
+ const before={connection:{...f.connection()},workspace:f.workspace(),audit:count(f,'audit_events')};
+ const visible=await(await f.service.status(new Request(origin+'/api/bank/status'))).json();
+ const automatic=await(await f.service.automaticSyncStatus()).json();
+ assert.ok(Array.isArray(visible.lastRun.warnings));assert.ok(visible.lastRun.warnings.every(value=>typeof value==='string'));
+ for(const warning of retained)assert.ok(visible.lastRun.warnings.includes(warning));
+ assert.match(visible.connection.postprocessWarning,/status.*okänd/i);
+ assert.ok(visible.lastRun.warnings.includes(visible.connection.postprocessWarning));
+ assert.equal(automatic.postprocessWarning,visible.connection.postprocessWarning);
+ assert.doesNotMatch(JSON.stringify([visible,automatic]),/PRIVATE_METADATA/);
+ assert.deepEqual({...f.connection()},before.connection);assert.deepEqual(f.workspace(),before.workspace);assert.equal(count(f,'audit_events'),before.audit);
+ assert.equal(f.sql.prepare('SELECT warnings FROM bank_sync_runs WHERE id=?').get('metadata-run').warnings,raw);
+ assert.equal(f.calls.length,0);
+});
+
+test('bank status metadata: valid warnings and empty warnings retain their meaning',async t=>{
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();
+ const postprocess='Bankhändelserna är sparade. Efterkontrollen behöver köras igen via betalningskontrollen.';
+ f.sql.prepare('INSERT INTO bank_sync_runs (id,owner,connection_id,imported,skipped,warnings,test,created_at) VALUES (?,?,?,?,?,?,?,?)').run('metadata-run',f.owner,id,1,0,'[]',0,new Date().toISOString());
+ for(const warnings of [[],['Granska originalet'],['Granska originalet',postprocess]]){
+  f.sql.prepare('UPDATE bank_sync_runs SET warnings=?').run(JSON.stringify(warnings));
+  const visible=await(await f.service.status(new Request(origin+'/api/bank/status'))).json();
+  const automatic=await(await f.service.automaticSyncStatus()).json();
+  assert.deepEqual(visible.lastRun.warnings,warnings);
+  assert.equal(visible.connection.postprocessWarning,warnings.includes(postprocess)?postprocess:null);
+  assert.equal(automatic.postprocessWarning,visible.connection.postprocessWarning);
+  assert.deepEqual(visible.connection.accounts.filter(account=>account.selected).map(account=>account.uid),[accountUid]);
+  assert.equal(visible.connection.metadataWarning,null);assert.equal(automatic.connected,true);assert.equal(automatic.syncAllowed,true);
+ }
+ assert.equal(f.calls.length,0);
+});
+
+for(const [label,raw] of [
+ ['invalid JSON','{'],['null','null'],['object','{}'],['string',JSON.stringify(accountUid)],['mixed array',JSON.stringify([accountUid,null])],
+])test('bank status metadata: malformed account selection advertises no access: '+label,async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ await f.service.status(new Request(origin+'/api/bank/status'));
+ f.sql.prepare('UPDATE bank_connections SET selected_accounts=?,auto_sync_enabled=1').run(raw);
+ const before={connection:{...f.connection()},workspace:f.workspace(),audit:count(f,'audit_events')};
+ const visible=await(await f.service.status(new Request(origin+'/api/bank/status'))).json();
+ const automatic=await(await f.service.automaticSyncStatus()).json();
+ assert.equal(visible.connection.connectionStatus,'pending_account');assert.equal(visible.connection.blockedReason,'BANK_ACCOUNT_SELECTION_REQUIRED');
+ assert.ok(visible.connection.accounts.every(account=>account.selected===false));
+ assert.match(visible.connection.metadataWarning,/kontoval.*okänd/i);assert.equal(automatic.metadataWarning,visible.connection.metadataWarning);
+ assert.equal(automatic.connected,false);assert.equal(automatic.syncAllowed,false);assert.equal(automatic.nextAttemptAt,null);assert.equal(visible.automatic.nextAttemptAt,null);
+ assert.deepEqual({...f.connection()},before.connection);assert.deepEqual(f.workspace(),before.workspace);assert.equal(count(f,'audit_events'),before.audit);assert.equal(f.calls.length,0);
+});
+
 test('committed bank imports stay successful if the independent after-check needs retrying',async t=>{
  const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();await f.service.setAutomaticSync(post('automatic',{enabled:true,connectionId:id}));f.reconcileError=true;
  const result=await(await f.service.automaticSync()).json();assert.equal(result.imported,1);assert.ok(result.warnings.some(w=>w.includes('Efterkontrollen')));assert.equal(f.connection().last_error,null);assert.equal(f.connection().sync_failures,0);assert.equal(count(f,'bank_sync_runs'),1);assert.equal(financialAuditCount(f),1);

@@ -102,6 +102,26 @@ const COOKIE = '__Secure-mg-bank-flow';
 const FLOW_AGE_MS = 15 * 60_000;
 const POSTPROCESS_WARNING='Bankhändelserna är sparade. Efterkontrollen behöver köras igen via betalningskontrollen.';
 const COMMITTED_REPLY_WARNING='Bankkörningen är sparad. Svaret kunde inte bekräftas; kontrollera status innan nästa hämtning.';
+const RUN_METADATA_WARNING='Bankkörningens varningar kunde inte läsas fullständigt. Efterkontrollens status är okänd.';
+const SELECTION_METADATA_WARNING='Bankanslutningens sparade kontoval kunde inte verifieras. Kontovalets status är okänd; granska anslutningen.';
+
+function storedStringArray(raw: string): { values: string[]; invalid: boolean } {
+  try {
+    const value: unknown = JSON.parse(raw);
+    if (Array.isArray(value)) {
+      const values = value.filter((entry): entry is string => typeof entry === 'string');
+      return { values, invalid: values.length !== value.length };
+    }
+  } catch { /* Status remains readable without repairing retained metadata. */ }
+  return { values: [], invalid: true };
+}
+
+function storedRunWarnings(run: { warnings: string } | null) {
+  const parsed = storedStringArray(run?.warnings ?? '[]');
+  return { warnings: parsed.invalid ? [...parsed.values, RUN_METADATA_WARNING] : parsed.values,
+    postprocessWarning: parsed.invalid ? RUN_METADATA_WARNING : parsed.values.includes(POSTPROCESS_WARNING) ? POSTPROCESS_WARNING : null };
+}
+
 const BANK_JOB_ERROR_CODES=new Set([
   'BANK_RATE_LIMIT','BANK_TIMEOUT','BANK_NETWORK_ERROR','BANK_RECONNECT_REQUIRED','BANK_AUTHORIZATION_EXPIRED',
   'BANK_PERIOD_UNAVAILABLE','BANK_DATE_RANGE_INVALID','BANK_ACCOUNT_UNAVAILABLE','BANK_ACTION_REQUIRED',
@@ -314,7 +334,10 @@ export async function status(request: Request): Promise<Response> {
     const at = now(), updatedMetadata = JSON.stringify(info);
     app = { ...app, metadata: updatedMetadata, updated_at: at };
   }
-  const selected: string[] = conn ? JSON.parse(conn.selected_accounts) : [];
+  const selection = storedStringArray(conn?.selected_accounts ?? '[]');
+  // Never salvage a partial account selection from malformed metadata.
+  const selected = selection.invalid ? [] : selection.values;
+  const runWarnings = storedRunWarnings(run);
   const bankAccounts = conn && storageReady() ? await accounts(conn) : [];
   const savedConsent = conn ? consentMetadata(conn) : null;
   const authority = conn ? await currentCompanyAuthorization(conn, 'read') : null;
@@ -356,7 +379,8 @@ export async function status(request: Request): Promise<Response> {
         corporateAuthorization: authority, bankgiro: { status: 'unavailable', reason: 'BANKGIRO_SCOPE_UNAVAILABLE' } },
       validUntil: conn.valid_until, lastSyncedAt: conn.last_synced_at, lastError: conn.last_error,
       dateFrom: conn.date_from,
-      postprocessWarning:run&&JSON.parse(run.warnings).includes(POSTPROCESS_WARNING)?POSTPROCESS_WARNING:null,
+      postprocessWarning: runWarnings.postprocessWarning,
+      metadataWarning: selection.invalid ? SELECTION_METADATA_WARNING : null,
       accounts: bankAccounts.map(account => ({
         uid: account.uid, label: maskAccount(account, {name: conn.bank_name, country: conn.country}), currency: account.currency || '',
         selected: selected.includes(account.uid),
@@ -365,7 +389,7 @@ export async function status(request: Request): Promise<Response> {
           Boolean(stableAccountKey(account, { name: conn.bank_name, country: conn.country })),
       })),
     } : null,
-    lastRun: run ? { createdAt: run.created_at, imported: run.imported, skipped: run.skipped, warnings: JSON.parse(run.warnings), test: Boolean(run.test) } : null,
+    lastRun: run ? { createdAt: run.created_at, imported: run.imported, skipped: run.skipped, warnings: runWarnings.warnings, test: Boolean(run.test) } : null,
   });
 }
 
@@ -738,8 +762,8 @@ export async function automaticSyncStatus(): Promise<Response> {
   const openPayments=await (await import('./openpayments-scheduler')).dispatchOpenPaymentsSchedule(user.userId,undefined,true);
   if(openPayments)return response(openPayments);
   const [app, conn] = await Promise.all([application(user.userId), connection(user.userId)]);
-  let selected: unknown = [];
-  try { selected = conn ? JSON.parse(conn.selected_accounts) : []; } catch { /* Invalid selection cannot advertise access. */ }
+  const selection = storedStringArray(conn?.selected_accounts ?? '[]');
+  const selected = selection.invalid ? [] : selection.values;
   const savedConsent = conn ? consentMetadata(conn) : null, authority = conn ? await currentCompanyAuthorization(conn, 'read') : null;
   const health = connectionHealth(app, conn, selected, savedConsent, authority), diagnostic = await latestConnectionDiagnostic(conn);
   const failures = conn?.sync_failures || 0, retryPending = Date.parse(conn?.retry_after || '') > Date.now();
@@ -751,7 +775,9 @@ export async function automaticSyncStatus(): Promise<Response> {
     nextAction: health.nextAction !== 'none' ? health.nextAction : failures >= 3 ? 'inspect_connection' : retryPending ? 'wait' : 'none', diagnostic,
     lastSyncedAt: conn?.last_synced_at ?? null, lastAttemptAt: conn?.auto_last_attempt_at ?? null,
     nextAttemptAt: conn && conn.auto_sync_enabled === 1 && health.syncAllowed ? automaticDueAt(conn) : null,
-    lastError: conn?.last_error ?? null, blocked:failures>=3, failures,postprocessWarning:run&&JSON.parse(run.warnings).includes(POSTPROCESS_WARNING)?POSTPROCESS_WARNING:null });
+    lastError: conn?.last_error ?? null, blocked:failures>=3, failures,
+    postprocessWarning: storedRunWarnings(run).postprocessWarning,
+    metadataWarning: selection.invalid ? SELECTION_METADATA_WARNING : null });
 }
 
 /** Check the retained legacy grant after a local validation failure. This is

@@ -4,7 +4,7 @@ Datum: 2026-11-06. Granskad bas: PR 61, `30dfaa97bb7ce2118b4756205347d4a96e8be6a
 
 ## Beslut och evidensnivå
 
-Verklig bankåtkomst och automatisk Bankgirohämtning är fortfarande blockerade. Denna delgranskning levererar endast dokumentation; inga produktfiler, tester, medgivanden, token, original eller ekonomiska uppgifter har ändrats. Ingen ny bank-/providerkörning, produktionsmutation, publicering eller push har gjorts. Inga nya tester har körts i denna delgranskning. Tidigare gröna sviter är historisk evidens och får inte räknas som en färsk verifiering av slutkandidaten.
+Verklig bankåtkomst och automatisk Bankgirohämtning är fortfarande blockerade. Leveransen omfattar en avgränsad korrigering av statusvisning för skadad lokal metadata, nya syntetiska regressionstester och denna rapport. Inga medgivanden, token, original eller ekonomiska uppgifter har ändrats. Ingen ny bank-/providerkörning, produktionsmutation, publicering eller push har gjorts. Tidigare gröna sviter är historisk evidens och får inte räknas som en färsk verifiering av slutkandidaten. De nya lokala körningarna redovisas separat nedan.
 
 Läst underlag omfattar `AGENTS.md`, `PROGRESS.md`, `QUALITY-SCORECARD.md`, [bank/recovery-granskningen](../final95/reviews/bank-recovery.md), [Bankgirogranskningen](../final95/reviews/bankgiro-final-audit.md), [beredskapskvittot](../integration/bankgiro-readiness-receipt.json), [medgivandets livscykel](../integration/saas/openpayments-consent-lifecycle.md) och [diagnoskontraktet](../quality8/bank-details-failure-projection/README.md). Root ansvarar för aktuell integrerad CI, produktionsschema och releasebeslut. Denna rapport höjer inga kvalitetspoäng.
 
@@ -36,9 +36,13 @@ Granskningsspåren i basen behandlar följande kontrakt. Färsk integrerad testn
 | Kontoisolering | Aktuell ägare/företagskontext, kontoval, samtyckesversion och runtime-generation måste gälla före och efter väntande providerarbete och före lagring. Roots säkerhetsändringar i delad tenantlagring granskas separat. |
 | Bankgiroproveniens | Exakta original, hash, fångstkvitto, behörighet, betalarfält, samlingsinsättning och fakturarelation är separata bevis. Manuell koppling ger inte underlaget bankäkthet. |
 
-### Kvarvarande granskningsspår, utan fixpåstående
+### Reproducerat och avgränsat rättat metadatafel
 
-`sites/lib/banking/service.ts` läser `JSON.parse(run.warnings).includes(...)` i både `status` och `automaticSyncStatus`, och returnerar även rått parsad warnings-data i `lastRun`. Detta kan vara en robusthetsrisk om lagrad metadata är ogiltig eller inte en array. Ingen sådan nåbar databaspost eller servicefelväg har reproducerats här, och normala skrivvägars format har inte motbevisats. Ingen produktändring föreslås för den frysta kandidaten utan regressionsevidens. En avgränsad uppföljning är att pröva verkliga statusharnessar med skadad metadata och endast vid reproducerat fel införa en säker warnings-projektion utan ekonomiska sidoeffekter.
+`sites/lib/banking/service.ts` antog att parsad `bank_sync_runs.warnings` alltid var en array. Ogiltig JSON, `null` och objekt fick vanlig statusläsning att kasta; en JSON-sträng eller blandad array kunde nå klienten med fel typ. Samma antagande för `selected_accounts` kunde krascha status eller visa ett konto som valt trots att hela urvalet var ogiltigt. Detta reproducerades med syntetiska databasrader i den befintliga SQLite-/serviceharnessen, inte med ändringar i drift.
+
+Den smala rättningen typkontrollerar listorna vid läsprojektion. Giltiga varningssträngar bevaras; ofullständiga varningar kompletteras med ett fast begripligt besked att efterkontrollens status är okänd. Ett felaktigt kontoval avvisas i sin helhet och visas med okänd kontovalsstatus. Befintlig `connectionHealth` avgör fortfarande behörighet och nästa åtgärd; inga rättigheter eller giltighetstider skapas. UI-komponenten `sites/components/bank-connection.tsx` visar kontovarningen i det befintliga alertområdet. Giltiga kontoval och giltiga varningslistor behåller sitt beteende.
+
+Testerna kontrollerar oförändrade anslutningsrader, arbetsyta, auditantal och sparade warnings-värden samt noll provideranrop. Det finns inget belägg för att produktionens metadata är skadad. Fixen påstår därför inte att den återställer den verkliga bankanslutningen. Skrivvägar, medgivandekontroller, import, förnyelse och transaktionscommit ändras inte.
 
 ## 0599 och 625 SEK
 
@@ -68,4 +72,26 @@ Följande officiella länkar finns i de versionslåsta tidigare granskningarna o
 
 ## Leveranskontroll
 
-Dokumentationsändringen kontrolleras med `git diff --check` och kontroll av att endast denna fil ändrats. Ingen ny funktionell testkörning ingår. Rapporten är inte ett produktions-READY-kvitto och ersätter inte roots färska CI eller en verklig bankacceptans.
+Rapporten är inte ett produktions-READY-kvitto och ersätter inte roots färska integrerade CI eller en verklig bankacceptans. Produktdiffen är begränsad till statusprojektionen i `service.ts` och varningsvisningen i `bank-connection.tsx`; regressionerna ligger i `sites/tests/banking-security.test.mjs`.
+
+| Ny lokal kontroll, Node 24.22.1 | Resultat |
+| --- | --- |
+| Elva nya regressioner på oförändrad produkt, `--test-name-pattern='bank status metadata:'` | 1 pass / 10 fail, exit 1. Felen är kastad JSON-/typvalidering eller felaktig statusprojektion. |
+| Samma elva regressioner efter rättning | 11/11, exit 0. |
+| Hela `banking-security.test.mjs`, inklusive de elva nya fallen och förstärkt kontroll av giltigt kontoval | 360/360, exit 0, 72,215 s; noll skip/cancel/TODO. De elva räknas inte dubbelt. |
+| Guarded TypeScript för denna arbetskopias `sites/tsconfig.json` | exit 0, tom fellogg. |
+| `git diff --check` | exit 0. |
+
+Testkommandot kördes från `sites`:
+
+```sh
+NODE_ENV=test node --import ../scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 tests/banking-security.test.mjs
+```
+
+Nätisoleringen blockerar extern trafik och servicefixturen förbjuder dessutom all verklig fetch. En första start utan `NODE_ENV=test` avvisades av `SAAS_TEST_ONLY` före testkörning; den räknas inte som regressionens röda resultat. Både root- och Sites-lockfil matchar den återanvända installationen exakt. Den vanliga guarded-check-starten från denna arbetskopia avvisade dess `node_modules`-symlänk enligt säkerhetsgrinden. Grinden ändrades inte: den godkända körningen gjordes från den verkliga installationskatalogen `/workspace/scratch/0005a76ddf57/Mgeorge/sites` med explicit projekt:
+
+```sh
+node scripts/run-verified-tool.mjs check --project /workspace/scratch/aab0f7dc06f9/completion-bank/sites/tsconfig.json
+```
+
+Full projekt-CI och oberoende diffgranskning samordnas av root på den integrerade kandidaten. Ingen build, verklig BankID-acceptans eller automatisk Bankgirohämtning påstås här.
