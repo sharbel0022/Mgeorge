@@ -1,0 +1,533 @@
+{
+  "identity": {
+    "main": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+    "parents": [
+      "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "520e22716c6298e4d24ccf3989e87cfe563d8d14"
+    ],
+    "tree": "4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+    "sites": "4feabc128c5f677103232d1cad1e4406083e8f19",
+    "verified": true
+  },
+  "run": {
+    "id": 42177971213,
+    "event": "push",
+    "head_branch": "main",
+    "head_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+    "attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-11-06T07:00:03Z",
+    "updated_at": "2026-11-06T07:07:18Z",
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213"
+  },
+  "jobs": [
+    {
+      "name": "bankgiro_bridge",
+      "role": "bridge",
+      "id": 127760756176,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "run_attempt": 1,
+      "started_at": "2026-11-06T07:00:06Z",
+      "completed_at": "2026-11-06T07:00:23Z",
+      "node_version": "v22.23.4",
+      "actual_checkout_line": 106,
+      "actual_checkout_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "summary": {
+        "tests": 47,
+        "suites": 0,
+        "pass": 47,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 5534.793138
+      },
+      "failed_lines": [],
+      "raw_characters": 35881,
+      "raw_lines": 490,
+      "job_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756176"
+    },
+    {
+      "name": "test",
+      "role": "node",
+      "id": 127760756473,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "run_attempt": 1,
+      "started_at": "2026-11-06T07:00:06Z",
+      "completed_at": "2026-11-06T07:03:49Z",
+      "node_version": "v22.23.4",
+      "actual_checkout_line": 106,
+      "actual_checkout_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "summary": {
+        "tests": 2323,
+        "suites": 0,
+        "pass": 2323,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 200317.13137
+      },
+      "failed_lines": [],
+      "raw_characters": 990618,
+      "raw_lines": 14327,
+      "job_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756473"
+    },
+    {
+      "name": "sites",
+      "role": "sites",
+      "id": 127760756672,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "run_attempt": 1,
+      "started_at": "2026-11-06T07:00:06Z",
+      "completed_at": "2026-11-06T07:07:17Z",
+      "node_version": "v22.23.4",
+      "actual_checkout_line": 106,
+      "actual_checkout_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "summary": {
+        "tests": 5237,
+        "suites": 0,
+        "pass": 5237,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 338624.916659
+      },
+      "failed_lines": [],
+      "raw_characters": 2249805,
+      "raw_lines": 32298,
+      "job_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756672"
+    }
+  ],
+  "required_gates": [
+    {
+      "job": "bankgiro_bridge",
+      "job_id": 127760756176,
+      "name": "Install isolated SFTP bridge",
+      "command": "npm --prefix bridge/bankgiro ci --ignore-scripts",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:00:13Z",
+      "completed_at": "2026-11-06T07:00:14Z",
+      "raw_command_line": 143
+    },
+    {
+      "job": "bankgiro_bridge",
+      "job_id": 127760756176,
+      "name": "Check isolated bridge syntax",
+      "command": "npm --prefix bridge/bankgiro run check",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:00:14Z",
+      "completed_at": "2026-11-06T07:00:15Z",
+      "raw_command_line": 151
+    },
+    {
+      "job": "bankgiro_bridge",
+      "job_id": 127760756176,
+      "name": "Audit isolated bridge production dependencies",
+      "command": "npm --prefix bridge/bankgiro audit --omit=dev --audit-level=high",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:00:15Z",
+      "completed_at": "2026-11-06T07:00:15Z",
+      "raw_command_line": 159,
+      "audit_output": [
+        "found 0 vulnerabilities"
+      ],
+      "zero_vulnerabilities": true
+    },
+    {
+      "job": "bankgiro_bridge",
+      "job_id": 127760756176,
+      "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+      "command": "npm --prefix bridge/bankgiro run test:isolated",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:00:15Z",
+      "completed_at": "2026-11-06T07:00:21Z",
+      "raw_command_line": 164
+    },
+    {
+      "job": "test",
+      "job_id": 127760756473,
+      "name": "Run npm ci --ignore-scripts",
+      "command": "npm ci --ignore-scripts",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:00:17Z",
+      "completed_at": "2026-11-06T07:00:19Z",
+      "raw_command_line": 143
+    },
+    {
+      "job": "test",
+      "job_id": 127760756473,
+      "name": "Run npm run check",
+      "command": "npm run check",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:00:19Z",
+      "completed_at": "2026-11-06T07:00:24Z",
+      "raw_command_line": 154,
+      "check_output": [
+        "##[group]Run npm run check",
+        "npm run check",
+        "shell: /usr/bin/bash -e {0}",
+        "##[endgroup]",
+        "",
+        "> mgeorge-fakturakoll@0.1.0 check",
+        "> node scripts/check.mjs",
+        "",
+        "201 JavaScript-filer syntaxkontrollerade."
+      ]
+    },
+    {
+      "job": "test",
+      "job_id": 127760756473,
+      "name": "Audit production dependencies",
+      "command": "npm audit --audit-level=high",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:00:24Z",
+      "completed_at": "2026-11-06T07:00:24Z",
+      "raw_command_line": 163,
+      "audit_output": [
+        "found 0 vulnerabilities"
+      ],
+      "zero_vulnerabilities": true
+    },
+    {
+      "job": "test",
+      "job_id": 127760756473,
+      "name": "Run tests with synthetic data",
+      "command": "npm run test:isolated",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:00:24Z",
+      "completed_at": "2026-11-06T07:03:45Z",
+      "raw_command_line": 168
+    },
+    {
+      "job": "sites",
+      "job_id": 127760756672,
+      "name": "Run npm run install:ci",
+      "command": "npm run install:ci",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:00:17Z",
+      "completed_at": "2026-11-06T07:00:33Z",
+      "raw_command_line": 145
+    },
+    {
+      "job": "sites",
+      "job_id": 127760756672,
+      "name": "Verify exact installed minimatch mitigation bytes",
+      "command": "node scripts/minimatch-backport.mjs --check --require-target",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:00:33Z",
+      "completed_at": "2026-11-06T07:00:34Z",
+      "raw_command_line": 163,
+      "mitigation_output": [
+        "##[group]Run node scripts/minimatch-backport.mjs --check --require-target",
+        "node scripts/minimatch-backport.mjs --check --require-target",
+        "shell: /usr/bin/bash -e {0}",
+        "##[endgroup]",
+        "[minimatch-backport] {\"targets\":1,\"writes\":0,\"status\":\"verified\"}"
+      ]
+    },
+    {
+      "job": "sites",
+      "job_id": 127760756672,
+      "name": "Install shared OCR runtime for cloud integration test",
+      "command": "npm ci --ignore-scripts",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:00:34Z",
+      "completed_at": "2026-11-06T07:00:35Z",
+      "raw_command_line": 168
+    },
+    {
+      "job": "sites",
+      "job_id": 127760756672,
+      "name": "Run npm run check",
+      "command": "npm run check",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:00:35Z",
+      "completed_at": "2026-11-06T07:00:47Z",
+      "raw_command_line": 179,
+      "check_output": [
+        "##[group]Run npm run check",
+        "npm run check",
+        "shell: /usr/bin/bash -e {0}",
+        "##[endgroup]",
+        "",
+        "> site-creator-vinext-starter@0.1.0 check",
+        "> node scripts/run-verified-tool.mjs check",
+        ""
+      ]
+    },
+    {
+      "job": "sites",
+      "job_id": 127760756672,
+      "name": "Audit Sites production dependencies",
+      "command": "npm audit --audit-level=high",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:00:47Z",
+      "completed_at": "2026-11-06T07:01:19Z",
+      "raw_command_line": 187,
+      "audit_output": [
+        "Severity: moderate",
+        "8 moderate severity vulnerabilities"
+      ],
+      "zero_vulnerabilities": false
+    },
+    {
+      "job": "sites",
+      "job_id": 127760756672,
+      "name": "Install isolated bridge for full synthetic SFTP chain",
+      "command": "npm --prefix ../bridge/bankgiro ci --ignore-scripts",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:01:19Z",
+      "completed_at": "2026-11-06T07:01:20Z",
+      "raw_command_line": 234
+    },
+    {
+      "job": "sites",
+      "job_id": 127760756672,
+      "name": "Run Sites tests with synthetic data",
+      "command": "npm run test:isolated",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:01:20Z",
+      "completed_at": "2026-11-06T07:06:59Z",
+      "raw_command_line": 242
+    },
+    {
+      "job": "sites",
+      "job_id": 127760756672,
+      "name": "Run npm run build",
+      "command": "npm run build",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T07:06:59Z",
+      "completed_at": "2026-11-06T07:07:14Z",
+      "raw_command_line": 31920,
+      "build_complete": true,
+      "build_output": [
+        "vite v8.3.5 building rsc environment for production...",
+        "✓ 509 modules transformed.",
+        "✓ built in 3.43s",
+        "vite v8.3.5 building ssr environment for production...",
+        "✓ 278 modules transformed.",
+        "✓ built in 905ms",
+        "[3/5] build rsc environment...",
+        "vite v8.3.5 building rsc environment for production...",
+        "✓ 526 modules transformed.",
+        "✓ built in 4.02s",
+        "[4/5] build client environment...",
+        "vite v8.3.5 building client environment for production...",
+        "✓ 2039 modules transformed.",
+        "✓ built in 2.46s",
+        "[5/5] build ssr environment...",
+        "vite v8.3.5 building ssr environment for production...",
+        "✓ 318 modules transformed.",
+        "✓ built in 1.71s",
+        "  Build complete."
+      ]
+    }
+  ],
+  "total": {
+    "tests": 7607,
+    "pass": 7607,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "required_gate_count": 16,
+  "all_16_success": true,
+  "all_audits_zero": false,
+  "actual_sites_build": {
+    "job": "sites",
+    "job_id": 127760756672,
+    "name": "Run npm run build",
+    "command": "npm run build",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-06T07:06:59Z",
+    "completed_at": "2026-11-06T07:07:14Z",
+    "raw_command_line": 31920,
+    "build_complete": true,
+    "build_output": [
+      "vite v8.3.5 building rsc environment for production...",
+      "✓ 509 modules transformed.",
+      "✓ built in 3.43s",
+      "vite v8.3.5 building ssr environment for production...",
+      "✓ 278 modules transformed.",
+      "✓ built in 905ms",
+      "[3/5] build rsc environment...",
+      "vite v8.3.5 building rsc environment for production...",
+      "✓ 526 modules transformed.",
+      "✓ built in 4.02s",
+      "[4/5] build client environment...",
+      "vite v8.3.5 building client environment for production...",
+      "✓ 2039 modules transformed.",
+      "✓ built in 2.46s",
+      "[5/5] build ssr environment...",
+      "vite v8.3.5 building ssr environment for production...",
+      "✓ 318 modules transformed.",
+      "✓ built in 1.71s",
+      "  Build complete."
+    ],
+    "build_complete_raw_line": "2026-11-06T07:07:14.5178036Z   Build complete."
+  },
+  "node_cases": [
+    {
+      "title": "startup resources close a hanging contender and release its SQLite holder on real test cancellation",
+      "line": 4507,
+      "block": [
+        "# Subtest: startup resources close a hanging contender and release its SQLite holder on real test cancellation",
+        "ok 692 - startup resources close a hanging contender and release its SQLite holder on real test cancellation",
+        "  ---",
+        "  duration_ms: 92.894997",
+        "  type: 'test'",
+        "  ...",
+        "# (node:4529) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "# (Use `node --trace-warnings ...` to show where the warning was created)",
+        "# Subtest: opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release"
+      ],
+      "duration_ms": 92.894997
+    },
+    {
+      "title": "opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release",
+      "line": 4515,
+      "block": [
+        "# Subtest: opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release",
+        "ok 693 - opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release",
+        "  ---",
+        "  duration_ms: 5166.121992",
+        "  type: 'test'",
+        "  ...",
+        "# (node:4545) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "# (Use `node --trace-warnings ...` to show where the warning was created)",
+        "# Subtest: matching respects direction, balances and prevents double-match"
+      ],
+      "duration_ms": 5166.121992
+    },
+    {
+      "title": "two real processes import and reconcile one bank payment once, then replay safely after restart",
+      "line": 11622,
+      "block": [
+        "# Subtest: two real processes import and reconcile one bank payment once, then replay safely after restart",
+        "ok 1866 - two real processes import and reconcile one bank payment once, then replay safely after restart",
+        "  ---",
+        "  duration_ms: 220.087323",
+        "  type: 'test'",
+        "  ...",
+        "# Subtest: abrupt process exit during bank insertion rolls back the entire import and retries once",
+        "ok 1867 - abrupt process exit during bank insertion rolls back the entire import and retries once",
+        "  ---"
+      ],
+      "duration_ms": 220.087323
+    },
+    {
+      "title": "abrupt process exit during bank insertion rolls back the entire import and retries once",
+      "line": 11628,
+      "block": [
+        "# Subtest: abrupt process exit during bank insertion rolls back the entire import and retries once",
+        "ok 1867 - abrupt process exit during bank insertion rolls back the entire import and retries once",
+        "  ---",
+        "  duration_ms: 167.528616",
+        "  type: 'test'",
+        "  ...",
+        "# (node:8227) ExperimentalWarning: SQLite is an experimental feature and might change at any time",
+        "# (Use `node --trace-warnings ...` to show where the warning was created)",
+        "# Subtest: one authenticated click runs existing pipeline, preserves settings, and sends no mail"
+      ],
+      "duration_ms": 167.528616
+    }
+  ],
+  "passed": true,
+  "all_audit_gates_success": true,
+  "audit_findings": {
+    "node": {
+      "reported_vulnerabilities": 0,
+      "command": "npm audit --audit-level=high",
+      "conclusion": "success"
+    },
+    "bankgiro_bridge": {
+      "reported_vulnerabilities": 0,
+      "command": "npm --prefix bridge/bankgiro audit --omit=dev --audit-level=high",
+      "conclusion": "success"
+    },
+    "sites": {
+      "reported_moderate_vulnerabilities": 8,
+      "command": "npm audit --audit-level=high",
+      "conclusion": "success",
+      "zero_vulnerabilities": false,
+      "policy_note": "The unchanged gate fails at high severity; the original log reports eight moderate vulnerabilities.",
+      "advisory_from_original_log": "GHSA-g3hv-75wg-m249",
+      "dependency_chain_from_original_log": "minimatch under @typescript-eslint/typescript-estree; the report includes the eslint/typescript-eslint dependency chain.",
+      "mitigation_bytecheck": {
+        "targets": 1,
+        "writes": 0,
+        "status": "verified",
+        "interpretation": "This is the existing byte-check result; it does not change the eight findings printed by npm audit."
+      }
+    }
+  },
+  "verdict": "PASS: first ordinary main-push Payment CI passed all 16 required run steps across 3 jobs; Sites audit retains eight moderate findings under the unchanged high-severity failure threshold.",
+  "verification_kind": "Independent read of original GitHub execution logs and metadata; not an independently launched local test run.",
+  "verified_at_utc": "2026-11-06 07:11:36 UTC",
+  "logs": [
+    {
+      "path": "docs/quality8/startup-main-ci-20261106/logs/bridge-job-127760756176.log",
+      "job_id": 127760756176,
+      "role": "bridge",
+      "utf8_bytes": 35883,
+      "javascript_characters": 35881,
+      "line_count": 490,
+      "source_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/jobs/127760756176/logs",
+      "job_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756176"
+    },
+    {
+      "path": "docs/quality8/startup-main-ci-20261106/logs/node-job-127760756473.log",
+      "job_id": 127760756473,
+      "role": "node",
+      "utf8_bytes": 990746,
+      "javascript_characters": 990618,
+      "line_count": 14327,
+      "source_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/jobs/127760756473/logs",
+      "job_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756473"
+    },
+    {
+      "path": "docs/quality8/startup-main-ci-20261106/logs/sites-job-127760756672.log",
+      "job_id": 127760756672,
+      "role": "sites",
+      "utf8_bytes": 2251145,
+      "javascript_characters": 2249805,
+      "line_count": 32298,
+      "source_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/jobs/127760756672/logs",
+      "job_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756672"
+    }
+  ],
+  "first_push_discovery": {
+    "total_count": 1,
+    "matching_run_ids": [
+      42177971213
+    ],
+    "first_and_only_matching_push_run_at_discovery": true
+  }
+}

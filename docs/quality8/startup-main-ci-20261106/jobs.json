@@ -1,0 +1,361 @@
+{
+  "total_count": 3,
+  "jobs": [
+    {
+      "id": 127760756176,
+      "run_id": 42177971213,
+      "workflow_name": "Payment control checks",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42177971213",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVYRLZM8AAAAdvyJt0A",
+      "head_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/jobs/127760756176",
+      "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756176",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T07:00:04Z",
+      "started_at": "2026-11-06T07:00:06Z",
+      "completed_at": "2026-11-06T07:00:23Z",
+      "name": "bankgiro_bridge",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T07:00:07Z",
+          "completed_at": "2026-11-06T07:00:07Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T07:00:07Z",
+          "completed_at": "2026-11-06T07:00:12Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T07:00:12Z",
+          "completed_at": "2026-11-06T07:00:13Z"
+        },
+        {
+          "name": "Install isolated SFTP bridge",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T07:00:13Z",
+          "completed_at": "2026-11-06T07:00:14Z"
+        },
+        {
+          "name": "Check isolated bridge syntax",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T07:00:14Z",
+          "completed_at": "2026-11-06T07:00:15Z"
+        },
+        {
+          "name": "Audit isolated bridge production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T07:00:15Z",
+          "completed_at": "2026-11-06T07:00:15Z"
+        },
+        {
+          "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T07:00:15Z",
+          "completed_at": "2026-11-06T07:00:21Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T07:00:21Z",
+          "completed_at": "2026-11-06T07:00:21Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-06T07:00:21Z",
+          "completed_at": "2026-11-06T07:00:21Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-06T07:00:21Z",
+          "completed_at": "2026-11-06T07:00:21Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/sharbel0022/Mgeorge/check-runs/127760756176",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000008555,
+      "runner_name": "GitHub Actions 1000008555",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127760756473,
+      "run_id": 42177971213,
+      "workflow_name": "Payment control checks",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42177971213",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVYRLZM8AAAAdvyJu-Q",
+      "head_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/jobs/127760756473",
+      "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756473",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T07:00:04Z",
+      "started_at": "2026-11-06T07:00:06Z",
+      "completed_at": "2026-11-06T07:03:49Z",
+      "name": "test",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T07:00:07Z",
+          "completed_at": "2026-11-06T07:00:08Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T07:00:08Z",
+          "completed_at": "2026-11-06T07:00:14Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T07:00:14Z",
+          "completed_at": "2026-11-06T07:00:17Z"
+        },
+        {
+          "name": "Run npm ci --ignore-scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T07:00:17Z",
+          "completed_at": "2026-11-06T07:00:19Z"
+        },
+        {
+          "name": "Run npm run check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T07:00:19Z",
+          "completed_at": "2026-11-06T07:00:24Z"
+        },
+        {
+          "name": "Audit production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T07:00:24Z",
+          "completed_at": "2026-11-06T07:00:24Z"
+        },
+        {
+          "name": "Run tests with synthetic data",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T07:00:24Z",
+          "completed_at": "2026-11-06T07:03:45Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T07:03:45Z",
+          "completed_at": "2026-11-06T07:03:45Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-06T07:03:45Z",
+          "completed_at": "2026-11-06T07:03:45Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-06T07:03:45Z",
+          "completed_at": "2026-11-06T07:03:45Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/sharbel0022/Mgeorge/check-runs/127760756473",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000008554,
+      "runner_name": "GitHub Actions 1000008554",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127760756672,
+      "run_id": 42177971213,
+      "workflow_name": "Payment control checks",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42177971213",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVYRLZM8AAAAdvyJvwA",
+      "head_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/jobs/127760756672",
+      "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756672",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T07:00:04Z",
+      "started_at": "2026-11-06T07:00:06Z",
+      "completed_at": "2026-11-06T07:07:17Z",
+      "name": "sites",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T07:00:07Z",
+          "completed_at": "2026-11-06T07:00:07Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T07:00:07Z",
+          "completed_at": "2026-11-06T07:00:12Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T07:00:12Z",
+          "completed_at": "2026-11-06T07:00:17Z"
+        },
+        {
+          "name": "Run npm run install:ci",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T07:00:17Z",
+          "completed_at": "2026-11-06T07:00:33Z"
+        },
+        {
+          "name": "Verify exact installed minimatch mitigation bytes",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T07:00:33Z",
+          "completed_at": "2026-11-06T07:00:34Z"
+        },
+        {
+          "name": "Install shared OCR runtime for cloud integration test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T07:00:34Z",
+          "completed_at": "2026-11-06T07:00:35Z"
+        },
+        {
+          "name": "Run npm run check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T07:00:35Z",
+          "completed_at": "2026-11-06T07:00:47Z"
+        },
+        {
+          "name": "Audit Sites production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-06T07:00:47Z",
+          "completed_at": "2026-11-06T07:01:19Z"
+        },
+        {
+          "name": "Install isolated bridge for full synthetic SFTP chain",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-06T07:01:19Z",
+          "completed_at": "2026-11-06T07:01:20Z"
+        },
+        {
+          "name": "Run Sites tests with synthetic data",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-06T07:01:20Z",
+          "completed_at": "2026-11-06T07:06:59Z"
+        },
+        {
+          "name": "Run npm run build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T07:06:59Z",
+          "completed_at": "2026-11-06T07:07:14Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-06T07:07:14Z",
+          "completed_at": "2026-11-06T07:07:14Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-06T07:07:14Z",
+          "completed_at": "2026-11-06T07:07:15Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-06T07:07:15Z",
+          "completed_at": "2026-11-06T07:07:15Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/sharbel0022/Mgeorge/check-runs/127760756672",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000008556,
+      "runner_name": "GitHub Actions 1000008556",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

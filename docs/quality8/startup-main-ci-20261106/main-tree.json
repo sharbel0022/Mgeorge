@@ -1,0 +1,157 @@
+{
+  "sha": "4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+  "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+  "tree": [
+    {
+      "path": ".env.example",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2975eeb79f243c212b23652a6d08dc8301abb5db",
+      "size": 1924,
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/2975eeb79f243c212b23652a6d08dc8301abb5db"
+    },
+    {
+      "path": ".gitattributes",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1cf5bee602729e726cbcd587393e08bd80e3bddf",
+      "size": 162,
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/1cf5bee602729e726cbcd587393e08bd80e3bddf"
+    },
+    {
+      "path": ".github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "964c9f961938bd9ee3d1181c70ea1a94e4c41038",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/964c9f961938bd9ee3d1181c70ea1a94e4c41038"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dac3e884d8de1de38ae507b01fbd7cb38bd298f5",
+      "size": 183,
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/dac3e884d8de1de38ae507b01fbd7cb38bd298f5"
+    },
+    {
+      "path": "AGENTS.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2603939c9aa4c2ce05ab7af895a499527988bd21",
+      "size": 1707,
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/2603939c9aa4c2ce05ab7af895a499527988bd21"
+    },
+    {
+      "path": "PLAN.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b46dbc1799131d2defb6624247a8b30a81c0026a",
+      "size": 7014,
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/b46dbc1799131d2defb6624247a8b30a81c0026a"
+    },
+    {
+      "path": "PROGRESS.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c0e49c5004f36733492b40d68619951e0a541045",
+      "size": 146152,
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/c0e49c5004f36733492b40d68619951e0a541045"
+    },
+    {
+      "path": "QUALITY-SCORECARD.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2518bdb0d72d64b13161933f3a178cf867db62d",
+      "size": 237565,
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/c2518bdb0d72d64b13161933f3a178cf867db62d"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d5eec5523b04589031f5354f44b74f88c57fca4",
+      "size": 17664,
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/7d5eec5523b04589031f5354f44b74f88c57fca4"
+    },
+    {
+      "path": "bridge",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "745600d2ed8dccfd9c143ff22dbd7e37bfa6be32",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/745600d2ed8dccfd9c143ff22dbd7e37bfa6be32"
+    },
+    {
+      "path": "docs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d4a36f78aa585227bd16f4ca9bd8be18fd4a6dcd",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/d4a36f78aa585227bd16f4ca9bd8be18fd4a6dcd"
+    },
+    {
+      "path": "migrations",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9e71a352806e32ba9303041a9e8b3400e936fe8e",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/9e71a352806e32ba9303041a9e8b3400e936fe8e"
+    },
+    {
+      "path": "package-lock.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "37952e5226e223208e74d365e94e53c8cd06e8a7",
+      "size": 13133,
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/37952e5226e223208e74d365e94e53c8cd06e8a7"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8ce9b05f66186016b791cb6d4b859deae59b54cc",
+      "size": 859,
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/8ce9b05f66186016b791cb6d4b859deae59b54cc"
+    },
+    {
+      "path": "public",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cd4c67f481c5befe8ff8077e796eae6c6c0fe152",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/cd4c67f481c5befe8ff8077e796eae6c6c0fe152"
+    },
+    {
+      "path": "scripts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f1e578982af02f197814a6404ce1734de37e81cc",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/f1e578982af02f197814a6404ce1734de37e81cc"
+    },
+    {
+      "path": "sites",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4feabc128c5f677103232d1cad1e4406083e8f19",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/4feabc128c5f677103232d1cad1e4406083e8f19"
+    },
+    {
+      "path": "source",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7817580269eb9d901c8ae7bd413dfae103cef5e4",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/7817580269eb9d901c8ae7bd413dfae103cef5e4"
+    },
+    {
+      "path": "src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e4b8955617924e0d22c4123d0a6dc5b27097b2e6",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/e4b8955617924e0d22c4123d0a6dc5b27097b2e6"
+    },
+    {
+      "path": "test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3362b5b16a2cc2b76a61b7ad25f830c18a4b069a",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/3362b5b16a2cc2b76a61b7ad25f830c18a4b069a"
+    }
+  ],
+  "truncated": false
+}

@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "repository": "sharbel0022/Mgeorge",
+  "reviewer": "/root/startup_remote_independent_review",
+  "verification_kind": "Independent verification of original GitHub Actions execution logs and metadata",
+  "execution_performer": "GitHub Actions",
+  "independent_local_execution": false,
+  "checked_commit": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+  "checked_tree": "4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+  "checked_sites_tree": "4feabc128c5f677103232d1cad1e4406083e8f19",
+  "checked_parents": [
+    "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+    "520e22716c6298e4d24ccf3989e87cfe563d8d14"
+  ],
+  "workflow_run": 42177971213,
+  "run_attempt": 1,
+  "event": "push",
+  "branch": "main",
+  "source_urls": {
+    "commit": "https://api.github.com/repos/sharbel0022/Mgeorge/git/commits/cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+    "tree": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+    "workflow": "https://raw.githubusercontent.com/sharbel0022/Mgeorge/cde9178c0f8e8e386329ed8feaa4201e87b5a78f/.github/workflows/payment-control-ci.yml",
+    "run": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42177971213",
+    "jobs": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42177971213/attempts/1/jobs?per_page=100",
+    "discovery": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs?head_sha=cde9178c0f8e8e386329ed8feaa4201e87b5a78f&event=push&per_page=100"
+  },
+  "logs": [
+    {
+      "path": "docs/quality8/startup-main-ci-20261106/logs/bridge-job-127760756176.log",
+      "job_id": 127760756176,
+      "role": "bridge",
+      "utf8_bytes": 35883,
+      "javascript_characters": 35881,
+      "line_count": 490,
+      "source_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/jobs/127760756176/logs",
+      "job_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756176"
+    },
+    {
+      "path": "docs/quality8/startup-main-ci-20261106/logs/node-job-127760756473.log",
+      "job_id": 127760756473,
+      "role": "node",
+      "utf8_bytes": 990746,
+      "javascript_characters": 990618,
+      "line_count": 14327,
+      "source_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/jobs/127760756473/logs",
+      "job_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756473"
+    },
+    {
+      "path": "docs/quality8/startup-main-ci-20261106/logs/sites-job-127760756672.log",
+      "job_id": 127760756672,
+      "role": "sites",
+      "utf8_bytes": 2251145,
+      "javascript_characters": 2249805,
+      "line_count": 32298,
+      "source_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/jobs/127760756672/logs",
+      "job_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756672"
+    }
+  ],
+  "verified_at_utc": "2026-11-06 07:11:36 UTC",
+  "checkpoint_branch": "checkpoint/startup-main-ci-20261106",
+  "checkpoint_parent": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+  "checkpoint_change_scope": "Only this documentation/evidence directory",
+  "raw_log_preservation": "Complete decoded original job-log strings, unchanged. API JSON fields preserved in readable serialization.",
+  "no_test_or_workflow_rerun": true,
+  "no_product_or_test_edit": true,
+  "no_main_or_pr_ref_update": true,
+  "no_deployment_by_reviewer": true,
+  "earlier_static_reviews_unchanged": true
+}
