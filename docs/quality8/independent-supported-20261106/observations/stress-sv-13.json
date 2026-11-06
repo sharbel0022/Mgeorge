@@ -1,0 +1,24 @@
+{
+  "id": "stress-sv-13",
+  "inputSha256": "ab8357fae420e7fa5cde51bfa357aca395e018e861a3a13f5299f76c92b40b0d",
+  "workerCompleted": true,
+  "workerThrown": null,
+  "elapsedMs": 2888,
+  "processed": {
+    "text": "FAKTURA\n\nMossglöd Verkstad AB\nOrganisationsnummer: 559871-0134\n\nFakturamottagare Fakturanummer\nKundexempel Norden AB SVv-26013\nExempelvägen 8, 652 00 Karlstad Fakturadatum\n2026-09-13\nFörfallodatum\n2026-10-13\nBeskrivning Antal Belopp\nKontorsservice 1 1 536,00\nMaterialleverans 1 1 024,00\nNettobelopp 2 560,00\nMoms 2590 640,00\nAtt betala 3 200,00\n\nValuta: SEK\n\nBetalningsvillkor: 30 dagar\n\nTack för er beställning.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n",
+    "confidence": 90,
+    "method": "ocr",
+    "ocrEvidence": {
+      "version": 1,
+      "inputSha256": "ab8357fae420e7fa5cde51bfa357aca395e018e861a3a13f5299f76c92b40b0d",
+      "textSha256": "615e8ac6be478d7dac32c8e905b702adf3fcf3ae2a37cc7f781b9b14d39008d8",
+      "pages": [
+        {
+          "page": 1,
+          "textSha256": "180472794f1e3fa192529c505f87ec1fbd06d6cc860f486ea382c238ac2fd137",
+          "bankgiro": []
+        }
+      ]
+    }
+  }
+}

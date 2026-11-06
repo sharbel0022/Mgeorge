@@ -1,0 +1,24 @@
+{
+  "id": "normal-sv-03",
+  "inputSha256": "d484c429ae07925b5b4a493ee627b854dcb756fc8b69045f6e4eda5d49a230f8",
+  "workerCompleted": true,
+  "workerThrown": null,
+  "elapsedMs": 2970,
+  "processed": {
+    "text": "FAKTURA\n\nLeverantör\n\nms Fakturanummer\nFjällruta Teknik AB SV-26003\nOrganisationsnummer: 559871-0035 Fakturadatum\n2026-09-03\n\nFakturamottagare: Kundexempel Norden AB Förfallodatum\n\nExempelvägen 8, 652 00 Karlstad 2026-10-03\n\nBeskrivning Antal Belopp\n\nKontorsservice 1 4 416,00\n\nMaterialleverans 1 2 944,00\nNettobelopp 7 360,00\nMoms 2590 1 840,00\nAtt betala 9 200,00\nValuta: SEK\n\nBetalningsvillkor: 30 dagar\n\nTack för er beställning.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n\n",
+    "confidence": 91,
+    "method": "ocr",
+    "ocrEvidence": {
+      "version": 1,
+      "inputSha256": "d484c429ae07925b5b4a493ee627b854dcb756fc8b69045f6e4eda5d49a230f8",
+      "textSha256": "153d84bca10b42862c57bd38ece7ac2fd25ada0e6e195dedd38f7b7cba2e3a60",
+      "pages": [
+        {
+          "page": 1,
+          "textSha256": "46f013321996de1285ab419a2fb899612ba780739beb96d25ad355c02a646d3d",
+          "bankgiro": []
+        }
+      ]
+    }
+  }
+}

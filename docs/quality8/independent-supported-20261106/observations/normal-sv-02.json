@@ -1,0 +1,24 @@
+{
+  "id": "normal-sv-02",
+  "inputSha256": "c4c6d9dbce589ff6afe69c23b8d662b4ba160eef09c92b295e721bda391cb86f",
+  "workerCompleted": true,
+  "workerThrown": null,
+  "elapsedMs": 3003,
+  "processed": {
+    "text": "Granlyra Service AB\n\nLeverantör | Organisationsnummer: 559871-0027\n\nFAKTURA\n\nFakturanummer SV-26002\n\nFakturadatum 2026-09-02\n\nFörfallodatum 2026-10-02\n\n\n\n\nFakturamottagare: Kundexempel Norden AB\nExempelvägen 8, 652 00 Karlstad\n\nBeskrivning Antal Belopp\n\nKontorsservice 1 750,00\n\nMaterialleverans 1 500,00\nNettobelopp\t1 250,00\n\nMoms 2590\t312,50\n\nAtt betala\t1 562,50\n\nValuta: SEK\n\nBetalningsvillkor: 30 dagar\n\nTack för er beställning.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n",
+    "confidence": 92,
+    "method": "ocr",
+    "ocrEvidence": {
+      "version": 1,
+      "inputSha256": "c4c6d9dbce589ff6afe69c23b8d662b4ba160eef09c92b295e721bda391cb86f",
+      "textSha256": "edf5badde06c12c2be1010d372c973d5de7bda8aed43f9ef09b24b98200b7691",
+      "pages": [
+        {
+          "page": 1,
+          "textSha256": "bafa7f7ffa8ab66334507f4b4bfcf719f5d352722d406a1bc55522a53487fad0",
+          "bankgiro": []
+        }
+      ]
+    }
+  }
+}

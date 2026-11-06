@@ -1,0 +1,268 @@
+{
+  "id": "normal-en-07",
+  "cohort": "normal",
+  "language": "en",
+  "workerCompleted": true,
+  "parsers": {
+    "node": {
+      "extraction": {
+        "version": 3,
+        "method": "ocr",
+        "fields": {
+          "invoice_number": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "party": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": "Kräver kontroll"
+          },
+          "organization_number": {
+            "value": "5598710076",
+            "confidence": 0.85,
+            "evidence": "Organization number: 559871-0076",
+            "warning": "Kräver kontroll"
+          },
+          "issued_at": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "due_at": {
+            "value": "2026-10-07",
+            "confidence": 0.85,
+            "evidence": "Due date 2026-10-07",
+            "warning": "Kräver kontroll"
+          },
+          "total_cents": {
+            "value": 405000,
+            "confidence": 0.85,
+            "evidence": "Amount due\t4 050.00",
+            "warning": "Kräver kontroll"
+          },
+          "vat_cents": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "net_cents": {
+            "value": 324000,
+            "confidence": 0.85,
+            "evidence": "Net amount\t3 240.00",
+            "warning": "Kräver kontroll"
+          },
+          "reference": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "bankgiro": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "direction": {
+            "value": "supplier",
+            "confidence": 0.94,
+            "evidence": "Föreslagen från mejlets riktning",
+            "warning": null
+          },
+          "kind": {
+            "value": "invoice",
+            "confidence": 0.85,
+            "evidence": "INVOICE",
+            "warning": "Kräver kontroll"
+          },
+          "currency": {
+            "value": "SEK",
+            "confidence": 0.85,
+            "evidence": "Currency: SEK",
+            "warning": "Kräver kontroll"
+          }
+        },
+        "details": {
+          "version": 1,
+          "supplier": {
+            "name": null,
+            "organization_number": "5598710076",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organization number: 559871-0076"
+              }
+            ]
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "reference": {
+            "kind": null,
+            "value": null,
+            "checksum_valid": null,
+            "formal_verified": false,
+            "evidence": []
+          },
+          "line_items": [],
+          "vat_rates": [],
+          "table_status": "absent"
+        },
+        "level": "red",
+        "classification": {
+          "category": "invoice",
+          "exclude_from_invoice_queue": false,
+          "reason": "",
+          "version": 1
+        },
+        "issues": [
+          "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+          "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, moms"
+        ],
+        "text_excerpt": "INVOICE\n\nEmber Quay Services AB\nOrganization number: 559871-0076\n\nBill to Invoice number\nKundexempel Norden AB EN-26007\nExempelvägen 8, 652 00 Karlstad Issue date\n2026-09-07\nDue date 2026-10-07\n\n\nDescription Qty Amount\nOffice services 1 1 944.00\nMaterials delivery 1 1 296.00\nNet amount\t3 240.00\n\nVAT 2590\t810.00\n\nAmount due\t4 050.00\n\n\nCurrency: SEK\n\nPayment terms: 30 days\n\nThank you for your order.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n",
+        "extracted_at": "2026-11-06T15:43:51.588Z"
+      },
+      "error": null
+    },
+    "sites": {
+      "extraction": {
+        "version": 3,
+        "method": "ocr",
+        "fields": {
+          "invoice_number": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "party": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": "Kräver kontroll"
+          },
+          "organization_number": {
+            "value": "5598710076",
+            "confidence": 0.85,
+            "evidence": "Organization number: 559871-0076",
+            "warning": "Kräver kontroll"
+          },
+          "issued_at": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "due_at": {
+            "value": "2026-10-07",
+            "confidence": 0.85,
+            "evidence": "Due date 2026-10-07",
+            "warning": "Kräver kontroll"
+          },
+          "total_cents": {
+            "value": 405000,
+            "confidence": 0.85,
+            "evidence": "Amount due\t4 050.00",
+            "warning": "Kräver kontroll"
+          },
+          "vat_cents": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "net_cents": {
+            "value": 324000,
+            "confidence": 0.85,
+            "evidence": "Net amount\t3 240.00",
+            "warning": "Kräver kontroll"
+          },
+          "reference": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "bankgiro": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "direction": {
+            "value": "supplier",
+            "confidence": 0.94,
+            "evidence": "Föreslagen från mejlets riktning",
+            "warning": null
+          },
+          "kind": {
+            "value": "invoice",
+            "confidence": 0.85,
+            "evidence": "INVOICE",
+            "warning": "Kräver kontroll"
+          },
+          "currency": {
+            "value": "SEK",
+            "confidence": 0.85,
+            "evidence": "Currency: SEK",
+            "warning": "Kräver kontroll"
+          }
+        },
+        "details": {
+          "version": 1,
+          "supplier": {
+            "name": null,
+            "organization_number": "5598710076",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organization number: 559871-0076"
+              }
+            ]
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "reference": {
+            "kind": null,
+            "value": null,
+            "checksum_valid": null,
+            "formal_verified": false,
+            "evidence": []
+          },
+          "line_items": [],
+          "vat_rates": [],
+          "table_status": "absent"
+        },
+        "level": "red",
+        "classification": {
+          "category": "invoice",
+          "exclude_from_invoice_queue": false,
+          "reason": "",
+          "version": 1
+        },
+        "issues": [
+          "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+          "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, moms"
+        ],
+        "text_excerpt": "INVOICE\n\nEmber Quay Services AB\nOrganization number: 559871-0076\n\nBill to Invoice number\nKundexempel Norden AB EN-26007\nExempelvägen 8, 652 00 Karlstad Issue date\n2026-09-07\nDue date 2026-10-07\n\n\nDescription Qty Amount\nOffice services 1 1 944.00\nMaterials delivery 1 1 296.00\nNet amount\t3 240.00\n\nVAT 2590\t810.00\n\nAmount due\t4 050.00\n\n\nCurrency: SEK\n\nPayment terms: 30 days\n\nThank you for your order.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n",
+        "extracted_at": "2026-11-06T15:43:51.589Z"
+      },
+      "error": null
+    }
+  }
+}

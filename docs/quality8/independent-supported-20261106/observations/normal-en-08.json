@@ -1,0 +1,24 @@
+{
+  "id": "normal-en-08",
+  "inputSha256": "9b6b8f8166abb61b95d1a9086e19c0b3a68fd7f731dc8f5136de389b080445c9",
+  "workerCompleted": true,
+  "workerThrown": null,
+  "elapsedMs": 3176,
+  "processed": {
+    "text": "Cedar Lantern Design AB\nSupplier | Organization number: 559871-0084\n\nINVOICE\n\nInvoice number Issue date Due date\n\nEN-26008 2026-09-08 2026-10-08\n\nBill to: Kundexempel Norden AB\n\nExempelvägen 8, 652 00 Karlstad\n\nDescription Qty Amount\n\nOffice services 1 2 808.00\n\nMaterials delivery 1 1 872.00\nNet amount\t4 680.00\n\nVAT 2590\t1170.00\n\nAmount due\t5 850.00\n\n\nPayment terms: 30 days\n\nThank you for your order.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n\nCurrency: SEK\n",
+    "confidence": 93,
+    "method": "ocr",
+    "ocrEvidence": {
+      "version": 1,
+      "inputSha256": "9b6b8f8166abb61b95d1a9086e19c0b3a68fd7f731dc8f5136de389b080445c9",
+      "textSha256": "9dbe95ef408c06174f03bec712a31ac4a48ba390d27302e2e016a571439eab85",
+      "pages": [
+        {
+          "page": 1,
+          "textSha256": "3cc7f7ff07a7e2720509c569fe5b584216784273b52f7852ddfc021edc18f7b9",
+          "bankgiro": []
+        }
+      ]
+    }
+  }
+}

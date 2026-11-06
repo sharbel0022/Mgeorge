@@ -1,0 +1,24 @@
+{
+  "id": "stress-en-14",
+  "inputSha256": "e7d8546aaf8d9ad20f768801adf0c04bd296e92e1acc3778139d229cf55fb242",
+  "workerCompleted": true,
+  "workerThrown": null,
+  "elapsedMs": 2174,
+  "processed": {
+    "text": "Maple Quartz Services AB\nSupplier | Organization number: 559871-0142\n\nINVOICE\n\nInvoice number Issue date Due date\n\nEN-26014 2026-09-14 2026-10-14\n\nBill to: Kundexempel Norden AB\nExempelvägen 8, 652 00 Karlstad\n\nDescription Qty Amount\n\nOffice services 1 2 592.00\n\nMaterials delivery nå 1 728.00\nNet amount\t4 320.00\n\nVAT 2590\t1 080.00\n\nAmount due\t5 400.00\n\n\nCurrency: SEK\n\nPayment terms: 30 days\nThank you for your order.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n",
+    "confidence": 90,
+    "method": "ocr",
+    "ocrEvidence": {
+      "version": 1,
+      "inputSha256": "e7d8546aaf8d9ad20f768801adf0c04bd296e92e1acc3778139d229cf55fb242",
+      "textSha256": "a7067912355a38dabe4eed4ce86106c87be51a4f933d0ed373fde2e5145b5ec2",
+      "pages": [
+        {
+          "page": 1,
+          "textSha256": "6ccbea6874e1e1d9af6dae8a0c97ac9225975e857b8117bd6eee2847aea6ec0a",
+          "bankgiro": []
+        }
+      ]
+    }
+  }
+}

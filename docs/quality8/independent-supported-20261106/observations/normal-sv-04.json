@@ -1,0 +1,24 @@
+{
+  "id": "normal-sv-04",
+  "inputSha256": "27741a77f246078ae50c364173b22c55ed2c223d886b441c35069f87b6d459fc",
+  "workerCompleted": true,
+  "workerThrown": null,
+  "elapsedMs": 2935,
+  "processed": {
+    "text": "FAKTURA\n\nBjörkkompass Material AB\nOrganisationsnummer: 559871-0043\n\nFakturamottagare Fakturanummer\nKundexempel Norden AB SV-26004\nExempelvägen 8, 652 00 Karlstad Fakturadatum\n2026-09-04\nFörfallodatum 2026-10-04\n\n\nBeskrivning Antal Belopp\nKontorsservice 1 1 788,00\nMaterialleverans 1 1 192,00\nNettobelopp\t2 980,00\n\nMoms 2590\t745,00\n\nAtt betala\t3 725,00\n\nValuta: SEK\n\nBetalningsvillkor: 30 dagar\n\nTack för er beställning.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n",
+    "confidence": 92,
+    "method": "ocr",
+    "ocrEvidence": {
+      "version": 1,
+      "inputSha256": "27741a77f246078ae50c364173b22c55ed2c223d886b441c35069f87b6d459fc",
+      "textSha256": "3ff2f609f536efe86b3014967e748faac1a922481c83a245294847800306188a",
+      "pages": [
+        {
+          "page": 1,
+          "textSha256": "5b35b4a2778477664b8294c82b5633c8ed8ac5461b390dd359e295dad236e645",
+          "bankgiro": []
+        }
+      ]
+    }
+  }
+}

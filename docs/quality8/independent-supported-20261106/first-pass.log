@@ -1,0 +1,55 @@
+{"id":"normal-sv-01","workerCompleted":true,"elapsedMs":2955,"levels":{"node":"red","sites":"red"}}
+{"id":"normal-sv-02","workerCompleted":true,"elapsedMs":3003,"levels":{"node":"yellow","sites":"yellow"}}
+{"id":"normal-sv-03","workerCompleted":true,"elapsedMs":2970,"levels":{"node":"red","sites":"red"}}
+{"id":"normal-sv-04","workerCompleted":true,"elapsedMs":2935,"levels":{"node":"red","sites":"red"}}
+{"id":"normal-sv-05","workerCompleted":true,"elapsedMs":2936,"levels":{"node":"yellow","sites":"yellow"}}
+{"id":"normal-sv-06","workerCompleted":true,"elapsedMs":3088,"levels":{"node":"red","sites":"red"}}
+{"id":"normal-en-07","workerCompleted":true,"elapsedMs":2976,"levels":{"node":"red","sites":"red"}}
+{"id":"normal-en-08","workerCompleted":true,"elapsedMs":3176,"levels":{"node":"red","sites":"red"}}
+{"id":"normal-en-09","workerCompleted":true,"elapsedMs":3505,"levels":{"node":"yellow","sites":"yellow"}}
+{"id":"normal-en-10","workerCompleted":true,"elapsedMs":3132,"levels":{"node":"red","sites":"red"}}
+{"id":"normal-en-11","workerCompleted":true,"elapsedMs":3124,"levels":{"node":"red","sites":"red"}}
+{"id":"normal-en-12","workerCompleted":true,"elapsedMs":2980,"levels":{"node":"yellow","sites":"yellow"}}
+{"id":"stress-sv-13","workerCompleted":true,"elapsedMs":2888,"levels":{"node":"red","sites":"red"}}
+{"id":"stress-en-14","workerCompleted":true,"elapsedMs":2174,"levels":{"node":"red","sites":"red"}}
+{
+  "calls": {
+    "worker": 14,
+    "node": 14,
+    "sites": 14
+  },
+  "workerCompleted": 14,
+  "workerFailed": 0,
+  "normal": {
+    "node": {
+      "TP": 62,
+      "FP": 0,
+      "FN": 46,
+      "recall": 0.5740740740740741,
+      "precision": 1
+    },
+    "sites": {
+      "TP": 62,
+      "FP": 0,
+      "FN": 46,
+      "recall": 0.5740740740740741,
+      "precision": 1
+    }
+  },
+  "stress": {
+    "node": {
+      "TP": 10,
+      "FP": 0,
+      "FN": 8,
+      "recall": 0.5555555555555556,
+      "precision": 1
+    },
+    "sites": {
+      "TP": 10,
+      "FP": 0,
+      "FN": 8,
+      "recall": 0.5555555555555556,
+      "precision": 1
+    }
+  }
+}

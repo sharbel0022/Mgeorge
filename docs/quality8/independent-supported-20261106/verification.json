@@ -1,0 +1,40 @@
+{
+  "verifiedAt": "2026-11-06T16:46:43.733240+01:00",
+  "frozenFilesUnchanged": 19,
+  "eachCaseExactlyOneWorkerAndOneCallPerParser": true,
+  "workerCalls": 14,
+  "nodeParserCalls": 14,
+  "sitesParserCalls": 14,
+  "methods": {
+    "ocr": 14
+  },
+  "actualConfidenceMin": 89,
+  "actualConfidenceMax": 93,
+  "allOrganizationFormatAndLuhnChecksPass": true,
+  "allArithmeticDateAndCurrencyChecksPass": true,
+  "normalPrimaryDenominatorPerEngine": 108,
+  "stressDenominatorPerEngine": 18,
+  "allReportedDenominatorsAndCaseTotalsMatch": true,
+  "nodeSitesOutputParityExceptExtractionTimestampAll14": true,
+  "timestampDifferences": [
+    "normal-sv-01",
+    "normal-sv-02",
+    "normal-sv-03",
+    "normal-sv-04",
+    "normal-sv-05",
+    "normal-sv-06",
+    "normal-en-07",
+    "normal-en-08",
+    "normal-en-09",
+    "normal-en-10",
+    "normal-en-11",
+    "normal-en-12",
+    "stress-sv-13",
+    "stress-en-14"
+  ],
+  "verificationNote": "Initial full-output equality assertion correctly failed on extracted_at wall-clock timestamps; after inspecting output differences only, equality was checked excluding that timestamp. No benchmark data, gold, parser call, or scoring rule changed.",
+  "productDiffFromApprovedSource": "docs-only",
+  "identicalInstalledLockfileVerified": true,
+  "freezeCommit": "cb83472359927adadf99cb50b54f9e9aeaded19a",
+  "noWorkerOrParserCallsDuringVerification": true
+}

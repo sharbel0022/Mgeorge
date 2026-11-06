@@ -1,0 +1,24 @@
+{
+  "id": "normal-sv-01",
+  "inputSha256": "26cd6e665336e565be51935602bc9741f25527bef70478f5c316c7ebfb3bf819",
+  "workerCompleted": true,
+  "workerThrown": null,
+  "elapsedMs": 2955,
+  "processed": {
+    "text": "FAKTURA\n\nMyrglimt Kontor AB\nOrganisationsnummer: 559871-0019\n\nFakturamottagare Fakturanummer\nKundexempel Norden AB SV-26001\nExempelvägen 8, 652 00 Karlstad Fakturadatum\n2026-09-01\nFörfallodatum 2026-10-01\n\n\nBeskrivning Antal Belopp\nKontorsservice 1 2 880,00\nMaterialleverans 1 1 920,00\nNettobelopp\t4 800,00\n\nMoms 2590\t1 200,00\n\nAtt betala\t6 000,00\n\nValuta: SEK\n\nBetalningsvillkor: 30 dagar\n\nTack för er beställning.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n",
+    "confidence": 93,
+    "method": "ocr",
+    "ocrEvidence": {
+      "version": 1,
+      "inputSha256": "26cd6e665336e565be51935602bc9741f25527bef70478f5c316c7ebfb3bf819",
+      "textSha256": "de6d537903e18a4e252303f4c033c98358f9c88f99b336d5d537f426e1216aeb",
+      "pages": [
+        {
+          "page": 1,
+          "textSha256": "66d3669b0a2988c7aaeba3f6cea79efa2a686093211dd9a4cf024396172fdbe8",
+          "bankgiro": []
+        }
+      ]
+    }
+  }
+}
