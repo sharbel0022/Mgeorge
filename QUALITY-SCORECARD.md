@@ -1,3 +1,13 @@
+## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
+
+PR 61 är normalt mergad till `24390ef7e8cf6b2274c57804dc9c2d74d362ab12`. Full PR-kvalitet, separat säkerhetsacceptans och separat main-CI är gröna för samma källträd. Site **68** publicerades från exakt motsvarande Sites-träd och är avgränsat kontrollerad efter release. [Releasekvitto](docs/completion/release-site68.md).
+
+Aktuell konservativ bedömning är **258,5/330 = 7,83/10**, 27/33 minst 8; målet 314/330 är inte uppnått. [Samtliga 33 kriterier med bevis och risker](docs/completion/final-33-assessment.md). De två oberoende OCR-förstaproven bevaras separat: 37,50 % recall i första kohorten med dokumenterade populationsbegränsningar; 57,41 % i separat giltig SEK-kohort. Ingen normalfaktura blev fullständig eller grön i något av proven.
+
+En separat granskningsbar worker-/standardetikettkandidat på `feature/final-95-completion` har frysta RED/GREEN-kvitton, 574/574 Node- och 464/464 Sites-fokusfall samt 120/120 oberoende aliasprov. Dess granskade käll- och testträd är byteidentiska med `100f9c3015da34f772ea0cba53d9871e978ebeab`. **Ny full PR-/main-CI och ny Sites-publicering återstår.** Tidigare grönt räknas inte för den nya koden. Den enda utvecklingsreplayen 62→66/108 avser en mellanversion, inga nya optiska anrop och ingen självständig slutacceptans.
+
+Swedbank kräver fortfarande giltig återanslutning; Bankgiro är `SOURCE_NOT_CONFIGURED`. Gmail-tillfällena 15:00 och 16:00 gav `no_update` utan appdispatch. Periodisk OCR har ett tidigare 6/0-kvitto från 10:44, medan 15:05 var CI-triggad. Den riktiga backupen täcker sitt frysta manifest på 430 original. Inga osäkra kunddokument har massgodkänts och inga finansiella allokeringar skapats. [Samlad rapport](docs/completion/final-integration-report.md).
+
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
 ## Pågående slutförandeverifiering — 2026-11-06 14:28 UTC

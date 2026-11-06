@@ -1,0 +1,61 @@
+{
+  "schema": "mgeorge-worker-reviewed-product-binding-v1",
+  "reviewed_original_commit": "f5d178ea816d276457685fbc0421cf144f7cf655",
+  "integrated_local_commit": "5bc2627c8889a6252bbc205ec43edea7f8ff1390",
+  "integrated_remote_commit": "0d20eb1a8a2ab66345b857be8c45d2e77b9b6da9",
+  "product_fix_remote_commit": "c581a1b58cfe146586226d9fcfcf9da20484d62a",
+  "scope": [
+    {
+      "path": "src",
+      "reviewed_object": "69dd44569dc6863037b47eadae8f1af277f4e6b2",
+      "integrated_object": "69dd44569dc6863037b47eadae8f1af277f4e6b2",
+      "identical": true
+    },
+    {
+      "path": "sites",
+      "reviewed_object": "ff078901d22a76ce0d0eac775e405ca50d8bcc6e",
+      "integrated_object": "ff078901d22a76ce0d0eac775e405ca50d8bcc6e",
+      "identical": true
+    },
+    {
+      "path": "scripts",
+      "reviewed_object": "cc017f88bace58eeeeb11af01f1ae68669afcd24",
+      "integrated_object": "cc017f88bace58eeeeb11af01f1ae68669afcd24",
+      "identical": true
+    },
+    {
+      "path": "test",
+      "reviewed_object": "faf327b4d61765ab96098141e2fc9d7e57f7dc15",
+      "integrated_object": "faf327b4d61765ab96098141e2fc9d7e57f7dc15",
+      "identical": true
+    },
+    {
+      "path": "bridge",
+      "reviewed_object": "745600d2ed8dccfd9c143ff22dbd7e37bfa6be32",
+      "integrated_object": "745600d2ed8dccfd9c143ff22dbd7e37bfa6be32",
+      "identical": true
+    },
+    {
+      "path": ".github",
+      "reviewed_object": "95efa60228291e7a08832423647774618e5ca458",
+      "integrated_object": "95efa60228291e7a08832423647774618e5ca458",
+      "identical": true
+    },
+    {
+      "path": "package.json",
+      "reviewed_object": "ec4a416cc6e55d664879afc262ffc7528e914a5d",
+      "integrated_object": "ec4a416cc6e55d664879afc262ffc7528e914a5d",
+      "identical": true
+    },
+    {
+      "path": "package-lock.json",
+      "reviewed_object": "37952e5226e223208e74d365e94e53c8cd06e8a7",
+      "integrated_object": "37952e5226e223208e74d365e94e53c8cd06e8a7",
+      "identical": true
+    }
+  ],
+  "all_compared_source_and_test_objects_identical": true,
+  "sites_release": "68",
+  "sites_tree": "ff078901d22a76ce0d0eac775e405ca50d8bcc6e",
+  "historical_scope": "This binding records the earlier worker-only integration at local5bc2627/remote0d20eb1. Later standard-label fixes change src, sites and test; use final-candidate-product-binding.json for the combined candidate."
+}

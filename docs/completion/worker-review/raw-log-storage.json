@@ -1,0 +1,15 @@
+{
+  "schema": "mgeorge-raw-review-log-storage-v1",
+  "reason": "Preserve original assertion-log whitespace byte for byte while keeping the integrated source diff free of whitespace errors. The historical review receipt retains its original logical filename and SHA256.",
+  "files": [
+    {
+      "logical_original": "parent-red.tap",
+      "archive": "parent-red.tap.gz",
+      "original_bytes": 14309,
+      "original_sha256": "e5e6a7b01bb64a6c8854b06d6d14e0cae4a1e06260ab9f2ca98f1358f10fb4f4",
+      "archive_bytes": 1337,
+      "archive_sha256": "62d862925c999948251f4a8d5118805b9f4048ef16b969a77c55eb539d64f90c",
+      "decompressed_bytes_verified": true
+    }
+  ]
+}

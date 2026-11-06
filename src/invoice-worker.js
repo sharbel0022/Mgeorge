@@ -76,6 +76,9 @@ async function run(workerData){
 }
 process.once('message',async data=>{
   let result;try{result=await run(data);}catch{result={error:true};}
-  finally{if(ocr)await ocr.terminate();}
-  process.send(result,()=>process.exit(0));
+  // Cleanup must not discard a completed receipt or the unreadable result.
+  try{if(ocr)await ocr.terminate();}
+  catch{result={...result,workerDiagnostics:{code:'DOCUMENT_WORKER_CLEANUP_FAILED'}};}
+  try{process.send(result,error=>process.exit(error?1:0));}
+  catch{process.exit(1);}
 });

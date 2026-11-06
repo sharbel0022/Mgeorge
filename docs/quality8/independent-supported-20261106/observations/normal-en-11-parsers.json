@@ -1,0 +1,284 @@
+{
+  "id": "normal-en-11",
+  "cohort": "normal",
+  "language": "en",
+  "workerCompleted": true,
+  "parsers": {
+    "node": {
+      "extraction": {
+        "version": 3,
+        "method": "ocr",
+        "fields": {
+          "invoice_number": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "party": {
+            "value": null,
+            "confidence": 0,
+            "evidence": "Supplier | Organization number: 559871-0118",
+            "warning": "Kräver kontroll"
+          },
+          "organization_number": {
+            "value": "5598710118",
+            "confidence": 0.85,
+            "evidence": "Supplier | Organization number: 559871-0118",
+            "warning": "Kräver kontroll"
+          },
+          "issued_at": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "due_at": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "total_cents": {
+            "value": 742500,
+            "confidence": 0.85,
+            "evidence": "Amount due\t7 425.00",
+            "warning": "Kräver kontroll"
+          },
+          "vat_cents": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "net_cents": {
+            "value": 594000,
+            "confidence": 0.85,
+            "evidence": "Net amount\t5 940.00",
+            "warning": "Kräver kontroll"
+          },
+          "reference": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "bankgiro": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "direction": {
+            "value": "supplier",
+            "confidence": 0.94,
+            "evidence": "Föreslagen från mejlets riktning",
+            "warning": null
+          },
+          "kind": {
+            "value": "invoice",
+            "confidence": 0.85,
+            "evidence": "INVOICE",
+            "warning": "Kräver kontroll"
+          },
+          "currency": {
+            "value": "SEK",
+            "confidence": 0.85,
+            "evidence": "Currency: SEK",
+            "warning": "Kräver kontroll"
+          }
+        },
+        "details": {
+          "version": 1,
+          "supplier": {
+            "name": null,
+            "organization_number": "5598710118",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Supplier | Organization number: 559871-0118"
+              }
+            ]
+          },
+          "recipient": {
+            "name": "Kundexempel Norden AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 10,
+                "text": "Bill to: Kundexempel Norden AB"
+              }
+            ]
+          },
+          "reference": {
+            "kind": null,
+            "value": null,
+            "checksum_valid": null,
+            "formal_verified": false,
+            "evidence": []
+          },
+          "line_items": [],
+          "vat_rates": [],
+          "table_status": "absent"
+        },
+        "level": "red",
+        "classification": {
+          "category": "invoice",
+          "exclude_from_invoice_queue": false,
+          "reason": "",
+          "version": 1
+        },
+        "issues": [
+          "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+          "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+          "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, moms"
+        ],
+        "text_excerpt": "Willow Orbit Supply AB\nSupplier | Organization number: 559871-0118\n\nINVOICE\n\nInvoice number Issue date Due date\n\nEN-26011 2026-09-11 2026-10-11\n\nBill to: Kundexempel Norden AB\n\nExempelvägen 8, 652 00 Karlstad\n\nDescription Qty Amount\n\nOffice services 1 3 564.00\n\nMaterials delivery 1 2 376.00\nNet amount\t5 940.00\n\nVAT 2590\t1485.00\n\nAmount due\t7 425.00\n\n\nPayment terms: 30 days\n\nThank you for your order.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n\nCurrency: SEK\n",
+        "extracted_at": "2026-11-06T15:44:04.554Z"
+      },
+      "error": null
+    },
+    "sites": {
+      "extraction": {
+        "version": 3,
+        "method": "ocr",
+        "fields": {
+          "invoice_number": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "party": {
+            "value": null,
+            "confidence": 0,
+            "evidence": "Supplier | Organization number: 559871-0118",
+            "warning": "Kräver kontroll"
+          },
+          "organization_number": {
+            "value": "5598710118",
+            "confidence": 0.85,
+            "evidence": "Supplier | Organization number: 559871-0118",
+            "warning": "Kräver kontroll"
+          },
+          "issued_at": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "due_at": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "total_cents": {
+            "value": 742500,
+            "confidence": 0.85,
+            "evidence": "Amount due\t7 425.00",
+            "warning": "Kräver kontroll"
+          },
+          "vat_cents": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "net_cents": {
+            "value": 594000,
+            "confidence": 0.85,
+            "evidence": "Net amount\t5 940.00",
+            "warning": "Kräver kontroll"
+          },
+          "reference": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "bankgiro": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "direction": {
+            "value": "supplier",
+            "confidence": 0.94,
+            "evidence": "Föreslagen från mejlets riktning",
+            "warning": null
+          },
+          "kind": {
+            "value": "invoice",
+            "confidence": 0.85,
+            "evidence": "INVOICE",
+            "warning": "Kräver kontroll"
+          },
+          "currency": {
+            "value": "SEK",
+            "confidence": 0.85,
+            "evidence": "Currency: SEK",
+            "warning": "Kräver kontroll"
+          }
+        },
+        "details": {
+          "version": 1,
+          "supplier": {
+            "name": null,
+            "organization_number": "5598710118",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Supplier | Organization number: 559871-0118"
+              }
+            ]
+          },
+          "recipient": {
+            "name": "Kundexempel Norden AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 10,
+                "text": "Bill to: Kundexempel Norden AB"
+              }
+            ]
+          },
+          "reference": {
+            "kind": null,
+            "value": null,
+            "checksum_valid": null,
+            "formal_verified": false,
+            "evidence": []
+          },
+          "line_items": [],
+          "vat_rates": [],
+          "table_status": "absent"
+        },
+        "level": "red",
+        "classification": {
+          "category": "invoice",
+          "exclude_from_invoice_queue": false,
+          "reason": "",
+          "version": 1
+        },
+        "issues": [
+          "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+          "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+          "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, moms"
+        ],
+        "text_excerpt": "Willow Orbit Supply AB\nSupplier | Organization number: 559871-0118\n\nINVOICE\n\nInvoice number Issue date Due date\n\nEN-26011 2026-09-11 2026-10-11\n\nBill to: Kundexempel Norden AB\n\nExempelvägen 8, 652 00 Karlstad\n\nDescription Qty Amount\n\nOffice services 1 3 564.00\n\nMaterials delivery 1 2 376.00\nNet amount\t5 940.00\n\nVAT 2590\t1485.00\n\nAmount due\t7 425.00\n\n\nPayment terms: 30 days\n\nThank you for your order.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n\nCurrency: SEK\n",
+        "extracted_at": "2026-11-06T15:44:04.559Z"
+      },
+      "error": null
+    }
+  }
+}

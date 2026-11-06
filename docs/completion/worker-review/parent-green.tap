@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: false send return is backpressure, and the exact complete result is preserved
+ok 1 - false send return is backpressure, and the exact complete result is preserved
+  ---
+  duration_ms: 2.155207
+  type: 'test'
+  ...
+# Subtest: message success remains stable after a subsequent process error or exit
+ok 2 - message success remains stable after a subsequent process error or exit
+  ---
+  duration_ms: 0.422254
+  type: 'test'
+  ...
+# Subtest: process error exposes no private exception fields or getters
+ok 3 - process error exposes no private exception fields or getters
+  ---
+  duration_ms: 1.081925
+  type: 'test'
+  ...
+# Subtest: input send failure beats a later claimed receipt
+ok 4 - input send failure beats a later claimed receipt
+  ---
+  duration_ms: 0.602936
+  type: 'test'
+  ...
+# Subtest: synchronous send throw stays private and stops the child
+ok 5 - synchronous send throw stays private and stops the child
+  ---
+  duration_ms: 0.323866
+  type: 'test'
+  ...
+# Subtest: normal exit without result
+ok 6 - normal exit without result
+  ---
+  duration_ms: 0.318248
+  type: 'test'
+  ...
+# Subtest: nonzero exit without result
+ok 7 - nonzero exit without result
+  ---
+  duration_ms: 0.194722
+  type: 'test'
+  ...
+# Subtest: known signal
+ok 8 - known signal
+  ---
+  duration_ms: 0.17281
+  type: 'test'
+  ...
+# Subtest: untrusted exit fields
+ok 9 - untrusted exit fields
+  ---
+  duration_ms: 0.531308
+  type: 'test'
+  ...
+# Subtest: objects without coercion
+ok 10 - objects without coercion
+  ---
+  duration_ms: 7.019193
+  type: 'test'
+  ...
+# Subtest: 90-second timeout rejects before a late result and the slot is released
+ok 11 - 90-second timeout rejects before a late result and the slot is released
+  ---
+  duration_ms: 0.619781
+  type: 'test'
+  ...
+# Subtest: the two-job boundary remains 429 and both failed slots can be reused
+ok 12 - the two-job boundary remains 429 and both failed slots can be reused
+  ---
+  duration_ms: 4.917647
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 330.255352

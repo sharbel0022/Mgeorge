@@ -1,0 +1,30 @@
+{
+  "startedAt": "2026-11-06T15:43:30.523Z",
+  "sourceCommit": "cb83472359927adadf99cb50b54f9e9aeaded19a",
+  "approvedProductCommit": "f5d178ea816d276457685fbc0421cf144f7cf655",
+  "freezeSha256": "0fd6c4de10ad0b4e8c883b727aa9c3a5a5a7a2a9d272957cee11469b9cb44758",
+  "node": "v24.22.1",
+  "platform": "linux",
+  "arch": "x64",
+  "dependencies": {
+    "@napi-rs/canvas": "0.1.80",
+    "@tesseract.js-data/swe": "1.0.0",
+    "tesseract.js": "6.0.1",
+    "tesseract.js-core": "6.1.2",
+    "pdfjs-dist": "5.4.149"
+  },
+  "sourceHashes": {
+    "src/invoice-extraction.js": "4ef7393f53ff1a850c26f76dbb4d908ba99620d859949236fbe0b844ead9aa13",
+    "src/invoice-worker.js": "4f7d992e8fbe81eb44d350763c7ef6e58db217f2a24be8d18041e7a546db3146",
+    "sites/lib/invoice-fields.js": "de8c04cb0032df723070f853cc917b276dc2620670443957247d91881a02d78d",
+    "package-lock.json": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d"
+  },
+  "modelFiles": {
+    "/workspace/scratch/aab0f7dc06f9/Mgeorge/node_modules/@tesseract.js-data/swe/4.0.0/swe.traineddata.gz": "8432cbbf8c916ab80e21c00379591e696b7dfee5183242f8a137cad93ec4803b",
+    "/workspace/scratch/aab0f7dc06f9/Mgeorge/node_modules/tesseract.js-core/tesseract-core-lstm.wasm": "220e2e87551edccb85519796a170469f8ab2a8055216789e3b8b1ada18b7bc2b",
+    "/workspace/scratch/aab0f7dc06f9/Mgeorge/node_modules/tesseract.js-core/tesseract-core-simd-lstm.wasm": "187d76742dfc0d8929f0b49a619f145bb6370730776c7bd0d3e20c6b2098808d",
+    "/workspace/scratch/aab0f7dc06f9/Mgeorge/node_modules/tesseract.js-core/tesseract-core-simd.wasm": "ca11ee92a02023e4f5083eefd0966fb83b297416da54e997b9f6ce445f719c9b",
+    "/workspace/scratch/aab0f7dc06f9/Mgeorge/node_modules/tesseract.js-core/tesseract-core.wasm": "740f7e466a2f026e1f1e54a2e0d9957e386d8166110d1290224abd3d08986106"
+  },
+  "preflightCalls": 0
+}

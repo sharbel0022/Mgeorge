@@ -1,0 +1,24 @@
+{
+  "id": "normal-en-12",
+  "inputSha256": "41d556900b5593eeaced66d423d54effe9a0e95af874a99b6f70c203f6f2d0c8",
+  "workerCompleted": true,
+  "workerThrown": null,
+  "elapsedMs": 2980,
+  "processed": {
+    "text": "INVOICE\n\nSupplier North Velvet Studio AB\n\n\n\nInvoice number EN-26012\n\n\n\nOrganization number: 559871-0126 Issue date\n2026-09-12\nBill to: Kundexempel Norden AB Due date\nExempelvägen 8, 652 00 Karlstad 2026-10-12\nDescription Qty Amount\nOffice services 1 2 268.00\nMaterials delivery 1 1 512.00\nNet amount\t3 780.00\n\nVAT 2590\t945.00\n\nAmount due\t4 725.00\n\n\nPayment terms: 30 days\n\nThank you for your order.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n\nCurrency: SEK\n\n",
+    "confidence": 93,
+    "method": "ocr",
+    "ocrEvidence": {
+      "version": 1,
+      "inputSha256": "41d556900b5593eeaced66d423d54effe9a0e95af874a99b6f70c203f6f2d0c8",
+      "textSha256": "b94b2f86573a0c1298642c5ea722640c652e0b84114f20b0fe0a813590dc835c",
+      "pages": [
+        {
+          "page": 1,
+          "textSha256": "0551442e3d11c390e7c8a55239c410cc150c1ddfdaea3a28ab5b32c758cdb1f8",
+          "bankgiro": []
+        }
+      ]
+    }
+  }
+}

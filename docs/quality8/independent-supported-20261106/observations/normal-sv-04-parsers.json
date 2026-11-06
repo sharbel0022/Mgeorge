@@ -1,0 +1,268 @@
+{
+  "id": "normal-sv-04",
+  "cohort": "normal",
+  "language": "sv",
+  "workerCompleted": true,
+  "parsers": {
+    "node": {
+      "extraction": {
+        "version": 3,
+        "method": "ocr",
+        "fields": {
+          "invoice_number": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "party": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": "Kräver kontroll"
+          },
+          "organization_number": {
+            "value": "5598710043",
+            "confidence": 0.85,
+            "evidence": "Organisationsnummer: 559871-0043",
+            "warning": "Kräver kontroll"
+          },
+          "issued_at": {
+            "value": "2026-09-04",
+            "confidence": 0.85,
+            "evidence": "Fakturadatum\n2026-09-04",
+            "warning": "Kräver kontroll"
+          },
+          "due_at": {
+            "value": "2026-10-04",
+            "confidence": 0.85,
+            "evidence": "Förfallodatum 2026-10-04",
+            "warning": "Kräver kontroll"
+          },
+          "total_cents": {
+            "value": 372500,
+            "confidence": 0.85,
+            "evidence": "Att betala\t3 725,00",
+            "warning": "Kräver kontroll"
+          },
+          "vat_cents": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "net_cents": {
+            "value": 298000,
+            "confidence": 0.85,
+            "evidence": "Nettobelopp\t2 980,00",
+            "warning": "Kräver kontroll"
+          },
+          "reference": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "bankgiro": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "direction": {
+            "value": "supplier",
+            "confidence": 0.94,
+            "evidence": "Föreslagen från mejlets riktning",
+            "warning": null
+          },
+          "kind": {
+            "value": "invoice",
+            "confidence": 0.85,
+            "evidence": "FAKTURA",
+            "warning": "Kräver kontroll"
+          },
+          "currency": {
+            "value": "SEK",
+            "confidence": 0.85,
+            "evidence": "Valuta: SEK",
+            "warning": "Kräver kontroll"
+          }
+        },
+        "details": {
+          "version": 1,
+          "supplier": {
+            "name": null,
+            "organization_number": "5598710043",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 559871-0043"
+              }
+            ]
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "reference": {
+            "kind": null,
+            "value": null,
+            "checksum_valid": null,
+            "formal_verified": false,
+            "evidence": []
+          },
+          "line_items": [],
+          "vat_rates": [],
+          "table_status": "absent"
+        },
+        "level": "red",
+        "classification": {
+          "category": "invoice",
+          "exclude_from_invoice_queue": false,
+          "reason": "",
+          "version": 1
+        },
+        "issues": [
+          "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+          "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: fakturanummer, kund eller leverantör, moms"
+        ],
+        "text_excerpt": "FAKTURA\n\nBjörkkompass Material AB\nOrganisationsnummer: 559871-0043\n\nFakturamottagare Fakturanummer\nKundexempel Norden AB SV-26004\nExempelvägen 8, 652 00 Karlstad Fakturadatum\n2026-09-04\nFörfallodatum 2026-10-04\n\n\nBeskrivning Antal Belopp\nKontorsservice 1 1 788,00\nMaterialleverans 1 1 192,00\nNettobelopp\t2 980,00\n\nMoms 2590\t745,00\n\nAtt betala\t3 725,00\n\nValuta: SEK\n\nBetalningsvillkor: 30 dagar\n\nTack för er beställning.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n",
+        "extracted_at": "2026-11-06T15:43:42.576Z"
+      },
+      "error": null
+    },
+    "sites": {
+      "extraction": {
+        "version": 3,
+        "method": "ocr",
+        "fields": {
+          "invoice_number": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "party": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": "Kräver kontroll"
+          },
+          "organization_number": {
+            "value": "5598710043",
+            "confidence": 0.85,
+            "evidence": "Organisationsnummer: 559871-0043",
+            "warning": "Kräver kontroll"
+          },
+          "issued_at": {
+            "value": "2026-09-04",
+            "confidence": 0.85,
+            "evidence": "Fakturadatum\n2026-09-04",
+            "warning": "Kräver kontroll"
+          },
+          "due_at": {
+            "value": "2026-10-04",
+            "confidence": 0.85,
+            "evidence": "Förfallodatum 2026-10-04",
+            "warning": "Kräver kontroll"
+          },
+          "total_cents": {
+            "value": 372500,
+            "confidence": 0.85,
+            "evidence": "Att betala\t3 725,00",
+            "warning": "Kräver kontroll"
+          },
+          "vat_cents": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "net_cents": {
+            "value": 298000,
+            "confidence": 0.85,
+            "evidence": "Nettobelopp\t2 980,00",
+            "warning": "Kräver kontroll"
+          },
+          "reference": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "bankgiro": {
+            "value": null,
+            "confidence": 0,
+            "evidence": null,
+            "warning": null
+          },
+          "direction": {
+            "value": "supplier",
+            "confidence": 0.94,
+            "evidence": "Föreslagen från mejlets riktning",
+            "warning": null
+          },
+          "kind": {
+            "value": "invoice",
+            "confidence": 0.85,
+            "evidence": "FAKTURA",
+            "warning": "Kräver kontroll"
+          },
+          "currency": {
+            "value": "SEK",
+            "confidence": 0.85,
+            "evidence": "Valuta: SEK",
+            "warning": "Kräver kontroll"
+          }
+        },
+        "details": {
+          "version": 1,
+          "supplier": {
+            "name": null,
+            "organization_number": "5598710043",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 559871-0043"
+              }
+            ]
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "reference": {
+            "kind": null,
+            "value": null,
+            "checksum_valid": null,
+            "formal_verified": false,
+            "evidence": []
+          },
+          "line_items": [],
+          "vat_rates": [],
+          "table_status": "absent"
+        },
+        "level": "red",
+        "classification": {
+          "category": "invoice",
+          "exclude_from_invoice_queue": false,
+          "reason": "",
+          "version": 1
+        },
+        "issues": [
+          "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+          "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: fakturanummer, kund eller leverantör, moms"
+        ],
+        "text_excerpt": "FAKTURA\n\nBjörkkompass Material AB\nOrganisationsnummer: 559871-0043\n\nFakturamottagare Fakturanummer\nKundexempel Norden AB SV-26004\nExempelvägen 8, 652 00 Karlstad Fakturadatum\n2026-09-04\nFörfallodatum 2026-10-04\n\n\nBeskrivning Antal Belopp\nKontorsservice 1 1 788,00\nMaterialleverans 1 1 192,00\nNettobelopp\t2 980,00\n\nMoms 2590\t745,00\n\nAtt betala\t3 725,00\n\nValuta: SEK\n\nBetalningsvillkor: 30 dagar\n\nTack för er beställning.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n",
+        "extracted_at": "2026-11-06T15:43:42.578Z"
+      },
+      "error": null
+    }
+  }
+}

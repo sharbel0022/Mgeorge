@@ -1,0 +1,24 @@
+{
+  "id": "normal-en-07",
+  "inputSha256": "1bfd23b8808b5c87dbd20d8d2a6e3984fa6ba93ad3b25b4fe316db6c573c6eaf",
+  "workerCompleted": true,
+  "workerThrown": null,
+  "elapsedMs": 2976,
+  "processed": {
+    "text": "INVOICE\n\nEmber Quay Services AB\nOrganization number: 559871-0076\n\nBill to Invoice number\nKundexempel Norden AB EN-26007\nExempelvägen 8, 652 00 Karlstad Issue date\n2026-09-07\nDue date 2026-10-07\n\n\nDescription Qty Amount\nOffice services 1 1 944.00\nMaterials delivery 1 1 296.00\nNet amount\t3 240.00\n\nVAT 2590\t810.00\n\nAmount due\t4 050.00\n\n\nCurrency: SEK\n\nPayment terms: 30 days\n\nThank you for your order.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n",
+    "confidence": 92,
+    "method": "ocr",
+    "ocrEvidence": {
+      "version": 1,
+      "inputSha256": "1bfd23b8808b5c87dbd20d8d2a6e3984fa6ba93ad3b25b4fe316db6c573c6eaf",
+      "textSha256": "1b691fec0e2a3e0dde7040821ac8ed7a67e29e16c11282d1e855a3cd7fad03e0",
+      "pages": [
+        {
+          "page": 1,
+          "textSha256": "3ac5b98289fecc8ded6ccdad99513534fa70dfbaf8b8855fb6ebea1ee4126550",
+          "bankgiro": []
+        }
+      ]
+    }
+  }
+}

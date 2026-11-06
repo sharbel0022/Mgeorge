@@ -1,0 +1,242 @@
+{
+  "schemaVersion": 1,
+  "kind": "browser-acceptance",
+  "passed": true,
+  "status": "PASSED",
+  "syntheticOnly": true,
+  "realBankVerification": "NOT_RUN",
+  "scope": "Actual bundled onboarding, company workspace and Dashboard UI in Chromium; APIs use isolated synthetic fixtures. Backend, authentication and provider end-to-end coverage is not claimed.",
+  "source": {
+    "commit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+    "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+    "branch": "main",
+    "workingTreeDirty": false,
+    "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+    "fileCount": 2443
+  },
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "release": "7.0.0-1017-azure",
+    "arch": "x64",
+    "logicalCpus": 4,
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C"
+  },
+  "startedAt": "2026-11-06T14:50:05.023Z",
+  "steps": [
+    {
+      "name": "bundle",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "docs/integration/saas-onboarding-browser/build-harness.mjs"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+      },
+      "startedAt": "2026-11-06T14:50:05.027Z",
+      "finishedAt": "2026-11-06T14:50:05.773Z",
+      "durationMs": 745.189,
+      "artifacts": [
+        {
+          "path": "bundle.stdout.log",
+          "bytes": 94,
+          "sha256": "395bc47a92be60371e04f3344edc59a627525991714b5b166a206b166d9c421e"
+        },
+        {
+          "path": "bundle.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "chromium",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "docs/integration/saas-onboarding-browser/browser-suite.mjs"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+      },
+      "startedAt": "2026-11-06T14:50:05.788Z",
+      "finishedAt": "2026-11-06T14:50:25.229Z",
+      "durationMs": 19441.725,
+      "artifacts": [
+        {
+          "path": "chromium.stdout.log",
+          "bytes": 2605,
+          "sha256": "1031c6ded4f223cb08c49bc5f0990a93bd8a97226b86ef91028d763f7f1c98a6"
+        },
+        {
+          "path": "chromium.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "workspace-bundle",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "docs/integration/saas-onboarding-browser/build-harness.mjs"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+      },
+      "startedAt": "2026-11-06T14:50:25.231Z",
+      "finishedAt": "2026-11-06T14:50:25.971Z",
+      "durationMs": 740.611,
+      "artifacts": [
+        {
+          "path": "workspace-bundle.stdout.log",
+          "bytes": 96,
+          "sha256": "45e197552ef85f90f8f80821efd73db4f90d17f727a722d643256eadd973cdcf"
+        },
+        {
+          "path": "workspace-bundle.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "workspace-chromium",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "scripts/quality/workspace-browser.mjs"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+      },
+      "startedAt": "2026-11-06T14:50:25.972Z",
+      "finishedAt": "2026-11-06T14:50:29.754Z",
+      "durationMs": 3781.908,
+      "artifacts": [
+        {
+          "path": "workspace-chromium.stdout.log",
+          "bytes": 413,
+          "sha256": "f822d5fabc3752b967d51d869f4bebb496c71327c671ed4f5f7d9292cc358a11"
+        },
+        {
+          "path": "workspace-chromium.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "dashboard-bundle",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "docs/integration/95-ui-browser/build-harness.mjs"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+      },
+      "startedAt": "2026-11-06T14:50:29.757Z",
+      "finishedAt": "2026-11-06T14:50:30.722Z",
+      "durationMs": 964.534,
+      "artifacts": [
+        {
+          "path": "dashboard-bundle.stdout.log",
+          "bytes": 209,
+          "sha256": "675fcfd04190a6822390b0d8235b9489694c3422a33c912f24af8e03494a1d8c"
+        },
+        {
+          "path": "dashboard-bundle.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "dashboard-chromium",
+      "kind": "command",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "errorCode": null,
+      "command": {
+        "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+        "args": [
+          "scripts/quality/dashboard-browser.mjs"
+        ],
+        "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+      },
+      "startedAt": "2026-11-06T14:50:30.723Z",
+      "finishedAt": "2026-11-06T14:50:49.778Z",
+      "durationMs": 19054.945,
+      "artifacts": [
+        {
+          "path": "dashboard-chromium.stdout.log",
+          "bytes": 1483,
+          "sha256": "f6696ff4224113f72140231a60d066e9ef7a68f4e7c9b7580438eb3a3e10abc5"
+        },
+        {
+          "path": "dashboard-chromium.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    }
+  ],
+  "playwrightVersion": "1.62.1",
+  "totals": {
+    "tests": 77,
+    "pass": 77,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "browserVersion": "151.0.7922.34",
+  "externalRequests": 0,
+  "browserErrors": 0,
+  "failures": [],
+  "workspace": {
+    "passed": true,
+    "tests": 5,
+    "failures": []
+  },
+  "dashboard": {
+    "passed": true,
+    "tests": 31,
+    "failures": [],
+    "runnerErrors": []
+  },
+  "sourceAfter": {
+    "commit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+    "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+    "branch": "main",
+    "workingTreeDirty": false,
+    "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+    "fileCount": 2443
+  },
+  "sourceChangedDuringRun": false,
+  "finishedAt": "2026-11-06T14:50:49.945Z"
+}

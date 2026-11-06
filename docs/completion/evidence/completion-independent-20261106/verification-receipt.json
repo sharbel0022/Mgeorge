@@ -1,0 +1,28 @@
+{
+  "verifiedAt": "2026-11-06T15:15:07.459677+00:00",
+  "status": "passed",
+  "noOpticalOrParserCalls": true,
+  "frozenFilesVerified": 23,
+  "imagesVerified": 19,
+  "opticalAttemptsExactlyOnce": 19,
+  "parserAttemptsExactlyOnce": 38,
+  "goldSchemaComplete": true,
+  "populationCounts": {
+    "normal": 16,
+    "stress": 3
+  },
+  "processingErrorPropagationVerified": true,
+  "independentlyRecomputedCountsMatch": true,
+  "pairedIdenticalFieldObjects": 19,
+  "pairedIdenticalEffectiveStatus": 19,
+  "successfulNormalCasesDiagnostic": {
+    "tp": 54,
+    "fp": 0,
+    "fn": 54,
+    "documents": 12,
+    "expectedFields": 108,
+    "precision": 1.0,
+    "recall": 0.5,
+    "role": "Post-run diagnostic conditioned on optical completion; does not replace primary fixed-denominator result"
+  }
+}

@@ -1,0 +1,262 @@
+{
+  "format": "MG-independent-standard-alias-review-1",
+  "recordedAt": "2026-11-06T16:10:07.142983+00:00",
+  "decision": "NO_BLOCKING_FINDING_IN_REVIEWED_DIFF",
+  "finalExactSource": {
+    "commit": "100f9c3015da34f772ea0cba53d9871e978ebeab",
+    "wholeTree": "e00e40a059109ad0a3b3a35edf4bb8f8df10b536",
+    "sha256": {
+      "src/invoice-extraction.js": "d19cd6743e57e1a175f563b7b1e5ff33b66523553614fb044bfbc264476b93a1",
+      "src/invoice-details.js": "6dc5ea343f76ffe4d1a7a4f0e001e118cf4b89aaa9771d9f0b6f19fa05642548",
+      "sites/lib/invoice-fields.js": "8ab6e8db0c0fba102d5481e889a05079f8e0ef3d5268dffa42732967d94d7c2b",
+      "sites/lib/invoice-details.js": "6dc5ea343f76ffe4d1a7a4f0e001e118cf4b89aaa9771d9f0b6f19fa05642548",
+      "sites/lib/ocr-layout.js": "57af030cf4acb3d7fee2bd9e3d2a708f311c95dba8226902de9a292c344d49ff",
+      "sites/lib/ocr-summary-layout.js": "6bea7b3ee69b1d1519f121b8ce949bffbf3c2fb7209df8f64e5edfbde778d3ba",
+      "sites/lib/ocr-bankgiro-evidence.js": "d47149b163ae2c7dd4344253747938184b27714164fbb2b3a3025baf4e92198a",
+      "src/invoice-worker.js": "4f7d992e8fbe81eb44d350763c7ef6e58db217f2a24be8d18041e7a546db3146",
+      "scripts/saas-test-isolation.mjs": "9f40b9159a1ad9f4d21c7ecdc76db31fd55d6a0efe793f3f32e7548809affb80",
+      "test/helpers/load-invoice-parsers.mjs": "b3e06cc790bf753f4c5934f300008666f00371f5e4a01b96b2a41dd4fd76d828",
+      "package-lock.json": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d",
+      "sites/package-lock.json": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0"
+    },
+    "listedWorktreeFilesMatchCommittedBytesAfterRun": true,
+    "worktreeStatusAfterRemovingTemporaryDependencyLinks": ""
+  },
+  "sourceBindings": {
+    "baseline": {
+      "commit": "f5d178ea816d276457685fbc0421cf144f7cf655",
+      "wholeTree": "85b3e39bf97c93246beed073bb3790baf62d94cd",
+      "sha256": {
+        "src/invoice-extraction.js": "4ef7393f53ff1a850c26f76dbb4d908ba99620d859949236fbe0b844ead9aa13",
+        "src/invoice-details.js": "0f46b7df4ddf9dac13d83486d040502f91d40bc7c3a292c9336062afff0bbc80",
+        "sites/lib/invoice-fields.js": "de8c04cb0032df723070f853cc917b276dc2620670443957247d91881a02d78d",
+        "sites/lib/invoice-details.js": "0f46b7df4ddf9dac13d83486d040502f91d40bc7c3a292c9336062afff0bbc80",
+        "sites/lib/ocr-layout.js": "14fce194a52c5f92f4a46989e0a43b7a3034296a356330995fddcb4c7a4b7b43",
+        "sites/lib/ocr-summary-layout.js": "6bea7b3ee69b1d1519f121b8ce949bffbf3c2fb7209df8f64e5edfbde778d3ba",
+        "sites/lib/ocr-bankgiro-evidence.js": "d47149b163ae2c7dd4344253747938184b27714164fbb2b3a3025baf4e92198a",
+        "src/invoice-worker.js": "4f7d992e8fbe81eb44d350763c7ef6e58db217f2a24be8d18041e7a546db3146",
+        "scripts/saas-test-isolation.mjs": "9f40b9159a1ad9f4d21c7ecdc76db31fd55d6a0efe793f3f32e7548809affb80",
+        "test/helpers/load-invoice-parsers.mjs": "b3e06cc790bf753f4c5934f300008666f00371f5e4a01b96b2a41dd4fd76d828",
+        "package-lock.json": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d",
+        "sites/package-lock.json": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0"
+      },
+      "listedWorktreeFilesMatchCommittedBytesAfterRun": true,
+      "worktreeStatusAfterRemovingTemporaryDependencyLinks": ""
+    },
+    "intermediate": {
+      "commit": "4c8a2e3f69c6b88b4b8d0bae299c6d30fc7d82ee",
+      "wholeTree": "5da447a3c08885986f2bfcbe645a78b3201b26f9",
+      "sha256": {
+        "src/invoice-extraction.js": "4419c373a90e0bfbd5ec26326e80d092047dbbac0ae9deece8cce0ded223390f",
+        "src/invoice-details.js": "6dc5ea343f76ffe4d1a7a4f0e001e118cf4b89aaa9771d9f0b6f19fa05642548",
+        "sites/lib/invoice-fields.js": "165ac7a7e75fddcd473b1a059427b51723b23a4c53c1282728431e645ed039f1",
+        "sites/lib/invoice-details.js": "6dc5ea343f76ffe4d1a7a4f0e001e118cf4b89aaa9771d9f0b6f19fa05642548",
+        "sites/lib/ocr-layout.js": "57af030cf4acb3d7fee2bd9e3d2a708f311c95dba8226902de9a292c344d49ff",
+        "sites/lib/ocr-summary-layout.js": "6bea7b3ee69b1d1519f121b8ce949bffbf3c2fb7209df8f64e5edfbde778d3ba",
+        "sites/lib/ocr-bankgiro-evidence.js": "d47149b163ae2c7dd4344253747938184b27714164fbb2b3a3025baf4e92198a",
+        "src/invoice-worker.js": "4f7d992e8fbe81eb44d350763c7ef6e58db217f2a24be8d18041e7a546db3146",
+        "scripts/saas-test-isolation.mjs": "9f40b9159a1ad9f4d21c7ecdc76db31fd55d6a0efe793f3f32e7548809affb80",
+        "test/helpers/load-invoice-parsers.mjs": "b3e06cc790bf753f4c5934f300008666f00371f5e4a01b96b2a41dd4fd76d828",
+        "package-lock.json": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d",
+        "sites/package-lock.json": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0"
+      }
+    },
+    "final": {
+      "commit": "100f9c3015da34f772ea0cba53d9871e978ebeab",
+      "wholeTree": "e00e40a059109ad0a3b3a35edf4bb8f8df10b536",
+      "sha256": {
+        "src/invoice-extraction.js": "d19cd6743e57e1a175f563b7b1e5ff33b66523553614fb044bfbc264476b93a1",
+        "src/invoice-details.js": "6dc5ea343f76ffe4d1a7a4f0e001e118cf4b89aaa9771d9f0b6f19fa05642548",
+        "sites/lib/invoice-fields.js": "8ab6e8db0c0fba102d5481e889a05079f8e0ef3d5268dffa42732967d94d7c2b",
+        "sites/lib/invoice-details.js": "6dc5ea343f76ffe4d1a7a4f0e001e118cf4b89aaa9771d9f0b6f19fa05642548",
+        "sites/lib/ocr-layout.js": "57af030cf4acb3d7fee2bd9e3d2a708f311c95dba8226902de9a292c344d49ff",
+        "sites/lib/ocr-summary-layout.js": "6bea7b3ee69b1d1519f121b8ce949bffbf3c2fb7209df8f64e5edfbde778d3ba",
+        "sites/lib/ocr-bankgiro-evidence.js": "d47149b163ae2c7dd4344253747938184b27714164fbb2b3a3025baf4e92198a",
+        "src/invoice-worker.js": "4f7d992e8fbe81eb44d350763c7ef6e58db217f2a24be8d18041e7a546db3146",
+        "scripts/saas-test-isolation.mjs": "9f40b9159a1ad9f4d21c7ecdc76db31fd55d6a0efe793f3f32e7548809affb80",
+        "test/helpers/load-invoice-parsers.mjs": "b3e06cc790bf753f4c5934f300008666f00371f5e4a01b96b2a41dd4fd76d828",
+        "package-lock.json": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d",
+        "sites/package-lock.json": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0"
+      },
+      "listedWorktreeFilesMatchCommittedBytesAfterRun": true,
+      "worktreeStatusAfterRemovingTemporaryDependencyLinks": ""
+    }
+  },
+  "nodeVersion": "v24.22.1",
+  "runResults": {
+    "corrected-baseline": {
+      "commit": "f5d178ea816d276457685fbc0421cf144f7cf655",
+      "exitCode": 1,
+      "summary": {
+        "tests": 120,
+        "suites": 0,
+        "pass": 78,
+        "fail": 42,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 801.256977
+      },
+      "uncompressedSha256": "3286cbc6b953cdc2dc50c9cb2c5a0ed28d581b198d2a4ccb21d7843e00d3ad1e",
+      "compressedSha256": "734fe3296df426d6609f041c1fbd84ddbcedcfe2448e1e40bb71859a509b4d2a",
+      "file": "corrected-baseline.tap.gz",
+      "failedNames": [
+        "node text issue_exact",
+        "node text issue_case_tab",
+        "node text issue_adjacent_line",
+        "node text issue_inline_siblings",
+        "node text late_issue_contradicting",
+        "node text late_issue_illegible",
+        "node text late_issue_impossible_calendar",
+        "node text late_issue_missing",
+        "node text late_invoice_conflict",
+        "node text conflict_beyond_excerpt",
+        "node text currency_before_organization",
+        "node text net_before_organization",
+        "node text bill_to_scalar_boundary",
+        "node text fakturamottagare_scalar_boundary",
+        "node wordbox layout_issue_aligned",
+        "node wordbox layout_organization_aligned",
+        "node wordbox layout_low_confidence_preserved",
+        "sites text issue_exact",
+        "sites text issue_case_tab",
+        "sites text issue_adjacent_line",
+        "sites text issue_inline_siblings",
+        "sites text late_issue_contradicting",
+        "sites text late_issue_illegible",
+        "sites text late_issue_impossible_calendar",
+        "sites text late_issue_missing",
+        "sites text late_invoice_conflict",
+        "sites text conflict_beyond_excerpt",
+        "sites text currency_before_organization",
+        "sites text net_before_organization",
+        "sites text bill_to_scalar_boundary",
+        "sites text fakturamottagare_scalar_boundary",
+        "sites wordbox layout_issue_aligned",
+        "sites wordbox layout_organization_aligned",
+        "sites wordbox layout_low_confidence_preserved",
+        "node local owned Organization number:",
+        "node printed recipient colon Bill to",
+        "node printed recipient colon Fakturamottagare",
+        "node layout organization stays in foreign local party",
+        "sites local owned Organization number:",
+        "sites printed recipient colon Bill to",
+        "sites printed recipient colon Fakturamottagare",
+        "sites layout organization stays in foreign local party"
+      ]
+    },
+    "final-100f9c3": {
+      "commit": "100f9c3015da34f772ea0cba53d9871e978ebeab",
+      "exitCode": 0,
+      "summary": {
+        "tests": 120,
+        "suites": 0,
+        "pass": 120,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 729.358759
+      },
+      "uncompressedSha256": "c8c1880dfba15cf87a156cc2aa056657275967a5a3fd3870946ad135ae0c809f",
+      "compressedSha256": "14e849eec8441148b6687a0ebc1c20de66d601e64e82a5fc6d551635d7a439c6",
+      "file": "final-100f9c3.tap.gz",
+      "failedNames": []
+    }
+  },
+  "earlierRawResults": {
+    "original-baseline": {
+      "uncompressedSha256": "3a3c72d93ece9034c7e8a6d63748044ebad48e4db8d6e187ed0fbdbe535aab4a",
+      "format": "node:test spec reporter",
+      "summaries": [
+        "ℹ tests 106",
+        "ℹ suites 0",
+        "ℹ pass 70",
+        "ℹ fail 36",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 455.117987"
+      ]
+    },
+    "original-4c8a2e3": {
+      "uncompressedSha256": "39e669f0d95b06f5f9cc096305b94da40ef246043b46638d5aa05915e3d5c145",
+      "format": "node:test spec reporter",
+      "summaries": [
+        "ℹ tests 106",
+        "ℹ suites 0",
+        "ℹ pass 94",
+        "ℹ fail 12",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 397.685951"
+      ]
+    },
+    "supplemental-baseline": {
+      "uncompressedSha256": "2dc588b517a191ea0fd7f46ddb2256b6038d65b10c7611bf22a72c9ea0e8b60f",
+      "format": "node:test spec reporter",
+      "summaries": [
+        "ℹ tests 14",
+        "ℹ suites 0",
+        "ℹ pass 6",
+        "ℹ fail 8",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 314.966626"
+      ]
+    }
+  },
+  "originalFreezeCommit": "799e909",
+  "supplementalFreezeCommit": "1008c2f",
+  "oracleCorrectionCommit": "76bc9624a645c334cba79c50461f8fb7963070d0",
+  "oracleCorrection": {
+    "fixturesChanged": [
+      "currency_before_organization",
+      "net_before_organization",
+      "layout_organization_aligned",
+      "layout_org_existing_spelling"
+    ],
+    "runtimesPerFixture": 2,
+    "change": "fields.organization_number.value: 9920000008 -> null after scalar ownership boundary",
+    "allOtherInputsAndExpectationsEqual": true,
+    "runnerUnchanged": true,
+    "allOriginalNegativeAssertionsPreserved": true
+  },
+  "artifactSha256": {
+    "cases.json": "e5f67aaa276960c93029dbd6da5907f6ecfb336a3aa88f97c23edc9495590476",
+    "cases-original.json.gz": "5e27450ebc029ffe65cd261337d2b8b13c84e133c932557ff158f858a96b601c",
+    "probes.test.mjs": "54bee041057fd47b4ced19942f02546675b19bc4bccc38440739d6b11dfd647e",
+    "supplemental.test.mjs": "cae2d428290a4a50e726b55d314bdca0e01945f12eb32f80c4b90750d4fa0432",
+    "freeze.json": "37540046a31561fa368eea513be837c06156e4db0dff68580e3ee56b1e7d136f",
+    "supplemental-freeze.json": "9d1fd2879ee860ed93dbb16c71400c3bb5159e36d088fab26989c4b68198a1d3",
+    "oracle-correction.json": "6f89efa14b688659d7f2b18507683ad4b08db2f0bf20eefcbf828c666d951d60",
+    "oracle-correction.md": "ad71abe9c4916bfd340d905a8b54ea00e827c448f20a17b8692ad7df4800e89f"
+  },
+  "commands": {
+    "correctedBaseline": {
+      "cwd": "/workspace/scratch/aab0f7dc06f9/security-alias-review",
+      "command": "NODE_ENV=test ALIAS_REVIEW_ROOT=/workspace/scratch/aab0f7dc06f9/security-alias-baseline node --import /workspace/scratch/aab0f7dc06f9/security-alias-baseline/scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-reporter=tap --test-concurrency=1 docs/completion/alias-review/probes.test.mjs docs/completion/alias-review/supplemental.test.mjs"
+    },
+    "final": {
+      "cwd": "/workspace/scratch/aab0f7dc06f9/security-alias-candidate",
+      "command": "NODE_ENV=test ALIAS_REVIEW_ROOT=/workspace/scratch/aab0f7dc06f9/security-alias-candidate node --import /workspace/scratch/aab0f7dc06f9/security-alias-candidate/scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-reporter=tap --test-concurrency=1 /workspace/scratch/aab0f7dc06f9/security-alias-review/docs/completion/alias-review/probes.test.mjs /workspace/scratch/aab0f7dc06f9/security-alias-review/docs/completion/alias-review/supplemental.test.mjs"
+    }
+  },
+  "reviewedProductPaths": [
+    "sites/lib/invoice-details.js",
+    "sites/lib/invoice-fields.js",
+    "sites/lib/ocr-layout.js",
+    "src/invoice-details.js",
+    "src/invoice-extraction.js"
+  ],
+  "limits": [
+    "Directed synthetic observations, not a random accuracy sample or independent optical benchmark.",
+    "Initial oracle errors and intermediate red outcomes are preserved, not relabeled green.",
+    "No OCR worker calls, new optical observations, holdout access/replays, provider or production operations.",
+    "No full CI, browser suite, build or deployment performed by this reviewer. Parent owns integration CI and release.",
+    "No exclusive resource lock; local elapsed times are informational.",
+    "No product modifications made by this reviewer."
+  ]
+}

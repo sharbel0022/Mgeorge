@@ -2,6 +2,7 @@ import {classifyDocument,documentConflicts} from './document-triage.js';
 import {extractInvoiceDetails,invoiceScalarText,invoiceReferenceMentions} from './invoice-details.js';
 import {assessOcrBankgiro,ocrInputHash} from '../sites/lib/ocr-bankgiro-evidence.js';
 import {fork} from 'node:child_process';
+import {constants as osConstants} from 'node:os';
 import {parseMoney} from './importers.js';
 const invoiceNumberLabel='(?:faktura[ \\t]*(?:nummer|nr|no)|invoice[ \\t]*(?:number|no))(?=[\\s.:#-]|\\d|$)';
 const validInvoiceIdentifier=value=>/^[\p{L}\p{N}][\p{L}\p{N}/_-]{0,79}$/u.test(value)&&!/^(?:ocr(?:[- /]?(?:nummer|referens))?|faktura(?:nummer|nr)?|fakturadatum|förfallo(?:datum|dag)|förfaller|invoice|date|leverantör|utställare|säljare|supplier|seller|kund|customer|netto|moms|vat|bankgiro|bg|totalbelopp|total|net|att)$/iu.test(value);
@@ -12,12 +13,12 @@ function normalizeInvoiceLayout(input){
   let text=invoiceScalarText(original);
   // Compact character-spaced digits without erasing the separator before a
   // sibling label. Trailing unknown content still goes through full validation.
-  text=text.replace(/((?:fakturadatum|förfallo(?:datum|dag)|förfaller|due\s*date|invoice\s*date)[ \t:.]*)([\d \t]+[/.\-][\d \t]+[/.\-][\d \t]+)/gi,(_,label,value)=>label+value.trimEnd().replace(/[ \t]/g,'')+(value.match(/[ \t]+$/)?.[0]||''));
+  text=text.replace(/((?:fakturadatum|förfallo(?:datum|dag)|förfaller|due\s*date|invoice\s*date|(?<![\p{L}\p{N}/_-])issue[ \t]+date(?=[ \t.:#]|\d|$))[ \t:.]*)([\d \t]+[/.\-][\d \t]+[/.\-][\d \t]+)/giu,(_,label,value)=>label+value.trimEnd().replace(/[ \t]/g,'')+(value.match(/[ \t]+$/)?.[0]||''));
   text=text.replace(/([,.])[ \t]+(?=\d{2}\b)/g,'$1');
   // PDF drawing order can differ from the visible column order. Text alone
   // cannot assign two numeric values to invoice/OCR headings with certainty.
   const numberColumn='(?:faktura[ \\t]*(?:nummer|nr|no)|invoice[ \\t]*(?:number|no))',ocrColumn='OCR(?:[- /]?(?:nummer|referens))?';
-  const otherColumn='(?:kund[ \\t]*(?:nummer|nr)|customer[ \\t]*(?:number|no)|sida|page|fakturadatum|invoice[ \\t]*date|förfallo(?:datum|dag)|due[ \\t]*date)';
+  const otherColumn='(?:kund[ \\t]*(?:nummer|nr)|customer[ \\t]*(?:number|no)|sida|page|fakturadatum|invoice[ \\t]*date|issue[ \\t]+date|förfallo(?:datum|dag)|due[ \\t]*date)';
   const header=new RegExp('(?<![\\p{L}\\p{N}_-])(?:('+numberColumn+')|('+ocrColumn+')|'+otherColumn+')(?=[^\\p{L}\\p{N}_-]|-(?:\\s|$)|$)','giu');
   let ambiguousInvoiceColumns=false,previousEnd=-1,hasNumber=false,hasOcr=false;
   for(const label of text.matchAll(header)){
@@ -95,7 +96,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     record(key,matches.map(m=>({value:m[1],evidence:m[0]})),convert,!!labels&&[...text.matchAll(labels)].some(m=>!positions.has(m.index)));
   };
   const referenceLabel='(?:OCR(?:[- /]?(?:nummer|referens))?|betalningsreferens|payment reference)';
-  const issuedDateLabel='(?:fakturadatum|faktureringsdatum|invoice\\s*date)';
+  const issuedDateLabel='(?:fakturadatum|faktureringsdatum|invoice\\s*date|(?<![\\p{L}\\p{N}/_-])issue[ \\t]+date(?=[\\s.:#]|\\d|$))';
   const dueDateLabel='(?:förfallodatum|förfallodag|förfaller|oss\\s*tillhanda\\s*senast|betalas\\s*senast|due\\s*date)';
   // Swedish summa/totalt/belopp summaries need explicit tax qualifiers.
   // Reuse their grammar as sibling boundaries so inline fields stay separate.
@@ -111,7 +112,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   // trailing content remains part of the value and must pass full validation.
   // Reuse the monetary census grammar exactly: a boundary must not discard an
   // occurrence that the field's own collector would never inspect.
-  const siblingLabel='(?:'+invoiceNumberLabel+'|'+referenceLabel+'|'+issuedDateLabel+'|'+dueDateLabel+'|'+totalLabel+'|'+vatLabel+'|'+netLabel+'|bankgirokonto|bankgiro|bg|org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organisation number|leverantör|utställare|säljare|supplier|seller|kund|customer|valuta|currency)';
+  const siblingLabel='(?:'+invoiceNumberLabel+'|'+referenceLabel+'|'+issuedDateLabel+'|'+dueDateLabel+'|'+totalLabel+'|'+vatLabel+'|'+netLabel+'|bankgirokonto|bankgiro|bg|org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organi[sz]ation[ \\t]+number|leverantör|utställare|säljare|supplier|seller|kund|customer|(?:fakturamottagare|bill[ \\t]+to)(?=[ \\t]*:)|valuta|currency)';
   const sibling=new RegExp('(?:[ \\t]*[;|][ \\t]*|[ \\t]+)(?='+siblingLabel+'(?=[ \\t.:#]|$)|'+issuedDateLabel+'|'+dueDateLabel+')','iu');
   const grabFull=(key,label,convert)=>{
     const invoiceLabel=key==='invoice_number',currencyLabel=key==='currency',dateField=key==='issued_at'||key==='due_at';
@@ -298,12 +299,24 @@ export async function runDocumentProcess(bytes,mime_type,preview=false){
   active++;
   try{
     return await new Promise((resolve,reject)=>{
-      const worker=fork(new URL('./invoice-worker.js',import.meta.url),[],{serialization:'advanced',stdio:['ignore','ignore','ignore','ipc'],execArgv:['--max-old-space-size=256'],env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot,TEMP:process.env.TEMP},windowsHide:true});
-      const timer=setTimeout(()=>{worker.kill();reject(Error('timeout'));},90000);
-      worker.once('message',value=>{clearTimeout(timer);resolve(value);});
-      worker.once('error',()=>{clearTimeout(timer);reject(Error('worker'));});
-      worker.once('exit',()=>{clearTimeout(timer);reject(Error('worker'));});
-      worker.send({bytes,mime_type,preview});
+      const started=performance.now();let worker,timer,settled=false,receivedMessage=false,timedOut=false;
+      const finish=(error,value)=>{if(settled)return;settled=true;clearTimeout(timer);error?reject(error):resolve(value);};
+      // Only fixed categories and process metadata may cross this boundary.
+      // Exception messages, child output and the original document stay private.
+      const fail=(code,exitCode=null,signal=null)=>finish(Object.assign(Error(timedOut?'timeout':'worker'),{
+        code,exitCode:Number.isSafeInteger(exitCode)?exitCode:null,
+        signal:typeof signal==='string'&&Object.hasOwn(osConstants.signals,signal)?signal:null,
+        elapsedMs:Math.max(0,Math.round(performance.now()-started)),receivedMessage,timedOut,
+      }));
+      const stop=()=>{try{worker?.kill();}catch{}};
+      try{worker=fork(new URL('./invoice-worker.js',import.meta.url),[],{serialization:'advanced',stdio:['ignore','ignore','ignore','ipc'],execArgv:['--max-old-space-size=256'],env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot,TEMP:process.env.TEMP},windowsHide:true});}
+      catch{fail('DOCUMENT_WORKER_START_FAILED');return;}
+      timer=setTimeout(()=>{timedOut=true;fail('DOCUMENT_WORKER_TIMEOUT');stop();},90000);
+      worker.once('message',value=>{receivedMessage=true;finish(null,value);});
+      worker.once('error',()=>{fail('DOCUMENT_WORKER_PROCESS_FAILED');stop();});
+      worker.once('exit',(code,signal)=>fail('DOCUMENT_WORKER_EXIT_WITHOUT_RESULT',code,signal));
+      try{worker.send({bytes,mime_type,preview},error=>{if(error){fail('DOCUMENT_WORKER_SEND_FAILED');stop();}});}
+      catch{fail('DOCUMENT_WORKER_SEND_FAILED');stop();}
     });
   }finally{active--;}
 }

@@ -1,0 +1,24 @@
+{
+  "id": "normal-sv-06",
+  "inputSha256": "4f4d63f02663ef74bb85a786a52b745fca94ff4dcdec717d1dae75bba9d53ba6",
+  "workerCompleted": true,
+  "workerThrown": null,
+  "elapsedMs": 3088,
+  "processed": {
+    "text": "FAKTURA\n\nLeverantör\n\na o Fakturanummer\nAngsvag Konsult AB SV-26006\nOrganisationsnummer: 559871-0068 Fakturadatum\n2026-09-06\nFakturamottagare: Kundexempel Norden AB Förfallodatum\nExempelvägen 8, 652 00 Karlstad 2026-10-06\nBeskrivning Antal Belopp\nKontorsservice 1 1 116,00\nMaterialleverans 1 744,00\nNettobelopp 1 860,00\nMoms 2590 465,00\nAtt betala 2 325,00\nValuta: SEK\n\nBetalningsvillkor: 30 dagar\n\nTack för er beställning.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n\n",
+    "confidence": 89,
+    "method": "ocr",
+    "ocrEvidence": {
+      "version": 1,
+      "inputSha256": "4f4d63f02663ef74bb85a786a52b745fca94ff4dcdec717d1dae75bba9d53ba6",
+      "textSha256": "3cc7522999a48008d00ee3ccaf842c8eab49a27d25357fe79509b1bf852a2ae4",
+      "pages": [
+        {
+          "page": 1,
+          "textSha256": "ed5a75572e696e1c56d5f8978032a43e13a6fed8ff99333d90fe335fb1877ee4",
+          "bankgiro": []
+        }
+      ]
+    }
+  }
+}

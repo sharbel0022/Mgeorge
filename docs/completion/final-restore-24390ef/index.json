@@ -1,0 +1,66 @@
+{
+  "format": "MG-final-restore-evidence-index-1",
+  "testedCommit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+  "testedTree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+  "passed": true,
+  "productionRestoreTested": false,
+  "scope": "existing full synthetic isolated evidence restore; no product edits or production operations",
+  "bankReview": {
+    "reportCommit": "3eed0a2a28538bcae63602fb209ca055f9a66e6e",
+    "reviewedProductCommit": "d7ede6af7cdd6633442c773f98b880d90104ac25",
+    "productFilesIdenticalAtTestedCommit": true,
+    "productFiles": [
+      {
+        "path": "sites/lib/banking/service.ts",
+        "sha256": "24bf060f7cf8e78072dbbfa4cd2e8aa13ee749472c18eb7d8eb97b164ae4f966"
+      },
+      {
+        "path": "sites/components/bank-connection.tsx",
+        "sha256": "ee6dd3f3fa5a3782c4c7dc0f943b77e720d8f5e16a4801853bef679603d2e477"
+      }
+    ],
+    "testsRerunForThisReceipt": false
+  },
+  "files": [
+    {
+      "path": "restore.json",
+      "bytes": 4897,
+      "sha256": "d81553290f7eda5675584aa108bd34069d554a0ed7169f2c9f49aad9ed9f7ddb"
+    },
+    {
+      "path": "restore.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source-before.json",
+      "bytes": 11536,
+      "sha256": "4831076b1e57506d2dbcb7897c16d25af09acd5494ee5981156597c3c74921cb"
+    },
+    {
+      "path": "source-after.json",
+      "bytes": 15717,
+      "sha256": "456eeaa555eaabe12e6eee0547bb8beb7bec431c64d6f355d2c23b78a579abf2"
+    },
+    {
+      "path": "process-receipt.json",
+      "bytes": 2178,
+      "sha256": "e24e938215489274bc93d8acdc23cf4b62f6872132c40e058cfadeb5281ae0dc"
+    },
+    {
+      "path": "candidate-ci-observation.json",
+      "bytes": 12658,
+      "sha256": "521d30710909c3aca46d457e2feb59939349e465c963464ee1eef6963218cf64"
+    },
+    {
+      "path": "main-ci-observation.json",
+      "bytes": 1171,
+      "sha256": "9e21e065e9bb13f7229e26b645d1fd543e6661b1c2d44687cd5d5e3b365f954b"
+    },
+    {
+      "path": "pr-quality-summary.json",
+      "bytes": 15854,
+      "sha256": "01ae133de5c911b948e74a42996a3eedeeef39e3a00eee275cb5dc419c38066c"
+    }
+  ]
+}

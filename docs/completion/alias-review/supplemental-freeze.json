@@ -1,0 +1,9 @@
+{
+  "frozenAt": "2026-11-06T16:06:13.079256+00:00",
+  "candidateCommit": "4c8a2e3f69c6b88b4b8d0bae299c6d30fc7d82ee",
+  "authoredAfterDiffReview": true,
+  "executedBeforeFreeze": false,
+  "expectedChecks": 14,
+  "purpose": "Explicit local ownership and printed-colon versus already-supported colonless recipient regression. Original 106 checks and failures unchanged.",
+  "sha256": "cae2d428290a4a50e726b55d314bdca0e01945f12eb32f80c4b90750d4fa0432"
+}

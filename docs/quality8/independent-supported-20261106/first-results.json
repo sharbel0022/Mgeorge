@@ -1,0 +1,3008 @@
+{
+  "finishedAt": "2026-11-06T15:44:12.622Z",
+  "calls": {
+    "worker": 14,
+    "node": 14,
+    "sites": 14
+  },
+  "workerCompleted": 14,
+  "workerFailed": 0,
+  "engines": {
+    "node": {
+      "normal": {
+        "documents": 12,
+        "workerCompleted": 12,
+        "workerFailed": 0,
+        "parserFailed": 0,
+        "allNineCorrect": 0,
+        "green": 0,
+        "falseGreen": 0,
+        "levels": {
+          "red": 8,
+          "yellow": 4
+        },
+        "directionMetadataCorrect": 12,
+        "perField": {
+          "invoice_number": {
+            "TP": 4,
+            "FP": 0,
+            "FN": 8
+          },
+          "party": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 10
+          },
+          "organization_number": {
+            "TP": 8,
+            "FP": 0,
+            "FN": 4
+          },
+          "issued_at": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 6
+          },
+          "due_at": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 6
+          },
+          "total_cents": {
+            "TP": 12,
+            "FP": 0,
+            "FN": 0
+          },
+          "net_cents": {
+            "TP": 12,
+            "FP": 0,
+            "FN": 0
+          },
+          "vat_cents": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 12
+          },
+          "currency": {
+            "TP": 12,
+            "FP": 0,
+            "FN": 0
+          }
+        },
+        "cases": [
+          {
+            "id": "normal-sv-01",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26001",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Myrglimt Kontor AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 120000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-02",
+            "correct": 7,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "party",
+                "expected": "Granlyra Service AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 31250,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-03",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26003",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Fjällruta Teknik AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "organization_number",
+                "expected": "559871-0035",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-03",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 184000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-04",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26004",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Björkkompass Material AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 74500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-05",
+            "correct": 7,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "party",
+                "expected": "Solmossa Form AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 160500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-06",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26006",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Ängsvåg Konsult AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "organization_number",
+                "expected": "559871-0068",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-06",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 46500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-07",
+            "correct": 5,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26007",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Ember Quay Services AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-07",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 81000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-08",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26008",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Cedar Lantern Design AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-08",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-08",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 117000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-09",
+            "correct": 5,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "organization_number",
+                "expected": "559871-0092",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-09",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-09",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 214000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-10",
+            "correct": 5,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26010",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Amber Brook Systems AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-10",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 53000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-11",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26011",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Willow Orbit Supply AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-11",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-11",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 148500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-12",
+            "correct": 5,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "organization_number",
+                "expected": "559871-0126",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-12",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-12",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 94500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          }
+        ],
+        "total": {
+          "TP": 62,
+          "FP": 0,
+          "FN": 46,
+          "recall": 0.5740740740740741,
+          "precision": 1
+        },
+        "targetMet": false
+      },
+      "normalSwedish": {
+        "documents": 6,
+        "workerCompleted": 6,
+        "workerFailed": 0,
+        "parserFailed": 0,
+        "allNineCorrect": 0,
+        "green": 0,
+        "falseGreen": 0,
+        "levels": {
+          "red": 4,
+          "yellow": 2
+        },
+        "directionMetadataCorrect": 6,
+        "perField": {
+          "invoice_number": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 4
+          },
+          "party": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 6
+          },
+          "organization_number": {
+            "TP": 4,
+            "FP": 0,
+            "FN": 2
+          },
+          "issued_at": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          },
+          "due_at": {
+            "TP": 4,
+            "FP": 0,
+            "FN": 2
+          },
+          "total_cents": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          },
+          "net_cents": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          },
+          "vat_cents": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 6
+          },
+          "currency": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          }
+        },
+        "cases": [
+          {
+            "id": "normal-sv-01",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26001",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Myrglimt Kontor AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 120000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-02",
+            "correct": 7,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "party",
+                "expected": "Granlyra Service AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 31250,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-03",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26003",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Fjällruta Teknik AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "organization_number",
+                "expected": "559871-0035",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-03",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 184000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-04",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26004",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Björkkompass Material AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 74500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-05",
+            "correct": 7,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "party",
+                "expected": "Solmossa Form AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 160500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-06",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26006",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Ängsvåg Konsult AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "organization_number",
+                "expected": "559871-0068",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-06",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 46500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          }
+        ],
+        "total": {
+          "TP": 34,
+          "FP": 0,
+          "FN": 20,
+          "recall": 0.6296296296296297,
+          "precision": 1
+        },
+        "targetMet": false
+      },
+      "normalEnglish": {
+        "documents": 6,
+        "workerCompleted": 6,
+        "workerFailed": 0,
+        "parserFailed": 0,
+        "allNineCorrect": 0,
+        "green": 0,
+        "falseGreen": 0,
+        "levels": {
+          "red": 4,
+          "yellow": 2
+        },
+        "directionMetadataCorrect": 6,
+        "perField": {
+          "invoice_number": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 4
+          },
+          "party": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 4
+          },
+          "organization_number": {
+            "TP": 4,
+            "FP": 0,
+            "FN": 2
+          },
+          "issued_at": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 6
+          },
+          "due_at": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 4
+          },
+          "total_cents": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          },
+          "net_cents": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          },
+          "vat_cents": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 6
+          },
+          "currency": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          }
+        },
+        "cases": [
+          {
+            "id": "normal-en-07",
+            "correct": 5,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26007",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Ember Quay Services AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-07",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 81000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-08",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26008",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Cedar Lantern Design AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-08",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-08",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 117000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-09",
+            "correct": 5,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "organization_number",
+                "expected": "559871-0092",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-09",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-09",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 214000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-10",
+            "correct": 5,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26010",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Amber Brook Systems AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-10",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 53000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-11",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26011",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Willow Orbit Supply AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-11",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-11",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 148500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-12",
+            "correct": 5,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "organization_number",
+                "expected": "559871-0126",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-12",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-12",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 94500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          }
+        ],
+        "total": {
+          "TP": 28,
+          "FP": 0,
+          "FN": 26,
+          "recall": 0.5185185185185185,
+          "precision": 1
+        },
+        "targetMet": false
+      },
+      "completedOnlyNormal": {
+        "documents": 12,
+        "workerCompleted": 12,
+        "workerFailed": 0,
+        "parserFailed": 0,
+        "allNineCorrect": 0,
+        "green": 0,
+        "falseGreen": 0,
+        "levels": {
+          "red": 8,
+          "yellow": 4
+        },
+        "directionMetadataCorrect": 12,
+        "perField": {
+          "invoice_number": {
+            "TP": 4,
+            "FP": 0,
+            "FN": 8
+          },
+          "party": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 10
+          },
+          "organization_number": {
+            "TP": 8,
+            "FP": 0,
+            "FN": 4
+          },
+          "issued_at": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 6
+          },
+          "due_at": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 6
+          },
+          "total_cents": {
+            "TP": 12,
+            "FP": 0,
+            "FN": 0
+          },
+          "net_cents": {
+            "TP": 12,
+            "FP": 0,
+            "FN": 0
+          },
+          "vat_cents": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 12
+          },
+          "currency": {
+            "TP": 12,
+            "FP": 0,
+            "FN": 0
+          }
+        },
+        "cases": [
+          {
+            "id": "normal-sv-01",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26001",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Myrglimt Kontor AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 120000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-02",
+            "correct": 7,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "party",
+                "expected": "Granlyra Service AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 31250,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-03",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26003",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Fjällruta Teknik AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "organization_number",
+                "expected": "559871-0035",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-03",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 184000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-04",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26004",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Björkkompass Material AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 74500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-05",
+            "correct": 7,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "party",
+                "expected": "Solmossa Form AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 160500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-06",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26006",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Ängsvåg Konsult AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "organization_number",
+                "expected": "559871-0068",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-06",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 46500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-07",
+            "correct": 5,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26007",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Ember Quay Services AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-07",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 81000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-08",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26008",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Cedar Lantern Design AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-08",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-08",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 117000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-09",
+            "correct": 5,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "organization_number",
+                "expected": "559871-0092",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-09",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-09",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 214000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-10",
+            "correct": 5,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26010",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Amber Brook Systems AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-10",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 53000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-11",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26011",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Willow Orbit Supply AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-11",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-11",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 148500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-12",
+            "correct": 5,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "organization_number",
+                "expected": "559871-0126",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-12",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-12",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 94500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          }
+        ],
+        "total": {
+          "TP": 62,
+          "FP": 0,
+          "FN": 46,
+          "recall": 0.5740740740740741,
+          "precision": 1
+        },
+        "targetMet": false
+      },
+      "stress": {
+        "documents": 2,
+        "workerCompleted": 2,
+        "workerFailed": 0,
+        "parserFailed": 0,
+        "allNineCorrect": 0,
+        "green": 0,
+        "falseGreen": 0,
+        "levels": {
+          "red": 2
+        },
+        "directionMetadataCorrect": 2,
+        "perField": {
+          "invoice_number": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 2
+          },
+          "party": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 2
+          },
+          "organization_number": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 0
+          },
+          "issued_at": {
+            "TP": 1,
+            "FP": 0,
+            "FN": 1
+          },
+          "due_at": {
+            "TP": 1,
+            "FP": 0,
+            "FN": 1
+          },
+          "total_cents": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 0
+          },
+          "net_cents": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 0
+          },
+          "vat_cents": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 2
+          },
+          "currency": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 0
+          }
+        },
+        "cases": [
+          {
+            "id": "stress-sv-13",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26013",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Mossglöd Verkstad AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 64000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "stress-en-14",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26014",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Maple Quartz Services AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-14",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-14",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 108000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          }
+        ],
+        "total": {
+          "TP": 10,
+          "FP": 0,
+          "FN": 8,
+          "recall": 0.5555555555555556,
+          "precision": 1
+        },
+        "targetMet": false
+      }
+    },
+    "sites": {
+      "normal": {
+        "documents": 12,
+        "workerCompleted": 12,
+        "workerFailed": 0,
+        "parserFailed": 0,
+        "allNineCorrect": 0,
+        "green": 0,
+        "falseGreen": 0,
+        "levels": {
+          "red": 8,
+          "yellow": 4
+        },
+        "directionMetadataCorrect": 12,
+        "perField": {
+          "invoice_number": {
+            "TP": 4,
+            "FP": 0,
+            "FN": 8
+          },
+          "party": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 10
+          },
+          "organization_number": {
+            "TP": 8,
+            "FP": 0,
+            "FN": 4
+          },
+          "issued_at": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 6
+          },
+          "due_at": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 6
+          },
+          "total_cents": {
+            "TP": 12,
+            "FP": 0,
+            "FN": 0
+          },
+          "net_cents": {
+            "TP": 12,
+            "FP": 0,
+            "FN": 0
+          },
+          "vat_cents": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 12
+          },
+          "currency": {
+            "TP": 12,
+            "FP": 0,
+            "FN": 0
+          }
+        },
+        "cases": [
+          {
+            "id": "normal-sv-01",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26001",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Myrglimt Kontor AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 120000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-02",
+            "correct": 7,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "party",
+                "expected": "Granlyra Service AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 31250,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-03",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26003",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Fjällruta Teknik AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "organization_number",
+                "expected": "559871-0035",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-03",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 184000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-04",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26004",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Björkkompass Material AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 74500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-05",
+            "correct": 7,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "party",
+                "expected": "Solmossa Form AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 160500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-06",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26006",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Ängsvåg Konsult AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "organization_number",
+                "expected": "559871-0068",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-06",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 46500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-07",
+            "correct": 5,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26007",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Ember Quay Services AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-07",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 81000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-08",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26008",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Cedar Lantern Design AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-08",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-08",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 117000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-09",
+            "correct": 5,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "organization_number",
+                "expected": "559871-0092",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-09",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-09",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 214000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-10",
+            "correct": 5,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26010",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Amber Brook Systems AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-10",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 53000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-11",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26011",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Willow Orbit Supply AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-11",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-11",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 148500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-12",
+            "correct": 5,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "organization_number",
+                "expected": "559871-0126",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-12",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-12",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 94500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          }
+        ],
+        "total": {
+          "TP": 62,
+          "FP": 0,
+          "FN": 46,
+          "recall": 0.5740740740740741,
+          "precision": 1
+        },
+        "targetMet": false
+      },
+      "normalSwedish": {
+        "documents": 6,
+        "workerCompleted": 6,
+        "workerFailed": 0,
+        "parserFailed": 0,
+        "allNineCorrect": 0,
+        "green": 0,
+        "falseGreen": 0,
+        "levels": {
+          "red": 4,
+          "yellow": 2
+        },
+        "directionMetadataCorrect": 6,
+        "perField": {
+          "invoice_number": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 4
+          },
+          "party": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 6
+          },
+          "organization_number": {
+            "TP": 4,
+            "FP": 0,
+            "FN": 2
+          },
+          "issued_at": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          },
+          "due_at": {
+            "TP": 4,
+            "FP": 0,
+            "FN": 2
+          },
+          "total_cents": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          },
+          "net_cents": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          },
+          "vat_cents": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 6
+          },
+          "currency": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          }
+        },
+        "cases": [
+          {
+            "id": "normal-sv-01",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26001",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Myrglimt Kontor AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 120000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-02",
+            "correct": 7,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "party",
+                "expected": "Granlyra Service AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 31250,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-03",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26003",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Fjällruta Teknik AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "organization_number",
+                "expected": "559871-0035",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-03",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 184000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-04",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26004",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Björkkompass Material AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 74500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-05",
+            "correct": 7,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "party",
+                "expected": "Solmossa Form AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 160500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-06",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26006",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Ängsvåg Konsult AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "organization_number",
+                "expected": "559871-0068",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-06",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 46500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          }
+        ],
+        "total": {
+          "TP": 34,
+          "FP": 0,
+          "FN": 20,
+          "recall": 0.6296296296296297,
+          "precision": 1
+        },
+        "targetMet": false
+      },
+      "normalEnglish": {
+        "documents": 6,
+        "workerCompleted": 6,
+        "workerFailed": 0,
+        "parserFailed": 0,
+        "allNineCorrect": 0,
+        "green": 0,
+        "falseGreen": 0,
+        "levels": {
+          "red": 4,
+          "yellow": 2
+        },
+        "directionMetadataCorrect": 6,
+        "perField": {
+          "invoice_number": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 4
+          },
+          "party": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 4
+          },
+          "organization_number": {
+            "TP": 4,
+            "FP": 0,
+            "FN": 2
+          },
+          "issued_at": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 6
+          },
+          "due_at": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 4
+          },
+          "total_cents": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          },
+          "net_cents": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          },
+          "vat_cents": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 6
+          },
+          "currency": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 0
+          }
+        },
+        "cases": [
+          {
+            "id": "normal-en-07",
+            "correct": 5,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26007",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Ember Quay Services AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-07",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 81000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-08",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26008",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Cedar Lantern Design AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-08",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-08",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 117000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-09",
+            "correct": 5,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "organization_number",
+                "expected": "559871-0092",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-09",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-09",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 214000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-10",
+            "correct": 5,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26010",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Amber Brook Systems AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-10",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 53000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-11",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26011",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Willow Orbit Supply AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-11",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-11",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 148500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-12",
+            "correct": 5,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "organization_number",
+                "expected": "559871-0126",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-12",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-12",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 94500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          }
+        ],
+        "total": {
+          "TP": 28,
+          "FP": 0,
+          "FN": 26,
+          "recall": 0.5185185185185185,
+          "precision": 1
+        },
+        "targetMet": false
+      },
+      "completedOnlyNormal": {
+        "documents": 12,
+        "workerCompleted": 12,
+        "workerFailed": 0,
+        "parserFailed": 0,
+        "allNineCorrect": 0,
+        "green": 0,
+        "falseGreen": 0,
+        "levels": {
+          "red": 8,
+          "yellow": 4
+        },
+        "directionMetadataCorrect": 12,
+        "perField": {
+          "invoice_number": {
+            "TP": 4,
+            "FP": 0,
+            "FN": 8
+          },
+          "party": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 10
+          },
+          "organization_number": {
+            "TP": 8,
+            "FP": 0,
+            "FN": 4
+          },
+          "issued_at": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 6
+          },
+          "due_at": {
+            "TP": 6,
+            "FP": 0,
+            "FN": 6
+          },
+          "total_cents": {
+            "TP": 12,
+            "FP": 0,
+            "FN": 0
+          },
+          "net_cents": {
+            "TP": 12,
+            "FP": 0,
+            "FN": 0
+          },
+          "vat_cents": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 12
+          },
+          "currency": {
+            "TP": 12,
+            "FP": 0,
+            "FN": 0
+          }
+        },
+        "cases": [
+          {
+            "id": "normal-sv-01",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26001",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Myrglimt Kontor AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 120000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-02",
+            "correct": 7,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "party",
+                "expected": "Granlyra Service AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 31250,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-03",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26003",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Fjällruta Teknik AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "organization_number",
+                "expected": "559871-0035",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-03",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 184000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-04",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26004",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Björkkompass Material AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 74500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-05",
+            "correct": 7,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "party",
+                "expected": "Solmossa Form AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 160500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-sv-06",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26006",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Ängsvåg Konsult AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "organization_number",
+                "expected": "559871-0068",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-06",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 46500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-07",
+            "correct": 5,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26007",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Ember Quay Services AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-07",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 81000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-08",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26008",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Cedar Lantern Design AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-08",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-08",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 117000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-09",
+            "correct": 5,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "organization_number",
+                "expected": "559871-0092",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-09",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-09",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 214000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-10",
+            "correct": 5,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26010",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Amber Brook Systems AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-10",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 53000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-11",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26011",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Willow Orbit Supply AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-11",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-11",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 148500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "normal-en-12",
+            "correct": 5,
+            "level": "yellow",
+            "wrong": [
+              {
+                "field": "organization_number",
+                "expected": "559871-0126",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-12",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-12",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 94500,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          }
+        ],
+        "total": {
+          "TP": 62,
+          "FP": 0,
+          "FN": 46,
+          "recall": 0.5740740740740741,
+          "precision": 1
+        },
+        "targetMet": false
+      },
+      "stress": {
+        "documents": 2,
+        "workerCompleted": 2,
+        "workerFailed": 0,
+        "parserFailed": 0,
+        "allNineCorrect": 0,
+        "green": 0,
+        "falseGreen": 0,
+        "levels": {
+          "red": 2
+        },
+        "directionMetadataCorrect": 2,
+        "perField": {
+          "invoice_number": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 2
+          },
+          "party": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 2
+          },
+          "organization_number": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 0
+          },
+          "issued_at": {
+            "TP": 1,
+            "FP": 0,
+            "FN": 1
+          },
+          "due_at": {
+            "TP": 1,
+            "FP": 0,
+            "FN": 1
+          },
+          "total_cents": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 0
+          },
+          "net_cents": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 0
+          },
+          "vat_cents": {
+            "TP": 0,
+            "FP": 0,
+            "FN": 2
+          },
+          "currency": {
+            "TP": 2,
+            "FP": 0,
+            "FN": 0
+          }
+        },
+        "cases": [
+          {
+            "id": "stress-sv-13",
+            "correct": 6,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "SV-26013",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Mossglöd Verkstad AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 64000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          },
+          {
+            "id": "stress-en-14",
+            "correct": 4,
+            "level": "red",
+            "wrong": [
+              {
+                "field": "invoice_number",
+                "expected": "EN-26014",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "party",
+                "expected": "Maple Quartz Services AB",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "issued_at",
+                "expected": "2026-09-14",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "due_at",
+                "expected": "2026-10-14",
+                "actual": null,
+                "workerCompleted": true
+              },
+              {
+                "field": "vat_cents",
+                "expected": 108000,
+                "actual": null,
+                "workerCompleted": true
+              }
+            ]
+          }
+        ],
+        "total": {
+          "TP": 10,
+          "FP": 0,
+          "FN": 8,
+          "recall": 0.5555555555555556,
+          "precision": 1
+        },
+        "targetMet": false
+      }
+    }
+  }
+}

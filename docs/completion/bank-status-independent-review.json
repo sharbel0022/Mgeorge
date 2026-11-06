@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "reviewedCommit": "d7ede6af7cdd6633442c773f98b880d90104ac25",
+  "beforeCommit": "b72fa0b444c52f0ce29ee7b8cd0b92eacca28e00",
+  "fixtureContextCommit": "edaccd85dcd7e8b23268c04640e1f9fc4d41ba57",
+  "scope": "Only saved bank status warnings/selection parsing and visible UI alert; no production operations.",
+  "decision": "NO_BLOCKING_FINDING_IN_REVIEWED_DIFF",
+  "red": {
+    "tests": 22,
+    "pass": 6,
+    "fail": 16,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "exitCode": 1,
+    "durationMilliseconds": 4199.933875
+  },
+  "green": {
+    "tests": 22,
+    "pass": 22,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "exitCode": 0,
+    "durationMilliseconds": 4668.973191
+  },
+  "enforcement": [
+    "PRAGMA query_only=ON throughout status calls",
+    "Every SQLite table compared before/after",
+    "Zero synthetic provider dispatches",
+    "Ordinary fetch throws through test fixture/network guard"
+  ],
+  "method": "The same frozen independent 22-case probe compiled exact git-extracted before/after service.ts snapshots through the existing synthetic composition fixture. Author regression tests were not imported or executed.",
+  "command": "NODE_ENV=test STATUS_REVIEW_SERVICE_PATH=<before-or-after-service-snapshot.ts> node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap sites/tests/independent-bank-status-review.mjs",
+  "artifacts": [
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/bank-status-independent-probe.mjs",
+      "bytes": 21987,
+      "sha256": "b6a09d6c2f0241e66a6e036d72a0dd92b6b2c6d09b5da837d28d15b870d08da2"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/bank-status-before.ts",
+      "bytes": 97310,
+      "sha256": "1458c81b742cb4d11efaacd23ba8839ae0c11c07eb561bf98869f52487e51229"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/bank-status-after.ts",
+      "bytes": 98607,
+      "sha256": "24bf060f7cf8e78072dbbfa4cd2e8aa13ee749472c18eb7d8eb97b164ae4f966"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/bank-status-independent-red.tap",
+      "bytes": 16928,
+      "sha256": "9ae05e3c766813be54941d80ab450b6bcecd9ac9c08892744f7f77d991f4259d"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/bank-status-independent-green.tap",
+      "bytes": 3945,
+      "sha256": "2ac18a986984f3ce55ee2334bcf4390cdc33ad4ca25b79cf06b1d185dd961574"
+    }
+  ],
+  "productFiles": [
+    {
+      "path": "sites/lib/banking/service.ts",
+      "sha256": "24bf060f7cf8e78072dbbfa4cd2e8aa13ee749472c18eb7d8eb97b164ae4f966"
+    },
+    {
+      "path": "sites/components/bank-connection.tsx",
+      "sha256": "ee6dd3f3fa5a3782c4c7dc0f943b77e720d8f5e16a4801853bef679603d2e477"
+    }
+  ],
+  "remainingGate": "Complete integrated CI/build; no claim of production bank readiness."
+}

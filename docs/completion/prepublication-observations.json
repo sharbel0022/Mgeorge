@@ -1,0 +1,440 @@
+{
+  "schema": "mgeorge-completion-prepublication-observations-v1",
+  "recordedAt": "2026-11-06 15:05:29 UTC",
+  "bank": {
+    "enabled": true,
+    "connected": false,
+    "intervalHours": 6,
+    "lastSyncedAt": "2026-11-05T08:05:14.646Z",
+    "lastAttemptAt": "2026-11-05T14:04:35.832Z",
+    "nextAttemptAt": "2026-11-05T14:06:00.000Z",
+    "lastError": "Bankhändelserna kunde inte hämtas. Försök igen.",
+    "blocked": false,
+    "failures": 1,
+    "postprocessWarning": null
+  },
+  "bankgiro": {
+    "enabled": false,
+    "sourceId": null,
+    "mode": null,
+    "state": "DISABLED",
+    "reason": "SOURCE_NOT_CONFIGURED",
+    "nextPollAt": null,
+    "missingReportIds": [],
+    "lastError": null,
+    "authorization": {
+      "status": "UNKNOWN",
+      "verifiedAt": null,
+      "validUntil": null
+    },
+    "lastSuccessAt": null,
+    "lastFailureAt": null,
+    "lastFailureCode": null,
+    "counts": {
+      "PENDING": 0,
+      "RETRY": 0,
+      "IMPORTED": 0,
+      "REVIEW": 0,
+      "DUPLICATE": 0,
+      "BLOCKED": 0
+    },
+    "jobs": []
+  },
+  "gmail": {
+    "lastSuccessfulFetch": "2026-11-06T14:28:00.627Z",
+    "lastAttempt": "2026-11-06T14:27:45.808Z",
+    "counts": {
+      "needs_review": 403,
+      "queued": 2,
+      "registered": 2,
+      "waiting_ocr": 58
+    },
+    "rollingRegistered": 5,
+    "cloudLastCompleted": "2026-11-06T14:11:58.332Z",
+    "scheduleObservation": {
+      "last_invoked_at": "2026-11-06T14:00:46.717Z",
+      "last_completed_at": "2026-11-06T14:01:01.519Z",
+      "last_outcome": "completed",
+      "source": "system_entrypoint",
+      "external_schedule_verified": false
+    },
+    "ordinaryScheduleVerified": false,
+    "laterFetchAttribution": "unknown"
+  },
+  "automation": {
+    "id": "Automation_6efa3aafab4081918c48001acc562f96",
+    "enabled": true,
+    "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261028T010000\nRRULE:FREQ=HOURLY;BYMINUTE=0;BYSECOND=0\nEND:VEVENT",
+    "updatedAt": "2026-11-06T14:58:10.356530+00:00",
+    "lastRun": {
+      "id": "e83fc7b1-99e4-832b-9d01-95dec15bb99b",
+      "recorded_status": "no_update",
+      "scheduled_for": "2026-11-06T15:00:00Z",
+      "started_at": "2026-11-06T14:57:44.300946Z",
+      "completed_at": "2026-11-06T14:57:47.529248Z",
+      "chat_ref": null
+    },
+    "latestResultBelongsToOlderRun": true,
+    "ordinaryDispatchProven": false
+  },
+  "backup": {
+    "id": "768fde9a-27a2-4b85-b85a-278239ec4aea",
+    "day": "2026-11-06",
+    "status": "complete",
+    "files": 430,
+    "copied": 430,
+    "bytes": 185567855,
+    "created_at": "2026-11-05T23:03:21.104Z",
+    "verified_at": "2026-11-06T00:48:58.086Z",
+    "verified_files": 430,
+    "verified_bytes": 185567855,
+    "verification_started_at": "2026-11-06T00:45:07.487Z",
+    "verification_scope": "manifest_pass",
+    "api_evidence": {
+      "version": "retained-api-receipts-v1",
+      "scope": "retained_json_checksums",
+      "records_checked": 19,
+      "records_without_receipt": 112
+    },
+    "error": null,
+    "attempts": 0
+  },
+  "environment": {
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "revision": 10,
+    "updated_at": "2026-11-05T17:57:48.138258+00:00",
+    "entries": [
+      {
+        "key": "BACKUP_ENABLED",
+        "is_secret": false,
+        "valueVisible": true,
+        "hasVisibleNonemptyValue": true
+      },
+      {
+        "key": "BACKUP_ENCRYPTION_KEY",
+        "is_secret": true,
+        "valueVisible": false,
+        "hasVisibleNonemptyValue": null
+      },
+      {
+        "key": "BANK_DATA_ENCRYPTION_KEY",
+        "is_secret": true,
+        "valueVisible": false,
+        "hasVisibleNonemptyValue": null
+      },
+      {
+        "key": "DOCUMENT_AUTOMATION_ENABLED",
+        "is_secret": false,
+        "valueVisible": true,
+        "hasVisibleNonemptyValue": true
+      },
+      {
+        "key": "DOCUMENT_CLOUD_OCR_ENABLED",
+        "is_secret": false,
+        "valueVisible": true,
+        "hasVisibleNonemptyValue": true
+      },
+      {
+        "key": "DOCUMENT_CLOUD_WORKER_TOKEN",
+        "is_secret": true,
+        "valueVisible": false,
+        "hasVisibleNonemptyValue": null
+      },
+      {
+        "key": "DOCUMENT_OWNER_EMAIL",
+        "is_secret": false,
+        "valueVisible": true,
+        "hasVisibleNonemptyValue": true
+      },
+      {
+        "key": "DOCUMENT_SCHEDULER_CONFIGURED",
+        "is_secret": false,
+        "valueVisible": true,
+        "hasVisibleNonemptyValue": true
+      },
+      {
+        "key": "DOCUMENT_SCHEDULE_MINUTES",
+        "is_secret": false,
+        "valueVisible": true,
+        "hasVisibleNonemptyValue": true
+      },
+      {
+        "key": "DOCUMENT_WORKER_TOKEN",
+        "is_secret": true,
+        "valueVisible": false,
+        "hasVisibleNonemptyValue": null
+      },
+      {
+        "key": "ENABLE_BANKING_APPLICATION_ID",
+        "is_secret": true,
+        "valueVisible": false,
+        "hasVisibleNonemptyValue": null
+      },
+      {
+        "key": "ENABLE_BANKING_ENVIRONMENT",
+        "is_secret": true,
+        "valueVisible": false,
+        "hasVisibleNonemptyValue": null
+      },
+      {
+        "key": "ENABLE_BANKING_KEY_ROTATED",
+        "is_secret": true,
+        "valueVisible": false,
+        "hasVisibleNonemptyValue": null
+      },
+      {
+        "key": "ENABLE_BANKING_PRIVATE_KEY",
+        "is_secret": true,
+        "valueVisible": false,
+        "hasVisibleNonemptyValue": null
+      },
+      {
+        "key": "ENABLE_BANKING_REDIRECT_URL",
+        "is_secret": false,
+        "valueVisible": true,
+        "hasVisibleNonemptyValue": true
+      },
+      {
+        "key": "GMAIL_ACCOUNT",
+        "is_secret": false,
+        "valueVisible": true,
+        "hasVisibleNonemptyValue": true
+      },
+      {
+        "key": "GOOGLE_CLIENT_ID",
+        "is_secret": true,
+        "valueVisible": false,
+        "hasVisibleNonemptyValue": null
+      },
+      {
+        "key": "GOOGLE_CLIENT_SECRET",
+        "is_secret": true,
+        "valueVisible": false,
+        "hasVisibleNonemptyValue": null
+      }
+    ]
+  },
+  "databaseBaseline": {
+    "observedAt": "2026-11-06 15:04:20 UTC",
+    "tables": [
+      {
+        "table": "workspaces",
+        "rowCount": 1,
+        "projection": {
+          "truncated": true,
+          "truncated_values": 1,
+          "omitted_columns": 0,
+          "omitted_rows": 0,
+          "next_offset": null
+        }
+      },
+      {
+        "table": "bank_connections",
+        "rowCount": 1,
+        "projection": {
+          "truncated": true,
+          "truncated_values": 1,
+          "omitted_columns": 0,
+          "omitted_rows": 0,
+          "next_offset": null
+        }
+      },
+      {
+        "table": "companies",
+        "rowCount": 0,
+        "projection": {
+          "truncated": false,
+          "truncated_values": 0,
+          "omitted_columns": 0,
+          "omitted_rows": 0,
+          "next_offset": null
+        }
+      },
+      {
+        "table": "company_memberships",
+        "rowCount": 0,
+        "projection": {
+          "truncated": false,
+          "truncated_values": 0,
+          "omitted_columns": 0,
+          "omitted_rows": 0,
+          "next_offset": null
+        }
+      },
+      {
+        "table": "company_roles",
+        "rowCount": 4,
+        "projection": {
+          "truncated": false,
+          "truncated_values": 0,
+          "omitted_columns": 0,
+          "omitted_rows": 0,
+          "next_offset": null
+        }
+      },
+      {
+        "table": "invoice_counterparties",
+        "rowCount": 2,
+        "projection": {
+          "truncated": false,
+          "truncated_values": 0,
+          "omitted_columns": 0,
+          "omitted_rows": 0,
+          "next_offset": null
+        }
+      },
+      {
+        "table": "document_registrations",
+        "rowCount": 2,
+        "projection": {
+          "truncated": false,
+          "truncated_values": 0,
+          "omitted_columns": 0,
+          "omitted_rows": 0,
+          "next_offset": null
+        }
+      },
+      {
+        "table": "bankgiro_ingest_sources",
+        "rowCount": 0,
+        "projection": {
+          "truncated": false,
+          "truncated_values": 0,
+          "omitted_columns": 0,
+          "omitted_rows": 0,
+          "next_offset": null
+        }
+      },
+      {
+        "table": "saas_bank_state",
+        "rowCount": 0,
+        "projection": {
+          "truncated": false,
+          "truncated_values": 0,
+          "omitted_columns": 0,
+          "omitted_rows": 0,
+          "next_offset": null
+        }
+      }
+    ],
+    "limitations": "workspaces.payload and bank_connections encrypted-account value are truncated by the bounded read API. Complete rows are available for the other seven tables. No full database or workspace-payload hash is claimed."
+  },
+  "productionFinancialUISummary": {
+    "verifiedPayments": 0,
+    "missingPaymentSpecifications": 44,
+    "manualPaymentReviews": 5,
+    "receivedSEK": 0,
+    "outstandingSEK": 16000,
+    "overdueSEK": 7250,
+    "payableSEK": 0,
+    "scope": "Visible UI summary only; not a complete account audit."
+  },
+  "merge": {
+    "pr61": {
+      "sha": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+      "merged": true,
+      "message": "Pull Request successfully merged"
+    },
+    "integratedPullRequests": [
+      {
+        "number": 45,
+        "state": "closed",
+        "merged": true,
+        "merged_at": "2026-11-06T14:48:47Z",
+        "merge_commit_sha": "4095e3de87c94ce9312e18844437dfb65e854cd5",
+        "head": "ac1abdc5469248eba212496af4a4573864908ace",
+        "title": "Harden real bank reconnection, consent diagnostics and provider transport"
+      },
+      {
+        "number": 46,
+        "state": "closed",
+        "merged": true,
+        "merged_at": "2026-11-06T14:48:47Z",
+        "merge_commit_sha": "03f84afd61bb1020e73c17c3cde332a1b07f55a0",
+        "head": "7d3bcb5ef533c39c9e23714e61709c924384ffb8",
+        "title": "Bankgiro: verifierad referensstatus och spårbar originalhistorik"
+      },
+      {
+        "number": 47,
+        "state": "closed",
+        "merged": true,
+        "merged_at": "2026-11-06T14:48:47Z",
+        "merge_commit_sha": "eac09480371cb30a08e6c6622daee9fe8de67a8c",
+        "head": "875876ae539f5ecba1fc39d4c213197806e245ce",
+        "title": "Agent 8: reproducerbar QA, CI-kvitton och syntetisk prestanda"
+      },
+      {
+        "number": 49,
+        "state": "closed",
+        "merged": true,
+        "merged_at": "2026-11-06T14:48:47Z",
+        "merge_commit_sha": "30f93f8eb9547bf1acf816bbcacce95cf7e45339",
+        "head": "03f84afd61bb1020e73c17c3cde332a1b07f55a0",
+        "title": "Agent 9: integration, säkra bankmedgivanden och verifierbar releasebedömning"
+      },
+      {
+        "number": 50,
+        "state": "closed",
+        "merged": true,
+        "merged_at": "2026-11-06T14:48:47Z",
+        "merge_commit_sha": "c02d2b5866148c26a5edaa458b36d8aa93386244",
+        "head": "1619c0e3a63b922c75a7f46d493d39e68075952f",
+        "title": "SaaS: säkra medgivanden och rätta företagens läsåtkomst"
+      },
+      {
+        "number": 51,
+        "state": "closed",
+        "merged": true,
+        "merged_at": "2026-11-06T14:48:47Z",
+        "merge_commit_sha": "17b4a893f0ca650de494dc4bf6a8ec7ccab21c5c",
+        "head": "0954777f10da8be9fb15daf3878c539b51801142",
+        "title": "Agent 5: deterministisk betalningsavstämning med bankbevis"
+      },
+      {
+        "number": 52,
+        "state": "closed",
+        "merged": true,
+        "merged_at": "2026-11-06T14:48:47Z",
+        "merge_commit_sha": "4ebd3994837eb248de0a18e53a9d2d4391e23419",
+        "head": "eb4242f783172ac441f9092f921b04b06dc11771",
+        "title": "fix(ocr): tillförlitlig fakturatolkning och återhämtning av dokumentkö"
+      },
+      {
+        "number": 53,
+        "state": "closed",
+        "merged": true,
+        "merged_at": "2026-11-06T14:48:47Z",
+        "merge_commit_sha": "6c403fd53e4f3cbf39cdd0974e00e30cc9db7168",
+        "head": "d9ca037a90ef9c9e629f62c4dcbf9cfcdeacb459",
+        "title": "Fix exact invoice references hidden by decimal amount search"
+      },
+      {
+        "number": 54,
+        "state": "closed",
+        "merged": true,
+        "merged_at": "2026-11-06T14:48:47Z",
+        "merge_commit_sha": "0ce2604de16b77bf96ff76ccedab115f61a3f9ac",
+        "head": "3db9f01305aa6830a4c2d1cc01970c06b91018c2",
+        "title": "security: durable login limits, request budgets, audit privacy and recovery guards"
+      },
+      {
+        "number": 55,
+        "state": "closed",
+        "merged": true,
+        "merged_at": "2026-11-06T14:48:47Z",
+        "merge_commit_sha": "ec46787c0aab582fbe387a5e19c6ad04c59d5db8",
+        "head": "d6646dd0971650878738f81215d0cfc5c04a1da3",
+        "title": "UI: svartvit arbetsyta, tydliga bankbevis och bevarade granskningsutkast"
+      },
+      {
+        "number": 61,
+        "state": "closed",
+        "merged": true,
+        "merged_at": "2026-11-06T14:48:45Z",
+        "merge_commit_sha": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+        "head": "ebbea9c67f174a6879f1e638633cc53e728282e2",
+        "title": "Complete reviewed bank, OCR, SaaS and recovery integration"
+      }
+    ]
+  }
+}

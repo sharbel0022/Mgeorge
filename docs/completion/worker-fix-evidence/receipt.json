@@ -1,0 +1,112 @@
+{
+  "format": "MG-worker-lifecycle-fix-1",
+  "baseline": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+  "redCommit": "6cba09889f4ecb7c5be3e3a14820fbecbe09f02c",
+  "fixCommit": "f5d178ea816d276457685fbc0421cf144f7cf655",
+  "fixTree": "85b3e39bf97c93246beed073bb3790baf62d94cd",
+  "sitesSubtreeBeforeAndAfter": "ff078901d22a76ce0d0eac775e405ca50d8bcc6e",
+  "runtime": "v24.22.1",
+  "sourceFiles": [
+    {
+      "path": "src/invoice-extraction.js",
+      "sha256": "4ef7393f53ff1a850c26f76dbb4d908ba99620d859949236fbe0b844ead9aa13"
+    },
+    {
+      "path": "src/invoice-worker.js",
+      "sha256": "4f7d992e8fbe81eb44d350763c7ef6e58db217f2a24be8d18041e7a546db3146"
+    },
+    {
+      "path": "test/document-worker-boundary.test.js",
+      "sha256": "64693ecf95eb0b033177f18c01e82cbaaf5ed552804d79173b480547a5a8dc9a"
+    },
+    {
+      "path": "test/helpers/document-worker-boundary-child.mjs",
+      "sha256": "31771eaf0672289efa96ed08eaa60db0218e1677c9010c7dd2c69f9d659f6ba5"
+    }
+  ],
+  "runs": [
+    {
+      "name": "red-frozen.tap",
+      "sourceCommit": "6cba09889f4ecb7c5be3e3a14820fbecbe09f02c",
+      "command": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 --test-reporter=tap test/document-worker-boundary.test.js",
+      "exitCode": 1,
+      "totals": {
+        "tests": 12,
+        "pass": 0,
+        "fail": 12,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "durationMilliseconds": 5422.09343,
+      "log": {
+        "path": "red-frozen.tap.gz",
+        "bytes": 1591,
+        "sha256": "c4acc22025a81936c84348b9358d498373666cb4993c89deee23ee5d7a81e383",
+        "uncompressedBytes": 14099,
+        "uncompressedSha256": "67b123dd8a1ab5db7e07897d97a1084393ce0cefbae0b04026a3ea16c46be120"
+      }
+    },
+    {
+      "name": "green.tap",
+      "sourceCommit": "f5d178ea816d276457685fbc0421cf144f7cf655",
+      "command": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 --test-reporter=tap test/document-worker-boundary.test.js",
+      "exitCode": 0,
+      "totals": {
+        "tests": 12,
+        "pass": 12,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "durationMilliseconds": 7376.412553,
+      "log": {
+        "path": "green.tap.gz",
+        "bytes": 677,
+        "sha256": "4e37e78ef002670027b691e82f86ac658ce5c449b39e9699732cd5dda52c6c3c",
+        "uncompressedBytes": 2748,
+        "uncompressedSha256": "5519a717d26fb9db13c606beaaba5de2f6de7fcbacd5533d0d301f1505c8419d"
+      }
+    },
+    {
+      "name": "focused.tap",
+      "sourceCommit": "f5d178ea816d276457685fbc0421cf144f7cf655",
+      "command": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 --test-reporter=tap test/document-worker-boundary.test.js test/ocr-bankgiro-producer.test.js test/pdf-layout-ocr.test.js test/sites-ocr-pull.test.js test/invoice-extraction.test.js",
+      "exitCode": 0,
+      "totals": {
+        "tests": 107,
+        "pass": 107,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "durationMilliseconds": 94238.730849,
+      "log": {
+        "path": "focused.tap.gz",
+        "bytes": 4897,
+        "sha256": "2c1dfd55c9c5dcf5034a67917e074c34ee57f88070284e662aa83d1d81f287fa",
+        "uncompressedBytes": 27770,
+        "uncompressedSha256": "425b01fc7840ac6c795bcc6dae770e2e1be6eb6cfb0cca14b28efbe8cc82fd70"
+      }
+    }
+  ],
+  "limits": {
+    "actualTimeoutMilliseconds": 90000,
+    "v8OldSpaceMiB": 256,
+    "maxConcurrentCalls": 2,
+    "language": "swe",
+    "psm": "AUTO",
+    "modelChanged": false,
+    "parserChanged": false,
+    "financialLogicChanged": false
+  },
+  "holdoutRead": false,
+  "holdoutRepeated": false,
+  "productionCalls": false,
+  "originalFourWorkerExitsProvenFixed": false,
+  "fullCi": "PENDING_ROOT_PR62",
+  "testMethod": "Actual child processes and actual production worker entrypoint; only Tesseract/transport failure dependencies are stubbed. Test-only interception invokes the registered 90-second timeout callback. No production test env bypass. Normal result/evidence compared byte-for-byte across cleanup fault.",
+  "dependencyReuse": "Both root/Sites locks byte-identical to installed trees; temporary root dependency symlink untracked during tests, removed afterward. No tracked source changed during green/focused runs."
+}

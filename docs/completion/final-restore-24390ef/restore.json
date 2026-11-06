@@ -1,0 +1,236 @@
+{
+  "format": "MG-Sites-synthetic-recovery-drill-1",
+  "scope": "synthetic-isolated-evidence-only",
+  "productionRestoreTested": false,
+  "startedAt": "2026-11-06T14:53:29.082Z",
+  "completedAt": "2026-11-06T14:53:46.033Z",
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "architecture": "x64"
+  },
+  "accepted": true,
+  "objectives": {
+    "isolatedRtoMilliseconds": 60000,
+    "simulatedRpoMilliseconds": 900000
+  },
+  "timing": {
+    "backupAndResumeMilliseconds": 5074.597,
+    "exportMilliseconds": 3230.598,
+    "restoreAndAcceptanceMilliseconds": 5470.712,
+    "totalDrillMilliseconds": 16951.556,
+    "rtoIncludes": [
+      "authenticated bundle validation",
+      "fresh SQLite evidence database",
+      "original write and readback",
+      "independent row, owner, ledger and SHA-256 acceptance"
+    ],
+    "rtoExcludes": [
+      "operator response",
+      "cloud download or regional outage",
+      "key custody or access recovery",
+      "production application activation"
+    ]
+  },
+  "simulatedRecovery": {
+    "clock": "synthetic scenario, not a production measurement",
+    "recoveryPointAt": "2026-11-05T12:00:00.000Z",
+    "postSnapshotWriteAt": "2026-11-05T12:05:00.000Z",
+    "incidentAt": "2026-11-05T12:15:00.000Z",
+    "rpoMilliseconds": 900000,
+    "postSnapshotWritesExcluded": 1
+  },
+  "resume": {
+    "interruptionObserved": true,
+    "snapshotPreserved": true,
+    "steps": 174,
+    "attempts": 1
+  },
+  "tables": [
+    {
+      "name": "workspaces",
+      "rows": 1
+    },
+    {
+      "name": "audit_events",
+      "rows": 1
+    },
+    {
+      "name": "documents",
+      "rows": 430
+    },
+    {
+      "name": "bank_applications",
+      "rows": 1
+    },
+    {
+      "name": "bank_connections",
+      "rows": 1
+    },
+    {
+      "name": "bank_sync_runs",
+      "rows": 1
+    },
+    {
+      "name": "gmail_connections",
+      "rows": 1
+    },
+    {
+      "name": "customer_contacts",
+      "rows": 1
+    },
+    {
+      "name": "customer_messages",
+      "rows": 1
+    },
+    {
+      "name": "reconciliation_findings",
+      "rows": 1
+    },
+    {
+      "name": "customer_deliveries",
+      "rows": 1
+    },
+    {
+      "name": "gmail_sources",
+      "rows": 1
+    },
+    {
+      "name": "gmail_runs",
+      "rows": 1
+    },
+    {
+      "name": "document_automation",
+      "rows": 1
+    },
+    {
+      "name": "document_jobs",
+      "rows": 1
+    },
+    {
+      "name": "document_extractions",
+      "rows": 1
+    },
+    {
+      "name": "invoice_counterparties",
+      "rows": 1
+    },
+    {
+      "name": "document_registrations",
+      "rows": 1
+    },
+    {
+      "name": "payment_control_runs",
+      "rows": 1
+    },
+    {
+      "name": "payment_control_requests",
+      "rows": 1
+    },
+    {
+      "name": "bankgiro_ingest_sources",
+      "rows": 1
+    },
+    {
+      "name": "bankgiro_ingest_jobs",
+      "rows": 1
+    },
+    {
+      "name": "saas_bank_state",
+      "rows": 1
+    },
+    {
+      "name": "company_bank_sync_scopes",
+      "rows": 1
+    },
+    {
+      "name": "company_bank_sync_jobs",
+      "rows": 1
+    },
+    {
+      "name": "company_bank_sync_requests",
+      "rows": 1
+    },
+    {
+      "name": "company_bank_sync_receipts",
+      "rows": 1
+    }
+  ],
+  "originals": {
+    "count": 430,
+    "bytes": 185567855,
+    "hashesChecked": 430
+  },
+  "ledger": {
+    "invoices": 2,
+    "invoiceCents": 75000,
+    "transactions": 2,
+    "transactionCents": 75000,
+    "allocations": 1,
+    "allocatedCents": 62500,
+    "revokedCredits": 1,
+    "revokedBankgiroLinks": 1
+  },
+  "rejectionChecks": [
+    {
+      "case": "wrong_key",
+      "stage": "restore",
+      "rejected": true,
+      "outputCreated": false
+    },
+    {
+      "case": "wrong_owner",
+      "stage": "restore",
+      "rejected": true,
+      "outputCreated": false
+    },
+    {
+      "case": "wrong_company",
+      "stage": "restore",
+      "rejected": true,
+      "outputCreated": false
+    },
+    {
+      "case": "corrupt_original",
+      "stage": "restore",
+      "rejected": true,
+      "outputCreated": false
+    },
+    {
+      "case": "missing_original",
+      "stage": "restore",
+      "rejected": true,
+      "outputCreated": false
+    },
+    {
+      "case": "altered_ledger",
+      "stage": "acceptance",
+      "rejected": true
+    },
+    {
+      "case": "altered_plaintext_original",
+      "stage": "acceptance",
+      "rejected": true
+    },
+    {
+      "case": "foreign_owner_row",
+      "stage": "acceptance",
+      "rejected": true
+    },
+    {
+      "case": "reactivated_application_issuer",
+      "stage": "acceptance",
+      "rejected": true
+    },
+    {
+      "case": "retained_application_token",
+      "stage": "acceptance",
+      "rejected": true
+    }
+  ],
+  "sourceUnchanged": true,
+  "otherOwnerExcluded": true,
+  "authorizationAndTransientRowsAbsent": true,
+  "workerLeasesInvalidated": true,
+  "applicationTokenRecoveryBlocked": true
+}

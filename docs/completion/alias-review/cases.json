@@ -1,0 +1,1097 @@
+{
+  "format": "MG-independent-standard-alias-review-cases-1",
+  "authoredAt": "2026-11-06T16:00:23.710123+00:00",
+  "baselineProductCommit": "f5d178ea816d276457685fbc0421cf144f7cf655",
+  "source": "Independent synthetic text and manually authored word boxes; no optical observation or blind corpus used.",
+  "syntheticOrganizations": [
+    "9920000008",
+    "9930000006"
+  ],
+  "common": [
+    "FAKTURA",
+    "Supplier: Syntetisk Nordverk AB",
+    "Supplier organization number: 992000-0008",
+    "Invoice number: SYN-71103",
+    "Due date: 2027-03-06",
+    "Net amount: 800.00 SEK",
+    "VAT: 200.00 SEK",
+    "Amount due: 1000.00 SEK",
+    "Currency: SEK"
+  ],
+  "textCases": [
+    {
+      "id": "issue_exact",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nIssue date: 2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": "2027-02-04"
+      },
+      "nonGreen": false,
+      "description": ""
+    },
+    {
+      "id": "issue_case_tab",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\niSsUe\tDATE: 2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": "2027-02-04"
+      },
+      "nonGreen": false,
+      "description": ""
+    },
+    {
+      "id": "issue_adjacent_line",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nIssue date:\n2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": "2027-02-04"
+      },
+      "nonGreen": false,
+      "description": ""
+    },
+    {
+      "id": "issue_inline_siblings",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nInvoice number: SYN-71103 Issue date: 2027-02-04 Due date: 2027-03-06",
+      "direction": "supplier",
+      "expected": {
+        "fields.invoice_number.value": "SYN-71103",
+        "fields.issued_at.value": "2027-02-04",
+        "fields.due_at.value": "2027-03-06"
+      },
+      "nonGreen": false,
+      "description": ""
+    },
+    {
+      "id": "equal_aliases",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nIssue date: 2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": "2027-02-04"
+      },
+      "nonGreen": false,
+      "description": ""
+    },
+    {
+      "id": "late_issue_contradicting",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nIssue date: 2027-02-05",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "late_issue_illegible",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nIssue date: unreadable",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "late_issue_impossible_calendar",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nIssue date: 2027-02-31",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "late_issue_missing",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nIssue date: ",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "late_invoice_conflict",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nIssue date: 2027-02-04\nInvoice date: 2027-02-05",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "conflict_beyond_excerpt",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nSynthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. Synthetic explanatory memo. \nIssue date: 2027-02-05",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "nonlabel_reissue",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nReissue date: 2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "nonlabel_token_prefix",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nTicketIssue date: 2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "nonlabel_slash_prefix",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\narchive/Issue date: 2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "nonlabel_dash_prefix",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nstatus-Issue date: 2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "nonlabel_underscore_prefix",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nnote_Issue date: 2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "nonlabel_identifier_word",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nIssueDateSetting: 2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "nonlabel_suffix",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nIssue dateTime: 2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "nonlabel_plural",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nIssue dates: 2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "issue_value_token_suffix",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nIssue date: 2027-02-04XYZ",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "issue_value_unknown_tail",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nIssue date: 2027-02-04 unsupported tail",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "issue_value_second_bare_date",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nIssue date: 2027-02-04 2027-02-05",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "prose_without_date_label",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nA memo about the issue date for a service ticket dated 2027-02-04.",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "issue_paragraph_gap",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nIssue date:\n\n2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "issue_page_break",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nIssue date:\f\n2027-02-04",
+      "direction": "supplier",
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "currency_before_organization",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nInvoice date: 2027-02-04\nCurrency: SEK Organization number: 992000-0008",
+      "direction": "supplier",
+      "expected": {
+        "fields.currency.value": "SEK",
+        "fields.organization_number.value": null
+      },
+      "nonGreen": false,
+      "description": ""
+    },
+    {
+      "id": "net_before_organization",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nInvoice number: SYN-71103\nDue date: 2027-03-06\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nNet amount: 800.00 SEK Organization number: 992000-0008",
+      "direction": "supplier",
+      "expected": {
+        "fields.net_cents.value": 80000,
+        "fields.organization_number.value": null
+      },
+      "nonGreen": false,
+      "description": ""
+    },
+    {
+      "id": "organization_residual_Organization_numbers",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nInvoice date: 2027-02-04\nCurrency: SEK Organization numbers: 993000-0006",
+      "direction": "supplier",
+      "expected": {
+        "fields.currency.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "organization_residual_Organization_numberX",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nInvoice date: 2027-02-04\nCurrency: SEK Organization numberX: 993000-0006",
+      "direction": "supplier",
+      "expected": {
+        "fields.currency.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "organization_residual_PrefixOrganization_number",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nInvoice date: 2027-02-04\nCurrency: SEK PrefixOrganization number: 993000-0006",
+      "direction": "supplier",
+      "expected": {
+        "fields.currency.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "bill_to_scalar_boundary",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nAmount due: 1000.00 SEK Bill to: Syntetisk Sydhandel AB\nCustomer organization number: 993000-0006",
+      "direction": "supplier",
+      "expected": {
+        "fields.total_cents.value": 100000,
+        "fields.party.value": "Syntetisk Nordverk AB",
+        "fields.organization_number.value": "9920000008",
+        "details.recipient.name": "Syntetisk Sydhandel AB",
+        "details.recipient.organization_number": "9930000006"
+      },
+      "nonGreen": false,
+      "description": ""
+    },
+    {
+      "id": "bill_to_foreign_role_only",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nBill to: Syntetisk Sydhandel AB\nCustomer organization number: 993000-0006",
+      "direction": "supplier",
+      "expected": {
+        "fields.party.value": "Syntetisk Nordverk AB",
+        "fields.organization_number.value": null,
+        "details.recipient.organization_number": "9930000006"
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "bill_to_mixed_row_unowned_org",
+      "kind": "text",
+      "text": "FAKTURA\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nSupplier: Syntetisk Nordverk AB Bill to: Syntetisk Sydhandel AB\nOrganization number: 993000-0006",
+      "direction": "supplier",
+      "expected": {
+        "details.supplier.organization_number": null,
+        "details.recipient.organization_number": null,
+        "fields.organization_number.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "fakturamottagare_scalar_boundary",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nAmount due: 1000.00 SEK Fakturamottagare: Syntetisk Sydhandel AB\nCustomer organization number: 993000-0006",
+      "direction": "supplier",
+      "expected": {
+        "fields.total_cents.value": 100000,
+        "fields.party.value": "Syntetisk Nordverk AB",
+        "fields.organization_number.value": "9920000008",
+        "details.recipient.name": "Syntetisk Sydhandel AB",
+        "details.recipient.organization_number": "9930000006"
+      },
+      "nonGreen": false,
+      "description": ""
+    },
+    {
+      "id": "fakturamottagare_foreign_role_only",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nFakturamottagare: Syntetisk Sydhandel AB\nCustomer organization number: 993000-0006",
+      "direction": "supplier",
+      "expected": {
+        "fields.party.value": "Syntetisk Nordverk AB",
+        "fields.organization_number.value": null,
+        "details.recipient.organization_number": "9930000006"
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "fakturamottagare_mixed_row_unowned_org",
+      "kind": "text",
+      "text": "FAKTURA\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nSupplier: Syntetisk Nordverk AB Fakturamottagare: Syntetisk Sydhandel AB\nOrganization number: 993000-0006",
+      "direction": "supplier",
+      "expected": {
+        "details.supplier.organization_number": null,
+        "details.recipient.organization_number": null,
+        "fields.organization_number.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "recipient_residual_Bill_totem",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nAmount due: 1000.00 SEK Bill totem: Syntetisk Sydhandel AB",
+      "direction": "supplier",
+      "expected": {
+        "fields.total_cents.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "recipient_residual_Bill_toSuffix",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nAmount due: 1000.00 SEK Bill toSuffix: Syntetisk Sydhandel AB",
+      "direction": "supplier",
+      "expected": {
+        "fields.total_cents.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "recipient_residual_FakturamottagareX",
+      "kind": "text",
+      "text": "FAKTURA\nSupplier: Syntetisk Nordverk AB\nSupplier organization number: 992000-0008\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nAmount due: 1000.00 SEK FakturamottagareX: Syntetisk Sydhandel AB",
+      "direction": "supplier",
+      "expected": {
+        "fields.total_cents.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    },
+    {
+      "id": "unknown_party_no_inference",
+      "kind": "text",
+      "text": "FAKTURA\nInvoice number: SYN-71103\nDue date: 2027-03-06\nNet amount: 800.00 SEK\nVAT: 200.00 SEK\nAmount due: 1000.00 SEK\nCurrency: SEK\nInvoice date: 2027-02-04\nCompany: Syntetisk Nordverk AB\nOrganization number: 992000-0008",
+      "direction": "supplier",
+      "expected": {
+        "fields.party.value": null
+      },
+      "nonGreen": true,
+      "description": ""
+    }
+  ],
+  "layoutCases": [
+    {
+      "id": "layout_issue_aligned",
+      "kind": "layout",
+      "rows": [
+        [
+          {
+            "text": "Issue",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 10,
+              "x1": 40,
+              "y1": 30
+            }
+          },
+          {
+            "text": "date:",
+            "confidence": 96,
+            "bbox": {
+              "x0": 48,
+              "y0": 10,
+              "x1": 88,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "2027-02-04",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 55,
+              "x1": 80,
+              "y1": 75
+            }
+          }
+        ]
+      ],
+      "joined": "Issue date: 2027-02-04",
+      "expectRaw": false,
+      "expected": {
+        "fields.issued_at.value": "2027-02-04"
+      },
+      "context": "date"
+    },
+    {
+      "id": "layout_organization_aligned",
+      "kind": "layout",
+      "rows": [
+        [
+          {
+            "text": "Organization",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 10,
+              "x1": 96,
+              "y1": 30
+            }
+          },
+          {
+            "text": "number:",
+            "confidence": 96,
+            "bbox": {
+              "x0": 104,
+              "y0": 10,
+              "x1": 160,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "992000-0008",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 55,
+              "x1": 88,
+              "y1": 75
+            }
+          }
+        ]
+      ],
+      "joined": "Organization number: 992000-0008",
+      "expectRaw": false,
+      "expected": {
+        "fields.organization_number.value": null
+      },
+      "context": "organization"
+    },
+    {
+      "id": "layout_org_existing_spelling",
+      "kind": "layout",
+      "rows": [
+        [
+          {
+            "text": "Organisation",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 10,
+              "x1": 96,
+              "y1": 30
+            }
+          },
+          {
+            "text": "number:",
+            "confidence": 96,
+            "bbox": {
+              "x0": 104,
+              "y0": 10,
+              "x1": 160,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "992000-0008",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 55,
+              "x1": 88,
+              "y1": 75
+            }
+          }
+        ]
+      ],
+      "joined": "Organisation number: 992000-0008",
+      "expectRaw": false,
+      "expected": {
+        "fields.organization_number.value": null
+      },
+      "context": "organization"
+    },
+    {
+      "id": "layout_cross_axis_competition",
+      "kind": "layout",
+      "rows": [
+        [
+          {
+            "text": "Issue",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 50,
+              "x1": 40,
+              "y1": 70
+            }
+          },
+          {
+            "text": "date:",
+            "confidence": 96,
+            "bbox": {
+              "x0": 48,
+              "y0": 50,
+              "x1": 88,
+              "y1": 70
+            }
+          }
+        ],
+        [
+          {
+            "text": "Due",
+            "confidence": 96,
+            "bbox": {
+              "x0": 200,
+              "y0": 10,
+              "x1": 224,
+              "y1": 30
+            }
+          },
+          {
+            "text": "date:",
+            "confidence": 96,
+            "bbox": {
+              "x0": 232,
+              "y0": 10,
+              "x1": 272,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "2027-02-04",
+            "confidence": 96,
+            "bbox": {
+              "x0": 200,
+              "y0": 50,
+              "x1": 280,
+              "y1": 70
+            }
+          }
+        ]
+      ],
+      "joined": null,
+      "expectRaw": true,
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "context": "date"
+    },
+    {
+      "id": "layout_two_values",
+      "kind": "layout",
+      "rows": [
+        [
+          {
+            "text": "Issue",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 10,
+              "x1": 40,
+              "y1": 30
+            }
+          },
+          {
+            "text": "date:",
+            "confidence": 96,
+            "bbox": {
+              "x0": 48,
+              "y0": 10,
+              "x1": 88,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "2027-02-05",
+            "confidence": 96,
+            "bbox": {
+              "x0": 200,
+              "y0": 10,
+              "x1": 280,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "2027-02-04",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 55,
+              "x1": 80,
+              "y1": 75
+            }
+          }
+        ]
+      ],
+      "joined": null,
+      "expectRaw": true,
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "context": "date"
+    },
+    {
+      "id": "layout_far_value",
+      "kind": "layout",
+      "rows": [
+        [
+          {
+            "text": "Issue",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 10,
+              "x1": 40,
+              "y1": 30
+            }
+          },
+          {
+            "text": "date:",
+            "confidence": 96,
+            "bbox": {
+              "x0": 48,
+              "y0": 10,
+              "x1": 88,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "2027-02-04",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 160,
+              "x1": 80,
+              "y1": 180
+            }
+          }
+        ]
+      ],
+      "joined": null,
+      "expectRaw": true,
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "context": "date"
+    },
+    {
+      "id": "layout_unrepresented_residual",
+      "kind": "layout",
+      "rows": [
+        [
+          {
+            "text": "Issue",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 10,
+              "x1": 40,
+              "y1": 30
+            }
+          },
+          {
+            "text": "date:",
+            "confidence": 96,
+            "bbox": {
+              "x0": 48,
+              "y0": 10,
+              "x1": 88,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "2027-02-04",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 55,
+              "x1": 80,
+              "y1": 75
+            }
+          }
+        ]
+      ],
+      "joined": null,
+      "expectRaw": true,
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "context": "date"
+    },
+    {
+      "id": "layout_unknown_Reissue_date",
+      "kind": "layout",
+      "rows": [
+        [
+          {
+            "text": "Reissue",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 10,
+              "x1": 56,
+              "y1": 30
+            }
+          },
+          {
+            "text": "date:",
+            "confidence": 96,
+            "bbox": {
+              "x0": 64,
+              "y0": 10,
+              "x1": 104,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "2027-02-04",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 55,
+              "x1": 80,
+              "y1": 75
+            }
+          }
+        ]
+      ],
+      "joined": null,
+      "expectRaw": true,
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "context": "date"
+    },
+    {
+      "id": "layout_unknown_IssueDateSetting",
+      "kind": "layout",
+      "rows": [
+        [
+          {
+            "text": "IssueDateSetting:",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 10,
+              "x1": 136,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "2027-02-04",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 55,
+              "x1": 80,
+              "y1": 75
+            }
+          }
+        ]
+      ],
+      "joined": null,
+      "expectRaw": true,
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "context": "date"
+    },
+    {
+      "id": "layout_unknown_Organization_numberX",
+      "kind": "layout",
+      "rows": [
+        [
+          {
+            "text": "Organization",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 10,
+              "x1": 96,
+              "y1": 30
+            }
+          },
+          {
+            "text": "numberX:",
+            "confidence": 96,
+            "bbox": {
+              "x0": 104,
+              "y0": 10,
+              "x1": 168,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "2027-02-04",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 55,
+              "x1": 80,
+              "y1": 75
+            }
+          }
+        ]
+      ],
+      "joined": null,
+      "expectRaw": true,
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "context": "date"
+    },
+    {
+      "id": "layout_unknown_Bill_totem",
+      "kind": "layout",
+      "rows": [
+        [
+          {
+            "text": "Bill",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 10,
+              "x1": 32,
+              "y1": 30
+            }
+          },
+          {
+            "text": "totem:",
+            "confidence": 96,
+            "bbox": {
+              "x0": 40,
+              "y0": 10,
+              "x1": 88,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "2027-02-04",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 55,
+              "x1": 80,
+              "y1": 75
+            }
+          }
+        ]
+      ],
+      "joined": null,
+      "expectRaw": true,
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "context": "date"
+    },
+    {
+      "id": "layout_unknown_FakturamottagareX",
+      "kind": "layout",
+      "rows": [
+        [
+          {
+            "text": "FakturamottagareX:",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 10,
+              "x1": 144,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "2027-02-04",
+            "confidence": 96,
+            "bbox": {
+              "x0": 0,
+              "y0": 55,
+              "x1": 80,
+              "y1": 75
+            }
+          }
+        ]
+      ],
+      "joined": null,
+      "expectRaw": true,
+      "expected": {
+        "fields.issued_at.value": null
+      },
+      "context": "date"
+    },
+    {
+      "id": "layout_low_confidence_preserved",
+      "kind": "layout",
+      "rows": [
+        [
+          {
+            "text": "Issue",
+            "confidence": 77,
+            "bbox": {
+              "x0": 0,
+              "y0": 10,
+              "x1": 40,
+              "y1": 30
+            }
+          },
+          {
+            "text": "date:",
+            "confidence": 77,
+            "bbox": {
+              "x0": 48,
+              "y0": 10,
+              "x1": 88,
+              "y1": 30
+            }
+          }
+        ],
+        [
+          {
+            "text": "2027-02-04",
+            "confidence": 83,
+            "bbox": {
+              "x0": 0,
+              "y0": 55,
+              "x1": 80,
+              "y1": 75
+            }
+          }
+        ]
+      ],
+      "joined": "Issue date: 2027-02-04",
+      "expectRaw": false,
+      "expected": {
+        "fields.issued_at.value": "2027-02-04"
+      },
+      "context": "date"
+    }
+  ]
+}

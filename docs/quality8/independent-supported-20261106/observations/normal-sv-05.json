@@ -1,0 +1,24 @@
+{
+  "id": "normal-sv-05",
+  "inputSha256": "e746e1e1d4e05029e5449a9cc66b5dab7e19c402f528579c832a09502d4d5959",
+  "workerCompleted": true,
+  "workerThrown": null,
+  "elapsedMs": 2936,
+  "processed": {
+    "text": "Solmossa Form AB\n\nLeverantör | Organisationsnummer: 559871-0050\n\nFAKTURA\n\nFakturanummer SV-26005\n\nFakturadatum 2026-09-05\n\nFörfallodatum 2026-10-05\n\n\n\n\nFakturamottagare: Kundexempel Norden AB\nExempelvägen 8, 652 00 Karlstad\n\nBeskrivning Antal Belopp\n\nKontorsservice 1 3 852,00\n\nMaterialleverans 1 2 568,00\nNettobelopp\t6 420,00\n\nMoms 2590\t1 605,00\n\nAtt betala\t8 025,00\n\nValuta: SEK\n\nBetalningsvillkor: 30 dagar\n\nTack för er beställning.\n\nTEST — SYNTHETIC INVOICE — DO NOT PAY\n",
+    "confidence": 93,
+    "method": "ocr",
+    "ocrEvidence": {
+      "version": 1,
+      "inputSha256": "e746e1e1d4e05029e5449a9cc66b5dab7e19c402f528579c832a09502d4d5959",
+      "textSha256": "02b9f21246ce70a9f72986b808503d6b2b3720c8257f1d394724e53af8bd512c",
+      "pages": [
+        {
+          "page": 1,
+          "textSha256": "6a1e334e035adc35c011f0b74cdc4b055939748a3b839f31dcc1bd502fce7faf",
+          "bankgiro": []
+        }
+      ]
+    }
+  }
+}

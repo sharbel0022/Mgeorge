@@ -1,0 +1,115 @@
+{
+  "kind": "bounded synthetic alias fix verification; not full CI or independent acceptance",
+  "createdAt": "2026-11-06T16:09:12.063977+00:00",
+  "commits": {
+    "base": "effca7cb93d50356e59a03d8366809b5ca3d5f55",
+    "red": "20c5969d0b6906aae1d18963ef810b064c393724",
+    "initialProduct": "0132d4537c5fd24e6a0af7f3cadf499a73706ed0",
+    "recipientRed": "fdf954df916d3ef700c529631a1291608aca2af4",
+    "finalProduct": "100f9c3015da34f772ea0cba53d9871e978ebeab",
+    "recipientGuard": "4c8a2e3f69c6b88b4b8d0bae299c6d30fc7d82ee",
+    "siblingRed": "8f97b00d3cfb21437358eaccb45d3bf55864796a"
+  },
+  "node": "v24.22.1",
+  "sourceHashes": {
+    "src/invoice-extraction.js": "d19cd6743e57e1a175f563b7b1e5ff33b66523553614fb044bfbc264476b93a1",
+    "src/invoice-details.js": "6dc5ea343f76ffe4d1a7a4f0e001e118cf4b89aaa9771d9f0b6f19fa05642548",
+    "sites/lib/invoice-fields.js": "8ab6e8db0c0fba102d5481e889a05079f8e0ef3d5268dffa42732967d94d7c2b",
+    "sites/lib/invoice-details.js": "6dc5ea343f76ffe4d1a7a4f0e001e118cf4b89aaa9771d9f0b6f19fa05642548",
+    "sites/lib/ocr-layout.js": "57af030cf4acb3d7fee2bd9e3d2a708f311c95dba8226902de9a292c344d49ff"
+  },
+  "results": {
+    "node-final-focus.tap": {
+      "command": "node --test --test-reporter=tap test/standard-field-alias-census.test.js test/standard-recipient-alias-boundary.test.js test/standard-recipient-sibling-census.test.js test/invoice-scalar-layout-regression.test.js test/invoice-reliability.test.js test/invoice-evidence-ocr.test.js test/invoice-summary-labels.test.js test/ocr-layout*.test.js test/final95-layout-date-alias.test.js test/final95-summary-cell-layout.test.js test/final95-horizontal-summary-layout.test.js test/final95-stacked-summary-safety.test.js test/final95-parser-census.test.js test/completion-ocr-boundary-review.test.js test/review-ocr-layout-boundaries.test.js",
+      "cwd": ".",
+      "exitCode": 0,
+      "tests": 574,
+      "pass": 574,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "sha256": "f16b2ea44637763ce1dba0bf8ff95f8a7a9e0c3bb1a774c209fd0ae1669b94e7",
+      "storedPath": "node-final-focus.tap.gz",
+      "compression": "gzip",
+      "uncompressedSha256": "bf5b8464e5e2cbcbe25974058c3530e271d381b2bc480e395816be27b26b3c13",
+      "uncompressedBytes": 126088,
+      "storedBytes": 15700
+    },
+    "sites-final-focus.tap": {
+      "command": "node --experimental-strip-types --test --test-reporter=tap tests/invoice-grammar-boundaries.test.mjs tests/invoice-v2-explicit-grammar.test.mjs tests/invoice-scalar-layout-regression.test.mjs tests/invoice-reliability.test.mjs tests/invoice-evidence-ocr.test.mjs tests/invoice-summary-labels.test.mjs tests/ocr-layout*.test.mjs tests/organization-event-context.test.mjs tests/review-organization*.test.mjs",
+      "cwd": "sites",
+      "exitCode": 0,
+      "tests": 464,
+      "pass": 464,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "sha256": "db77731e1031ab7b218a3cbdb71dd02cc4a2d4898b681baa3d08b60cc16d063d",
+      "storedPath": "sites-final-focus.tap.gz",
+      "compression": "gzip",
+      "uncompressedSha256": "9346cef1f32db2b7c09d193da73711d89e592b3c5d1f48dfc265bc3391a18808",
+      "uncompressedBytes": 107495,
+      "storedBytes": 12310
+    }
+  },
+  "newFrozenTests": {
+    "initial": 70,
+    "initialRedPass": 40,
+    "initialRedFail": 30,
+    "initialGreen": 70,
+    "recipientBoundary": 4,
+    "recipientRedPass": 0,
+    "recipientRedFail": 4,
+    "finalNewPass": 102,
+    "recipientSibling": 28,
+    "recipientSiblingRedPass": 24,
+    "recipientSiblingRedFail": 4,
+    "recipientSiblingGreen": 28
+  },
+  "developmentReplay": {
+    "calls": {
+      "ocr": 0,
+      "node": 14,
+      "sites": 14
+    },
+    "sourceCommit": "0132d4537c5fd24e6a0af7f3cadf499a73706ed0",
+    "firstResultsSha256": "241a8ef5cce3cc956dd2771e75b11602e5ebccbf25e9b0418331eba6805885a4",
+    "normal": {
+      "node": {
+        "TP": 66,
+        "FP": 0,
+        "FN": 42,
+        "recall": 0.6111111111111112,
+        "precision": 1
+      },
+      "sites": {
+        "TP": 66,
+        "FP": 0,
+        "FN": 42,
+        "recall": 0.6111111111111112,
+        "precision": 1
+      }
+    },
+    "finalLayoutDiffNotReplayed": true,
+    "finalProductNotReplayed": true,
+    "note": "The one replay is bound to intermediate source 0132. Final layout-colon and scalar-sibling corrections were not replayed; do not relabel the 66/108 score as a new run of 100f9c3."
+  },
+  "noScoreChanges": true,
+  "remainingGates": [
+    "Independent code review",
+    "Full exact PR and main CI",
+    "Publication, if separately authorized by root"
+  ],
+  "intermediateAttempts": [
+    "Initial 66-case RED was expanded to the frozen 70 before production edits.",
+    "Patch-script precondition failure left source unchanged; unchanged-source-red.tap preserves the repeated 40/70 result.",
+    "Partial scalar changes gave 58/70; adding layout labels gave 68/70; newline-aware Issue date delimiter completed 70/70.",
+    "Self-review found colonless recipient reconstruction could lose an existing next-line name. Separate 0/4 RED and restricted printed-colon alias closed it.",
+    "The one stored-observation development replay remains bound to 0132, preceding the final layout-only guard.",
+    "Independent review identified the existing scalar recipient-boundary gap. Separate 24/28 RED and a two-line mandatory-colon sibling update gave the same 28/28; orphan organization abstention remains unchanged."
+  ],
+  "rawLogStorage": "raw-log-storage.json",
+  "documentationNote": "The initial documentation-only diff check reported raw test-runner whitespace. Logs were gzip-compressed without changing their uncompressed bytes; product checks remain separate."
+}

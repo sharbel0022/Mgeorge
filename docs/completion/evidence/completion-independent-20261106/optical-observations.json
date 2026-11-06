@@ -1,0 +1,189 @@
+[
+  {
+    "id": "N01",
+    "inputSha256": "eedf8e43c5e18d6aead3ba8af679f2edc512548c987707f817c1d13d433e8eae",
+    "rawObservationSha256": "a63e2219cbbe322a01e6869dbbd9beacf282d0e934142c92296b8d524a5cec79",
+    "error": {
+      "kind": "document-process-exception",
+      "message": "Error: worker",
+      "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+    },
+    "confidence": null,
+    "method": null,
+    "text": ""
+  },
+  {
+    "id": "N02",
+    "inputSha256": "e5135309f37374d2df649ea553e4bfadee0802c72747c14f1bd7da6f873df508",
+    "rawObservationSha256": "f42ad2c70032299d891960e951b44f22130df9a8edee8100700a5b5e20540d0f",
+    "error": {
+      "kind": "document-process-exception",
+      "message": "Error: worker",
+      "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+    },
+    "confidence": null,
+    "method": null,
+    "text": ""
+  },
+  {
+    "id": "N03",
+    "inputSha256": "ff2a8633c3186fd90046f9bb236de60e833407851b34da5ebb1abcd52b18e6a6",
+    "rawObservationSha256": "822d28753f17f0782eafd186a978e2bda1c2c80db9f26eaa170342c8fc45519d",
+    "error": null,
+    "confidence": 93,
+    "method": "ocr",
+    "text": "FAKTU RA Testbolag Silverkotte AB\n\nOrganisationsnummer 000000-1111\n\n\n\n\nFakturanummer Fakturadatum Förfallodatum\n\nSYN-2029-421 2026-09-05 2026-10-05\n\nMottagare: Syntetisk Testkund AB\n\nFiktiv leveransadress, Teststad\n\nBeskrivning Belopp\nSyntetisk konsulttjänst 696,00 SEK\nAntal: 1\n\nSumma exkl. moms: 696,00 SEK\n\nMoms 25 260: 174,00 SEK\n\nAtt betala: 870,00 SEK\n\nBetalningsvillkor: 30 dagar\n\nEndast syntetiskt testmaterial. Ingen betalning ska göras.\n\nIdentiteter och belopp är påhittade.\n\nSida 1 av 1\n"
+  },
+  {
+    "id": "N04",
+    "inputSha256": "a30ef7a4861871b850a0bb576632854d230caed2b01f91261e74ef143f957999",
+    "rawObservationSha256": "cbe987ea23e1b55ae8aa705024526405160dc5ec72ec73bbdab690bdae56790d",
+    "error": null,
+    "confidence": 93,
+    "method": "ocr",
+    "text": "Demo Amber Harbor I td\n\nCompany registration number: 000000-1148\n\nINVOICE\n\nInvoice number: SYN-2030-438\n\nInvoice date: 2026-09-06\n\nDue date: 2026-10-06\n\nBill to: Synthetic Test Customer Ltd\n\nDescription Amount\nSynthetic consulting service 768.00 EUR\nQuantity: 1\n\nNet amount: 768.00 EUR\n\nVAT 2590: 192.00 EUR\n\nTotal due: 960.00 EUR\n\nPayment terms: 30 days\n\nSynthetic evaluation only. Do not make any payment.\n\nAll identities and amounts are fictional.\n\nPage 1 of 1\n"
+  },
+  {
+    "id": "N05",
+    "inputSha256": "a139334a45dd4c686bf57796718bbf5aebbe502b4550f1cc5ff93fce05054ce9",
+    "rawObservationSha256": "29c1c42c05618912ada73ff124abab2e5c309c1f932a29de010784d9151862e7",
+    "error": null,
+    "confidence": 93,
+    "method": "ocr",
+    "text": "FA KTU RA Fakturanummer\n\nSYN-2031-455\n\nTestfirma Molnlinje AB\n\nFakturadatum 2026-09-07\n\nOrganisationsnummer: 000000-1185\nExempelgatan 0, 000 00 Teststad\n\ninvoiceQexample.invalid Förfallodatum\n\n2026-10-07\nMottagare: Syntetisk Testkund AB\nBeskrivning Belopp\nSyntetisk konsulttjänst 840,00 SEK\n\nAntal: 1\n\nSumma exkl. moms: 840,00 SEK\n\nMoms 25 20: 210,00 SEK\n\nAtt betala: 1 050,00 SEK\n\nBetalningsvillkor: 30 dagar\n\nEndast syntetiskt testmaterial. Ingen betalning ska göras.\n\nIdentiteter och belopp är påhittade.\n\nSida 1 av 1\n"
+  },
+  {
+    "id": "N06",
+    "inputSha256": "099d1ab5f77018440af68681c100c451278666d6c8da5c3a3afa5bc2a4e5adb9",
+    "rawObservationSha256": "282b7c80755bb733b6167376e0b6939c7bbb20e1ab2fd53ee2b34780ca70fa68",
+    "error": {
+      "kind": "document-process-exception",
+      "message": "Error: worker",
+      "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+    },
+    "confidence": null,
+    "method": null,
+    "text": ""
+  },
+  {
+    "id": "N07",
+    "inputSha256": "59f50208bbcf225f4b1a10e20cac5d54afa974aca164a4e17da95241171e2b90",
+    "rawObservationSha256": "490625122aeef46745806e379bdfbca8af0e87f7a8f1fd444a334d9c0130cc7d",
+    "error": null,
+    "confidence": 93,
+    "method": "ocr",
+    "text": "FAKTU RA Testbolag Pappersö AB\n\nOrganisationsnummer 000000-1259\n\n\n\n\nFakturanummer SYN-2033-489\n\nFakturadatum 2026-09-09\n\nFörfallodatum 2026-10-09\n\n\n\n\nMottagare: Syntetisk Testkund AB\n\nFiktiv leveransadress, Teststad\n\nBeskrivning Belopp\nSyntetisk konsulttjänst 984,00 SEK\nAntal: 1\n\nSumma exkl. moms: 984,00 SEK\n\nMoms 25 260: 246,00 SEK\n\nAtt betala: 1 230,00 SEK\n\nBetalningsvillkor: 30 dagar\n\nEndast syntetiskt testmaterial. Ingen betalning ska göras.\n\nIdentiteter och belopp är påhittade.\n\nSida 1 av 1\n"
+  },
+  {
+    "id": "N08",
+    "inputSha256": "9c80d8f921175594999fab8a06608b6cbe10f2081c13d2ee1bc87f8cdb44925e",
+    "rawObservationSha256": "02b8f44e639cd97fbbe105ac69ebb08440e128544c9456a6d56f83e24a489976",
+    "error": null,
+    "confidence": 94,
+    "method": "ocr",
+    "text": "Demo Copper Finch I td\n\nCompany registration number: 000000-1296\n\nINVOICE\n\nInvoice number: SYN-2034-506\n\nInvoice date: 2026-09-10\n\nDue date: 2026-10-10\n\nBill to: Synthetic Test Customer Ltd\n\nDescription Amount\nSynthetic consulting service 1,056.00 EUR\nQuantity: 1\n\nNet amount: 1,056.00 EUR\n\nVAT 2590: 264.00 EUR\n\nTotal due: 1,320.00 EUR\n\nPayment terms: 30 days\n\nSynthetic evaluation only. Do not make any payment.\n\nAll identities and amounts are fictional.\n\nPage 1 of 1\n"
+  },
+  {
+    "id": "N09",
+    "inputSha256": "ac58fe029bfd885967e2bf263ce5f0cb610f0a78f7c4c635308a794f405dee5d",
+    "rawObservationSha256": "c1a9f4a9581f3d6581b257a4cfb904113a3e9953ccafceb9ec099a221bde5504",
+    "error": null,
+    "confidence": 88,
+    "method": "ocr",
+    "text": "—-  m.HHW]  LHHAAG hoaoao00a8z8>oooocopo)ocopgpyrTr T HH\n\nFAKTU RA Fakturanummer\n\nSYN-2035-523\n\nTestfirma Grön Ruta AB\n\nFakturadatum\nOrganisationsnummer: 000000-1333 2026-09-11\nExempelgatan 0, 000 00 Teststad\n\ninvoiceQexample.invalid Förfallodatum\n\n2026-10-11\nMottagare: Syntetisk Testkund AB\nBeskrivning Belopp\nSyntetisk konsulttjänst 1 128,00 SEK\n\nAntal: 1\n\nSumma exkl. moms: 1 128,00 SEK\n\nMoms 25 26: 282,00 SEK\n\nAtt betala: 1 410,00 SEK\n\nBetalningsvillkor: 30 dagar\n\nEndast syntetiskt testmaterial. Ingen betalning ska göras.\n\nIdentiteter och belopp är påhittade.\n\nSida 1 av 1\n"
+  },
+  {
+    "id": "N10",
+    "inputSha256": "526f6eafffcfadfa911b150e517c0cad76327cf12891ae025d9878523ba12fdb",
+    "rawObservationSha256": "a9915b21ffe1ff28a81df46aeeff05ecfca3187561d4e593b06cddee2eacc643",
+    "error": {
+      "kind": "document-process-exception",
+      "message": "Error: worker",
+      "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+    },
+    "confidence": null,
+    "method": null,
+    "text": ""
+  },
+  {
+    "id": "N11",
+    "inputSha256": "565c84d87a78edad5a345f7135336364fff34554cbcea344811578f7fe7c8b20",
+    "rawObservationSha256": "57ceb3a55ef2e7e4c0d7f4dfa1acf0eb58ddead270fda9049226527254d4dbeb",
+    "error": null,
+    "confidence": 93,
+    "method": "ocr",
+    "text": "FAKTU RA Testbolag Månsten AB\n\nOrganisationsnummer 000000-1407\n\n\n\n\nFakturanummer Fakturadatum Förfallodatum\n\nSYN-2037-557 2026-09-13 2026-10-13\n\nMottagare: Syntetisk Testkund AB\n\nFiktiv leveransadress, Teststad\n\nBeskrivning Belopp\nSyntetisk konsulttjänst 1 272,00 SEK\nAntal: 1\n\nSumma exkl. moms: 1 272,00 SEK\n\nMoms 25 26: 318,00 SEK\n\nAtt betala: 1 590,00 SEK\n\nBetalningsvillkor: 30 dagar\n\nEndast syntetiskt testmaterial. Ingen betalning ska göras.\n\nIdentiteter och belopp är påhittade.\n\nSida 1 av 1\n"
+  },
+  {
+    "id": "N12",
+    "inputSha256": "662683649ce997c3afd82b82d5e99bb31f17473d863dbd18aa405c41fe3f2883",
+    "rawObservationSha256": "ceeb2283ef915ddfd5ee759fb2213e2488378cbf968d2f6555856aa51caae6de",
+    "error": null,
+    "confidence": 93,
+    "method": "ocr",
+    "text": "Demo Indigo Orchard I td\n\nCompany registration number: 000000-1444\n\nINVOICE\n\nInvoice number: SYN-2038-574\nInvoice date: 2026-09-14\n\nDue date: 2026-10-14\n\nBill to: Synthetic Test Customer Ltd\n\nDescription Amount\nSynthetic consulting service 1,344.00 EUR\nQuantity: 1\n\nNet amount: 1,344.00 EUR\n\nVAT 2596: 336.00 EUR\n\nTotal due: 1,680.00 EUR\n\nPayment terms: 30 days\n\nSynthetic evaluation only. Do not make any payment.\n\nAll identities and amounts are fictional.\n\nPage 1 of 1\n"
+  },
+  {
+    "id": "N13",
+    "inputSha256": "d61d0f0677110811c458f9a06e9a03dbaaed3e8fc47de1c08349fc761bb1ea9c",
+    "rawObservationSha256": "1b2a7768dbc510b5d5da447e8be22ac17164750f365f2bf44b875ab65b56ba09",
+    "error": null,
+    "confidence": 92,
+    "method": "ocr",
+    "text": "FA KTU RA Fakturanummer\n\nSYN-2039-591\n\nTestfirma Tallcirkel AB\n\nFakturadatum 2026-09-15\n\nOrganisationsnummer: 000000-1481\nExempelgatan 0, 000 00 Teststad\n\ninvoiceQexample.invalid Förfallodatum\n\n2026-10-15\nMottagare: Syntetisk Testkund AB\nBeskrivning Belopp\nSyntetisk konsulttjänst 1 416,00 SEK\n\nAntal: 1\n\nSumma exkl. moms: 1 416,00 SEK\n\nMoms 25 26: 354,00 SEK\n\nAtt betala: 1 770,00 SEK\n\nBetalningsvillkor: 30 dagar\n\nEndast syntetiskt testmaterial. Ingen betalning ska göras.\n\nIdentiteter och belopp är påhittade.\n\nSida 1 av 1\n"
+  },
+  {
+    "id": "N14",
+    "inputSha256": "6e97dfb1f6bdd33ddb1e1eadf3aa5b85bcee489e9ce9757962b562e72644c391",
+    "rawObservationSha256": "c1e0fc707b62d29548061ac769a56946cf887710b7a03b8a1a89024583b187eb",
+    "error": null,
+    "confidence": 92,
+    "method": "ocr",
+    "text": "Demo Violet Meadow I td\n\nCompany registration number: 000000-1518\n\nINVOICE\n\nInvoice number: SYN-2040-608\nInvoice date: 2026-09-16\nDue date: 2026-10-16\n\nBill to: Synthetic Test Customer Ltd\n0 Sample Road, Fictional City\n\nDescription\n\nAmount\n\nSynthetic consulting service\n\nQuantity: 1\n\n1,488.00 EUR\n\nNet amount: 1,488.00 EUR\n\nVAT 25960: 372.00 EUR\n\nTotal due: 1,860.00 EUR\n\nPayment terms: 30 days\n\nSynthetic evaluation only. Do not make any payment.\n\nAll identities and amounts are fictional.\n\nPage 1 of 1\n"
+  },
+  {
+    "id": "N15",
+    "inputSha256": "c2ae2aa82fec42b40597e017b5595b54a66ac4514ec97d77f5d5310b8e2eed69",
+    "rawObservationSha256": "37589a5affd5ea476bada8d9e181b5fca03e1c820ed830491fcf83f16165cce4",
+    "error": null,
+    "confidence": 93,
+    "method": "ocr",
+    "text": "FAKTU RA Testbolag Stilla Vik AB\n\nOrganisationsnummer 000000-1555\n\n\n\n\nFakturanummer SYN-2041-625\n\nFakturadatum 2026-09-17\n\nFörfallodatum 2026-10-17\n\n\n\n\nMottagare: Syntetisk Testkund AB\n\nFiktiv leveransadress, Teststad\n\nBeskrivning Belopp\nSyntetisk konsulttjänst 1 560,00 SEK\nAntal: 1\n\nSumma exkl. moms: 1 560,00 SEK\n\nMoms 25 260: 390,00 SEK\n\nAtt betala: 1 950,00 SEK\n\nBetalningsvillkor: 30 dagar\n\nEndast syntetiskt testmaterial. Ingen betalning ska göras.\n\nIdentiteter och belopp är påhittade.\n\nSida 1 av 1\n"
+  },
+  {
+    "id": "N16",
+    "inputSha256": "8d6b1627e4f8b73626955e211b4c797df13f56fa2acb85edcbbea3926f490b5d",
+    "rawObservationSha256": "13466f130c0b63090bffb0ce88a45061fb691346f9b6b6fc4506830980a7a1a3",
+    "error": null,
+    "confidence": 93,
+    "method": "ocr",
+    "text": "Demo Golden Fern I td\n\nCompany registration number: 000000-1592\n\nINVOICE\n\nInvoice number: SYN-2042-642\nInvoice date: 2026-09-18\n\nDue date: 2026-10-18\n\nBill to: Synthetic Test Customer Ltd\n\nDescription Amount\n\nSynthetic consulting service 1,632.00 EUR\n\nQuantity: 1\n\nNet amount: 1,632.00 EUR\n\nVAT 25960: 408.00 EUR\n\nTotal due: 2,040.00 EUR\n\nPayment terms: 30 days\nSynthetic evaluation only. Do not make any payment.\n\nAll identities and amounts are fictional.\n\nPage 1 of 1\n"
+  },
+  {
+    "id": "S01",
+    "inputSha256": "289e18a6618e803f437e7adbdc55e1220185a52ea0ab678ecb266865ade61084",
+    "rawObservationSha256": "509fe535668ac3d6f50ab8615081acdc19c433b2ea74b45a778db86f4c671181",
+    "error": null,
+    "confidence": 90,
+    "method": "ocr",
+    "text": "FA KTU RA Fakturanummer\n\nSYN-2043-659\nTestfirma Skymningsblå AB i ee\nOrganisationsnummer: 000000-1629 2026-09-19\nExempelgatan 0, 000 00 Teststad\ninvoice& example invalid Förfallodatum\n2026-10-19\nMottagare: Syntetisk Testkund AB\nBeskrivning Belopp\nSyntetisk konsulttjänst 1 704,00 SEK\n\nAntal: 1\n\nSumma exkl. moms: 1 704,00 SEK\n\nMoms 25 96: 426,00 SEK\n\nAtt betala: 2 130,00 SEK\n\nBetalningsvillkor: 30 dagar\n\nEndast syntetiskt testmaterial. Ingen betalning ska göras\n\nidentiteter och belopp är påhittade\n\nSida 1 av 1\n"
+  },
+  {
+    "id": "S02",
+    "inputSha256": "e3424fbb0101f24dcd3c783ae486e5319372723a4e50efe5dcc8e7048883b7ba",
+    "rawObservationSha256": "20fa00d965bf92b34d8234a3a74c8cb8fe4554cc67160d2caadc7713ce81546c",
+    "error": null,
+    "confidence": 93,
+    "method": "ocr",
+    "text": "Bill to: Synthetic Test Customer Ltd\n0 Sample Road, Fictional City\n\nDescription Amount\nSynthetic consulting service 1,776.00 EUR\nQuantity: 1\n\nNet amount: 1,776.00 EUR\n\nVAT 2590: 444.00 EUR\n\nTotal due: 2,220.00 EUR\n\nPayment terms: 30 days\n\nSynthetic evaluation only. Do not make any payment.\n\nAll identities and amounts are fictional.\n\nPage 1 of 1\n"
+  },
+  {
+    "id": "S03",
+    "inputSha256": "dee4bb8481c881cd357af69e2d743f4e389f55335475cdcc1d9b4b1d9291bb5e",
+    "rawObservationSha256": "08c000115ff48fdbfadb3c205eea7bdae80577541b30125719e192283160bcd2",
+    "error": null,
+    "confidence": 94,
+    "method": "ocr",
+    "text": "FAKTU RA Testbolag Röda Rutan AB\n\nOrganisationsnummer 000000-1703\n\n\n\n\nFakturanummer Fakturadatum Förfallodatum\n\nSYN-2045-693 2026-09-21 2026-10-21\n\nMottagare: Syntetisk Testkund AB\n\nFiktiv leveransadress, Teststad\n\nBeskrivning Belopp\nSyntetisk konsulttjänst 1 348,00 SEK\nAntal: 1\n\nSumma exkl. moms: 1 848,00 SEK\n\nMoms 25 260: 462,00 SEK\n\nAtt betala: 2 310,00 SEK\n\nAtt betala: 2 331,00 SEK\n\nBetalningsvillkor: 30 dagar\n\nEndast syntetiskt testmaterial. Ingen betalning ska göras.\n\nIdentiteter och belopp är påhittade.\n\nSida 1 av 1\n"
+  }
+]

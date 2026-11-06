@@ -1,0 +1,24 @@
+{
+  "kind": "synthetic-development-RED",
+  "createdAt": "2026-11-06T15:57:48.968046+00:00",
+  "sourceCommit": "effca7cb93d50356e59a03d8366809b5ca3d5f55",
+  "command": "node --test --test-reporter=tap test/standard-field-alias-census.test.js",
+  "expectedFailures": 30,
+  "tests": 70,
+  "pass": 40,
+  "fail": 30,
+  "productionChanges": false,
+  "opticalCalls": 0,
+  "holdoutReplays": 0,
+  "testSha256": "87f088a121314735dd3f1b22e183362f9c9191319329cb674ad6c27b375b85d9",
+  "redSha256": "404eecc4a426832e2becf271ab7c5e370c6a3ae889dc6ed46da70a2342431d05",
+  "baseline": {
+    "tests": 68,
+    "pass": 68,
+    "fail": 0
+  },
+  "notes": [
+    "Initial 66-case execution is preserved separately. Before freeze, four longer organization-label negatives were added and the competing heading fixture was made non-overlapping.",
+    "Frozen independent first-pass outcome is unchanged."
+  ]
+}

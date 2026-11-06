@@ -1,0 +1,1591 @@
+{
+  "schema": "mgeorge-completion-independent-33-draft-v1",
+  "assessed_at": "2026-11-06T14:57:55.547664+00:00",
+  "status": "DRAFT_NOT_A_FINAL_PRODUCTION_OR_RELEASE_CERTIFICATE",
+  "reviewer": "bank_completion",
+  "independence": "Samlad bedömning separat från integrationsansvarig. Bedömaren implementerade bankens metadatafix; dess oberoende negativa granskning utfördes av security_completion (22/22). Inga nya produktändringar eller tester görs i denna bedömningsuppgift.",
+  "previous_assessment": {
+    "path": "docs/quality8/current-33-assessment.json",
+    "assessed_at": "2026-11-06T06:21:26Z",
+    "aggregate": {
+      "sum": 257.5,
+      "maximum": 330,
+      "average": 7.803030303030303,
+      "at_least_8": 28,
+      "area_count": 33,
+      "below_8_ids": [
+        6,
+        10,
+        15,
+        16,
+        28
+      ],
+      "all_33_at_least_8": false
+    }
+  },
+  "proposed_aggregate": {
+    "sum": 258.0,
+    "maximum": 330,
+    "average": 7.818181818181818,
+    "at_least_8": 26,
+    "area_count": 33,
+    "below_8_ids": [
+      6,
+      10,
+      11,
+      15,
+      16,
+      28,
+      33
+    ],
+    "minimum_requested_sum": 314,
+    "gap_to_requested_sum": 56.0,
+    "goal_met": false,
+    "all_33_at_least_8": false
+  },
+  "code_state": {
+    "pr": 61,
+    "pr_head": "ebbea9c67f174a6879f1e638633cc53e728282e2",
+    "quality_run_id": "42235429917",
+    "tested_checkout": "4d19058628bf3ec2973be40a465c509eaf82408d",
+    "tested_tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+    "merged_main_root_reported": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+    "main_tree_equal_root_reported": true,
+    "main_ci_run_id": "42237265007",
+    "main_ci_final_result": null,
+    "live_site_version": 66,
+    "live_native_commit": "0b119b8d472f70a1bfeac686c12889b618a32fb2",
+    "saved_site_version": 68,
+    "saved_native_source": "349779e799d4510b56173901e6be69880818b5d4",
+    "saved_version_deployed": false
+  },
+  "production_observation_basis": "Rootrapporterad godkänd aktuell läsning/ordinarie körning samt baseline.json. Denna bedömare gör inga nya produktionsanrop. Senare köantal, 14:28-framgång utan attribuering, runtimekonfiguration och merge/Sites68 kommer från roots överlämning, inte den äldre baselinefilen.",
+  "production": {
+    "bank_connected": false,
+    "bank_revalidation_code": "BANK_CONSENT_INVALID",
+    "bank_last_success": "2026-11-05T08:05:14.646Z",
+    "bankgiro_reason": "SOURCE_NOT_CONFIGURED",
+    "gmail_direct_imports": 7,
+    "gmail_direct_success_at": "2026-11-06T14:00:58.102Z",
+    "ordinary_gmail_schedule_verified": false,
+    "cloud_ocr_trigger": "manual",
+    "cloud_ocr_processed": 6,
+    "cloud_ocr_failed": 0,
+    "documents": {
+      "needs_review": 403,
+      "queued": 2,
+      "waiting_ocr": 58,
+      "registered": 2,
+      "rolling_registered": 5
+    },
+    "latest_read_at_root_reported": "2026-11-06T14:50Z",
+    "gmail_latest_success_at": "2026-11-06T14:28:00.627Z",
+    "gmail_latest_attempt_at": "2026-11-06T14:27:45.808Z",
+    "later_fetch_attribution": "unknown; not attributed to direct14:00 or scheduled dispatch",
+    "openpayments_site_runtime_config_present": false,
+    "missing_runtime_config_entries": [
+      "SAAS_BANK_ENABLED",
+      "SAAS_OPENPAYMENTS_CONFIG",
+      "SAAS_OPENPAYMENTS_REGISTRATIONS",
+      "SAAS_OPENPAYMENTS_MTLS_BINDING_CONFIG"
+    ],
+    "environment_revision": 10,
+    "environment_entry_count": 18,
+    "environment_changed": false,
+    "enable_banking_secret_placeholders_present": true,
+    "secret_values_read": false,
+    "backup": {
+      "verified_originals": 430,
+      "bytes": 185567855,
+      "new_gmail_imports_included": false,
+      "production_restore_tested": false
+    }
+  },
+  "final_release": {
+    "decision": null,
+    "published_version": null,
+    "published_source": null,
+    "postpublication_evidence": null,
+    "owner": "root",
+    "status": "PENDING"
+  },
+  "independent_ocr_final_evaluation": {
+    "corpus": null,
+    "candidate_sha": null,
+    "first_run_evidence": null,
+    "mandatory_recall": null,
+    "field_precision": null,
+    "false_green_count": null,
+    "acceptance_met": null,
+    "status": "PENDING",
+    "known_development_replay_only": {
+      "mandatory_correct": 74,
+      "mandatory_expected": 100,
+      "false_values": 0
+    }
+  },
+  "technical_evidence": {
+    "quality_receipts": [
+      {
+        "name": "node22",
+        "receipt_path": "/workspace/scratch/aab0f7dc06f9/ci-evidence/completion-pr-node22/receipt.json",
+        "repository_receipt_path": "docs/completion/ci/pr/node22/receipt.json",
+        "sha256": "1c7cdde9de12fac8be06e7146a47ad845eb7a47b39b126885d6ce0faa0f25190",
+        "status": "PASSED",
+        "source": {
+          "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+          "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+          "branch": "",
+          "workingTreeDirty": false,
+          "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+          "fileCount": 2443
+        },
+        "github": {
+          "runId": "42235429917",
+          "runAttempt": "1",
+          "event": "pull_request",
+          "checkoutSha": "4d19058628bf3ec2973be40a465c509eaf82408d",
+          "pullRequestHeadSha": "ebbea9c67f174a6879f1e638633cc53e728282e2",
+          "pullRequestBaseSha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+        },
+        "steps": [
+          {
+            "name": "install-node",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "syntax",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "audit-production",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": {
+              "measured": true,
+              "vulnerabilities": {
+                "info": 0,
+                "low": 0,
+                "moderate": 0,
+                "high": 0,
+                "critical": 0,
+                "total": 0
+              }
+            }
+          },
+          {
+            "name": "audit-all",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": {
+              "measured": true,
+              "vulnerabilities": {
+                "info": 0,
+                "low": 0,
+                "moderate": 0,
+                "high": 0,
+                "critical": 0,
+                "total": 0
+              }
+            }
+          },
+          {
+            "name": "node-tests",
+            "passed": true,
+            "exitCode": 0,
+            "totals": {
+              "tests": 2898,
+              "pass": 2898,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            },
+            "audit": null
+          }
+        ]
+      },
+      {
+        "name": "node24",
+        "receipt_path": "/workspace/scratch/aab0f7dc06f9/ci-evidence/completion-pr-node24/receipt.json",
+        "repository_receipt_path": "docs/completion/ci/pr/node24/receipt.json",
+        "sha256": "9cdc8b9d9e36539e84c534a29e5aafc86ed669225479ea37eb129c6673694107",
+        "status": "PASSED",
+        "source": {
+          "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+          "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+          "branch": "",
+          "workingTreeDirty": false,
+          "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+          "fileCount": 2443
+        },
+        "github": {
+          "runId": "42235429917",
+          "runAttempt": "1",
+          "event": "pull_request",
+          "checkoutSha": "4d19058628bf3ec2973be40a465c509eaf82408d",
+          "pullRequestHeadSha": "ebbea9c67f174a6879f1e638633cc53e728282e2",
+          "pullRequestBaseSha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+        },
+        "steps": [
+          {
+            "name": "install-node",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "syntax",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "audit-production",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": {
+              "measured": true,
+              "vulnerabilities": {
+                "info": 0,
+                "low": 0,
+                "moderate": 0,
+                "high": 0,
+                "critical": 0,
+                "total": 0
+              }
+            }
+          },
+          {
+            "name": "audit-all",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": {
+              "measured": true,
+              "vulnerabilities": {
+                "info": 0,
+                "low": 0,
+                "moderate": 0,
+                "high": 0,
+                "critical": 0,
+                "total": 0
+              }
+            }
+          },
+          {
+            "name": "node-tests",
+            "passed": true,
+            "exitCode": 0,
+            "totals": {
+              "tests": 2898,
+              "pass": 2898,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            },
+            "audit": null
+          }
+        ]
+      },
+      {
+        "name": "sites",
+        "receipt_path": "/workspace/scratch/aab0f7dc06f9/ci-evidence/completion-pr-sites/receipt.json",
+        "repository_receipt_path": "docs/completion/ci/pr/sites/receipt.json",
+        "sha256": "b668156daadddfa84ad20ecceed8741de52dcf5bfe35cd1ba509268f9bc38f22",
+        "status": "PASSED",
+        "source": {
+          "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+          "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+          "branch": "",
+          "workingTreeDirty": false,
+          "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+          "fileCount": 2443
+        },
+        "github": {
+          "runId": "42235429917",
+          "runAttempt": "1",
+          "event": "pull_request",
+          "checkoutSha": "4d19058628bf3ec2973be40a465c509eaf82408d",
+          "pullRequestHeadSha": "ebbea9c67f174a6879f1e638633cc53e728282e2",
+          "pullRequestBaseSha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+        },
+        "steps": [
+          {
+            "name": "install-node",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "install-sites",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "install-bridge",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "minimatch-mitigation",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "typecheck",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "audit-production",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": {
+              "measured": true,
+              "vulnerabilities": {
+                "info": 0,
+                "low": 0,
+                "moderate": 0,
+                "high": 0,
+                "critical": 0,
+                "total": 0
+              }
+            }
+          },
+          {
+            "name": "audit-all",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": {
+              "measured": true,
+              "vulnerabilities": {
+                "info": 0,
+                "low": 0,
+                "moderate": 8,
+                "high": 0,
+                "critical": 0,
+                "total": 8
+              }
+            }
+          },
+          {
+            "name": "sites-tests",
+            "passed": true,
+            "exitCode": 0,
+            "totals": {
+              "tests": 5820,
+              "pass": 5820,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            },
+            "audit": null
+          },
+          {
+            "name": "production-build",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          }
+        ]
+      },
+      {
+        "name": "bridge",
+        "receipt_path": "/workspace/scratch/aab0f7dc06f9/ci-evidence/completion-pr-bridge/receipt.json",
+        "repository_receipt_path": "docs/completion/ci/pr/bridge/receipt.json",
+        "sha256": "e9f482de163705b998855010d3b1802a09695ed0cbddfefa1f318feb9af283c5",
+        "status": "PASSED",
+        "source": {
+          "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+          "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+          "branch": "",
+          "workingTreeDirty": false,
+          "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+          "fileCount": 2443
+        },
+        "github": {
+          "runId": "42235429917",
+          "runAttempt": "1",
+          "event": "pull_request",
+          "checkoutSha": "4d19058628bf3ec2973be40a465c509eaf82408d",
+          "pullRequestHeadSha": "ebbea9c67f174a6879f1e638633cc53e728282e2",
+          "pullRequestBaseSha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+        },
+        "steps": [
+          {
+            "name": "install-bridge",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "syntax",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "audit-production",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": {
+              "measured": true,
+              "vulnerabilities": {
+                "info": 0,
+                "low": 0,
+                "moderate": 0,
+                "high": 0,
+                "critical": 0,
+                "total": 0
+              }
+            }
+          },
+          {
+            "name": "audit-all",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": {
+              "measured": true,
+              "vulnerabilities": {
+                "info": 0,
+                "low": 0,
+                "moderate": 0,
+                "high": 0,
+                "critical": 0,
+                "total": 0
+              }
+            }
+          },
+          {
+            "name": "bridge-tests",
+            "passed": true,
+            "exitCode": 0,
+            "totals": {
+              "tests": 47,
+              "pass": 47,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            },
+            "audit": null
+          }
+        ]
+      },
+      {
+        "name": "browser",
+        "receipt_path": "/workspace/scratch/aab0f7dc06f9/ci-evidence/completion-pr-browser/receipt.json",
+        "repository_receipt_path": "docs/completion/ci/pr/browser/receipt.json",
+        "sha256": "7cc3f96d67a2b4e5131a6e4404409c9988034e246c7ccf34d1eb214cc8c5e5d5",
+        "status": "PASSED",
+        "source": {
+          "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+          "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+          "branch": "",
+          "workingTreeDirty": false,
+          "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+          "fileCount": 2443
+        },
+        "github": {
+          "runId": "42235429917",
+          "runAttempt": "1",
+          "event": "pull_request",
+          "checkoutSha": "4d19058628bf3ec2973be40a465c509eaf82408d",
+          "pullRequestHeadSha": "ebbea9c67f174a6879f1e638633cc53e728282e2",
+          "pullRequestBaseSha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+        },
+        "steps": [
+          {
+            "name": "install-sites",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "install-browser-tooling",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "install-chromium",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "audit-all",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": {
+              "measured": true,
+              "vulnerabilities": {
+                "info": 0,
+                "low": 0,
+                "moderate": 0,
+                "high": 0,
+                "critical": 0,
+                "total": 0
+              }
+            }
+          },
+          {
+            "name": "browser-acceptance",
+            "passed": true,
+            "exitCode": 0,
+            "totals": {
+              "tests": 77,
+              "pass": 77,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            },
+            "audit": null
+          }
+        ]
+      },
+      {
+        "name": "performance",
+        "receipt_path": "/workspace/scratch/aab0f7dc06f9/ci-evidence/completion-pr-performance/receipt.json",
+        "repository_receipt_path": "docs/completion/ci/pr/performance/receipt.json",
+        "sha256": "cf2eb787caaedbefd54658f1127f51641202cd8ba968cee5dec37560bd3c5858",
+        "status": "PASSED",
+        "source": {
+          "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+          "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+          "branch": "",
+          "workingTreeDirty": false,
+          "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+          "fileCount": 2443
+        },
+        "github": {
+          "runId": "42235429917",
+          "runAttempt": "1",
+          "event": "pull_request",
+          "checkoutSha": "4d19058628bf3ec2973be40a465c509eaf82408d",
+          "pullRequestHeadSha": "ebbea9c67f174a6879f1e638633cc53e728282e2",
+          "pullRequestBaseSha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+        },
+        "steps": [
+          {
+            "name": "install-node",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          },
+          {
+            "name": "company-benchmark",
+            "passed": true,
+            "exitCode": 0,
+            "totals": null,
+            "audit": null
+          }
+        ]
+      }
+    ],
+    "browser": {
+      "tests": {
+        "tests": 77,
+        "pass": 77,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "externalRequests": 0,
+      "browserErrors": 0
+    },
+    "counting": "2898+5820+47=8765 Node/Sites/bridge testfall och 77 browserfall =8842 distinkta suitefall. Node22/24 och security-delpopulationer adderas inte igen. Ingen statistisk oberoendehet mellan fallen påstås.",
+    "security_counts_root_reported": {
+      "node": 377,
+      "sites": 1225
+    },
+    "benchmark": {
+      "batches": [
+        {
+          "company_count": 1,
+          "status": "passed",
+          "verification": {
+            "isolation": true,
+            "replay": true,
+            "competingClaims": true,
+            "persistedTransactions": 10
+          },
+          "metrics": {
+            "elapsedMs": 336.7207360000001,
+            "attempts": 4,
+            "successes": 3,
+            "expectedBusy": 1,
+            "errors": 0,
+            "imported": 10,
+            "duplicate": 20,
+            "latencyMs": {
+              "unit": "one company sync attempt, including provider scheduling yield",
+              "p50": 84.2842139999999,
+              "p95": 144.23140899999999,
+              "max": 144.23140899999999
+            },
+            "successfulLatencyMs": {
+              "p50": 107.73551300000003,
+              "p95": 144.23140899999999
+            },
+            "successfulSyncsPerSecond": 8.90946021215634,
+            "importedTransactionsPerSecond": 29.6982007071878
+          }
+        },
+        {
+          "company_count": 10,
+          "status": "passed",
+          "verification": {
+            "isolation": true,
+            "replay": true,
+            "competingClaims": true,
+            "persistedTransactions": 100
+          },
+          "metrics": {
+            "elapsedMs": 3062.6277050000003,
+            "attempts": 40,
+            "successes": 30,
+            "expectedBusy": 10,
+            "errors": 0,
+            "imported": 100,
+            "duplicate": 200,
+            "latencyMs": {
+              "unit": "one company sync attempt, including provider scheduling yield",
+              "p50": 320.7403049999998,
+              "p95": 446.0977019999998,
+              "max": 471.86517200000003
+            },
+            "successfulLatencyMs": {
+              "p50": 343.618563,
+              "p95": 450.33484999999996
+            },
+            "successfulSyncsPerSecond": 9.795509898582335,
+            "importedTransactionsPerSecond": 32.651699661941116
+          }
+        },
+        {
+          "company_count": 100,
+          "status": "passed",
+          "verification": {
+            "isolation": true,
+            "replay": true,
+            "competingClaims": true,
+            "persistedTransactions": 1000
+          },
+          "metrics": {
+            "elapsedMs": 30403.652029999997,
+            "attempts": 400,
+            "successes": 300,
+            "expectedBusy": 100,
+            "errors": 0,
+            "imported": 1000,
+            "duplicate": 2000,
+            "latencyMs": {
+              "unit": "one company sync attempt, including provider scheduling yield",
+              "p50": 378.97168899999815,
+              "p95": 488.7637599999998,
+              "max": 857.8457699999999
+            },
+            "successfulLatencyMs": {
+              "p50": 414.9127430000008,
+              "p95": 491.24116100000174
+            },
+            "successfulSyncsPerSecond": 9.867235676292538,
+            "importedTransactionsPerSecond": 32.890785587641794
+          }
+        }
+      ],
+      "limitations": [
+        "Synthetic fixtures only. No customer data, real bank credentials, provider requests, browser activity, or production capacity claims.",
+        "Fresh local SQLite files per batch; setup is reported separately. No warm-up, repeated statistical trials, artificial network latency, or distributed workers.",
+        "Concurrency is asynchronous overlap in one Node process using the production scheduler and real persisted sync leases. It does not measure cross-process locking.",
+        "Provider authorization and rate-policy evidence are explicit synthetic fixtures. This does not verify any bank integration or regulatory permission.",
+        "Timing depends on host contention and filesystem caching; percentile observations and throughput are informational, never pass/fail thresholds."
+      ]
+    },
+    "restore": {
+      "format": "MG-Sites-synthetic-recovery-drill-1",
+      "scope": "synthetic-isolated-evidence-only",
+      "productionRestoreTested": false,
+      "startedAt": "2026-11-06T14:24:28.252Z",
+      "completedAt": "2026-11-06T14:24:36.197Z",
+      "runtime": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "architecture": "x64"
+      },
+      "accepted": true,
+      "objectives": {
+        "isolatedRtoMilliseconds": 60000,
+        "simulatedRpoMilliseconds": 900000
+      },
+      "timing": {
+        "backupAndResumeMilliseconds": 2129.219,
+        "exportMilliseconds": 1461.352,
+        "restoreAndAcceptanceMilliseconds": 2412.098,
+        "totalDrillMilliseconds": 7944.952,
+        "rtoIncludes": [
+          "authenticated bundle validation",
+          "fresh SQLite evidence database",
+          "original write and readback",
+          "independent row, owner, ledger and SHA-256 acceptance"
+        ],
+        "rtoExcludes": [
+          "operator response",
+          "cloud download or regional outage",
+          "key custody or access recovery",
+          "production application activation"
+        ]
+      },
+      "simulatedRecovery": {
+        "clock": "synthetic scenario, not a production measurement",
+        "recoveryPointAt": "2026-11-05T12:00:00.000Z",
+        "postSnapshotWriteAt": "2026-11-05T12:05:00.000Z",
+        "incidentAt": "2026-11-05T12:15:00.000Z",
+        "rpoMilliseconds": 900000,
+        "postSnapshotWritesExcluded": 1
+      },
+      "resume": {
+        "interruptionObserved": true,
+        "snapshotPreserved": true,
+        "steps": 174,
+        "attempts": 1
+      },
+      "tables": [
+        {
+          "name": "workspaces",
+          "rows": 1
+        },
+        {
+          "name": "audit_events",
+          "rows": 1
+        },
+        {
+          "name": "documents",
+          "rows": 430
+        },
+        {
+          "name": "bank_applications",
+          "rows": 1
+        },
+        {
+          "name": "bank_connections",
+          "rows": 1
+        },
+        {
+          "name": "bank_sync_runs",
+          "rows": 1
+        },
+        {
+          "name": "gmail_connections",
+          "rows": 1
+        },
+        {
+          "name": "customer_contacts",
+          "rows": 1
+        },
+        {
+          "name": "customer_messages",
+          "rows": 1
+        },
+        {
+          "name": "reconciliation_findings",
+          "rows": 1
+        },
+        {
+          "name": "customer_deliveries",
+          "rows": 1
+        },
+        {
+          "name": "gmail_sources",
+          "rows": 1
+        },
+        {
+          "name": "gmail_runs",
+          "rows": 1
+        },
+        {
+          "name": "document_automation",
+          "rows": 1
+        },
+        {
+          "name": "document_jobs",
+          "rows": 1
+        },
+        {
+          "name": "document_extractions",
+          "rows": 1
+        },
+        {
+          "name": "invoice_counterparties",
+          "rows": 1
+        },
+        {
+          "name": "document_registrations",
+          "rows": 1
+        },
+        {
+          "name": "payment_control_runs",
+          "rows": 1
+        },
+        {
+          "name": "payment_control_requests",
+          "rows": 1
+        },
+        {
+          "name": "bankgiro_ingest_sources",
+          "rows": 1
+        },
+        {
+          "name": "bankgiro_ingest_jobs",
+          "rows": 1
+        },
+        {
+          "name": "saas_bank_state",
+          "rows": 1
+        },
+        {
+          "name": "company_bank_sync_scopes",
+          "rows": 1
+        },
+        {
+          "name": "company_bank_sync_jobs",
+          "rows": 1
+        },
+        {
+          "name": "company_bank_sync_requests",
+          "rows": 1
+        },
+        {
+          "name": "company_bank_sync_receipts",
+          "rows": 1
+        }
+      ],
+      "originals": {
+        "count": 430,
+        "bytes": 185567855,
+        "hashesChecked": 430
+      },
+      "ledger": {
+        "invoices": 2,
+        "invoiceCents": 75000,
+        "transactions": 2,
+        "transactionCents": 75000,
+        "allocations": 1,
+        "allocatedCents": 62500,
+        "revokedCredits": 1,
+        "revokedBankgiroLinks": 1
+      },
+      "rejectionChecks": [
+        {
+          "case": "wrong_key",
+          "stage": "restore",
+          "rejected": true,
+          "outputCreated": false
+        },
+        {
+          "case": "wrong_owner",
+          "stage": "restore",
+          "rejected": true,
+          "outputCreated": false
+        },
+        {
+          "case": "wrong_company",
+          "stage": "restore",
+          "rejected": true,
+          "outputCreated": false
+        },
+        {
+          "case": "corrupt_original",
+          "stage": "restore",
+          "rejected": true,
+          "outputCreated": false
+        },
+        {
+          "case": "missing_original",
+          "stage": "restore",
+          "rejected": true,
+          "outputCreated": false
+        },
+        {
+          "case": "altered_ledger",
+          "stage": "acceptance",
+          "rejected": true
+        },
+        {
+          "case": "altered_plaintext_original",
+          "stage": "acceptance",
+          "rejected": true
+        },
+        {
+          "case": "foreign_owner_row",
+          "stage": "acceptance",
+          "rejected": true
+        },
+        {
+          "case": "reactivated_application_issuer",
+          "stage": "acceptance",
+          "rejected": true
+        },
+        {
+          "case": "retained_application_token",
+          "stage": "acceptance",
+          "rejected": true
+        }
+      ],
+      "sourceUnchanged": true,
+      "otherOwnerExcluded": true,
+      "authorizationAndTransientRowsAbsent": true,
+      "workerLeasesInvalidated": true,
+      "applicationTokenRecoveryBlocked": true
+    },
+    "merge_restore_root_reported": {
+      "source": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+      "originals": 430,
+      "bytes": 185567855,
+      "durable_table_groups": 27,
+      "negative_cases": 10,
+      "source_unchanged": true,
+      "token_recovery_blocked": true,
+      "restore_and_acceptance_ms": 5470.712,
+      "whole_drill_ms": 16951.556,
+      "production_restore_tested": false,
+      "exclusive_global_resource_guarantee": false,
+      "receipt_finalization": "pending_root"
+    }
+  },
+  "rubric_issues": [
+    "PLAN beskriver acceptans för minst 8, inte en förregistrerad skala för 8,5/9/9,5/10. Halvsteg här är konservativa ordinala förslag med skäl, inte empiriskt kalibrerade sannolikheter eller en testtalsformel.",
+    "Det gamla 8-målet gällde varje rad. Det nya uppdraget kräver minst 314/330. Redovisa både summa och antal rader minst 8; ersätt inte något villkor genom avrundning. 314/330 ger 9,515.../10; exakt 9,5 motsvarar 313,5, men användarens gräns är fortfarande 314.",
+    "Kriterium 11 kräver ett synligt genomfört Gmail-schema. Att endast lägga schemafrågan i 28 och behålla 11=8 utan aktuellt belägg skulle ändra den befintliga rubricen.",
+    "Kriterium 17:s tidigare 8 avser stödd manuell Bankgiroimport. Det uppfyller inte användarens starkare mål om automatisk auktoriserad Bankgirokälla. 18/19 gäller sanningsenlig återgivning av ägt original, inte obevisad bankautenticitet eller AIS-/fakturarelation.",
+    "Kriterierna 6, 10, 11 och 28 har kvar interna produkt-/utvärderings-/driftintegrationsbehov. De får inte beskrivas som blockerade enbart av BankID, produktionscertifikat eller bankavtal.",
+    "Kriterium 29 saknar ett uttryckligt accepterat produktions-RPO/färskhetsintervall. Den verifierade 430-originalssnapshoten är inte automatiskt komplett för senare importer; dokumentera snapshotens räckvidd och verifiera en ny snapshot för de nya originalen.",
+    "Restore på syntetiska 430 original och simulerad RPO är inte återställning av kundens produktionsbackup. Bevara den begränsningen även om teststorleken exakt matchar gammal produktion.",
+    "Kodkandidat, PR-checkout, main-merge, sparad Sites-version och publicerad native-version är skilda objekt. Nya poäng är förslag under angiven evidens; slutligt release-/OCR-resultat ska fyllas utan att den historiska 257,5-tabellen skrivs om.",
+    "Node22 och Node24 prövar samma testpopulation. Säkerhetssviter och fokustester överlappar fullsviterna. 1/10/100-företagssynk i en process är inte distribuerad last, produktions-SLA eller ett sökbenchmark.",
+    "Det nya oberoende OCR-provets korpus, freeze, parser-SHA och första resultat ska bevaras. Känd replay 74/100 får inte beskrivas som oberoende 85/98-acceptans eller räknas dubbelt för Node och Sites."
+  ],
+  "sources": [
+    {
+      "path": "docs/quality8/current-33-assessment.json",
+      "sha256": "20fe003efbee90a44d62cb3e2d9adecc33da467260e837b4b0a1d766e29e69f4",
+      "bytes": 28667,
+      "kind": "read_repository_evidence"
+    },
+    {
+      "path": "QUALITY-SCORECARD.md",
+      "sha256": "56bf907a78f4cd55ac6a4e866cf8e68fa8f5261c433db5c3f8cd3a3f19c1e551",
+      "bytes": 238490,
+      "kind": "read_repository_evidence"
+    },
+    {
+      "path": "docs/quality8/PLAN.md",
+      "sha256": "2b7c6e2bcfdd1c0c9d4929a96d9860925d44ed92fe6569c502e8057630a63b5a",
+      "bytes": 8662,
+      "kind": "read_repository_evidence"
+    },
+    {
+      "path": "docs/quality8/recovery-evidence.md",
+      "sha256": "24554c840d08e7b0574e11cabc96f46b346991c610ef22f60721128c4622209f",
+      "bytes": 11376,
+      "kind": "read_repository_evidence"
+    },
+    {
+      "path": "docs/quality8/recovery-integration-rerun.json",
+      "sha256": "a1ca3e4082a2cd29b1db1aea182dce214d6c1e175c1d28ff5fdc13ae2081ce15",
+      "bytes": 6674,
+      "kind": "read_repository_evidence"
+    },
+    {
+      "path": "docs/completion/baseline.json",
+      "sha256": "40015ba1475e9e8e11046df1c983408cb5fc546db1325022d8c378410b69397f",
+      "bytes": 6652,
+      "kind": "read_repository_evidence"
+    },
+    {
+      "path": "docs/completion/bank.md",
+      "sha256": "86f4dca0cc4329e5f09dfc039dcf94f80816686c231f67a21a2e1dd07724f847",
+      "bytes": 13643,
+      "kind": "read_repository_evidence"
+    },
+    {
+      "path": "docs/completion/ocr.md",
+      "sha256": "e3c8e84cbde84134b33ebc078d2886a418b9a52a84e4133dbf01eafec9fc0367",
+      "bytes": 14712,
+      "kind": "read_repository_evidence"
+    },
+    {
+      "path": "docs/completion/security.md",
+      "sha256": "34c959d1765a19cd0554ce377c2c754575f7c17ade4cfa3c6b59a98cdbc09f5f",
+      "bytes": 17252,
+      "kind": "read_repository_evidence"
+    },
+    {
+      "path": "docs/completion/independent-security-review.md",
+      "sha256": "d041c3bc7f3372d3afbe7583c9a91e59f69834b4d6a7f598c3fbac0bcf2e6223",
+      "bytes": 4469,
+      "kind": "read_repository_evidence"
+    },
+    {
+      "path": "docs/completion/provider-reference-check.md",
+      "sha256": "ae42e37247caf8bdd4d3a2381f69e6443184946bf93282658aa86184b476fcf6",
+      "bytes": 3452,
+      "kind": "read_repository_evidence"
+    },
+    {
+      "path": "docs/completion/security/restore-c22bd94.json",
+      "sha256": "f26362905dd0c96314b0a4d054cc5348b4df33d0fad7752d05a0fc621460a752",
+      "bytes": 4896,
+      "kind": "read_repository_evidence"
+    },
+    {
+      "path": "docs/completion/ocr-evidence/development-summary.json",
+      "sha256": "39f97cda94bcada7a7a4d15fe1e783e13a21b683e581fdd6f22bbb83f5c5aab9",
+      "bytes": 9293,
+      "kind": "read_repository_evidence"
+    }
+  ],
+  "rows": [
+    {
+      "id": 1,
+      "area": "Design",
+      "criterion": "Läsbara huvudvyer, tydlig informationshierarki och fungerande fel-/tomlägen; visuell kontroll av berörda vyer.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "77/77 Chromiumfall omfattar onboarding, arbetsyta och dashboard; full Sites-CI är grön. [CI] [BROWSER]",
+      "production_evidence": "Site 66 är publicerad. Den nya UI-kandidatens Site 68 är sparad men ännu inte publicerad. [LIVE]",
+      "remaining_risks": "Syntetiska API-svar är inte autentiserad produktionsacceptans; ingen ny skärmläsar- eller fysisk mobilcertifiering.",
+      "reason": "Behåll 8: nytt browserkvitto stärker regressionstäckningen men ger ingen ny full visuell produktionsacceptans.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 2,
+      "area": "Startsida",
+      "criterion": "Sammanfattningar motsvarar källdata; okänd och föråldrad status visas korrekt.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "31 dashboardfall och regressionssviter för betalningsöversikt/källstatus ingår i godkänd kandidat. [CI] [BROWSER]",
+      "production_evidence": "Ingen ny publicerad dashboard eller fullständig omrevision av produktionsregistret är verifierad. [LIVE]",
+      "remaining_risks": "Lokala projektioner med syntetiska bankbevis fastställer inte att samtliga verkliga kundsaldon är omverifierade.",
+      "reason": "Behåll 8 för konsekvent käll-/saldo-projektion; ingen höjning enbart för fler gröna tester.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 3,
+      "area": "Navigation",
+      "criterion": "Centrala arbetsflöden kan nås och lämnas med tangentbord och tydliga länkar.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "41 onboarding-, 5 arbetsyte- och 31 dashboardfall passerar Chromium; 0 browserfel. [BROWSER]",
+      "production_evidence": "Historisk publicerad fokus-/sökacceptans finns i föregående bedömning; ny leverans efter Site 66 saknas. [OLD] [LIVE]",
+      "remaining_risks": "Browserharnessen använder syntetiska API:er och ersätter inte samtliga verkliga användarresor.",
+      "reason": "Behåll 8: aktuellt regressionsskydd, men ingen oberoende bredare produktionsevidens som motiverar 8,5.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 4,
+      "area": "Mobil",
+      "criterion": "Berörda huvudflöden fungerar vid 320, 390, 768, 1024 och 1440 px utan blockerande överlapp.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Befintliga geometri-/responsivitetsgränser och Chromiumflöden passerar den nya kandidaten. [CI] [BROWSER]",
+      "production_evidence": "Tidigare 25 geometrier vid fem bredder är historiskt underlag, inte en ny fysisk mobilkörning. [OLD]",
+      "remaining_risks": "Ingen fysisk telefon, nytt publicerat UI eller full autentiserad mobilbankresa är verifierad.",
+      "reason": "Behåll tidigare 8; förväxla inte gammal geometriacceptans med dagens 77 andra browserfall.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 5,
+      "area": "Sök/filter",
+      "criterion": "Kombinerade filter, svenska belopp/datum, referenser och tomträffar fungerar på båda implementationerna; relevanta prestandamätningar.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Node/Sites innehåller referens-, belopps-, filter- och arbetsytesökregressioner; respektive fullsvit passerar. [CI]",
+      "production_evidence": "Ingen ny systematisk sökmätning över det verkliga kundregistret har redovisats. [LIVE]",
+      "remaining_risks": "Det nya företagsbenchmarkets p95 mäter synkförsök, inte sökning eller verklig UI-latens.",
+      "reason": "Behåll 8. Företagssynkens prestanda får inte användas som ett nytt sökprestandakvitto.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 6,
+      "area": "Minimal manuell hantering",
+      "criterion": "Säkra normalfall går igenom den avsedda kön; avvikelser har konkreta granskningsskäl och återupptagning; verklig köprogress observeras.",
+      "previous_score": 6.5,
+      "proposed_score": 6.5,
+      "delta": 0.0,
+      "at_least_8": false,
+      "test_evidence": "Återhämtning av sparat OCR-resultat vid R2-/strömfel har nya negativa regressioner; ingen automatisk registrering skapas av återhämtningen. [OCR] [CI]",
+      "production_evidence": "Direkt Gmail gav 7 importer; manuellt startad moln-OCR behandlade 6, 0 fel. Senaste läsning 14:50 visar 403 granskning, 2 köade, 58 väntar OCR och fortsatt 2 registrerade; senare bakgrundsprogress tillskrivs ingen obestyrkt körkälla. [LIVE]",
+      "remaining_risks": "Ett normalt nytt underlag är inte visat genom hela kedjan till säker registrering. Hög granskningsvolym och otillräcklig OCR-recall är interna produktbegränsningar.",
+      "reason": "Behåll 6,5: verklig köprogress är belagd, men samma sak som minimal manuell hantering är inte belagd.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 7,
+      "area": "Kundfakturor",
+      "criterion": "Skapa, kontrollera och visa fakturor utan felaktiga betalstatusar eller ägarblandning.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Ägar-/register-, faktura- och ekonomiregressioner ingår i grön Node/Sites-CI; negativa tenantfall har separat granskning. [CI] [SECURITY]",
+      "production_evidence": "Registreringsantalet är fortsatt 2 i roots aktuella läsning; inga nya kundfakturor skapades för denna bedömning. [LIVE]",
+      "remaining_risks": "Ingen ny komplett produktionsattest av varje kundfaktura eller nytt kommersiellt företagsflöde.",
+      "reason": "Behåll 8 för bevarande och registerfunktion; syntetisk QA får inte skapa ekonomiska kundposter.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 8,
+      "area": "Leverantörsfakturor",
+      "criterion": "Belopp, datum, motpart och original bevaras med samma gränser och kontroller som kundflödet.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Belopps-/datum-/motpartsgränser och originalbevarande ingår i fulla sviter. Nya OCR-cellregler avstår vid konflikt. [CI] [OCR]",
+      "production_evidence": "Kända verkliga dokument ligger fortsatt i gransknings-/OCR-kö; ingen ny komplett leverantörsregistrering visas. [LIVE]",
+      "remaining_risks": "Omärkta leverantörshuvuden och organisationsnummer återfinns fortfarande otillräckligt i den kända OCR-mängden.",
+      "reason": "Behåll 8 för register/bevarande; poängen betyder inte hög automatisk extraktionstäckning.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 9,
+      "area": "PDF",
+      "criterion": "Text- och bild-PDF hanteras, sid-/storleksgränser gäller och trasiga dokument stoppas begripligt.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Text-PDF, optisk fallback, källbindning, storleksgränser och trasiga underlag täcks av den gröna kandidatens sviter. [CI]",
+      "production_evidence": "Sex manuellt initierade molnbearbetningar är belagda, men ingen ny representativ produktionsmätning av PDF-fältprecision. [LIVE]",
+      "remaining_risks": "Bild-PDF delar de optiska begränsningarna i kriterium 10. Tekniskt genomförd bearbetning säger inget om varje fälts riktighet.",
+      "reason": "Behåll 8 för säker formatbehandling; höj inte efter enbart lyckade workeranrop.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 10,
+      "area": "Bild-OCR",
+      "criterion": "Fryst representativ rasterkorpus samt separata hållna fall; minst 85 % återfunna obligatoriska fält och minst 98 % fältprecision, utan felaktigt grönt ekonomiskt kritiskt fall. Redovisa även dokumentnivå och svåra fall.",
+      "previous_score": 6.5,
+      "proposed_score": 6.5,
+      "delta": 0.0,
+      "at_least_8": false,
+      "test_evidence": "Känd utvecklingsreplay: 74/100 obligatoriska normalfält, 0 felvärden; stress 8/20. Node/Sites använder samma 12 observationer. Nytt oberoende förstaprov är ännu pending. [OCR]",
+      "production_evidence": "Manuell moln-OCR 6 behandlade/0 fel och 403 dokument för granskning; ingen produktionsfacitjämförelse finns. [LIVE]",
+      "remaining_risks": "74 % recall når inte 85 %. 100 % precision i liten känd mängd bevisar inte 98 % i oberoende population. Detta är internt OCR-/utvärderingsarbete.",
+      "reason": "Behåll 6,5 tills det frysta oberoende provets första utfall bedömts. Slutvärden lämnas uttryckligen pending.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 11,
+      "area": "Gmail",
+      "criterion": "Aktuell lyckad hämtning, återförsök/dubblettskydd och synligt genomfört schema; inga mejl skickas av bakgrundsflödet.",
+      "previous_score": 8,
+      "proposed_score": 7.5,
+      "delta": -0.5,
+      "at_least_8": false,
+      "test_evidence": "127/127 riktade Gmailfall, ny eligibility-projektion och korrupt låsdeadline avvisas säkert; full kandidat-CI passerar. [OCR] [CI]",
+      "production_evidence": "Direktkörning importerade 7 nya underlag 14:00:58.102Z. Senaste framgång är 14:28:00.627Z efter försök 14:27:45.808Z, utan källattribuering. Ordinarie timschemats appinvokering är fortfarande inte verifierad. [LIVE]",
+      "remaining_risks": "Kriteriet kräver uttryckligen synligt genomfört schema. Klarlagd prompt, heartbeat och manuell körning räcker inte.",
+      "reason": "Sänk 8 till 7,5 för aktuellt evidensgap i den befintliga rubricen. Detta är ingen påstådd försämring av Gmail-parsern.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 12,
+      "area": "Automatisk registrering",
+      "criterion": "Endast verifierad motpart och grön tolkning; atomär idempotens och återhämtning efter förlorat svar.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Atomär/idempotent registrering, motpartsbehörighet och återhämtning ingår i grön CI. Sparat OCR-resultat återgår till granskning, inte automatisk registrering. [CI] [OCR]",
+      "production_evidence": "Fortfarande 2 registrerade dokument; ingen ny normalfaktura genom hela automatiska kedjan är belagd. [LIVE]",
+      "remaining_risks": "Säkra registreringsvillkor och faktisk genomströmning är olika mått; den senare begränsningen ligger även i 6 och 10.",
+      "reason": "Behåll 8 för registreringssäkerhet. Ingen höjning för en hög andel säkra avståenden.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 13,
+      "area": "Dubbletter",
+      "criterion": "Samma original eller betalning kan inte dubbelräknas vid omkörning eller samtidighet.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "1/10/100 företag: 1 110 initiala importer, 2 220 igenkända dubbletter i återspelning och konkurrerande försök, 111 förväntade busy; alla isolerings-/återspelningskontroller godkända. [PERF] [CI]",
+      "production_evidence": "Gmails 7 nya importer gav 0 rapporterade dubbletter; detta är inte ett nytt omkörningsprov av produktionsregistret. [LIVE]",
+      "remaining_risks": "Benchmark körs i en Node-process med syntetisk provider. Ingen distribuerad produktionskapacitet eller full registerinventering styrks.",
+      "reason": "Behåll 8: den nya mätningen stärker aktuell evidens, men större testantal eller en upprepad benchmark visar inte ensamt en ny kvalitetsnivå över det tidigare säkra dubblettkontraktet.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 14,
+      "area": "Dokumentgranskning",
+      "criterion": "Original och osäkerhet kan granskas; korrigering påverkar rätt dokument och lämnar spår.",
+      "previous_score": 8,
+      "proposed_score": 8.5,
+      "delta": 0.5,
+      "at_least_8": true,
+      "test_evidence": "Nya 43/43 återhämtningsfall visar att ett sparat resultat överlever tillfälliga original-läsfel; lease, kvitto, väntetid och granskningsspår förblir bundna. Oberoende 24 gränsfall och full CI kompletterar. [OCR] [CI]",
+      "production_evidence": "403 dokument behöver granskning. Ingen massgodkänning eller osäker registrering har gjorts. [LIVE]",
+      "remaining_risks": "Rättningen är tekniskt verifierad; en faktisk R2-incident har inte återskapats mot kundoriginal i drift.",
+      "reason": "Höj ett halvt steg för konkret rättad förlust av återhämtningsbar granskningsstatus, med före-/efterregression och bevarat original.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 15,
+      "area": "Swedbank",
+      "criterion": "Aktuell godkänd anslutning och verifierad läsning av rätt valt konto; utgångna/återkallade medgivanden stoppas.",
+      "previous_score": 6.5,
+      "proposed_score": 6.5,
+      "delta": 0.0,
+      "at_least_8": false,
+      "test_evidence": "Bankens konto-/medgivandefences och mTLS/tokenarbete ingår i CI. Statusfixen har 360 servicefall och 22 oberoende negativa prober. [BANK] [CI]",
+      "production_evidence": "connected=false; vanlig revalidering gav BANK_CONSENT_INVALID utan betrodd providerorsak. Företagsbehörighet saknas för den äldre anslutningen. [LIVE]",
+      "remaining_risks": "Verklig auktorisation/SCA och separat konto-/företagsbindning saknas. Enable Banking-hemlighetsplatshållare finns men deras giltighet är inte påstådd. Open Payments SaaS saknar samtliga fyra nödvändiga runtimeposter i Site; inget påstående att certifikat är ogiltigt. [PROVIDER]",
+      "reason": "Behåll 6,5. Tekniskt bättre diagnos eller framtida valid_until är inte faktisk bankåtkomst.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 16,
+      "area": "Automatisk bankhämtning",
+      "criterion": "Aktuell genomförd körning med befintligt samtycke, hållbara återförsök och korrekt nästa tid.",
+      "previous_score": 6.5,
+      "proposed_score": 6.5,
+      "delta": 0.0,
+      "at_least_8": false,
+      "test_evidence": "Retry, cooldown, idempotens, pagination och samtidighetsgränser passerar syntetiska sviter; 1/10/100-benchmark är lokalt. [CI] [PERF]",
+      "production_evidence": "Senaste lyckade bankhämtning är fortfarande 2026-11-05T08:05:14.646Z. Ingen ny behörig schemalagd hämtning är verifierad. [LIVE]",
+      "remaining_risks": "Verkligt medgivande blockerar hämtning; därefter behövs separat observerad automatisk körning och nästa tid.",
+      "reason": "Behåll 6,5. Automatreglage eller en syntetisk schemakörning får inte ersätta driftbeviset.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 17,
+      "area": "Bankgiro-import",
+      "criterion": "Stödda originalformat bevaras och tolkas spårbart; manuell import och automatisk källa redovisas separat.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "47/47 bryggfall och Bankgiro-/original-/idempotenssviter passerar. Filer, format och intagsbehörighet hålls skilda. [CI] [BANK]",
+      "production_evidence": "Bankgiro är DISABLED/SOURCE_NOT_CONFIGURED. Det tidigare ägda XLSX-originalet ger begränsat bevarandebevis. [LIVE] [OLD]",
+      "remaining_risks": "Bankgiroprodukt/avtal, faktisk källa, auktoriseringskvitto, rätt konto och bankprofil måste styrkas. Open Payments SaaS-runtime är inte konfigurerad i Site; CAMT/SFTP är inte aktiverat. [PROVIDER]",
+      "reason": "Behåll 8 enligt befintligt kriteriums stöd för manuell import. Detta uppfyller inte användarens starkare mål om automatisk verklig Bankgiroinformation.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 18,
+      "area": "Verklig betalare",
+      "criterion": "Källtyp och bevisnivå syns, korrekt betalare visas när bankunderlaget har den, saknad uppgift hålls okänd; verkligt underlag verifieras utan antaganden.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Parser-/proveniens- och källstatusgränser ingår i full CI; syntetiska betalare används inte som kundfakta. [CI] [BANK]",
+      "production_evidence": "Tidigare hashverifierat ägt XLSX innehåller betalare; den separata AIS-posten på 625 SEK saknar sådan uppgift. Ingen ny bankkälla har verifierats. [OLD] [BANK]",
+      "remaining_risks": "Rapportens angivna betalare är en observation i ett original, inte bevis för aktuell bankäkthet, kontoauktorisation eller rapport–AIS-relation.",
+      "reason": "Behåll tidigare rubric-korrigerade 8. Ingen ny verifierad betalare eller högre bankbevisnivå påstås.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 19,
+      "area": "Verklig OCR/referens",
+      "criterion": "Bankens explicit angivna referens bevaras skild från förslag och fakturanummer; verkligt original verifieras.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "0599 bevaras som text med inledande nolla; formell OCR, dokumentnummer och generisk referens hålls isär i regressionerna. [CI] [BANK]",
+      "production_evidence": "Tidigare ägt original visar generisk referens 0599. AIS saknar referens och faktura 0599 var inte registrerad i den tidigare läsningen. [OLD] [BANK]",
+      "remaining_risks": "Beloppet 625 SEK och liknande referens bevisar inte en gemensam insättning eller fakturabetalning.",
+      "reason": "Behåll 8 för sanningsenligt bevarande av explicit referens. Varken OCR-klass eller verifierad fakturakoppling får hittas på.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 20,
+      "area": "Automatisk matchning",
+      "criterion": "Representativ separat acceptanskorpus med noll falskt säkra kopplingar, tydliga orsaker till avstående och atomärt idempotent resultat.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Separat matchningsacceptans och idempotenta ekonomigränser ingår i den aktuella gröna Node/Sites-kandidaten. [CI] [OLD]",
+      "production_evidence": "Ingen ny verklig automatisk matchning från en aktiv bankkälla har observerats. [LIVE]",
+      "remaining_risks": "Syntetiska falskt-säker-kontroller mäter inte verklig falskmatchningsfrekvens. Giltiga verifierade indata är en förutsättning.",
+      "reason": "Behåll 8 för policy/algoritm under verifierad indata; ingen uppgradering via fungerande syntetisk bankadapter.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 21,
+      "area": "Delbetalning",
+      "criterion": "Exakta heltalsören, korrekt restbelopp, återtag och samtidighetskontroller.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Regressionsgrindar för heltalsören, restbelopp, återtag och samtidighet passerar. Återställningsoraklet bevarar 62 500 öres allokering. [CI] [RESTORE]",
+      "production_evidence": "Ingen riktig delbetalning har bokförts som test i denna cykel. [LIVE]",
+      "remaining_risks": "Isolerat saldo-orakel certifierar inte varje gammal kundallokering eller godtycklig påfyllning av ett befintligt par.",
+      "reason": "Behåll 8; säker avgränsad ekonomilogik är återverifierad men ingen ny bred affärsacceptans visas.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 22,
+      "area": "Överbetalning",
+      "criterion": "Överskott särskiljs och kan inte automatiskt fördelas utan giltig grund.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Överskott, återtagna krediter och allokeringsgränser täcks av grön CI och återställningskontroll. [CI] [RESTORE]",
+      "production_evidence": "Ingen återbetalning eller ny verklig överskottsfördelning utfördes som QA. [LIVE]",
+      "remaining_risks": "Ett återstående belopp ger ingen automatisk rätt att omfördela eller återbetala pengar.",
+      "reason": "Behåll 8 med oförändrad restriktiv fördelningspolicy.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 23,
+      "area": "Flera fakturor per betalning",
+      "criterion": "Verifierade explicita fördelningar fungerar; tvetydiga delmängdssummor avstår; summor och samtidighet är säkra.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Explicit fördelningsvektor, tvetydiga delmängder, atomär lagring och idempotens omfattas av kandidatens sviter. [CI] [OLD]",
+      "production_evidence": "Ingen ny verifierad verklig fördelning av en samlingsbetalning har skapats. [LIVE]",
+      "remaining_risks": "125+500=625 i syntetiskt underlag bevisar inte den verkliga insättningsrelationen. D1 och R2 är inte en enda atomär transaktion.",
+      "reason": "Behåll 8 för explicit säker fördelning; ingen automatisk inferens från delmängdssummor.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 24,
+      "area": "Historik",
+      "criterion": "Källor och ändringar kan följas utan att förväxla tidigare och aktuella fakta.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Historik-, original-, återspelnings- och metadataregressioner passerar. Status läser skadade körvarningar utan att skriva om dem. [CI] [BANK]",
+      "production_evidence": "Äldre historiska kvitton och original bevaras; 112 tidigare API-poster utan kvitto har inte fått fabricerade efterhandskvitton. [OLD]",
+      "remaining_risks": "En tidigare registrerad relation eller hash är inte aktuell bankbehörighet eller bevis för ett saknat original.",
+      "reason": "Behåll 8 för spårbar och ärlig historik; ingen full omverifiering av det historiska registret har gjorts.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 25,
+      "area": "Betalstatus",
+      "criterion": "Status beräknas från giltiga allokeringar och tillgängliga bankfakta; inaktuella resultat markeras.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Saldo-/bevisprojektioner och negativa bankmetadataprov passerar; ogiltigt urval annonserar ingen synkåtkomst. [CI] [BANK]",
+      "production_evidence": "Banken är fortsatt spärrad; den nya statusfixen har inte publicerats i Site 66. [LIVE]",
+      "remaining_risks": "Registrerat saldo, föreslagen koppling och verifierade bankfakta är skilda statusar. Ny UI-efterkontroll efter release saknas.",
+      "reason": "Behåll 8. Rättad statusrobusthet motiverar inte ett nytt påstående om verifierade kundbetalningar.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 26,
+      "area": "Kontrollera alla betalningar",
+      "criterion": "Begränsad, återupptagbar körning med korrekt sammanfattning och felhantering.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Begränsad betalningskontroll, leaser, idempotens och fel-/efterkontrollprojektion ingår i grön kandidat-CI. [CI] [BANK]",
+      "production_evidence": "Ingen ny fullständig ekonomirevision av kundregistret har utförts som del av denna rapport. [LIVE]",
+      "remaining_risks": "Betalningskontroll avslutar inte automatiskt en separat Gmail-efterkontroll. Trasiga warnings ska fortsatt visas som okänd kontrollstatus.",
+      "reason": "Behåll 8; ett korrekt säkert återförsökskontrakt är verifierat, inte fullständig verklig betalningsacceptans.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 27,
+      "area": "Mejlförslag",
+      "criterion": "Korrekt underlag och förhandsgranskning; uttryckligt godkännande krävs före sändning.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Förslag, underlag, förhandsgranskning och uttryckligt sändningsgodkännande omfattas av full CI. [CI] [OLD]",
+      "production_evidence": "Inga kundmejl skickades som QA eller av denna bedömare.",
+      "remaining_risks": "Syntetisk sändningsspärr bevisar inte faktisk mejlleverans eller att alla mottagaruppgifter är korrekta.",
+      "reason": "Behåll 8 för säkert förslag/godkännande; ingen verklig utskicksframgång påstås.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 28,
+      "area": "Schemaläggning",
+      "criterion": "Befintliga scheman fungerar och minst en faktisk körning observeras; överlapp, paus och sen körning hanteras; ingen grön status från enbart konfiguration.",
+      "previous_score": 6.5,
+      "proposed_score": 6.5,
+      "delta": 0.0,
+      "at_least_8": false,
+      "test_evidence": "Lås, väntetider, leaseåterhämtning och eligibility är förstärkta och passerar CI. [OCR] [CI]",
+      "production_evidence": "Aktuellt Gmail-timschema saknar ännu verifierad appinvokering; den nya OCR-körningen var manuellt startad. Äldre periodisk OCR-evidens är historisk. Backupens fulla automatiska återupptagningskedja är inte nyverifierad. [LIVE] [OLD]",
+      "remaining_risks": "Schema/prompt, heartbeat och manuell dispatch får inte förväxlas. Driftskonfiguration/extern automation behöver följas upp; det är inte ett BankID-/bankavtalsberoende.",
+      "reason": "Behåll 6,5 tills faktiska ordinarie körkvitton och sammanhängande resultat finns.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 29,
+      "area": "Backup",
+      "criterion": "Aktuell krypterad backup är fullständigt kontrolläst; filantal, originalhashar och slutförandetid redovisas.",
+      "previous_score": 8,
+      "proposed_score": 8,
+      "delta": 0,
+      "at_least_8": true,
+      "test_evidence": "Kryptering, manifest, korruption och ägargränser täcks av CI och isolerad syntetisk återställning. [CI] [RESTORE]",
+      "production_evidence": "Den frysta snapshoten har 430/430 kontrollästa original, 185 567 855 byte, klar 2026-11-06T00:48:58Z. Den föregår 7 nya Gmail-importer. [OLD] [LIVE]",
+      "remaining_risks": "Poängen gäller just detta manifest; senare importer ingår inte. Ny backup behövs för deras täckning. Inget faktiskt accepterat produktions-RPO har definierats i underlaget.",
+      "reason": "Behåll 8 för den bevisade snapshoten, utan att kalla den komplett för dagens senare inventering. Rubricen behöver ett uttryckligt färskhets-/RPO-krav; en import är inte i sig en påvisad backupdefekt.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 30,
+      "area": "Säkerhet",
+      "criterion": "Ägar-/företagsgränser, sekretess, godkännanden och ekonomisk integritet bevaras; relevanta negativa tester och beroendegranskning.",
+      "previous_score": 8.5,
+      "proposed_score": 8.5,
+      "delta": 0.0,
+      "at_least_8": true,
+      "test_evidence": "Två verkliga tenant-SQL-brister rättades med frysta negativa fall och oberoende 28/28-omgranskning. Root redovisar färsk security 377 Node+1 225 Sites. Prod-audit 0; Sites all-deps 8 moderate, 0 high/critical. [SECURITY] [CI] [LIVE]",
+      "production_evidence": "Ingen produktionsläcka konstaterad. Companies=0 och saas_bank_state=0; saknat tokenschema måste hanteras före verklig Open Payments-aktivering. Ny säkerhetskod är ännu inte Site 66. [LIVE]",
+      "remaining_risks": "Intern SQL-invariant var bruten, men ingen godtycklig extern SQL-endpoint visades. Ingen full extern pentest, GDPR-/avtalsacceptans eller kommersiell SaaS-attest.",
+      "reason": "Behåll 8,5: substantiell rättning och ny negativ evidens, men inte tillräckligt för en ny generell säkerhetscertifiering.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 31,
+      "area": "Katastrofåterställning",
+      "criterion": "Isolerad återställningsövning med faktisk backup-/restore-kod, mätt RPO/RTO och kontroller av original, register, betalningar, korruption och fel ägare. Ingen återställning över produktion.",
+      "previous_score": 8,
+      "proposed_score": 8.5,
+      "delta": 0.5,
+      "at_least_8": true,
+      "test_evidence": "Ny isolerad drill: 430 syntetiska original, 185 567 855 byte, 27 tabellgrupper; korruption/fel ägare/företag/nyckel och återaktiverad tokenutgivare avvisas. Restore+acceptans 2 412,098 ms; hela övningen 7 944,952 ms. [RESTORE]",
+      "production_evidence": "Ingen produktionsbackup hämtades eller återställdes; productionRestoreTested=false. Produktionsoriginalens antal/bytes användes endast som syntetisk storlek. [RESTORE]",
+      "remaining_risks": "RPO 15 min är simulerat. Tiderna utesluter molnnedladdning, operatör, nyckelåtkomst, regionalt fel och tjänsteaktivering.",
+      "reason": "Höj ett halvt steg för nytillkommen verifierad applikationstoken-/utgivarkarantän: tidigare kvitto hade 8 negativa kontroller, nu 10. Storleken ensam eller snabbare tid motiverar inte höjningen. Produktionsrestore är inte visad.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 32,
+      "area": "Kod/tester",
+      "criterion": "Berörda regressioner, oberoende granskning och fulla obligatoriska CI-grindar på exakt levererad kod.",
+      "previous_score": 8.5,
+      "proposed_score": 9,
+      "delta": 0.5,
+      "at_least_8": true,
+      "test_evidence": "Sex PR-kvalitetsjobb godkända: Node22/24 vardera 2 898, Sites 5 820, bridge 47, Chromium 77; rena installationer, typ/syntax, audit, build och prestanda. Frysta RED/GREEN och oberoende omgranskningar finns. [CI] [SECURITY] [BANK]",
+      "production_evidence": "PR 61 är normalt mergad som 24390ef7 med samma ad40-träd som den provade merge-checkouten. Separat main-CI pågår och Site 68 är ännu inte publicerad. [LIVE]",
+      "remaining_risks": "Node-versionerna och säkerhetsdelmängderna är överlappande. Täckning gäller laddade källfiler; ingen säkerhets-/kvalitetsgrad kan räknas från testantal ensamt. Main/release efterkontroll återstår.",
+      "reason": "Höj ett halvt steg för verkliga frysta RED/GREEN-fynd som rättats och återprovats oberoende (SQL-gräns, metadata, OCR-recovery), tillsammans med source-hashade rena integrationskvitton och samma merge-träd. Antal tester ensamt motiverar inte höjningen; release är pending.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    },
+    {
+      "id": 33,
+      "area": "Verklig produktionsverifiering",
+      "criterion": "Levererad version kopplas till exakt källträd; bank/Gmail/OCR/backup har relevanta aktuella observationer och ekonomiska skydd jämförs före/efter.",
+      "previous_score": 8,
+      "proposed_score": 7.5,
+      "delta": -0.5,
+      "at_least_8": false,
+      "test_evidence": "CI binder source-träd ad40 till PR-head ebbea9c och merge-checkout 4d190586. Root bekräftar samma träd i main24390ef7; detta är käll-/CI-bevis. [CI] [LIVE]",
+      "production_evidence": "Live är fortfarande Site 66/native0b119b8. Site 68/source349779e7 är sparad men ej publicerad; ny publicerad versions-/migrations-/API-/UI-/ekonomisk efterkontroll saknas. [LIVE]",
+      "remaining_risks": "Färska bankavslag, direkt Gmail och manuell OCR ger nyttiga driftobservationer men verifierar inte den nya leveransen. Det historiska 8-betyget för Site 66 bevaras separat.",
+      "reason": "Föreslå 7,5 för det nya leveransscopets ännu ofullständiga produktionsbevis. Detta är ett evidensavdrag tills publicering/efterkontroll bedömts, inte en påstådd Site 66-regression.",
+      "final_score": null,
+      "finalization_status": "pending_root_release_and_independent_ocr_assessment"
+    }
+  ],
+  "required_root_finalization": [
+    "Fyll faktiskt main-CI-resultat med källa.",
+    "Fyll publicerad Sites-version, exakt source/tree, migrationsstatus och före-/efterkontroll om release sker.",
+    "Fyll nytt oberoende OCR-provs första utfall och bedöm kriterium 10 utan facitanpassning.",
+    "Fyll observerat ordinarie Gmail-schema om det verkligen körts; ompröva 11/28 först därefter.",
+    "Begränsa backupanspråket till dess manifest eller verifiera ny snapshot med de senare originalen.",
+    "Sätt final_score per rad och räkna om samma tabells summa; lämna historiska värden oförändrade."
+  ]
+}
