@@ -1,8 +1,8 @@
-## 2026-11-06 — Bankgirokandidat, oförändrad produktionsbedömning
+## 2026-11-06 — Bankgiro, oförändrad produktionsbedömning
 
-[PR 68](https://github.com/sharbel0022/Mgeorge/pull/68) dokumenterar och härdar originalproveniens, exakta bankfält, behörighetsbunden replay och kontroll före finansiell skrivning i Node/Sites. [Full omfattning och testkvitton](docs/integration/bankgiro-reconciliation-2026-11-06.md). Första negativa CI bekräftade 4 Node- och 8 Sites-fel i de nya testerna; slutlig kandidatverifiering återstår.
+[PR 68](https://github.com/sharbel0022/Mgeorge/pull/68) härdar originalproveniens, exakta bank-/betalarfält, behörighetsbunden replay och sista kontrollen före finansiell skrivning i Node/Sites. [Full omfattning, källor och testkvitton](docs/integration/bankgiro-reconciliation-2026-11-06.md). Native regressioner har verifierad RED/GREEN: 190 fokuserade fall passerar samt Sites typkontroll. Den aktuella PR-revisionens obligatoriska fulla CI och oberoende granskning redovisas i PR:en.
 
-Berörda områden är Bankgirointegration, betalningsmatchning, originalintegritet, åtkomstkontroll, idempotens, revisionsspår och manuell granskning. Samtliga tidigare kriteriepoäng och totalen **258,5/330 = 7,83/10** lämnas oförändrade. Den verkliga källan är `SOURCE_NOT_CONFIGURED`; 0599/625,00 SEK är inte bankverifierad och har inga allokeringar. Ingen aktiv källa, leverantörscertifiering eller produktionsberoende 9,5-nivå kan härledas ur tester.
+Berörda områden är Bankgirointegration, betalningsmatchning, originalintegritet, åtkomstkontroll, idempotens, revisionsspår och manuell granskning. Samtliga tidigare kriteriepoäng och totalen **258,5/330 = 7,83/10** lämnas oförändrade. Verklig källa är `SOURCE_NOT_CONFIGURED`; 0599/625,00SEK är inte bankverifierad och har inga allokeringar. Ingen aktiv källa, leverantörscertifiering eller produktionsberoende9,5-nivå följer av tester.
 
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 

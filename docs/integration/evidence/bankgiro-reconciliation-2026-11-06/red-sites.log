@@ -1,0 +1,479 @@
+✔ automatic retention stores the exact owned original once across renamed concurrent deliveries (282.276574ms)
+✔ retention keeps referenced bytes after a database commit response is lost (149.539184ms)
+✔ retention refuses a forged hash before any original is written (131.631714ms)
+✔ a complete individual report links under the verified aggregate with no allocation or invoice mutation (146.15143ms)
+✔ a complete two-payer report replaces the aggregate economically exactly once (137.02498ms)
+✔ a report arriving before AIS stays review-only and repeated intake does not promote it later (120.595918ms)
+✔ XLSX original remains retained non-economic evidence with no invented bank transaction ID (151.712604ms)
+✔ missing payer and payment reference remain missing and cannot release the aggregate (107.881553ms)
+✔ changed retained report bytes cannot change the workspace or audit (117.71586ms)
+✔ another owner cannot consume a retained report or reuse its lease (122.666843ms)
+✔ a lost import response is retried from the committed original receipt without a second write (134.086823ms)
+✔ lease changing at the commit boundary cannot partially import a report (119.534111ms)
+✔ lease expiry changing at the commit boundary cannot partially import a report (127.928118ms)
+✔ revision changing at the commit boundary cannot partially import a report (109.406418ms)
+✔ consent changing at the commit boundary cannot partially import a report (129.303666ms)
+✔ job identity changing at the commit boundary cannot partially import a report (110.802876ms)
+✔ document identity changing at the commit boundary cannot partially import a report (118.052068ms)
+✔ source authorization revocation during original read prevents report mutation (119.598148ms)
+✔ source authorization revocation during commit prevents report mutation (109.227533ms)
+✔ source authorization generation during original read prevents report mutation (115.699103ms)
+✔ source authorization generation during commit prevents report mutation (110.087083ms)
+✔ an already imported report cannot return a duplicate receipt after source authorization revocation (124.808883ms)
+✔ an already imported report cannot return a duplicate receipt after source authorization generation (119.018164ms)
+✔ a rejected oversized conflicting report retains its evidence hold and both originals without attempted money (212.135354ms)
+✔ source status and run stay explicitly disabled without a registered delivery source (94.800528ms)
+✔ status reads the configured queue without authorizing or retrieving source data (99.590619ms)
+✔ public source status omits private delivery and original metadata (104.512529ms)
+✔ the registered-source entrypoint processes a synthetic delivery through the real queue and sink once (148.869192ms)
+✔ synthetic sources cannot be activated through the production entrypoint (113.856198ms)
+✔ source endpoints authenticate and reject cross-origin runs before any write (162.878278ms)
+✔ status endpoint uses the authenticated owner and remains read-only (148.980685ms)
+✔ run endpoint accepts an empty request but refuses owner/provider/configuration and oversized bodies (160.072035ms)
+✔ a malformed delivered report is retained and blocked instead of repeatedly retried (159.962637ms)
+✔ parser-accepted payer name beyond domain limits is retained and blocked without repeated imports (149.180747ms)
+✔ parser-accepted bank reference beyond domain limits is retained and blocked without repeated imports (166.763172ms)
+✔ parser-accepted report metadata beyond domain limits is retained and blocked without repeated imports (180.337853ms)
+✔ storage failure remains retryable instead of being classified as an invalid original (144.172582ms)
+✔ consent failure remains retryable instead of being classified as an invalid original (142.94683ms)
+✔ revision failure remains retryable instead of being classified as an invalid original (128.502203ms)
+✔ a domain-rejected contradictory report preserves evidence holds before the worker blocks it (168.745433ms)
+✖ Sites source rejects an explicitly different recipient in retained csv (243.255687ms)
+✖ Sites source rejects an explicitly different recipient in retained xml (115.38549ms)
+✖ Sites source rejects an explicitly different recipient in retained xlsx (136.623703ms)
+✔ Sites source retains exact bytes and permits matching formatted recipient in csv (117.879188ms)
+✔ Sites source retains exact bytes and permits matching formatted recipient in xml (123.339735ms)
+✔ Sites source retains exact bytes and permits matching formatted recipient in xlsx (112.372592ms)
+✖ Sites hash replay rechecks recipient authority before adopting the earlier import (118.468146ms)
+✔ absent source is disabled without touching storage (5.156589ms)
+✔ synthetic source requires explicit test opt-in (3.825964ms)
+✔ retains originals and parses exact leading zero references without allocations (19.685809ms)
+✔ review completion persists a safe Bankgiro information reason across worker restart (4.609114ms)
+✔ a report account mismatch is retained but permanently blocked instead of retried (3.714186ms)
+✔ restart and alternate filename/report identity deduplicate owner original (5.698756ms)
+✔ same report identity changed bytes is retained and blocked (6.278629ms)
+✔ unknown committed outcome survives process restart without duplicate effect (6.626654ms)
+✔ hash mismatch cannot import bytes (2.853049ms)
+✔ authorization revoked during download prevents retain/import (2.693759ms)
+✔ generation replacement during download blocks original import (2.333465ms)
+✔ lease takeover after download fences all stale writes (1.89186ms)
+✔ malformed last descriptor leaves whole page and cursor uncommitted (1.553761ms)
+✔ delivery gaps survive restart and late reports with old booking dates arrive (5.286635ms)
+✔ owner isolation retains identical reports separately (5.511113ms)
+✔ retry-after prevents provider calls until durable time (2.154085ms)
+✔ bounded run resumes durable pending queue on next process (43.603764ms)
+✔ source rate embargo takes precedence over an earlier queued retry in public next permitted time (3.641396ms)
+✔ acknowledging a terminal page with absent polling hint preserves the backlog rate limit across restart (19.257914ms)
+✔ acknowledging a terminal page with earlier polling hint preserves the backlog rate limit across restart (19.258575ms)
+✔ acknowledging a terminal page with later polling hint preserves the backlog rate limit across restart (22.031243ms)
+✔ cross-source same owner hash converges to one parsed import (4.76569ms)
+✔ cross-owner authorization blocks before any listing (1.736236ms)
+✔ authorization expiry during listing rejects the entire page (1.741885ms)
+✔ commit-time fence rolls back writes after takeover between assert and batch (1.501743ms)
+✔ a stalled source is bounded by a timeout and leaves durable retry metadata (2.216559ms)
+✔ normal listing poll delay does not starve already discovered pending reports (17.173665ms)
+✔ invalid registry source is blocked without touching storage (0.494135ms)
+✔ production lease fence evaluates expiration at SQL execution time (27.176614ms)
+✔ ready backlog is not advertised as backoff merely because listing is delayed (16.398536ms)
+✔ a stalled sink is bounded and late commits lose their lease (3.668066ms)
+✔ timed-out sink cannot retain its lease while a later report is processed (3.090937ms)
+✔ source embargo is re-read under the acquired lease (1.676906ms)
+✔ report download failure keeps committed delivery cursor unchanged (2.200876ms)
+✔ fifty-report page is replayed until every original has an accepted import outcome (69.770551ms)
+✔ conflicting report variant never acknowledges its delivery cursor (5.46256ms)
+✔ public status projects only safe API fields and queue identifiers (0.833355ms)
+✔ terminal job completion rejects a source authorization revoked after sink returns (3.287183ms)
+✔ source call timeout respects the remaining total run budget (1.866643ms)
+✔ discovery cannot overwrite concurrent g1 authorization revocation (1.617216ms)
+✔ discovery cannot overwrite concurrent g2 authorization revocation (1.16847ms)
+✔ metadata retry update cannot replay a stale generation or authorization status (1.153218ms)
+✔ worker conserves originals and financial state when discovery loses source authorization (1.893473ms)
+✔ absent-source bootstrap cannot replace an authorization inserted before its batch (1.425367ms)
+✔ explicit eight-day seconds is never shortened by source retry policy (5.397572ms)
+✔ explicit fourteen-day HTTP date is never shortened by source retry policy (4.331566ms)
+✔ unrepresentable positive retry advice cannot schedule an early retry (0.453393ms)
+✖ same-byte queue replay requires current validation after sourceId changes (4.38762ms)
+✖ same-byte queue replay requires current validation after scopeId changes (3.847817ms)
+✖ same-byte queue replay requires current validation after authorizationGeneration changes (3.611892ms)
+✖ same-byte queue replay requires current validation after registrationBinding changes (6.95568ms)
+✔ CAMT preserves explicit Bankgiro account strings, payer, reference and amount (6.340493ms)
+✔ CAMT debit account roles preserve the owned and counterparty Bankgiro separately (0.561957ms)
+✖ CAMT lookalike or unrelated account schemes never become Bankgiro evidence (1.240719ms)
+✖ CAMT account scheme choices are unambiguous and scalar (1.156773ms)
+✔ CAMT transaction codes cannot substitute for an explicit Bankgiro account scheme (0.692443ms)
+✖ CAMT mixed payer identifier schemes cannot become organization evidence (2.772507ms)
+✔ 0599 / 625 SEK: a missing bank original blocks saved verified flags until the exact bytes return (397.917611ms)
+✔ 0599 / 625 SEK: a altered bank original blocks saved verified flags until the exact bytes return (176.830444ms)
+✔ 0599 / 625 SEK: expired registered source authorization invalidates an earlier exact preview without changing money (149.637364ms)
+✔ 0599 / 625 SEK: expired receiving account consent invalidates an earlier exact preview without changing money (157.880013ms)
+✖ 0599 / 625 SEK: source authorization expiry changing inside the final batch rolls back allocation and audit (148.975098ms)
+✖ 0599 / 625 SEK: source registration binding changing inside the final batch rolls back allocation and audit (124.029664ms)
+✖ 0599 / 625 SEK: report receipt registration binding changing inside the final batch rolls back allocation and audit (150.369077ms)
+✖ 0599 / 625 SEK: source registration revision changing inside the final batch rolls back allocation and audit (144.367691ms)
+✖ 0599 / 625 SEK: source authorization verification time changing inside the final batch rolls back allocation and audit (138.584137ms)
+✔ 0599 / 625 SEK: database clock one millisecond before expiry decides the final batch without changing source rows (115.692433ms)
+✖ 0599 / 625 SEK: database clock exactly at expiry decides the final batch without changing source rows (131.725249ms)
+✔ 0599 / 625 SEK: an already expired source permits only an explicit reviewed manual allocation with the same final snapshot (113.988426ms)
+ℹ tests 116
+ℹ suites 0
+ℹ pass 99
+ℹ fail 17
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9798.801962
+
+✖ failing tests:
+
+test at tests/bankgiro-ingest-service.test.mjs:196:42
+✖ Sites source rejects an explicitly different recipient in retained csv (243.255687ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/bankgiro-ingest-service.test.mjs:199:2)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'ACCOUNT_MISMATCH' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests/bankgiro-ingest-service.test.mjs:196:42
+✖ Sites source rejects an explicitly different recipient in retained xml (115.38549ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/bankgiro-ingest-service.test.mjs:199:2)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'ACCOUNT_MISMATCH' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests/bankgiro-ingest-service.test.mjs:196:42
+✖ Sites source rejects an explicitly different recipient in retained xlsx (136.623703ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/bankgiro-ingest-service.test.mjs:199:2)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'ACCOUNT_MISMATCH' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests/bankgiro-ingest-service.test.mjs:212:1
+✖ Sites hash replay rechecks recipient authority before adopting the earlier import (118.468146ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/bankgiro-ingest-service.test.mjs:216:2)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'ACCOUNT_MISMATCH' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests/bankgiro-ingest.test.mjs:144:3
+✖ same-byte queue replay requires current validation after sourceId changes (4.38762ms)
+  AssertionError [ERR_ASSERTION]: a hash alone must not grant another source authority
+  + actual - expected
+  
+  + {
+  +   attempts: 1,
+  +   authorizationGeneration: 'g1',
+  +   availableAt: null,
+  +   createdAt: 1793577600000,
+  +   documentId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e',
+  +   filename: 'one.csv',
+  +   id: 'eda7441c-dea8-4037-a239-82abe0d00a3d',
+  +   importId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e',
+  +   lastError: null,
+  +   nextAttemptAt: null,
+  +   owner: 'owner',
+  +   paymentCount: 1,
+  +   registrationBinding: '',
+  +   reportId: 'one',
+  +   scopeId: 'test-scope',
+  +   sha256: '9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e',
+  +   sourceId: 'test-bank',
+  +   status: 'REVIEW',
+  +   updatedAt: 1793577600000
+  + }
+  - null
+  
+      at TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/bankgiro-ingest.test.mjs:150:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: { id: 'eda7441c-dea8-4037-a239-82abe0d00a3d', owner: 'owner', sourceId: 'test-bank', scopeId: 'test-scope', reportId: 'one', sha256: '9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e', filename: 'one.csv', availableAt: null, authorizationGeneration: 'g1', documentId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e', status: 'REVIEW', attempts: 1, nextAttemptAt: null, lastError: null, importId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e', paymentCount: 1, createdAt: 1793577600000, updatedAt: 1793577600000, registrationBinding: '' },
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/bankgiro-ingest.test.mjs:144:3
+✖ same-byte queue replay requires current validation after scopeId changes (3.847817ms)
+  AssertionError [ERR_ASSERTION]: a hash alone must not grant another source authority
+  + actual - expected
+  
+  + {
+  +   attempts: 1,
+  +   authorizationGeneration: 'g1',
+  +   availableAt: null,
+  +   createdAt: 1793577600000,
+  +   documentId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e',
+  +   filename: 'one.csv',
+  +   id: '3b081315-7344-4844-8d31-889cb8e0bd15',
+  +   importId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e',
+  +   lastError: null,
+  +   nextAttemptAt: null,
+  +   owner: 'owner',
+  +   paymentCount: 1,
+  +   registrationBinding: '',
+  +   reportId: 'one',
+  +   scopeId: 'test-scope',
+  +   sha256: '9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e',
+  +   sourceId: 'test-bank',
+  +   status: 'REVIEW',
+  +   updatedAt: 1793577600000
+  + }
+  - null
+  
+      at TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/bankgiro-ingest.test.mjs:150:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: { id: '3b081315-7344-4844-8d31-889cb8e0bd15', owner: 'owner', sourceId: 'test-bank', scopeId: 'test-scope', reportId: 'one', sha256: '9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e', filename: 'one.csv', availableAt: null, authorizationGeneration: 'g1', documentId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e', status: 'REVIEW', attempts: 1, nextAttemptAt: null, lastError: null, importId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e', paymentCount: 1, createdAt: 1793577600000, updatedAt: 1793577600000, registrationBinding: '' },
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/bankgiro-ingest.test.mjs:144:3
+✖ same-byte queue replay requires current validation after authorizationGeneration changes (3.611892ms)
+  AssertionError [ERR_ASSERTION]: a hash alone must not grant another source authority
+  + actual - expected
+  
+  + {
+  +   attempts: 1,
+  +   authorizationGeneration: 'g1',
+  +   availableAt: null,
+  +   createdAt: 1793577600000,
+  +   documentId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e',
+  +   filename: 'one.csv',
+  +   id: '4e5ac196-bdc4-402a-bde5-d4ee61ed042f',
+  +   importId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e',
+  +   lastError: null,
+  +   nextAttemptAt: null,
+  +   owner: 'owner',
+  +   paymentCount: 1,
+  +   registrationBinding: '',
+  +   reportId: 'one',
+  +   scopeId: 'test-scope',
+  +   sha256: '9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e',
+  +   sourceId: 'test-bank',
+  +   status: 'REVIEW',
+  +   updatedAt: 1793577600000
+  + }
+  - null
+  
+      at TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/bankgiro-ingest.test.mjs:150:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: { id: '4e5ac196-bdc4-402a-bde5-d4ee61ed042f', owner: 'owner', sourceId: 'test-bank', scopeId: 'test-scope', reportId: 'one', sha256: '9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e', filename: 'one.csv', availableAt: null, authorizationGeneration: 'g1', documentId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e', status: 'REVIEW', attempts: 1, nextAttemptAt: null, lastError: null, importId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e', paymentCount: 1, createdAt: 1793577600000, updatedAt: 1793577600000, registrationBinding: '' },
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/bankgiro-ingest.test.mjs:144:3
+✖ same-byte queue replay requires current validation after registrationBinding changes (6.95568ms)
+  AssertionError [ERR_ASSERTION]: a hash alone must not grant another source authority
+  + actual - expected
+  
+  + {
+  +   attempts: 1,
+  +   authorizationGeneration: 'g1',
+  +   availableAt: null,
+  +   createdAt: 1793577600000,
+  +   documentId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e',
+  +   filename: 'one.csv',
+  +   id: '62b977a2-5c88-4a31-b28f-6ec63cc05c04',
+  +   importId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e',
+  +   lastError: null,
+  +   nextAttemptAt: null,
+  +   owner: 'owner',
+  +   paymentCount: 1,
+  +   registrationBinding: '',
+  +   reportId: 'one',
+  +   scopeId: 'test-scope',
+  +   sha256: '9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e',
+  +   sourceId: 'test-bank',
+  +   status: 'REVIEW',
+  +   updatedAt: 1793577600000
+  + }
+  - null
+  
+      at TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/bankgiro-ingest.test.mjs:150:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: { id: '62b977a2-5c88-4a31-b28f-6ec63cc05c04', owner: 'owner', sourceId: 'test-bank', scopeId: 'test-scope', reportId: 'one', sha256: '9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e', filename: 'one.csv', availableAt: null, authorizationGeneration: 'g1', documentId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e', status: 'REVIEW', attempts: 1, nextAttemptAt: null, lastError: null, importId: 'owner:9ae702836cf2bc1fc09214fba84a791fd1389bc559a9aad992c298f0bdac951e', paymentCount: 1, createdAt: 1793577600000, updatedAt: 1793577600000, registrationBinding: '' },
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/helpers/camt-bankgiro.mjs:39:2
+✖ CAMT lookalike or unrelated account schemes never become Bankgiro evidence (1.240719ms)
+  AssertionError [ERR_ASSERTION]: NOTBGNR
+  
+  '0012345' !== ''
+  
+      at TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/helpers/camt-bankgiro.mjs:42:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '0012345',
+    expected: '',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/helpers/camt-bankgiro.mjs:46:2
+✖ CAMT account scheme choices are unambiguous and scalar (1.156773ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/helpers/camt-bankgiro.mjs:57:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /tvetyd|kontoschema|XML/i,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests/helpers/camt-bankgiro.mjs:68:2
+✖ CAMT mixed payer identifier schemes cannot become organization evidence (2.772507ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/helpers/camt-bankgiro.mjs:80:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /tvetyd|schema|XML/i,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests/reconciliation-0599-evidence.test.mjs:110:3
+✖ 0599 / 625 SEK: source authorization expiry changing inside the final batch rolls back allocation and audit (148.975098ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/reconciliation-0599-evidence.test.mjs:128:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'BANKGIRO_SOURCE_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests/reconciliation-0599-evidence.test.mjs:110:3
+✖ 0599 / 625 SEK: source registration binding changing inside the final batch rolls back allocation and audit (124.029664ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/reconciliation-0599-evidence.test.mjs:128:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'BANKGIRO_SOURCE_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests/reconciliation-0599-evidence.test.mjs:110:3
+✖ 0599 / 625 SEK: report receipt registration binding changing inside the final batch rolls back allocation and audit (150.369077ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/reconciliation-0599-evidence.test.mjs:128:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'BANKGIRO_SOURCE_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests/reconciliation-0599-evidence.test.mjs:110:3
+✖ 0599 / 625 SEK: source registration revision changing inside the final batch rolls back allocation and audit (144.367691ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/reconciliation-0599-evidence.test.mjs:128:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'BANKGIRO_SOURCE_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests/reconciliation-0599-evidence.test.mjs:110:3
+✖ 0599 / 625 SEK: source authorization verification time changing inside the final batch rolls back allocation and audit (138.584137ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/reconciliation-0599-evidence.test.mjs:128:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'BANKGIRO_SOURCE_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests/reconciliation-0599-evidence.test.mjs:143:3
+✖ 0599 / 625 SEK: database clock exactly at expiry decides the final batch without changing source rows (131.725249ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/reconciliation-0599-evidence.test.mjs:173:7)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'BANKGIRO_SOURCE_CHANGED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }

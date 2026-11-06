@@ -65,4 +65,18 @@ export function camtBankgiroTests({parse,fields}){
   assert.equal(row.payerBankgiro,'');
   assert.equal(row.reference,'0599');
  });
+ test('CAMT mixed payer identifier schemes cannot become organization evidence',()=>{
+  const identifier='0000000042';
+  const original=scheme=>syntheticCamt.replace('</Dbtr>','<Id><OrgId><Othr><Id>'+identifier+'</Id><SchmeNm>'+scheme+'</SchmeNm><Issr>SE</Issr></Othr></OrgId></Id></Dbtr>');
+  const evidence=scheme=>{const row=parse(original(scheme))[0];return row.payerEvidence??row.payer_evidence;};
+  const customer=evidence('<Cd>CUST</Cd>');
+  assert.equal(customer.identifiers[0].kind,'customer');
+  assert.equal(customer.organizationNumber,'');
+  assert.equal(evidence('<Cd>COID</Cd>').organizationNumber,identifier);
+  for(const scheme of [
+   '<Cd>COID</Cd><Prtry>CUST</Prtry>',
+   '<Prtry>CUST</Prtry><Cd>COID</Cd>',
+   '<Cd>CUST</Cd><Prtry>COID</Prtry>'
+  ])assert.throws(()=>parse(original(scheme)),/tvetyd|schema|XML/i);
+ });
 }

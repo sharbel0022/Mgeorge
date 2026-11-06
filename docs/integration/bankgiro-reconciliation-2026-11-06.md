@@ -28,25 +28,25 @@ Mer detaljer: [SFTP-paketets driftkontrakt](../../bridge/bankgiro/README.md), [a
 
 ### Exakta Bankgirofält i CAMT
 
-Den gamla Sites-matchningen accepterade varje kontoschema som innehöll texten `BGNR` eller `BANKGIRO`, exempelvis `NOTBANKGIRO`. Node tappade samtidigt explicit Bankgiro på gäldenärs- och borgenärskontona.
+Den gamla Sites-matchningen accepterade varje kontoschema som innehöll texten `BGNR` eller `BANKGIRO`, exempelvis `NOTBANKGIRO`. Node tappade samtidigt explicit Bankgiro på gäldenärs- och borgenärskontona. Ett separat reproducerat fel lät ett tvetydigt organisationsschema med både `COID` och `CUST` bli organisationsbevis. Den gemensamma schemavalideringen används därför även för betalarens organisationsidentifierare; giltiga kund-ID och organisations-ID hålls isär.
 
-Den gemensamma läsaren ska kräva ett entydigt, icke tomt `Cd`- eller `Prtry`-fält och endast känna igen projektets redan stödda exakta alias `BGNR` och `BANKGIRO`. Identifieraren behålls som text. Kredit/debit avgör vilken sida som är det egna kontot respektive motparten. Betalarnamn, generell referens `0599`, datum och 62500 öre kontrolleras separat. Transaktionskoder får inte skapa en kontorelation.
+Den gemensamma läsaren kräver ett entydigt, icke tomt `Cd`- eller `Prtry`-fält och endast känna igen projektets redan stödda exakta alias `BGNR` och `BANKGIRO`. Identifieraren behålls som text. Kredit/debit avgör vilken sida som är det egna kontot respektive motparten. Betalarnamn, generell referens `0599`, datum och 62500 öre kontrolleras separat. Transaktionskoder får inte skapa en kontorelation.
 
 Detta är en härdning av befintligt generiskt stöd. Placeringen av just dessa alias i Swedbanks aktuella kundprofil har inte styrkts genom bankens kredit-MIG/exempel och certifieras inte här.
 
 ### Mottagaren måste stämma med aktuell källbehörighet
 
-En intakt fil kan ha en uttrycklig mottagare som strider mot den konfigurerade källans Bankgiro. Båda originalintagen ska jämföra den uppgiften före första import och före återanvändning av en tidigare import. Endast presentationsmellanslag och bindestreck normaliseras; inledande nollor bevaras. Motsägelse ger `ACCOUNT_MISMATCH`; originalet ligger kvar för granskning och importen skapar inga allokeringar.
+En intakt fil kan ha en uttrycklig mottagare som strider mot den konfigurerade källans Bankgiro. Båda originalintagen jämför den uppgiften före första import och före återanvändning av en tidigare import. Endast presentationsmellanslag och bindestreck normaliseras; inledande nollor bevaras. Motsägelse ger `ACCOUNT_MISMATCH`; originalet ligger kvar för granskning och importen skapar inga allokeringar.
 
 Ett saknat originalfält fylls inte från auktoriseringen. Övriga kontroller av konto, original, källa, företagsgräns och bankmedgivande gäller fortfarande.
 
 ### Samma hash ger inte en ny källauktorisering
 
-Rapportköns tidigare snabbväg sökte identisk hash enbart inom ägaren. Återanvändning ska även kräva samma käll-ID, scope, auktoriseringsgeneration och registreringsbindning. Byteidentiska filer under en annan behörighet måste därför genomgå det aktuella originalintagets kontroller. Befintlig importidempotens hindrar nya ekonomiska rader.
+Rapportköns tidigare snabbväg sökte identisk hash enbart inom ägaren. Återanvändning kräver nu även samma käll-ID, scope, auktoriseringsgeneration och registreringsbindning. Byteidentiska filer under en annan behörighet måste därför genomgå det aktuella originalintagets kontroller. Befintlig importidempotens hindrar nya ekonomiska rader.
 
 ### Aktuell behörighet vid själva allokeringen
 
-Sites slutliga skrivkontroll behöver omfatta registreringsrevision, registreringsbindning och verifierings-/giltighetstid i källraden samt registreringsbindningen i rapportkvittot. En samtidig förändring får inte lämna en sparad allokering eller revisionspost. För ett rent källkvitto prövas även giltigheten med databasens klocka inne i den slutliga transaktionen, inklusive exakt utgångstid utan någon ändrad databasrad. Ett redan spärrat underlag behåller sitt befintliga undantag för uttryckligen granskade manuella allokeringar; det blir inte bankverifierat och dess fält måste fortfarande vara oförändrade. Befintliga ägargränser, AIS-kontomedgivande, originalkontroll och arbetsytans revisionsvillkor gäller samtidigt.
+Sites slutliga skrivkontroll omfattar nu registreringsrevision, registreringsbindning och verifierings-/giltighetstid i källraden samt registreringsbindningen i rapportkvittot. En samtidig förändring får inte lämna en sparad allokering eller revisionspost. För ett rent källkvitto prövas även giltigheten med databasens klocka inne i den slutliga transaktionen, inklusive exakt utgångstid utan någon ändrad databasrad. Ett redan spärrat underlag behåller sitt befintliga undantag för uttryckligen granskade manuella allokeringar; det blir inte bankverifierat och dess fält måste fortfarande vara oförändrade. Befintliga ägargränser, AIS-kontomedgivande, originalkontroll och arbetsytans revisionsvillkor gäller samtidigt.
 
 De nya regressionerna prövar det verkliga SQLite-baserade D1-testlagret och det finansiella skrivsteget. Node tar redan ett exklusivt skrivlås före sin läsning och avstämning; motsvarande utelämnade fältlista hittades inte där.
 
@@ -109,14 +109,22 @@ Fortsättningspunkten är alltså ett leverantörs- och kundbundet acceptansprov
 
 ## Testresultat och granskningsstatus
 
-Denna sektion uppdateras med den slutliga kandidatens verkliga CI-kvitton före leverans. De första testerna ligger i ett separat testcommit så att fel och rättningar kan följas. Inga äldre huvudgrensresultat räknas som test av ny produktkod.
+[Lokalt verifieringskvitto med produkt-/test-/låsfiler och logghashar](evidence/bankgiro-reconciliation-2026-11-06/local-verification.json). Dessa riktade körningar ingår som överlappande delar i de fulla sviterna.
 
-- Första testcommit: `a1e9e3acb581d53078e66be01b59b09ee7ac4968`, [CI 42307643931](https://github.com/sharbel0022/Mgeorge/actions/runs/42307643931). Node 22 och 24: **3015 godkända / 4 fel** av 3019. Sites: **5823 godkända / 8 fel** av 5831. Samtliga dessa sviter hade 0 skip/cancel/todo. Rena installationer, syntax, typer, audit och Sites-bygge passerade; de nya negativa testerna demonstrerar mottagar-/auktoriseringsbristerna. Bridge- och prestandajobb passerade. Browserns slutresultat var ännu inte observerat när nästa testcommit publicerades.
-- Andra testcommit: `5066e6b76b4ac3ae0a70089dafe07448995d9aaa`, med delade CAMT-fältprov och separat 0599-original-/käll-/slutskrivningsacceptans. Native resultat är ännu inte avläst.
-- Ny lokal, riktad Node-baslinje: 95 godkända, 0 fel/skip/cancel/todo.
-- Rotinstallation: godkänd. Ren Sites-installation avbröts med exit 137; ett efterföljande länkat beroendeträd underkändes av integritetsvakten.
-- Exekveringsmiljön blev därefter otillgänglig. Lokala Sites-/bridge-körningar saknar verifierat slutresultat.
-- Ordinarie PR-CI används för rena installationer, båda Node-versionerna, syntax, säkerhetsaudit, Sites-typer/tester/bygge, SSH/SFTP, prestanda och Chromium.
-- Inga workflows, spärrar, befintliga assertions eller beroendepinnar sänks för att få gröna resultat.
+| Körning | Faktiskt resultat |
+| --- | --- |
+| Första testcommit `a1e9e3a`, [CI 42307643931](https://github.com/sharbel0022/Mgeorge/actions/runs/42307643931) | Båda Node-versionerna: 3015 pass / 4 fail av 3019. Sites: 5823 pass / 8 fail av 5831. Nya negativa fall demonstrerade mottagar- och replaybristerna. |
+| Andra testcommit `5066e6b7`, [CI 42309403888](https://github.com/sharbel0022/Mgeorge/actions/runs/42309403888) | Node 24: 3017 pass / 7 fail av 3024. Sites: 5832 pass / 16 fail av 5848. CAMT-fält och slutliga behörighetskontroller ingår. |
+| Native lokal RED på `5066e6b7` plus nytt organisationsschematest | Node 22 pass / 8 fail av 30. Sites 99 pass / 17 fail av 116. Alla fel avser de avsedda assertionerna; ingen installations-/harnesskrasch. [Node](evidence/bankgiro-reconciliation-2026-11-06/red-node.log), [Sites](evidence/bankgiro-reconciliation-2026-11-06/red-sites.log). |
+| Native lokal GREEN, samma regressioner samt befintlig CAMT-integritet | **40/40 Node och 127/127 Sites**. [Node](evidence/bankgiro-reconciliation-2026-11-06/green-node.log), [Sites](evidence/bankgiro-reconciliation-2026-11-06/green-sites.log). |
+| Befintliga betalar-/identitetsfall efter den gemensamma schemarättningen | **18/18 Node och 5/5 Sites**. [Node](evidence/bankgiro-reconciliation-2026-11-06/green-payer-node.log), [Sites](evidence/bankgiro-reconciliation-2026-11-06/green-payer-sites.log). |
+| Verifierad Sites-typkontroll | `npm run check`, exit 0, befintlig integritetsvakt aktiv. [Logg](evidence/bankgiro-reconciliation-2026-11-06/sites-check.log). |
+| Slutlig full verifiering och oberoende granskning | Den aktuella produktrevisionens resultat, jobblänkar och granskningsutfall redovisas i [PR 68](https://github.com/sharbel0022/Mgeorge/pull/68). De daterade röda körningarna ovan är inte slutlig acceptans. |
+
+Samtliga angivna testkörningar hade 0 skip/cancel/todo. Lokal GREEN är sammanlagt **190 godkända fall** i de angivna, separata testfilerna. Fulla CI-resultat summeras inte med dessa överlappande fokustester eller med båda Node-versionerna som om de vore olika testfall.
+
+De första två fulla CI-körningarna klarade rena installationer, syntax/typer, audit, Sites-bygge, SFTP, prestanda och Chromium; testerna var avsiktligt röda. Projektets oförändrade ordinarie PR-grindar kräver rena installationer, Node 22 och 24, hela Node-/Sites-sviterna, säkerhetsaudit, Sites-bygge, verklig syntetisk SSH/SFTP-kedja, prestanda och Chromium för slutprodukten. Inga workflows, befintliga assertions eller beroendepinnar har sänkts.
+
+Miljöbegränsningen bevaras som historik: första lokala rotinstallationen och 95 riktade baslinjefall passerade; Sites-installationen avbröts med exit 137 och ett länkat beroendeträd underkändes. Exekveringsmiljön blev sedan otillgänglig och den tillfälliga kopian försvann. Efter återställning hämtades exakta Git-commits igen. Fysiska, redan installerade beroendeträd kopierades först när alla tre låsfiler matchade basen exakt. Den verifierade verktygsvakten och typkontrollen passerade. Detta är **inte** en ny ren lokal installation; de rena fulla installationerna verifieras i CI.
 
 Befintlig kvalitetsbedömning 258,5/330 = 7,83/10 lämnas oförändrad. Denna kodförbättring styrker inte produktionsberoende poänghöjning eller kommersiell Bankgiroacceptans.

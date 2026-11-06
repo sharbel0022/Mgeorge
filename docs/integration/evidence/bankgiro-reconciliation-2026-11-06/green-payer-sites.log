@@ -1,0 +1,15 @@
+(node:12) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ API typed payer facts survive import and cannot be changed behind the bank original (13.198322ms)
+✔ foreign unscoped organization cannot identify an unrelated customer (9.610807ms)
+✔ conflicting bank payer IDs remain a hold despite matching name and OCR (1.327139ms)
+✔ actual ISO importer keeps transaction-indexed reference path and exact whitespace (3.448134ms)
+✔ Unicode minus stays supported after evidence changes (0.228725ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 247.74635
