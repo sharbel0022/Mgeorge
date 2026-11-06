@@ -1,0 +1,20 @@
+{
+  "schema": "mgeorge-automatic-cloud-ocr-receipt-v1",
+  "run_id": 42239375434,
+  "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42239375434",
+  "job_id": 127965306352,
+  "event": "workflow_run",
+  "commit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+  "conclusion": "success",
+  "log_extract": [
+    "2026-11-06T15:03:01.6439995Z HEAD is now at 24390ef Merge pull request #61 from sharbel0022/feature/final-95-recovery",
+    "2026-11-06T15:05:07.9223561Z {\"status\":\"complete\",\"processed\":6,\"failed\":0}"
+  ],
+  "result": {
+    "status": "complete",
+    "processed": 6,
+    "failed": 0
+  },
+  "application_completed_at": "2026-11-06T15:05:07.163Z",
+  "evidence_limit": "CI-triggered ordinary production OCR, not a cron-periodicity or Gmail-scheduler acceptance. No OCR accuracy or invoice registration follows from a successful process count."
+}

@@ -1,0 +1,397 @@
+[
+  {
+    "profile": "node22",
+    "source": {
+      "commit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+      "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+      "branch": "main",
+      "workingTreeDirty": false,
+      "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+      "fileCount": 2443
+    },
+    "status": "PASSED",
+    "steps": [
+      {
+        "name": "install-node",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "syntax",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "audit-production",
+        "passed": true,
+        "totals": null,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        }
+      },
+      {
+        "name": "audit-all",
+        "passed": true,
+        "totals": null,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        }
+      },
+      {
+        "name": "node-tests",
+        "passed": true,
+        "totals": {
+          "tests": 2898,
+          "pass": 2898,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "audit": null
+      }
+    ]
+  },
+  {
+    "profile": "node24",
+    "source": {
+      "commit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+      "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+      "branch": "main",
+      "workingTreeDirty": false,
+      "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+      "fileCount": 2443
+    },
+    "status": "PASSED",
+    "steps": [
+      {
+        "name": "install-node",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "syntax",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "audit-production",
+        "passed": true,
+        "totals": null,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        }
+      },
+      {
+        "name": "audit-all",
+        "passed": true,
+        "totals": null,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        }
+      },
+      {
+        "name": "node-tests",
+        "passed": true,
+        "totals": {
+          "tests": 2898,
+          "pass": 2898,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "audit": null
+      }
+    ]
+  },
+  {
+    "profile": "bridge",
+    "source": {
+      "commit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+      "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+      "branch": "main",
+      "workingTreeDirty": false,
+      "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+      "fileCount": 2443
+    },
+    "status": "PASSED",
+    "steps": [
+      {
+        "name": "install-bridge",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "syntax",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "audit-production",
+        "passed": true,
+        "totals": null,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        }
+      },
+      {
+        "name": "audit-all",
+        "passed": true,
+        "totals": null,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        }
+      },
+      {
+        "name": "bridge-tests",
+        "passed": true,
+        "totals": {
+          "tests": 47,
+          "pass": 47,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "audit": null
+      }
+    ]
+  },
+  {
+    "profile": "browser",
+    "source": {
+      "commit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+      "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+      "branch": "main",
+      "workingTreeDirty": false,
+      "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+      "fileCount": 2443
+    },
+    "status": "PASSED",
+    "steps": [
+      {
+        "name": "install-sites",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "install-browser-tooling",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "install-chromium",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "audit-all",
+        "passed": true,
+        "totals": null,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        }
+      },
+      {
+        "name": "browser-acceptance",
+        "passed": true,
+        "totals": {
+          "tests": 77,
+          "pass": 77,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "audit": null
+      }
+    ]
+  },
+  {
+    "profile": "performance",
+    "source": {
+      "commit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+      "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+      "branch": "main",
+      "workingTreeDirty": false,
+      "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+      "fileCount": 2443
+    },
+    "status": "PASSED",
+    "steps": [
+      {
+        "name": "install-node",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "company-benchmark",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      }
+    ]
+  },
+  {
+    "profile": "sites",
+    "source": {
+      "commit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+      "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+      "branch": "main",
+      "workingTreeDirty": false,
+      "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+      "fileCount": 2443
+    },
+    "status": "PASSED",
+    "steps": [
+      {
+        "name": "install-node",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "install-sites",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "install-bridge",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "minimatch-mitigation",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "typecheck",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      },
+      {
+        "name": "audit-production",
+        "passed": true,
+        "totals": null,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        }
+      },
+      {
+        "name": "audit-all",
+        "passed": true,
+        "totals": null,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 8,
+            "high": 0,
+            "critical": 0,
+            "total": 8
+          }
+        }
+      },
+      {
+        "name": "sites-tests",
+        "passed": true,
+        "totals": {
+          "tests": 5820,
+          "pass": 5820,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "audit": null
+      },
+      {
+        "name": "production-build",
+        "passed": true,
+        "totals": null,
+        "audit": null
+      }
+    ]
+  }
+]

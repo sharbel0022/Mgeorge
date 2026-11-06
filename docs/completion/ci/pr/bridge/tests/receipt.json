@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "kind": "test-suite",
+  "name": "bridge-tests",
+  "syntheticOnly": true,
+  "realBankVerification": "NOT_RUN",
+  "network": "loopback-only accidental-egress guard; synthetic provider fixtures; not a malicious-code sandbox",
+  "source": {
+    "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+    "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+    "branch": "",
+    "workingTreeDirty": false,
+    "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+    "fileCount": 2443
+  },
+  "sourceAfter": {
+    "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+    "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+    "branch": "",
+    "workingTreeDirty": false,
+    "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+    "fileCount": 2443
+  },
+  "sourceChangedDuringRun": false,
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "release": "7.0.0-1017-azure",
+    "arch": "x64",
+    "logicalCpus": 4,
+    "cpu": "AMD EPYC 7763 64-Core Processor"
+  },
+  "startedAt": "2026-11-06T14:36:44.723Z",
+  "finishedAt": "2026-11-06T14:36:50.766Z",
+  "durationMs": 6042.859,
+  "command": {
+    "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+    "args": [
+      "--import",
+      "/home/runner/work/Mgeorge/Mgeorge/scripts/saas-test-isolation.mjs",
+      "--experimental-strip-types",
+      "--test",
+      "--test-concurrency=1",
+      "--test-timeout=180000",
+      "--test-reporter=tap",
+      "--test-reporter-destination=stdout",
+      "--test-reporter=junit",
+      "--test-reporter-destination=/home/runner/work/_temp/quality-bridge/tests/tests.junit.xml",
+      "--experimental-test-coverage",
+      "--test-reporter=lcov",
+      "--test-reporter-destination=/home/runner/work/_temp/quality-bridge/tests/coverage.lcov",
+      "--test-coverage-include=src/**",
+      "--test-coverage-exclude=**/node_modules/**",
+      "--test-coverage-exclude=**/test/**",
+      "--test-coverage-exclude=**/tests/**",
+      "test/adapter-contract.test.js",
+      "test/bridge.test.js",
+      "test/main.test.js"
+    ],
+    "cwd": "bridge/bankgiro"
+  },
+  "files": [
+    "test/adapter-contract.test.js",
+    "test/bridge.test.js",
+    "test/main.test.js"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "errorCode": null,
+  "totals": {
+    "tests": 47,
+    "pass": 47,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "complete": true,
+  "passed": true,
+  "failures": [],
+  "coverage": {
+    "requested": true,
+    "measured": true,
+    "scope": "loaded production files only; unimported files are not measured",
+    "aggregation": "per-lcov-record",
+    "files": 2,
+    "records": 2,
+    "lines": {
+      "covered": 412,
+      "total": 421,
+      "percent": 97.86
+    },
+    "functions": {
+      "covered": 69,
+      "total": 76,
+      "percent": 90.79
+    },
+    "branches": {
+      "covered": 268,
+      "total": 289,
+      "percent": 92.73
+    },
+    "sourceLines": {
+      "measured": true,
+      "aggregation": "union-by-source-path-and-line",
+      "scope": "loaded LCOV source paths and line numbers only; transformed source mappings are not verified",
+      "covered": 412,
+      "total": 421,
+      "percent": 97.86
+    }
+  },
+  "artifacts": [
+    {
+      "path": "tests.tap",
+      "bytes": 11749,
+      "sha256": "fb54d9cb410b0d1d147b6eff8669b8a680f4486c05124d7c70267d4526ceb5a7"
+    },
+    {
+      "path": "tests.junit.xml",
+      "bytes": 10078,
+      "sha256": "b0b8f82da70a7eb15e9f53dc270476c65218ce0d209400a3fb5188c72dd0217c"
+    },
+    {
+      "path": "coverage.lcov",
+      "bytes": 11613,
+      "sha256": "fe80ea29da66f03cca7384743345b94cc6cadee5ca7cf7b48edaa7cce9876708"
+    },
+    {
+      "path": "source-manifest.json",
+      "bytes": 467163,
+      "sha256": "93e59ab35c078a0463e69ee520e460a1aad28da2aef05db5a917ff30358efcb6"
+    }
+  ]
+}

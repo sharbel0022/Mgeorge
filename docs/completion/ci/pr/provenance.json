@@ -1,0 +1,94 @@
+{
+  "schema": "mgeorge-completion-pr-ci-v1",
+  "candidateHead": "ebbea9c67f174a6879f1e638633cc53e728282e2",
+  "baseMain": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+  "testedMergeRef": "4d19058628bf3ec2973be40a465c509eaf82408d",
+  "mergedMain": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+  "exactTree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+  "sitesTree": "ff078901d22a76ce0d0eac775e405ca50d8bcc6e",
+  "quality": {
+    "runId": 42235429917,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42235429917"
+  },
+  "security": {
+    "runId": 42235429991,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42235429991",
+    "node": 377,
+    "sites": 1225,
+    "overlapsWithQuality": true
+  },
+  "artifacts": [
+    {
+      "id": 13512696295,
+      "name": "quality-sites-4d19058628bf3ec2973be40a465c509eaf82408d-1",
+      "bytes": 729410,
+      "digest": "sha256:cb7e81254ebdbcccc360427fe2315b7bf880b3d3639721e38dd0a8402b4557e4",
+      "expiresAt": "2026-11-20T14:44:23Z"
+    },
+    {
+      "id": 13512506534,
+      "name": "quality-browser-4d19058628bf3ec2973be40a465c509eaf82408d-1",
+      "bytes": 5318452,
+      "digest": "sha256:1d36ad829e786a3bb80fcd4b7b750829850e8e3f9c39920d8724f969772332c9",
+      "expiresAt": "2026-11-20T14:45:31Z"
+    },
+    {
+      "id": 13512200134,
+      "name": "quality-performance-4d19058628bf3ec2973be40a465c509eaf82408d-1",
+      "bytes": 124840,
+      "digest": "sha256:488f184e1edea8c6ddc0867da5dee7650fcf85e6f80472aac0e02ae0591686a6",
+      "expiresAt": "2026-11-20T14:37:28Z"
+    },
+    {
+      "id": 13512165900,
+      "name": "quality-node-22.23.4-4d19058628bf3ec2973be40a465c509eaf82408d-1",
+      "bytes": 585887,
+      "digest": "sha256:b4b8b42d1f94e1ded4fe2929134254430eb5d3bb5f222cd5983df7fe482b9a5f",
+      "expiresAt": "2026-11-20T14:41:28Z"
+    },
+    {
+      "id": 13511682463,
+      "name": "quality-node-24.22.1-4d19058628bf3ec2973be40a465c509eaf82408d-1",
+      "bytes": 592963,
+      "digest": "sha256:54c789ef9868419d35ab54545231c46da36f95dd84cfbaecf8ee0a29fafcf021",
+      "expiresAt": "2026-11-20T14:41:11Z"
+    },
+    {
+      "id": 13510709464,
+      "name": "quality-bridge-4d19058628bf3ec2973be40a465c509eaf82408d-1",
+      "bytes": 247211,
+      "digest": "sha256:5e0f97c43ddea45b444fae9bdb6ed0654d6e9726b3125010794917bda186ca7e",
+      "expiresAt": "2026-11-20T14:36:51Z"
+    }
+  ],
+  "totals": {
+    "node22": 2898,
+    "node24": 2898,
+    "sites": 5820,
+    "bridge": 47,
+    "browser": 77
+  },
+  "counting": "Node22 and Node24 execute the same logical Node suite. Security is overlapping and is not added as unique tests. Performance is a workload, not a test-case count.",
+  "audits": {
+    "production": {
+      "node": 0,
+      "sites": 0,
+      "bridge": 0
+    },
+    "sitesAll": {
+      "moderate": 8,
+      "high": 0,
+      "critical": 0
+    }
+  },
+  "limits": [
+    "All CI bank APIs and browser backends are synthetic; no bank authorization or live customer journey is certified.",
+    "Coverage only measures loaded source paths; transformed-source mappings are not verified.",
+    "The earlier local SIGKILL failures remain recorded and were not reclassified as successful.",
+    "Exact main CI and hosted publication are recorded separately."
+  ]
+}
