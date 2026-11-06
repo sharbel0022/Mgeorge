@@ -1,0 +1,342 @@
+{
+  "format": "MG-IPC-diagnostic-1",
+  "commit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+  "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+  "scope": "new non-holdout synthetic probe; no source edits",
+  "sourceFiles": [
+    {
+      "path": "src/invoice-extraction.js",
+      "sha256": "3cd67fe4bf7babe46dd3d84fbc0324003b61e121495b685a8b5b0259e32338ae"
+    },
+    {
+      "path": "src/invoice-worker.js",
+      "sha256": "e14496922f70a62038b0ff24dcc61026d0c11a85192d3abff3a9105114952fef"
+    }
+  ],
+  "input": {
+    "bytes": 14272,
+    "sha256": "4b3899f870a947029f602d83d9ccdb630b0ad7d1d3648d6583f138b0d9c36e3d",
+    "width": 640,
+    "height": 240
+  },
+  "instrumentation": "Test-only child_process.fork hook captures stdout/stderr and events. Controlled transport children and injected cleanup exception are synthetic diagnostics; final real mode uses unmodified actual worker. Original 256 MiB V8 old-space flag retained. No holdout data read.",
+  "results": [
+    {
+      "mode": "small",
+      "startedAt": "2026-11-06T15:14:55.057Z",
+      "pid": 20,
+      "execArgv": [
+        "--max-old-space-size=256"
+      ],
+      "events": [
+        {
+          "event": "message",
+          "error": false,
+          "textBytes": 9
+        },
+        {
+          "event": "disconnect"
+        },
+        {
+          "event": "exit",
+          "code": 0,
+          "signal": null
+        },
+        {
+          "event": "close",
+          "code": 0,
+          "signal": null
+        }
+      ],
+      "stderr": "",
+      "stdoutBytes": 0,
+      "wrapper": {
+        "resolved": true,
+        "error": false,
+        "method": "probe",
+        "textBytes": 9
+      },
+      "completedAt": "2026-11-06T15:14:55.210Z"
+    },
+    {
+      "mode": "large",
+      "startedAt": "2026-11-06T15:14:55.216Z",
+      "pid": 27,
+      "execArgv": [
+        "--max-old-space-size=256"
+      ],
+      "events": [
+        {
+          "event": "message",
+          "error": false,
+          "textBytes": 262144
+        },
+        {
+          "event": "disconnect"
+        },
+        {
+          "event": "exit",
+          "code": 0,
+          "signal": null
+        },
+        {
+          "event": "close",
+          "code": 0,
+          "signal": null
+        }
+      ],
+      "stderr": "",
+      "stdoutBytes": 0,
+      "wrapper": {
+        "resolved": true,
+        "error": false,
+        "method": "probe",
+        "textBytes": 262144
+      },
+      "completedAt": "2026-11-06T15:14:55.325Z"
+    },
+    {
+      "mode": "small",
+      "startedAt": "2026-11-06T15:14:55.327Z",
+      "pid": 34,
+      "execArgv": [
+        "--max-old-space-size=256"
+      ],
+      "events": [
+        {
+          "event": "message",
+          "error": false,
+          "textBytes": 9
+        },
+        {
+          "event": "disconnect"
+        },
+        {
+          "event": "exit",
+          "code": 0,
+          "signal": null
+        },
+        {
+          "event": "close",
+          "code": 0,
+          "signal": null
+        }
+      ],
+      "stderr": "",
+      "stdoutBytes": 0,
+      "wrapper": {
+        "resolved": true,
+        "error": false,
+        "method": "probe",
+        "textBytes": 9
+      },
+      "completedAt": "2026-11-06T15:14:55.429Z"
+    },
+    {
+      "mode": "large",
+      "startedAt": "2026-11-06T15:14:55.429Z",
+      "pid": 41,
+      "execArgv": [
+        "--max-old-space-size=256"
+      ],
+      "events": [
+        {
+          "event": "message",
+          "error": false,
+          "textBytes": 262144
+        },
+        {
+          "event": "disconnect"
+        },
+        {
+          "event": "exit",
+          "code": 0,
+          "signal": null
+        },
+        {
+          "event": "close",
+          "code": 0,
+          "signal": null
+        }
+      ],
+      "stderr": "",
+      "stdoutBytes": 0,
+      "wrapper": {
+        "resolved": true,
+        "error": false,
+        "method": "probe",
+        "textBytes": 262144
+      },
+      "completedAt": "2026-11-06T15:14:55.507Z"
+    },
+    {
+      "mode": "exit0",
+      "startedAt": "2026-11-06T15:14:55.507Z",
+      "pid": 48,
+      "execArgv": [
+        "--max-old-space-size=256"
+      ],
+      "events": [
+        {
+          "event": "disconnect"
+        },
+        {
+          "event": "exit",
+          "code": 0,
+          "signal": null
+        },
+        {
+          "event": "close",
+          "code": 0,
+          "signal": null
+        }
+      ],
+      "stderr": "",
+      "stdoutBytes": 0,
+      "wrapper": {
+        "resolved": false,
+        "name": "Error",
+        "message": "worker",
+        "code": null,
+        "signal": null
+      },
+      "completedAt": "2026-11-06T15:14:55.606Z"
+    },
+    {
+      "mode": "exit7",
+      "startedAt": "2026-11-06T15:14:55.613Z",
+      "pid": 55,
+      "execArgv": [
+        "--max-old-space-size=256"
+      ],
+      "events": [
+        {
+          "event": "disconnect"
+        },
+        {
+          "event": "exit",
+          "code": 7,
+          "signal": null
+        },
+        {
+          "event": "close",
+          "code": 7,
+          "signal": null
+        }
+      ],
+      "stderr": "",
+      "stdoutBytes": 0,
+      "wrapper": {
+        "resolved": false,
+        "name": "Error",
+        "message": "worker",
+        "code": null,
+        "signal": null
+      },
+      "completedAt": "2026-11-06T15:14:55.658Z"
+    },
+    {
+      "mode": "signal",
+      "startedAt": "2026-11-06T15:14:55.658Z",
+      "pid": 62,
+      "execArgv": [
+        "--max-old-space-size=256"
+      ],
+      "events": [
+        {
+          "event": "disconnect"
+        },
+        {
+          "event": "exit",
+          "code": null,
+          "signal": "SIGTERM"
+        },
+        {
+          "event": "close",
+          "code": null,
+          "signal": "SIGTERM"
+        }
+      ],
+      "stderr": "",
+      "stdoutBytes": 0,
+      "wrapper": {
+        "resolved": false,
+        "name": "Error",
+        "message": "worker",
+        "code": null,
+        "signal": null
+      },
+      "completedAt": "2026-11-06T15:14:55.722Z"
+    },
+    {
+      "mode": "cleanup-fault",
+      "startedAt": "2026-11-06T15:14:55.725Z",
+      "pid": 69,
+      "execArgv": [
+        "--max-old-space-size=256"
+      ],
+      "events": [
+        {
+          "event": "disconnect"
+        },
+        {
+          "event": "exit",
+          "code": 1,
+          "signal": null
+        },
+        {
+          "event": "close",
+          "code": 1,
+          "signal": null
+        }
+      ],
+      "stderr": "file:///workspace/scratch/aab0f7dc06f9/security-evidence/ipc-24390ef/cleanup-fault-child.mjs:1\nimport {createRequire} from 'node:module';const require=createRequire(\"/workspace/scratch/aab0f7dc06f9/security-ipc-probe/package.json\");const tess=require('tesseract.js');tess.createWorker=async()=>({setParameters:async()=>{},recognize:async()=>({data:{text:'SYNTHETIC IPC CLEANUP PROBE',confidence:99,blocks:[]}}),terminate:async()=>{throw Error('SYNTHETIC_CLEANUP_FAILURE');}});await import(\"file:///workspace/scratch/aab0f7dc06f9/security-ipc-probe/src/invoice-worker.js\");\n                                                                                                                                                                                                                                                                                                                                                      ^\n\nError: SYNTHETIC_CLEANUP_FAILURE\n    at Object.terminate (file:///workspace/scratch/aab0f7dc06f9/security-evidence/ipc-24390ef/cleanup-fault-child.mjs:1:343)\n    at process.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/security-ipc-probe/src/invoice-worker.js:79:28)\n\nNode.js v24.22.1\n",
+      "stdoutBytes": 0,
+      "wrapper": {
+        "resolved": false,
+        "name": "Error",
+        "message": "worker",
+        "code": null,
+        "signal": null
+      },
+      "completedAt": "2026-11-06T15:14:56.873Z"
+    },
+    {
+      "mode": "real",
+      "startedAt": "2026-11-06T15:14:56.873Z",
+      "pid": 89,
+      "execArgv": [
+        "--max-old-space-size=256"
+      ],
+      "events": [
+        {
+          "event": "message",
+          "error": false,
+          "textBytes": 43
+        },
+        {
+          "event": "disconnect"
+        },
+        {
+          "event": "exit",
+          "code": 0,
+          "signal": null
+        },
+        {
+          "event": "close",
+          "code": 0,
+          "signal": null
+        }
+      ],
+      "stderr": "Estimating resolution as 421\n",
+      "stdoutBytes": 0,
+      "wrapper": {
+        "resolved": true,
+        "error": false,
+        "method": "ocr",
+        "textBytes": 43
+      },
+      "completedAt": "2026-11-06T15:14:59.573Z"
+    }
+  ]
+}

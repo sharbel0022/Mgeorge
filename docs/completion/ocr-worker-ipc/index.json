@@ -1,0 +1,21 @@
+{
+  "sourceCommit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+  "sourceTree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+  "sourceUnchanged": true,
+  "holdoutRead": false,
+  "holdoutRepeated": false,
+  "productChanged": false,
+  "originalFailuresAttributed": false,
+  "artifacts": [
+    {
+      "path": "probe.mjs",
+      "bytes": 4981,
+      "sha256": "327d1d7a6c63d048ecc2d711662eecdaa1154e14f545a059943579b472a125b8"
+    },
+    {
+      "path": "receipt.json",
+      "bytes": 8756,
+      "sha256": "a8f17e44ef46ea19e343ffb4e57591b57de1484f88f786a761768ac23bfe42e3"
+    }
+  ]
+}
