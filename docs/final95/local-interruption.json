@@ -1,0 +1,35 @@
+{
+  "schema": "mgeorge-final95-local-interruption-v1",
+  "recorded_at": "2026-11-06 22:45:41 UTC",
+  "source_sha": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "command": "npm run quality:node -- /tmp/mgeorge-final95-evidence-279f73027612/node --skip-install",
+  "dependencies": "Existing installations with matching root/Sites lock hashes through locally ignored symlinks; no clean install claimed.",
+  "syntax": "PASSED",
+  "audit_production": "PASSED",
+  "audit_all": "PASSED",
+  "full_suite": "NOT_COMPLETED",
+  "process_exit_code": 137,
+  "observed_failures": [
+    {
+      "file": "test/invoice-extraction.test.js",
+      "details": "Two optical scenarios returned fallback method pdf instead of expected ocr."
+    },
+    {
+      "file": "test/invoice-parser-corpus-q8.test.js",
+      "details": "File-level SIGKILL."
+    },
+    {
+      "file": "test/ocr-bankgiro-producer.test.js",
+      "details": "Two DOCUMENT_WORKER_EXIT_WITHOUT_RESULT and one null Bankgiro result."
+    }
+  ],
+  "runtime_after": "UNAVAILABLE",
+  "root_cause": "NOT_ESTABLISHED: do not infer OOM or a specific product defect from SIGKILL alone.",
+  "raw_logs": "Written under /tmp/mgeorge-final95-evidence-279f73027612; recovery not confirmed after environment outage. This durable record preserves only tool-visible observations, not the full TAP file.",
+  "browser": {
+    "extension": "Originating browser context unavailable",
+    "cloud": "createBrowserTab returned Unknown CDP tab; subsequent tab list empty.",
+    "fresh_production_ui": "NOT_VERIFIED"
+  },
+  "release_gate": "No fresh full local pass; remote CI must be observed on the exact candidate."
+}

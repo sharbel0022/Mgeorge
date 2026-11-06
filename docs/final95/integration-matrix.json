@@ -1,0 +1,122 @@
+{
+  "schema": "mgeorge-final95-integration-matrix-v1",
+  "recorded_at": "2026-11-06 22:45:41 UTC",
+  "base_sha": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "new_deliveries": [
+    {
+      "agent": 1,
+      "scope": "OpenAI invoice intelligence",
+      "branch": "feature/95-openai-invoices",
+      "remote_sha": null,
+      "pull_request": null,
+      "review": "NOT_AVAILABLE",
+      "integrated": false,
+      "reason": "Exact requested branch absent from fresh GitHub search and git ls-remote; no open PR at initial inventory."
+    },
+    {
+      "agent": 2,
+      "scope": "Gmail/OCR automation",
+      "branch": "feature/95-document-automation",
+      "remote_sha": null,
+      "pull_request": null,
+      "review": "NOT_AVAILABLE",
+      "integrated": false,
+      "reason": "Exact requested branch absent from fresh GitHub search and git ls-remote; no open PR at initial inventory."
+    },
+    {
+      "agent": 3,
+      "scope": "Real bank recovery",
+      "branch": "feature/95-bank-recovery",
+      "remote_sha": null,
+      "pull_request": null,
+      "review": "NOT_AVAILABLE",
+      "integrated": false,
+      "reason": "Exact requested branch absent from fresh GitHub search and git ls-remote; no open PR at initial inventory."
+    },
+    {
+      "agent": 4,
+      "scope": "Bankgiro reconciliation",
+      "branch": "feature/95-bankgiro-reconciliation",
+      "remote_sha": null,
+      "pull_request": null,
+      "review": "NOT_AVAILABLE",
+      "integrated": false,
+      "reason": "Exact requested branch absent from fresh GitHub search and git ls-remote; no open PR at initial inventory."
+    },
+    {
+      "agent": 5,
+      "scope": "SaaS security and recovery",
+      "branch": "feature/95-saas-readiness",
+      "remote_sha": null,
+      "pull_request": null,
+      "review": "NOT_AVAILABLE",
+      "integrated": false,
+      "reason": "Exact requested branch absent from fresh GitHub search and git ls-remote; no open PR at initial inventory."
+    }
+  ],
+  "previous_deliveries": [
+    {
+      "branch": "feature/95-bank",
+      "sha": "ac1abdc5469248eba212496af4a4573864908ace",
+      "associated_pr": 45,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-bankgiro",
+      "sha": "7d3bcb5ef533c39c9e23714e61709c924384ffb8",
+      "associated_pr": 46,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-quality",
+      "sha": "875876ae539f5ecba1fc39d4c213197806e245ce",
+      "associated_pr": 47,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-integration",
+      "sha": "03f84afd61bb1020e73c17c3cde332a1b07f55a0",
+      "associated_pr": 49,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-saas",
+      "sha": "1619c0e3a63b922c75a7f46d493d39e68075952f",
+      "associated_pr": 50,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-reconciliation",
+      "sha": "0954777f10da8be9fb15daf3878c539b51801142",
+      "associated_pr": 51,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-ocr",
+      "sha": "eb4242f783172ac441f9092f921b04b06dc11771",
+      "associated_pr": 52,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-security",
+      "sha": "3db9f01305aa6830a4c2d1cc01970c06b91018c2",
+      "associated_pr": 54,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-ui",
+      "sha": "d6646dd0971650878738f81215d0cfc5c04a1da3",
+      "associated_pr": 55,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    }
+  ]
+}

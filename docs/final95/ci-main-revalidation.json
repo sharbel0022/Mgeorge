@@ -1,0 +1,436 @@
+{
+  "recorded_at": "2026-11-06 22:45:41 UTC",
+  "source": {
+    "schema": "mgeorge-final-ci-provenance-v1",
+    "recorded_at": "2026-11-06T16:42:36.499334+00:00",
+    "run_id": 42253201335,
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42253201335",
+    "phase": "main",
+    "checkout_commit": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+    "pr_head": "70dd9c5dca6981e440bec0486e43788d2ef3f6a1",
+    "tree": "c1912a91e44ecaca7095dcaca1201c3904df87d7",
+    "sites_tree": "c2feb372a4c0ef121ffe594784684957c14ddac1",
+    "source_content_sha256": "20bfd18b8d8a5dd0ea9012f566b8276f234d2d79663ff2a6d36e0e0f8973ed0a",
+    "working_tree_dirty": false,
+    "profiles_all_passed": true,
+    "artifacts": [
+      {
+        "profile": "node22",
+        "label": "completion-final-main-node22",
+        "artifact_id": 13521482900,
+        "file": "completion-final-main-node22.zip",
+        "bytes": 613608,
+        "sha256": "aa01329f725f782d2d108761c2d0fe47c0dc8db39a80fdc60f256ab9c83727eb",
+        "download_digest_verified": true
+      },
+      {
+        "profile": "node24",
+        "label": "completion-final-main-node24",
+        "artifact_id": 13521517809,
+        "file": "completion-final-main-node24.zip",
+        "bytes": 619605,
+        "sha256": "0de974b5e0bfd89f7aa9e5aae7d5f5dfc10166ef79594d35b3b78e5b5ed09b06",
+        "download_digest_verified": true
+      },
+      {
+        "profile": "sites",
+        "label": "completion-final-main-sites",
+        "artifact_id": 13521404226,
+        "file": "completion-final-main-sites.zip",
+        "bytes": 752305,
+        "sha256": "d4cfea92309b199839139423cc93d32cd884c06235e0d41791e7f9afbdb5d290",
+        "download_digest_verified": true
+      },
+      {
+        "profile": "bridge",
+        "label": "completion-final-main-bridge",
+        "artifact_id": 13520743838,
+        "file": "completion-final-main-bridge.zip",
+        "bytes": 268320,
+        "sha256": "d6858e7b2ca457029c7c2516cdb51662ad4b5ff1706a95d4cd0ab098b7b3e90e",
+        "download_digest_verified": true
+      },
+      {
+        "profile": "browser",
+        "label": "completion-final-main-browser",
+        "artifact_id": 13520663758,
+        "file": "completion-final-main-browser.zip",
+        "bytes": 5338845,
+        "sha256": "d1e1ecd30969d858cb291325d8c5c5aa764c2b8243b8c8813dc7f37887ab987d",
+        "download_digest_verified": true
+      },
+      {
+        "profile": "performance",
+        "label": "completion-final-main-performance",
+        "artifact_id": 13521068335,
+        "file": "completion-final-main-performance.zip",
+        "bytes": 135374,
+        "sha256": "6ee0d5f5fab565b193eee185c05de98e9de03a80d57fe09d141eabe1f0fddcfb",
+        "download_digest_verified": true
+      }
+    ],
+    "retained_files_index": "retained-files.json",
+    "summary": "summary.json",
+    "limits": [
+      "Node22/24 exercise the same logical suite. Security subsets and repeated PR/main runs are not added as independent cases.",
+      "All provider and browser fixtures in these CI jobs are synthetic. They do not verify real bank or commercial SaaS acceptance.",
+      "The company benchmark uses one Node process, four concurrent company jobs and at most eight competing attempts; it does not measure distributed capacity.",
+      "Source manifests and raw TAP/JUnit/LCOV/logs are retained byte-exact with deterministic gzip; screenshot files are indexed but not duplicated.",
+      "Coverage describes loaded files; transformed source mappings were not independently verified."
+    ]
+  },
+  "fresh_job_observation": {
+    "jobs": [
+      {
+        "id": 128013426740,
+        "name": "Sites types, tests and production build",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 42253201335,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Verified installs, types, audits, complete synthetic suite and production build",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Retain Sites receipts, failure logs, JUnit and LCOV",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          },
+          {
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          }
+        ]
+      },
+      {
+        "id": 128013426961,
+        "name": "Chromium synthetic onboarding acceptance",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 42253201335,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Install locked browser tooling and run all synthetic UI scenarios",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Retain browser results, screenshots and source manifests",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          },
+          {
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          }
+        ]
+      },
+      {
+        "id": 128013427080,
+        "name": "Node 24.22.1",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 42253201335,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Locked install, syntax, audits and complete synthetic suite with coverage",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Retain Node receipts, failure logs, JUnit and LCOV",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          },
+          {
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          }
+        ]
+      },
+      {
+        "id": 128013427090,
+        "name": "Bankgiro SFTP integration",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 42253201335,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Locked install, syntax, audits and synthetic SSH SFTP HTTP recovery",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Retain bridge receipts, failure logs, JUnit and LCOV",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          },
+          {
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          }
+        ]
+      },
+      {
+        "id": 128013427154,
+        "name": "Synthetic 1, 10 and 100 company performance",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 42253201335,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Measure real SQLite work with synthetic companies",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Retain workload, correctness and latency evidence",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          },
+          {
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          }
+        ]
+      },
+      {
+        "id": 128013427431,
+        "name": "Node 22.23.4",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 42253201335,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Locked install, syntax, audits and complete synthetic suite with coverage",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Retain Node receipts, failure logs, JUnit and LCOV",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          },
+          {
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          }
+        ]
+      }
+    ]
+  },
+  "artifact_metadata_matches_retained_provenance": true,
+  "scope": "Re-read historical main jobs and artifact metadata, not a new test run."
+}
