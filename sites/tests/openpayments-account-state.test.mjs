@@ -1,3 +1,4 @@
+import {sitesTokenCoordinatorUrl} from './helpers/openpayments-coordinator-loader.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -8,7 +9,7 @@ import {seal,unseal,randomToken} from '../lib/banking/security.ts';
 import {scopedResourceCodec} from '../lib/banking/bank-data-provider.js';
 import {CONFIG} from './helpers/openpayments-fixture.mjs';
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
-function compile(imports,path='../lib/banking/openpayments-account-state.ts'){let code=stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'});imports={'./openpayments-workers-transport.js':new URL('../lib/banking/openpayments-workers-transport.js',import.meta.url).href,...imports};for(const [from,to]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+from+q,JSON.stringify(to));return data(code);}
+function compile(imports,path='../lib/banking/openpayments-account-state.ts'){let code=stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'});imports={'./openpayments-sites-token-coordinator':sitesTokenCoordinatorUrl,'./openpayments-workers-transport.js':new URL('../lib/banking/openpayments-workers-transport.js',import.meta.url).href,...imports};for(const [from,to]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+from+q,JSON.stringify(to));return data(code);}
 async function fixture(t){const f=companyFixture(t);await f.create('company-a');const scope=await f.scope(),owner=scope.owner,db=f.database(scope),key=randomToken(),expiry='2099-01-01T00:00:00.000Z',identity={iban:'SE4550000000058398257466',bban:'SYNTHETICBBAN',currency:'SEK'};
 const registration={companyId:'company-a',verified:true,corporateAccessVerified:true,redirectVerified:true,corporateId:'synthetic-corporate',psuId:'synthetic-psu',bicFi:'OPBKSE21',bankId:'OPBKSE21'};
 const env={SAAS_BANK_ENABLED:'true',SAAS_OPENPAYMENTS_CONFIG:JSON.stringify(CONFIG),SAAS_OPENPAYMENTS_REGISTRATIONS:JSON.stringify([registration]),BANK_DATA_ENCRYPTION_KEY:key};

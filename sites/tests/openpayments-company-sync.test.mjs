@@ -1,3 +1,4 @@
+import {sitesTokenCoordinatorUrl} from './helpers/openpayments-coordinator-loader.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -10,7 +11,7 @@ import {fixtureTransport,CONFIG,CONSENT_ID,AUTH_ID,ACCOUNT_ID,TX,json} from './h
 import {applyCommand,paymentOriginalIssue} from '../lib/domain.ts';
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 const local=path=>new URL('../lib/'+path,import.meta.url).href;
-function compiled(path,imports){let code=stripTypeScriptTypes(readFileSync(new URL('../lib/'+path,import.meta.url),'utf8'),{mode:'transform'});imports={'./openpayments-workers-transport.js':local('banking/openpayments-workers-transport.js'),...imports};for(const[from,to]of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+from+quote,JSON.stringify(to));return data(code);}
+function compiled(path,imports){let code=stripTypeScriptTypes(readFileSync(new URL('../lib/'+path,import.meta.url),'utf8'),{mode:'transform'});imports={'../company-storage.js':local('company-storage.js'),'./openpayments-sites-token-coordinator':sitesTokenCoordinatorUrl,'./openpayments-workers-transport.js':local('banking/openpayments-workers-transport.js'),...imports};for(const[from,to]of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+from+quote,JSON.stringify(to));return data(code);}
 const module=await import(compiled('banking/openpayments-company-sync.ts',{'../server':data('export const db=()=>{},identity=async()=>{},currentCompanyContext=()=>{},withCompanyOwner=async()=>{},readWorkspace=async()=>{};'),'../domain':local('domain.ts'),'../reconciliation-evidence':data('export const reconciliationPreviewWithOriginals=async()=>[];'),'../company-bank-sync-store.js':local('company-bank-sync-store.js'),'../company-bank-sync.js':local('company-bank-sync.js'),'../company-bank-account-key.js':local('company-bank-account-key.js'),'../company-reconciliation-policy.js':local('company-reconciliation-policy.js'),'./saas-runtime':data('export const saasBankSnapshot=async()=>{},saasBankSyncContext=async()=>{},saasBankSyncConfiguration=async()=>{};'),'./openpayments-company-enrichment':data('export const enrichOpenPaymentsCompany=async()=>({state:"unavailable"});'),'./openpayments-normalization.js':local('banking/openpayments-normalization.js')}));
 const date=new Date().toISOString().slice(0,10),expiry=new Date(Date.now()+30*86400000).toISOString().slice(0,10);
 async function setup(t,{transactions,consentStatus,enabled=true,bankgiro=false}={}){

@@ -1,9 +1,11 @@
 import {assertCompanyContext,assertCompanyPermission,companyDataBoundary,COMPANY_ROLES} from './company-contract.js';
+import {openPaymentsTokenFenceStatement} from './banking/openpayments/token-coordinator-fence.js';
 
 // Every financial/automation table with an owner column. A migration regression
 // compares this manifest with the actual SQLite schema and its write triggers.
 export const ownerTables=Object.freeze(["audit_events","backup_runs","bank_applications","bank_auth_flows","bank_connections","bank_locks","bank_sync_runs","bankgiro_ingest_jobs","bankgiro_ingest_leases","bankgiro_ingest_sources","company_bank_sync_jobs","company_bank_sync_receipts","company_bank_sync_requests","company_bank_sync_scopes","customer_contacts","customer_deliveries","customer_messages","customer_reviews","document_automation","document_extractions","document_jobs","document_registrations","documents","gmail_connections","gmail_flows","gmail_locks","gmail_runs","gmail_sources","invoice_counterparties","payment_control_requests","payment_control_runs","reconciliation_findings","saas_bank_state","workspaces"]);
 const statements=new WeakMap();
+const applicationFenceDatabases=new WeakMap();
 const id=value=>typeof value==='string'&&/^[A-Za-z0-9][A-Za-z0-9:@._-]{0,199}$/.test(value)&&value!=='.'&&value!=='..';
 const fail=(code,status=403)=>{throw Object.assign(Error(code),{code,status});};
 const validActor=actor=>{if(!id(actor))fail('AUTH_REQUIRED',401);return actor;};
@@ -227,6 +229,7 @@ function sqlShape(query){
  return shape;
 }
 function scopedStatement(database,entry,scope){
+ if(entry.applicationTokenFence)return openPaymentsTokenFenceStatement(entry.applicationTokenFence,database);
  const shape=sqlShape(entry.query);
  const used=ownerTables.filter(table=>new RegExp('\\b'+table+'\\b','i').test(shape));
  let query=entry.query,args=entry.args;
@@ -265,12 +268,25 @@ export function createCompanyDatabase(database,getScope){
   const statement={bind(...values){return prepare(query,values);},first(column){return perform(entry,'first',column);},all(){return perform(entry,'all');},run(){return perform(entry,'run');},raw(options){return perform(entry,'raw',options);}};
   statements.set(statement,entry);return statement;
  }
- return Object.freeze({prepare,async batch(items){
+ const result=Object.freeze({prepare,async batch(items){
   const pinned=await scope();await assertScopeCurrent(database,pinned);
   const entries=[];
   for(const item of items){const entry=statements.get(item);if(!entry||scopeKey(await entry.scope())!==scopeKey(pinned))fail('COMPANY_BOUNDARY_MISMATCH');entries.push(entry);}
-  const mutation=entries.some(e=>writes(e.query));
+  const mutation=entries.some(e=>!e.applicationTokenFence&&writes(e.query));
   if(mutation)return authorizedBatch(database,pinned,'write',entries.map(e=>scopedStatement(database,e,pinned)));
   const result=await database.batch(entries.map(e=>scopedStatement(database,e,pinned)));await assertScopeCurrent(database,pinned);return result;
  },async exec(){fail('COMPANY_SQL_DENIED');},async dump(){fail('COMPANY_SQL_DENIED');}});
+ applicationFenceDatabases.set(result,capability=>{
+  // This proves raw-DB identity and private branding without executing SQL.
+  // Ordinary prepare() remains unable to name either global control table.
+  openPaymentsTokenFenceStatement(capability,database);
+  const statement=Object.freeze({});statements.set(statement,{applicationTokenFence:capability,scope});return statement;
+ });
+ return result;
+}
+
+/** Server-only fixed assertion. The opaque statement is usable only by the
+ * current company's authorized batch, and never exposes application rows. */
+export function companyApplicationTokenFence(database,capability){
+ const create=applicationFenceDatabases.get(database);if(!create)fail('COMPANY_SQL_DENIED');return create(capability);
 }

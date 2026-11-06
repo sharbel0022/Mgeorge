@@ -1,3 +1,4 @@
+import {sitesTokenCoordinatorUrl} from './helpers/openpayments-coordinator-loader.mjs';
 import test,{after} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,mkdtempSync,writeFileSync,rmSync} from 'node:fs';
@@ -17,6 +18,7 @@ after(()=>rmSync(directory,{recursive:true,force:true}));
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 const local=path=>new URL('../lib/'+path,import.meta.url).href;
 function compiled(path,imports={}){
+ imports={'./openpayments-sites-token-coordinator':sitesTokenCoordinatorUrl,...imports};
  const source=new URL('../lib/'+path,import.meta.url);
  let code=stripTypeScriptTypes(readFileSync(source,'utf8'),{mode:'transform'});
  for(const[from,to]of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+from+quote,JSON.stringify(to));
@@ -149,4 +151,30 @@ for(const count of [1,10,100])test(count+' actual isolated company requests shar
  assert.equal(f.provider.calls.filter(c=>new URL(c.url).pathname.endsWith('/aspsps')).length,count);
  const calls=f.provider.calls.length;assert.notEqual((await f.call('saasBankDiscovery',{companyId:'company-a'})).status,200);assert.equal(f.provider.calls.length,calls);
  assert.equal(f.f.sql.prepare('SELECT count(*) n FROM saas_bank_state').get().n,0);assert.equal(f.plainFetches(),0);
+});
+
+for(const rotate of [false,true])test('stored active consent and an empty issuer registry support '+(rotate?'atomic rejection of a commit-time rotation':'the first authorized sync'),async t=>{
+ const date=new Date().toISOString().slice(0,10);
+ const f=await fixture(t,{responses:{
+  'GET /psd2/consent/v1/consents/consent-a/status':()=>json({consentStatus:'valid'}),
+  'GET /psd2/consent/v1/consents/consent-a':()=>json({consentStatus:'valid',validUntil:'2099-01-01',recurringIndicator:true,frequencyPerDay:4,access:{}}),
+  'GET /psd2/accountinformation/v1/accounts/resource-a/transactions':()=>json({account:{iban:'SE4550000000058398257466'},transactions:{booked:[{...TX,bookingDate:date,remittanceInformationStructured:'0000599'}],_links:{}}}),
+ }});
+ await f.saveActiveState();const before=f.f.sql.prepare('SELECT * FROM workspaces WHERE owner=?').get(f.owner);
+ assert.equal((await f.call('saasBankSyncConfiguration')).status,200);
+ assert.equal(f.f.sql.prepare('SELECT count(*) n FROM company_application_tokens').get().n,0,'configuration GET remains a pure stored read');assert.equal(f.provider.calls.length,0);
+ let rotations=0;
+ if(rotate)f.f.beforeBatch=statements=>{if(statements.some(statement=>/UPDATE workspaces SET payload=/.test(statement.query))){f.f.beforeBatch=null;rotations++;f.f.sql.prepare("UPDATE company_application_tokens SET epoch=epoch+1,config_hash=?").run('e'.repeat(64));}};
+ const result=await f.call('sync',{body:{},operation:async req=>(await f.sync.sitesOpenPaymentsCompanySync(req,'company-a')).run('account-a')});
+ assert.equal(result.status,200,JSON.stringify(result.data));
+ if(rotate){
+  assert.equal(rotations,1,'rotation occurred after the guard and immediately before the actual financial batch');
+  assert.notEqual(result.data.status,'success');assert.deepEqual(f.f.sql.prepare('SELECT * FROM workspaces WHERE owner=?').get(f.owner),before);
+  assert.equal(f.f.sql.prepare('SELECT count(*) n FROM company_bank_sync_receipts').get().n,0);
+ }else{
+  assert.equal(result.data.status,'success',JSON.stringify(result.data));assert.equal(result.data.imported,1);
+  const workspace=JSON.parse(f.f.sql.prepare('SELECT payload FROM workspaces WHERE owner=?').get(f.owner).payload);
+  assert.equal(workspace.transactions.length,1);assert.equal(workspace.transactions[0].amount,62500);assert.equal(workspace.transactions[0].verified,false);assert.deepEqual(workspace.allocations,[]);
+ }
+ assert.equal(f.provider.calls.filter(call=>new URL(call.url).pathname==='/connect/token').length,1);assert.equal(f.plainFetches(),0);
 });

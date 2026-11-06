@@ -62,5 +62,8 @@ test('isolated restore verifies company before creating evidence output and reco
  assert.deepEqual(JSON.parse(readFileSync(join(result.directory,'receipt.json'),'utf8')).companyBoundary,boundary());
  assert.deepEqual(new Uint8Array(readFileSync(join(result.directory,'originals',f.id+'.bin'))),f.bytes);
  const recovered=new DatabaseSync(join(result.directory,'evidence.sqlite'),{readOnly:true});
- try{for(const table of ['companies','company_memberships','company_user_contexts','company_worker_grants','company_operation_guard'])assert.equal(recovered.prepare('SELECT count(*) n FROM evidence_'+table).get().n,0);}finally{recovered.close();}
+ try{
+  for(const table of ['companies','company_memberships','company_user_contexts','company_worker_grants','company_operation_guard','company_application_tokens'])assert.equal(recovered.prepare('SELECT count(*) n FROM evidence_'+table).get().n,0);
+  const issuer=recovered.prepare('SELECT * FROM evidence_company_application_token_control').get();assert.equal(issuer.recovery_required,1);assert.equal(issuer.restore_marker,'isolated-evidence-restore');
+ }finally{recovered.close();}
 });

@@ -12,7 +12,7 @@ const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 const OMITTED_TABLES=['bank_auth_flows','bank_locks','gmail_flows','gmail_locks','customer_reviews','backup_runs','bankgiro_ingest_leases'];
 // Authorization is reconstructed only by separately verified administration.
 // Evidence restoration must not reactivate a user, worker grant or tenant.
-const CONTROL_TABLES=['companies','company_memberships','company_roles','company_user_contexts','company_worker_grants','company_operation_guard'];
+const CONTROL_TABLES=['companies','company_memberships','company_roles','company_user_contexts','company_worker_grants','company_operation_guard','company_application_tokens','company_application_token_control'];
 const fail=code=>{throw Error('backup_recovery_'+code);};
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const quote=value=>'"'+value.replaceAll('"','""')+'"';
@@ -128,6 +128,9 @@ function evidenceDatabase(snapshot){
   // archive is executed; all row values use bound parameters.
   const migrations=new URL('../drizzle/',import.meta.url);
   for(const file of readdirSync(migrations).filter(name=>/^\d{4}_[a-z0-9_]+\.sql$/.test(name)).sort())database.exec(readFileSync(new URL(file,migrations),'utf8'));
+  // No app token is part of a customer snapshot. Even this newly created,
+  // subsequently renamed evidence database retains an explicit issuer gate.
+  database.prepare("UPDATE company_application_token_control SET recovery_required=1,revision=revision+1,restore_marker='isolated-evidence-restore',recovery_evidence='' WHERE id=1").run();
   const tables=database.prepare("SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all().map(row=>row.name);
   const expected=[...BACKUP_TABLES,...OMITTED_TABLES,...CONTROL_TABLES].sort();
   if(JSON.stringify(tables)!==JSON.stringify(expected))fail('schema_invalid');
