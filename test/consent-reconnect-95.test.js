@@ -90,3 +90,70 @@ test('consent-reconnect-95: verified consent denial durably requires renewal and
     assert.equal(calls.filter(call => call.path.endsWith('/transactions')).length, transactionReads);
   });
 });
+
+test('consent-reconnect-95: account selection durably fences a rejected company consent', async t => {
+  const login = await call('/api/login', 'POST', { password: process.env.MG_ADMIN_PASSWORD });
+  assert.equal(login.status, 200); cookie = login.headers['set-cookie'][0].split(';')[0];
+  for (const [code, patch, revoked] of [
+    ['BANK_CONSENT_INVALID', { status: 'REVOKED' }, false],
+    ['BANK_CONSENT_EXPIRED', { access: { valid_until: '2000-01-01T00:00:00.000Z', transactions: true } }, false],
+    ['BANK_ACCOUNT_SCOPE_INVALID', { accounts: ['other-account'] }, false],
+    ['BANK_TRANSACTION_SCOPE_REQUIRED', { access: { valid_until: future(), transactions: false } }, false],
+    ['CORPORATE_AUTHORIZATION_REQUIRED', {}, true],
+  ]) await t.test(code, async () => {
+    authority(); currentPatch = {}; revokeAuthority = false;
+    assert.equal((await call('/api/bank/connect', 'POST', {})).status, 200);
+    assert.equal((await call('/api/bank/callback?state=' + authState + '&code=synthetic-once')).status, 302);
+    let before = db.prepare('SELECT * FROM bank_connections ORDER BY rowid DESC LIMIT 1').get();
+    assert.equal(before.status, 'pending_account');
+    if (code === 'BANK_CONSENT_INVALID') {
+      assert.equal((await call('/api/bank/accounts', 'POST', { connection_id: before.id, account_uid: account.uid })).status, 200);
+      before = db.prepare('SELECT * FROM bank_connections WHERE id=?').get(before.id);
+      assert.equal(before.status, 'connected'); assert.ok(before.last_synced);
+    }
+    const transactions = calls.filter(item => item.path.endsWith('/transactions')).length;
+    const imports = db.prepare('SELECT count(*) n FROM bank_transactions').get().n;
+    currentPatch = patch; revokeAuthority = revoked;
+    const result = await call('/api/bank/accounts', 'POST', { connection_id: before.id, account_uid: account.uid });
+    assert.equal(result.status, 409); assert.equal(result.json.code, code);
+    const failed = db.prepare('SELECT * FROM bank_connections WHERE id=?').get(before.id);
+    assert.equal(failed.status, 'renewal_required');
+    for (const key of ['encrypted_session', 'accounts_json', 'consent_json', 'selected_account_uid', 'last_synced', 'valid_until']) assert.equal(failed[key], before[key], key);
+    const count = calls.length;
+    assert.equal((await call('/api/bank/accounts', 'POST', { connection_id: before.id, account_uid: account.uid })).status, 409);
+    assert.equal((await call('/api/bank/sync', 'POST', { connection_id: before.id })).status, 409);
+    assert.equal(calls.length, count, 'a known rejected consent must not be read again');
+    assert.equal(calls.filter(item => item.path.endsWith('/transactions')).length, transactions);
+    assert.equal(db.prepare('SELECT count(*) n FROM bank_transactions').get().n, imports);
+  });
+});
+
+test('consent-reconnect-95: selection does not turn provider configuration or raw error text into consent revocation', async t => {
+  const login = await call('/api/login', 'POST', { password: process.env.MG_ADMIN_PASSWORD });
+  assert.equal(login.status, 200); cookie = login.headers['set-cookie'][0].split(';')[0];
+  for (const [providerStatus, httpStatus, expectedCode] of [[401, 409, 'application_access_denied'], [500, 502, 'bank_error']]) await t.test(expectedCode, async () => {
+    authority(); currentPatch = {}; revokeAuthority = false;
+    assert.equal((await call('/api/bank/connect', 'POST', {})).status, 200);
+    assert.equal((await call('/api/bank/callback?state=' + authState + '&code=synthetic-once')).status, 302);
+    const before = db.prepare('SELECT * FROM bank_connections ORDER BY rowid DESC LIMIT 1').get();
+    const syntheticFetch = globalThis.fetch;
+    let rejectedReads = 0;
+    globalThis.fetch = async (url, options = {}) => {
+      const target = new URL(url);
+      if (target.pathname.startsWith('/sessions/') && options.method === 'GET') {
+        assert.equal(target.origin, 'https://api.enablebanking.com'); rejectedReads++;
+        return Response.json({ error: 'BANK_CONSENT_INVALID', code: 'BANK_CONSENT_INVALID', message: 'SYNTHETIC_PRIVATE_PROVIDER_ERROR' }, { status: providerStatus });
+      }
+      return syntheticFetch(url, options);
+    };
+    try {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const result = await call('/api/bank/accounts', 'POST', { connection_id: before.id, account_uid: account.uid });
+        assert.equal(result.status, httpStatus); assert.equal(result.json.code, expectedCode);
+        assert.ok(!JSON.stringify(result.json).includes('SYNTHETIC_PRIVATE_PROVIDER_ERROR'));
+        assert.deepEqual(db.prepare('SELECT * FROM bank_connections WHERE id=?').get(before.id), before);
+      }
+      assert.equal(rejectedReads, 2, 'configuration/transport failures must not invent a consent revocation');
+    } finally { globalThis.fetch = syntheticFetch; }
+  });
+});

@@ -345,9 +345,12 @@ export async function status(request: Request): Promise<Response> {
   const health = connectionHealth(app, conn, selected, savedConsent, authority);
   const diagnostic = await latestConnectionDiagnostic(conn);
   const latestFlow = await db().prepare('SELECT * FROM bank_auth_flows WHERE owner=? ORDER BY created_at DESC,rowid DESC LIMIT 1').bind(user.userId).first<BankFlowRow>();
-  const context = latestFlow ? flowContext(latestFlow) : null;
-  const requiresRestart = latestFlow && ['pending', 'exchanging'].includes(latestFlow.status) && !context;
-  const expiredFlow = latestFlow && ['pending', 'exchanging'].includes(latestFlow.status) && (Date.parse(latestFlow.expires_at) <= Date.now() || requiresRestart);
+  let context: FlowContext | null = null;
+  try { context = latestFlow ? flowContext(latestFlow) : null; }
+  catch { /* Historical flow context must not block an independently authorized status read. Callback validation stays strict. */ }
+  const requiresRestart = Boolean(latestFlow && !context);
+  const flowExpiresAt = latestFlow ? Date.parse(latestFlow.expires_at) : NaN;
+  const expiredFlow = latestFlow && (requiresRestart || ['pending', 'exchanging'].includes(latestFlow.status) && (!Number.isFinite(flowExpiresAt) || flowExpiresAt <= Date.now()));
   const workspace = await readWorkspace(company.storageOwnerId);
   let redirectUrl:string|null=null;
   try{redirectUrl=bankRedirectUrl();}catch{/* A bad callback must not hide the existing connection's read-only status. */}
@@ -359,7 +362,7 @@ export async function status(request: Request): Promise<Response> {
     consentFlow: latestFlow ? { id: context?.flowId ?? null, companyId: context?.companyId ?? company.companyId,
       status: expiredFlow ? 'expired' : latestFlow.status, expiresAt: latestFlow.expires_at,
       reason: requiresRestart ? 'CONSENT_RESTART_REQUIRED' : expiredFlow ? latestFlow.status === 'pending' ? 'CALLBACK_NOT_RECEIVED' : 'AUTHORIZATION_OUTCOME_UNKNOWN' : latestFlow.result_code || null,
-      connectionId: latestFlow.connection_id || null } : null,
+      connectionId: context ? latestFlow.connection_id || null : null } : null,
     storageReady: storageReady(), configured: Boolean(app), activation: configurationStatus(),
     application: app ? safeApplication(metadata(app),redirectUrl) : null,
     redirectUrl, callback, syncMode: conn?.auto_sync_enabled === 1 ? 'automatic' : 'manual',

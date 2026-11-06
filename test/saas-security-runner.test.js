@@ -59,6 +59,8 @@ test('acceptance runner excludes operator preload flags and secrets from both su
     assert.ok(report.suites.every(suite => suite.passed && suite.tests === 1 && suite.pass === 1));
     assert.ok(report.suites[0].files.includes('test/security-login-rate-limit.test.js'));
     assert.ok(report.suites[0].files.includes('test/saas-security-runner.test.js'));
+    assert.ok(report.suites[0].files.includes('test/consent-reconnect-95.test.js'));
+    assert.ok(report.suites[0].files.includes('test/openpayments-runtime-disable.test.js'));
     assert.ok(report.suites[1].files.includes('tests/security-request-budget.test.mjs'));
     assert.equal(report.productionAcceptance, 'NOT_VERIFIED');
     assert.equal(report.commercialLaunch, 'NOT_APPROVED');

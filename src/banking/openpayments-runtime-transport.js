@@ -70,7 +70,7 @@ export function configuredOpenPaymentsNodeTransport({environment=process.env,con
   const cacheIdentity=identity.identity,invalidateTokenCache=()=>{invalidateOpenPaymentsTokenCacheIdentity(cacheIdentity);if(identities.get(environment)?.identity===cacheIdentity)identities.delete(environment);};
   const validateCertificate=()=>{
     try{
-      if(environment[CONFIG_KEY]!==raw||environment.SAAS_OPENPAYMENTS_CONFIG!==providerRaw||digest(JSON.stringify(material()))!==fingerprint)throw denied();
+      if(environment.SAAS_BANK_ENABLED!=='true'||environment[CONFIG_KEY]!==raw||environment.SAAS_OPENPAYMENTS_CONFIG!==providerRaw||digest(JSON.stringify(material()))!==fingerprint)throw denied();
       native.validateCertificate();
       if(identities.get(environment)?.identity!==cacheIdentity)throw denied();
     }catch(error){invalidateTokenCache();if(identities.get(environment)?.identity===cacheIdentity)identities.delete(environment);throw error;}

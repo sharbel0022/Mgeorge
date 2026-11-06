@@ -1085,9 +1085,11 @@ async function companyRoute(req,res,url,path){
     catch(e){if(e.status===401&&!e.providerStatus)throw e;return json(res,200,{imported:0,duplicate:0,initial_sync_error:e.message});}
     }catch(e){
       assertSessionStillAuthorized(req);
+      const consent=consentDiagnostic(e);
+      const renewal=e.code==='renewal_required'||['BANK_CONSENT_EXPIRED','BANK_CONSENT_INVALID','BANK_ACCOUNT_SCOPE_INVALID','BANK_TRANSACTION_SCOPE_REQUIRED','CORPORATE_AUTHORIZATION_REQUIRED'].includes(consent?.code);
       bankLeases.get(connection.id).write(()=>{
       if(e.status===429||e.code==='bank_unavailable'&&e.status===503&&Number.isFinite(e.retryAfter)&&e.retryAfter>0)db.prepare('UPDATE bank_connections SET retry_after=?,last_error=? WHERE id=?').run(Date.now()+Math.max(60,e.retryAfter||60)*1000,'Bankhämtningen behöver vänta till nästa tillåtna försök.',connection.id);
-      if(e.code==='renewal_required')db.prepare("UPDATE bank_connections SET status='renewal_required',last_error=? WHERE id=?").run('Bankanslutningen behöver förnyas – koppla igen',connection.id);
+      if(renewal)db.prepare("UPDATE bank_connections SET status='renewal_required',last_error=? WHERE id=?").run(consent?.message??'Bankanslutningen behöver förnyas – koppla igen',connection.id);
       });
       throw e;
     }finally{bankSyncing.delete(connection.id);}

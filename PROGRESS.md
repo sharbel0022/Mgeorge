@@ -30,6 +30,16 @@ Ingen projekt-API-nyckel hittades i den tillgängliga lokala miljön eller Sites
 
 Verklig full CI på `76f4c182` gav 3 094/3 094 Node-tester på vardera versionen och 5 827/5 827 Sites-tester samt gröna bygg-/säkerhetskontroller. En efterföljande granskningsrättning stoppar AI-ifyllnad vid motstridiga parter och rader; dess fokuserade prov gick från 16/22 till 22/22. Senaste källans fulla CI och granskningsläge finns på PR:n. Det körda optiska utvecklingsprovet gav 46/52 korrekta förväntade fält, 0 felvärden, 1/4 kompletta dokument och 4/4 granskningar. AI-armarna är inte mätta. [Verifiering och bevarade rådata](docs/openai-invoices/VERIFICATION.md). Lokal körmiljö blev otillgänglig under arbetet; sådana avbrutna körningar räknas inte som godkända tester. [Plan](docs/openai-invoices/PLAN.md) · [Drift och begränsningar](docs/openai-invoices/OPERATIONS.md).
 
+## 2026-11-06 — PR 65: bankrättningar verifierade, verklig åtkomst fortsatt spärrad
+
+Branch `feature/95-bank-recovery` utgår från verifierad main `f3c80629d4856c2f8ecbb1ed81be391a13ac6be8`. [PR 65](https://github.com/sharbel0022/Mgeorge/pull/65) rättar tre reproducerbara fel: historisk flowkontext som blockerade Sites-status, saknad beständig återanslutningsspärr vid Node-kontoval och en fångad Node-mTLS-transport som inte kontrollerade senare avstängning.
+
+Den granskade produktionskällan `090ae0a4ef9f2fe7ce6dd8b282622f93d9e21939` passerade full [kvalitets-CI](https://github.com/sharbel0022/Mgeorge/actions/runs/42308985247): Node 22 och 24 vardera **3 025/3 025**, Sites **5 827/5 827** inklusive typkontroll och produktionsbygge, brygga **47/47**, Chromium och 1/10/100-företagsprestanda. Separat [säkerhetsacceptans](https://github.com/sharbel0022/Mgeorge/actions/runs/42308985277) gav **396/396 Node och 1 232/1 232 Sites**. Noll fail/cancel/skip/TODO i TAP-sviterna; överlappande antal summeras inte. Oberoende kodgranskning fann inget blockerande fel. Slutlig dokumentationsrevision behåller kod-/testblobbarna och dess egna jobbutfall redovisas i PR.
+
+[Bankrapport](docs/bank-recovery/README.md), [driftobservationer](docs/bank-recovery/observations.json), [verifieringskvitto](docs/bank-recovery/verification.json) och [råa RED-felutdrag](docs/bank-recovery/red-observed.json) skiljer syntetiskt godkänt från verklig åtkomst. Ursprunglig kontoscope-incident är belagd, men dess exakta felande predikat saknas. Färsk lokal status **23:06 UTC** är fortsatt `connected=false`, `reauth_required`, `BANK_RECONNECT_REQUIRED`. Cachad Enable-registrering har äldre callback; aktuell providerregistrering, bankens användar-/kontobehörighet, betrodd företagsattest, Open Payments-produktionskonfiguration och faktisk mTLS/SCA måste verifieras separat.
+
+Inga verkliga bank-/provider-API-anrop, betalningar, produktionsskrivningar, publiceringar eller statusåterställningar utfördes. Inga numeriska kvalitetsbetyg höjs; verklig bankacceptans och kommersiell aktivering är inte styrkta.
+
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 
 PR 61 är normalt mergad till `24390ef7e8cf6b2274c57804dc9c2d74d362ab12`. Full PR-kvalitet, separat säkerhetsacceptans och separat main-CI är gröna för samma källträd. Site **68** publicerades från exakt motsvarande Sites-träd och är avgränsat kontrollerad efter release. [Releasekvitto](docs/completion/release-site68.md).

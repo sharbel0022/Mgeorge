@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 1,
+  "kind": "Observed CI RED failure excerpts, not a new test execution",
+  "artifacts": [
+    {
+      "artifactId": 13545814787,
+      "zipSha256": "f17555e91518f56f298e6d22bfff0910fdb8f00db911d30554676fe09daba752",
+      "sourceCommit": "d56ebcdcb3e860777632075777694b5052f9cbe5",
+      "node": "v22.23.4",
+      "workingTreeDirty": false,
+      "suites": [
+        {
+          "name": "node-security.tap",
+          "sha256": "1d9d63e3c0c02a3cbf01f467e3c0b92d0c04032f4419abff6d11b6f62cf92de9",
+          "totals": {
+            "tests": 377,
+            "pass": 377,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "failures": []
+        },
+        {
+          "name": "sites-security.tap",
+          "sha256": "a7683f94cac2734a3b31fd03408b120c5ded4699019fcf88eee6d6378f0a03aa",
+          "totals": {
+            "tests": 1232,
+            "pass": 1225,
+            "fail": 7,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "failures": [
+            {
+              "test": "not ok 395 - bank-recovery: viewer can read status after an earlier authorization start",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: 'Du saknar behörighet till företagets bankanslutning.'",
+                "code: 'COMPANY_ACCESS_DENIED'"
+              ]
+            },
+            {
+              "test": "not ok 396 - bank-recovery: accountant can read status after an earlier authorization start",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: 'Du saknar behörighet till företagets bankanslutning.'",
+                "code: 'COMPANY_ACCESS_DENIED'"
+              ]
+            },
+            {
+              "test": "not ok 397 - bank-recovery: malformed retained flow cannot hide safe connection status",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: \"Expected property name or '}' in JSON at position 1 (line 1 column 2)\"",
+                "code: 'ERR_TEST_FAILURE'"
+              ]
+            },
+            {
+              "test": "not ok 398 - bank-recovery: foreign retained flow cannot hide safe connection status",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: 'Du saknar behörighet till företagets bankanslutning.'",
+                "code: 'COMPANY_ACCESS_DENIED'"
+              ]
+            },
+            {
+              "test": "not ok 399 - bank-recovery: old membership retained flow cannot hide safe connection status",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: 'Du saknar behörighet till företagets bankanslutning.'",
+                "code: 'COMPANY_ACCESS_DENIED'"
+              ]
+            },
+            {
+              "test": "not ok 400 - bank-recovery: invalid pending flow expiry is reported as expired without a provider read",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: |-",
+                "+ actual - expected",
+                "+ 'pending'",
+                "- 'expired'",
+                "code: 'ERR_ASSERTION'",
+                "expected: 'expired'",
+                "actual: 'pending'",
+                "operator: 'strictEqual'"
+              ]
+            },
+            {
+              "test": "not ok 401 - bank-recovery: stale completed flow identifiers are not projected into the current company context",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: 'Du saknar behörighet till företagets bankanslutning.'",
+                "code: 'COMPANY_ACCESS_DENIED'"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "artifactId": 13546284743,
+      "zipSha256": "8965b1a05fcbbe33376002cd6a183bab3906a7228c4f8969625e347a181d4f98",
+      "sourceCommit": "2c89eebda333a1255866805550535138ae1accc1",
+      "node": "v22.23.4",
+      "workingTreeDirty": false,
+      "suites": [
+        {
+          "name": "node-security.tap",
+          "sha256": "2584ddf18c28454baaac240c4254c5a0bf9cb409f7c3528f199bcce31a496bb8",
+          "totals": {
+            "tests": 396,
+            "pass": 386,
+            "fail": 10,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "failures": [
+            {
+              "test": "not ok 1 - BANK_CONSENT_INVALID",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: |-",
+                "+ actual - expected",
+                "+ 'connected'",
+                "- 'renewal_required'",
+                "code: 'ERR_ASSERTION'",
+                "expected: 'renewal_required'",
+                "actual: 'connected'",
+                "operator: 'strictEqual'"
+              ]
+            },
+            {
+              "test": "not ok 2 - BANK_CONSENT_EXPIRED",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: |-",
+                "+ actual - expected",
+                "+ 'pending_account'",
+                "- 'renewal_required'",
+                "code: 'ERR_ASSERTION'",
+                "expected: 'renewal_required'",
+                "actual: 'pending_account'",
+                "operator: 'strictEqual'"
+              ]
+            },
+            {
+              "test": "not ok 3 - BANK_ACCOUNT_SCOPE_INVALID",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: |-",
+                "+ actual - expected",
+                "+ 'pending_account'",
+                "- 'renewal_required'",
+                "code: 'ERR_ASSERTION'",
+                "expected: 'renewal_required'",
+                "actual: 'pending_account'",
+                "operator: 'strictEqual'"
+              ]
+            },
+            {
+              "test": "not ok 4 - BANK_TRANSACTION_SCOPE_REQUIRED",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: |-",
+                "+ actual - expected",
+                "+ 'pending_account'",
+                "- 'renewal_required'",
+                "code: 'ERR_ASSERTION'",
+                "expected: 'renewal_required'",
+                "actual: 'pending_account'",
+                "operator: 'strictEqual'"
+              ]
+            },
+            {
+              "test": "not ok 5 - CORPORATE_AUTHORIZATION_REQUIRED",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: |-",
+                "+ actual - expected",
+                "+ 'pending_account'",
+                "- 'renewal_required'",
+                "code: 'ERR_ASSERTION'",
+                "expected: 'renewal_required'",
+                "actual: 'pending_account'",
+                "operator: 'strictEqual'"
+              ]
+            },
+            {
+              "test": "not ok 137 - consent-reconnect-95: account selection durably fences a rejected company consent",
+              "diagnosticExcerpt": [
+                "failureType: 'subtestsFailed'",
+                "error: '5 subtests failed'",
+                "code: 'ERR_TEST_FAILURE'"
+              ]
+            },
+            {
+              "test": "not ok 252 - disabling Node banking retires captured transport and cache even if configuration is restored",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: 'Missing expected exception.'",
+                "code: 'ERR_ASSERTION'",
+                "expected:",
+                "code: 'INVALID_CLIENT_CERTIFICATE'",
+                "operator: 'throws'"
+              ]
+            },
+            {
+              "test": "not ok 253 - captured Node transport rejects disabled service false before opening a socket",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: |-",
+                "+ actual - expected",
+                "+   code: 'PROVIDER_NETWORK_ERROR'",
+                "-   code: 'INVALID_CLIENT_CERTIFICATE'",
+                "code: 'ERR_ASSERTION'",
+                "expected:",
+                "code: 'INVALID_CLIENT_CERTIFICATE'",
+                "actual:",
+                "error: 'The Open Payments connection failed.'",
+                "operator: 'rejects'"
+              ]
+            },
+            {
+              "test": "not ok 254 - captured Node transport rejects disabled service undefined before opening a socket",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: |-",
+                "+ actual - expected",
+                "+   code: 'PROVIDER_NETWORK_ERROR'",
+                "-   code: 'INVALID_CLIENT_CERTIFICATE'",
+                "code: 'ERR_ASSERTION'",
+                "expected:",
+                "code: 'INVALID_CLIENT_CERTIFICATE'",
+                "actual:",
+                "error: 'The Open Payments connection failed.'",
+                "operator: 'rejects'"
+              ]
+            },
+            {
+              "test": "not ok 255 - banking disabled during an in-flight read discards the response and retires its cache",
+              "diagnosticExcerpt": [
+                "failureType: 'testCodeFailure'",
+                "error: 'Missing expected rejection.'",
+                "code: 'ERR_ASSERTION'",
+                "expected:",
+                "code: 'INVALID_CLIENT_CERTIFICATE'",
+                "operator: 'rejects'"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "sites-security.tap",
+          "sha256": "fe530f4d54bdf787b837fc0dcf4a6cc31d1eb91dbcb3a09a14b83f5ad6bdcdc2",
+          "totals": {
+            "tests": 1232,
+            "pass": 1232,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "failures": []
+        }
+      ]
+    }
+  ]
+}

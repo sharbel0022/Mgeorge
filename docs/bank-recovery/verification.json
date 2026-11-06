@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "baselineMandatoryWorkflow": "https://github.com/sharbel0022/Mgeorge/actions/runs/42253201335",
+  "baselineMandatoryJobsPassed": 6,
+  "syntheticOnly": true,
+  "realBankAcceptance": "NOT_VERIFIED",
+  "stages": [
+    {
+      "name": "Sites regression before production fix",
+      "headCommit": "e6c106cace734eca6e0c92f106e9c67074974e2d",
+      "testedMergeCommit": "d56ebcdcb3e860777632075777694b5052f9cbe5",
+      "workflow": "https://github.com/sharbel0022/Mgeorge/actions/runs/42307276652",
+      "jobId": 128199680063,
+      "artifactId": 13545814787,
+      "node": {
+        "tests": 377,
+        "pass": 377,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "sites": {
+        "tests": 1232,
+        "pass": 1225,
+        "fail": 7,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "fullQualityWorkflow": "https://github.com/sharbel0022/Mgeorge/actions/runs/42307276822",
+      "fullQualityOutcome": "Cancelled by next source update after Node22/24, bridge, browser and performance succeeded; incomplete Sites suite is not a passing result"
+    },
+    {
+      "name": "Sites corrected; Node and captured Open Payments transport regressions before their production fixes",
+      "headCommit": "1452ffc0e48d7a1397a425a98b6cc1f18a4b6734",
+      "testedMergeCommit": "2c89eebda333a1255866805550535138ae1accc1",
+      "workflow": "https://github.com/sharbel0022/Mgeorge/actions/runs/42308154158",
+      "jobId": 128202653909,
+      "artifactId": 13546284743,
+      "node": {
+        "tests": 396,
+        "pass": 386,
+        "fail": 10,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "sites": {
+        "tests": 1232,
+        "pass": 1232,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "fullQualityWorkflow": "https://github.com/sharbel0022/Mgeorge/actions/runs/42308154148",
+      "fullNode22": {
+        "jobId": 128202767997,
+        "tests": 3025,
+        "pass": 3015,
+        "fail": 10,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "fullNode24": {
+        "jobId": 128202768084,
+        "tests": 3025,
+        "pass": 3015,
+        "fail": 10,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "name": "All production fixes with unchanged regressions",
+      "headCommit": "090ae0a4ef9f2fe7ce6dd8b282622f93d9e21939",
+      "testedMergeCommit": "f2ac5612644a079c98933857bf86e87fa213dfb1",
+      "securityWorkflow": "https://github.com/sharbel0022/Mgeorge/actions/runs/42308985277",
+      "securityJobId": 128205442801,
+      "securityArtifactId": 13548325846,
+      "nodeSecurity": {
+        "tests": 396,
+        "pass": 396,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "sitesSecurity": {
+        "tests": 1232,
+        "pass": 1232,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "fullQualityWorkflow": "https://github.com/sharbel0022/Mgeorge/actions/runs/42308985247",
+      "fullNode22": {
+        "jobId": 128205556983,
+        "tests": 3025,
+        "pass": 3025,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "fullNode24": {
+        "jobId": 128205557393,
+        "tests": 3025,
+        "pass": 3025,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "bridge": {
+        "jobId": 128205557394,
+        "tests": 47,
+        "pass": 47,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "performance": {
+        "jobId": 128205557183,
+        "result": "success",
+        "companies": [
+          1,
+          10,
+          100
+        ],
+        "externalProviderPerformance": "NOT_MEASURED"
+      },
+      "browser": {
+        "jobId": 128205557268,
+        "result": "success"
+      },
+      "fullSites": {
+        "jobId": 128205557460,
+        "artifactId": 13548327063,
+        "tests": 5827,
+        "pass": 5827,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "typecheck": "success",
+        "productionBuild": "success",
+        "dependencyAudits": "success"
+      },
+      "requiredQualityJobsPassed": 6
+    }
+  ],
+  "finalVerification": {
+    "location": "https://github.com/sharbel0022/Mgeorge/pull/65",
+    "requiredWorkflows": [
+      "Payment control checks",
+      "SaaS security acceptance"
+    ],
+    "requiredSource": "Latest PR head against verified main, with checked-out merge SHA and source manifests in receipts",
+    "note": "This receipt freezes the observed GREEN source and exact changed code/test blob SHAs. The following documentation-only update must retain those blobs; final PR-head job IDs and results are recorded in the PR description. Earlier success is not presented as a new unrun CI result."
+  },
+  "localBeforeExecutorLoss": {
+    "nodeBaseline": {
+      "tests": 49,
+      "pass": 49
+    },
+    "sitesBaseline": {
+      "pass": 127,
+      "processFailures": 2,
+      "signals": [
+        "SIGKILL"
+      ]
+    },
+    "sitesLimitedRetry": {
+      "pass": 4,
+      "processFailures": 1,
+      "signal": "SIGKILL"
+    },
+    "unqualifiedFirstStart": "Rejected by SAAS_TEST_ONLY before test execution because NODE_ENV=test was absent",
+    "limitation": "Local Sites attempts are failures, not passing verification. No local post-fix result is claimed."
+  },
+  "safety": {
+    "providerNetwork": "Stubs or loopback TLS only",
+    "realBankPayments": 0,
+    "productionStateChanges": 0,
+    "statusResets": 0
+  },
+  "testedFiles": [
+    {
+      "path": "scripts/run-saas-security-acceptance.mjs",
+      "gitBlobSha": "3dc8765dce2de854624d809f95ada195f11d803f"
+    },
+    {
+      "path": "sites/lib/banking/service.ts",
+      "gitBlobSha": "9783332736e5b4dc8e307c1df072f05b02103354"
+    },
+    {
+      "path": "sites/tests/banking-security.test.mjs",
+      "gitBlobSha": "028e889eb00df2ee9853582daa841fad7eb1e513"
+    },
+    {
+      "path": "src/banking/openpayments-runtime-transport.js",
+      "gitBlobSha": "b217e6c142f3ed962120b01a9f50a26eff494bb5"
+    },
+    {
+      "path": "src/server.js",
+      "gitBlobSha": "d2d8f3e5bacc4b902057c9d7e7dbb484b9e62fdd"
+    },
+    {
+      "path": "test/consent-reconnect-95.test.js",
+      "gitBlobSha": "d2c3e22dd5f657576fbe081b0adc1785eec9845e"
+    },
+    {
+      "path": "test/openpayments-runtime-disable.test.js",
+      "gitBlobSha": "6b423af54df155df914ce657006ad216bb6cb6af"
+    }
+  ],
+  "observedRedFailureExcerpts": "red-observed.json",
+  "review": {
+    "reviewedCommit": "090ae0a4ef9f2fe7ce6dd8b282622f93d9e21939",
+    "kind": "Independent read-only code and evidence review by a separate agent",
+    "critical": 0,
+    "important": 0,
+    "confirmedMinor": 0,
+    "productionChangesRequested": 0,
+    "limits": [
+      "No independent execution by the reviewer; root inspected CI logs and later raw RED TAP artifacts",
+      "No real provider, BankID, production certificate or corporate permission acceptance",
+      "Original incident predicate cannot be reconstructed without its provider response",
+      "No exhaustive new audit of unchanged pagination, retry, tenant or distributed token code",
+      "In-flight transport regression disables before the native response is returned; arbitrary later streaming timing is outside this test's coverage"
+    ],
+    "disposition": "Accept the narrow code change subject to the required final PR gates. Real bank acceptance remains blocked. The unchanged areas retain their existing full synthetic regression gates; production and arbitrary stream-timing coverage are not claimed."
+  }
+}
