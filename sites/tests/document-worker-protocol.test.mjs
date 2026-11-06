@@ -69,7 +69,7 @@ import {runSitesOcr} from '../../src/sites-ocr-pull.js';
 const identityOf=job=>({id:job.id,lease:job.lease,sha256:job.sha256});
 test('version 2 leases expose an opaque run receipt identity and a bounded deadline',async t=>{
   const f=await fixture(t);await f.document('v2');const job=await f.lease();
-  assert.equal(job.protocol,2);assert.match(job.run_id,/^[a-f0-9]{64}$/);
+  assert.equal(job.protocol,2);assert.match(job.run_id,/^[A-Za-z0-9_-]{43}$/);
   assert.ok(Date.parse(job.lease_until)>Date.now());assert.ok(Date.parse(job.lease_until)<=Date.now()+180000);
   assert.notEqual(job.run_id,job.lease);
 });
@@ -198,4 +198,91 @@ for(const lost of ['before acceptance','after acceptance'])test('real worker and
   assert.equal(sends,lost==='before acceptance'?2:1);
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+});
+
+test('a replacement run cannot settle an older accepted receipt',async t=>{
+  const f=await fixture(t);await f.document('replaced-receipt');const old=await f.lease();
+  await f.complete(old);await f.processing.retryInvoiceDocument(f.owner,old.id);
+  const replacement=await f.lease();assert.notEqual(replacement.run_id,old.run_id);await f.complete(replacement);
+  const oldReceipt=await(await f.worker('receipt',identityOf(old))).json();
+  const newReceipt=await(await f.worker('receipt',identityOf(replacement))).json();
+  assert.equal(oldReceipt.accepted,true);assert.equal(oldReceipt.settled,false);
+  assert.equal(newReceipt.accepted,true);assert.equal(newReceipt.settled,true);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,2);
+});
+test('concurrent completion after receipt acceptance stays pending without another history row',async t=>{
+  const f=await fixture(t);await f.document('overlap');const job=await f.lease(),pause=pauseAfterReceipt(f);
+  const completing=f.complete(job);await pause.started;
+  try{
+    assert.deepEqual(await(await f.complete(job)).json(),{ignored:true});
+    const receipt=await(await f.worker('receipt',identityOf(job))).json();
+    assert.equal(receipt.accepted,true);assert.equal(receipt.settled,false);
+    assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);
+  }finally{pause.release();await completing;}
+});
+for(const attempt of [1,2])test('three accepted expired jobs at attempt '+attempt+' remain protected beyond the recovery batch',async t=>{
+  const f=await fixture(t),jobs=[];
+  for(const id of ['a','b','c']){
+    await f.document(id);const job=await f.lease();await f.complete(job);jobs.push(job);
+  }
+  const history=f.sql.prepare('SELECT * FROM document_extractions ORDER BY document_id').all();
+  for(const job of jobs)f.sql.prepare("UPDATE document_jobs SET state='processing',attempts=?,lease=?,lease_until='2000-01-01' WHERE document_id=?").run(attempt,job.lease,job.id);
+  assert.equal(await f.lease(),null);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_jobs WHERE attempts<>?').get(attempt).n,0);
+  assert.deepEqual(f.sql.prepare('SELECT * FROM document_extractions ORDER BY document_id').all(),history);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+});
+for(const change of ['expiry','replacement','original'])test('heartbeat rechecks '+change+' under the write lock',async t=>{
+  const f=await fixture(t);await f.document('write-race');const job=await f.lease(),prepare=f.d1.prepare.bind(f.d1);
+  let concurrent;
+  f.d1.prepare=query=>{
+    const statement=prepare(query);
+    if(query.startsWith('UPDATE document_jobs SET lease_until=?')){const run=statement.run.bind(statement);statement.run=async()=>{
+      if(change==='expiry')f.sql.prepare("UPDATE document_jobs SET lease_until='2000-01-01'").run();
+      if(change==='replacement')f.sql.prepare("UPDATE document_jobs SET lease='replacement'").run();
+      if(change==='original')f.sql.prepare('UPDATE documents SET sha256=?').run('0'.repeat(64));
+      concurrent={...f.sql.prepare('SELECT * FROM document_jobs').get()};return run();
+    };}
+    return statement;
+  };
+  assert.equal((await f.worker('heartbeat',identityOf(job))).status,409);
+  assert.ok(concurrent);assert.deepEqual({...f.sql.prepare('SELECT * FROM document_jobs').get()},concurrent);
+});
+test('an original-store exception named like corruption remains a transport failure',async t=>{
+  const f=await fixture(t);await f.document('untrusted-error');const job=await f.lease();
+  f.env.BUCKET.get=async()=>{throw Error('original_integrity');};
+  assert.equal((await f.complete(job)).status,503);
+  const row=f.sql.prepare('SELECT * FROM document_jobs').get();
+  assert.equal(row.state,'processing');assert.equal(row.lease,job.lease);assert.equal(row.error_code,'');
+});
+test('a lost OCR-failure acknowledgement never fabricates an accepted extraction receipt',async t=>{
+  const f=await fixture(t);await f.document('ocr-failure');const job=await f.lease();
+  assert.deepEqual(await(await f.complete(job,true)).json(),{ok:true});
+  assert.equal((await f.worker('receipt',identityOf(job))).status,409);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,0);
+  assert.equal(f.sql.prepare('SELECT attempts FROM document_jobs').get().attempts,1);
+});
+test('current failure counts separate transport, OCR, integrity and missing document information',async t=>{
+  const f=await fixture(t);
+  for(const [id,error,state] of [['transport','original_unavailable','queued'],['ocr','cloud_ocr_failed','failed'],['integrity','original_integrity','failed'],['information','','needs_review']]){
+    await f.document(id);
+    f.sql.prepare('INSERT INTO document_jobs(owner,document_id,state,engine,error_code,available_at,updated_at) VALUES(?,?,?,?,?,?,?)').run(f.owner,id,state,'local',error,new Date().toISOString(),new Date().toISOString());
+  }
+  const before=f.sql.prepare('SELECT * FROM document_jobs ORDER BY document_id').all();
+  const status=await f.processing.processingStatus(f.owner);
+  assert.deepEqual(status.failure_summary,{basis:'current_jobs',transport:1,ocr:1,integrity:1,interrupted:0,document_review:1});
+  assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs ORDER BY document_id').all(),before);
+});
+
+for(const defect of ['missing receipt','changed original metadata'])test('an early accepted result with '+defect+' is held without an automatic retry loop',async t=>{
+  const f=await fixture(t);await f.document('held');const job=await f.lease();await f.complete(job);
+  const original=f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction;
+  f.sql.prepare("UPDATE document_jobs SET state='processing',lease=?,lease_until='2000-01-01'").run(job.lease);
+  if(defect==='missing receipt')f.sql.prepare('DELETE FROM document_extractions').run();
+  else f.sql.prepare('UPDATE documents SET sha256=?').run('0'.repeat(64));
+  assert.equal(await f.lease(),null);
+  const row=f.sql.prepare('SELECT * FROM document_jobs').get();
+  assert.equal(row.state,'failed');assert.equal(row.attempts,1);assert.equal(row.extraction,original);
+  assert.equal(row.error_code,defect==='missing receipt'?'result_receipt_missing':'original_integrity');
+  assert.equal(await f.lease(),null);
 });

@@ -82,8 +82,17 @@ export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentPro
     const lost=new Promise((_,reject)=>{rejectLost=reject;});
     void lost.catch(()=>{});
     const beat=async()=>{
-      const value=await json('/api/ocr-worker/heartbeat',jobIdentity(job),8192);
-      if(value.ok!==true||value.run_id!==job.run_id||!timestamp(value.lease_until))throw protocolFailure('LEASE_HEARTBEAT_REJECTED');
+      for(let attempt=0;attempt<2;attempt++){
+        try{
+          const value=await json('/api/ocr-worker/heartbeat',jobIdentity(job),8192);
+          if(value.ok!==true||value.run_id!==job.run_id||!timestamp(value.lease_until))throw protocolFailure('LEASE_HEARTBEAT_REJECTED');
+          return;
+        }catch(error){
+          const http=httpFailures.get(error);
+          if(attempt===1||bodyLimitFailures.has(error)||retryDeferredFailures.has(error)||(http&&!(http.http_status>=500)))throw error;
+          await delay(250);
+        }
+      }
     };
     await beat();
     const schedule=()=>{
@@ -103,6 +112,7 @@ export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentPro
       },
     };
   };
+  const acceptedReceipts=new WeakSet(),pendingReceipts=new WeakSet();
   const complete=async(job,result)=>{
     const body={...jobIdentity(job),...result};
     if(job.protocol!==2)return json('/api/ocr-worker/complete',body,16384);
@@ -121,9 +131,10 @@ export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentPro
       if(receipt.id!==job.id||receipt.sha256!==job.sha256||receipt.run_id!==job.run_id||typeof receipt.accepted!=='boolean')throw protocolFailure('RESULT_RECEIPT_INVALID');
       if(receipt.accepted){
         if(typeof receipt.settled!=='boolean'||!timestamp(receipt.accepted_at))throw protocolFailure('RESULT_RECEIPT_INVALID');
-        if(!receipt.settled)return {accepted_pending:true};
+        if(!receipt.settled){const pending={};pendingReceipts.add(pending);return pending;}
         if(!terminal(receipt.state))throw protocolFailure('RESULT_RECEIPT_INVALID');
-        return {state:receipt.state,registered:receipt.state==='registered',receipt_accepted:true};
+        const accepted={state:receipt.state,registered:receipt.state==='registered'};
+        acceptedReceipts.add(accepted);return accepted;
       }
       if(receipt.retryable!==true||attempt===2)throw failure;
       // Only the same immutable result is resent, after a fresh absence/lease
@@ -153,7 +164,7 @@ export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentPro
       if(lease.job===null)break;const job=lease.job;
       if(!job||typeof job!=='object')throw Error('invalid_job');
       if(!/^[a-zA-Z0-9_-]{1,100}$/.test(job.id)||!/^[A-Za-z0-9_-]{43}$/.test(job.lease)||!['application/pdf','image/png','image/jpeg','image/webp'].includes(job.mime)||!Number.isInteger(job.size)||job.size>MAX_BYTES||job.size<1||!/^[a-f0-9]{64}$/.test(job.sha256))throw Error('invalid_job');
-      if(job.protocol!==undefined&&(job.protocol!==2||!/^[a-f0-9]{64}$/.test(job.run_id)||!timestamp(job.lease_until)))throw Error('invalid_job');
+      if(job.protocol!==undefined&&(job.protocol!==2||!/^[A-Za-z0-9_-]{43}$/.test(job.run_id)||!timestamp(job.lease_until)))throw Error('invalid_job');
       let heartbeat;
       try{
         if(job.protocol===2)heartbeat=await startHeartbeat(job);
@@ -174,10 +185,10 @@ export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentPro
         // race a successful terminal transition and erase its acknowledgement.
         await heartbeat?.stop();
         const completion=await complete(job,result);
-        if(completion.accepted_pending)return {processed,failed,accepted_pending:1,status_unknown:true};
-        if(!completion.receipt_accepted&&!completionAccepted(result,completion))throw Error('completion_rejected');
+        if(pendingReceipts.has(completion))return {processed,failed,accepted_pending:1,status_unknown:true};
+        if(!acceptedReceipts.has(completion)&&!completionAccepted(result,completion))throw Error('completion_rejected');
         settled++;
-        if(result.error&&!completion.receipt_accepted)failed++;else processed++;
+        if(result.error&&!acceptedReceipts.has(completion))failed++;else processed++;
       }finally{
         // Cleanup cannot replace an accepted result or a more specific failure.
         if(heartbeat)await heartbeat.stop().catch(()=>{});

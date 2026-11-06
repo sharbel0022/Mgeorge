@@ -8,7 +8,7 @@ function fixture({complete, receipt, heartbeat, extract, protocol=2}={}) {
   const token=randomBytes(32).toString('base64url'),lease=randomBytes(32).toString('base64url');
   const bytes=Buffer.from('synthetic retained original for receipt recovery');
   const job={id:'synthetic-receipt-job',lease,mime:'image/png',size:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')};
-  if(protocol===2)Object.assign(job,{protocol:2,run_id:createHash('sha256').update(JSON.stringify(['document-job-v1','synthetic-owner',job.id,lease])).digest('hex'),lease_until:new Date(Date.now()+180000).toISOString()});
+  if(protocol===2)Object.assign(job,{protocol:2,run_id:createHash('sha256').update(JSON.stringify(['document-job-v1','synthetic-owner',job.id,lease])).digest('base64url'),lease_until:new Date(Date.now()+180000).toISOString()});
   const f={job,bodies:[],receipts:0,heartbeats:0,extractions:0,leases:0,downloads:0,stored:false};
   f.accepted=(settled=true)=>({accepted:true,settled,state:settled?'needs_review':'processing',id:job.id,sha256:job.sha256,run_id:job.run_id,accepted_at:new Date().toISOString()});
   f.missing=()=>({accepted:false,retryable:true,id:job.id,sha256:job.sha256,run_id:job.run_id});
@@ -116,4 +116,17 @@ test('heartbeats continue during extraction and stop once the run settles',async
   assert.ok(f.heartbeats>first);
   release();assert.deepEqual(await running,{processed:1,failed:0});
   const final=f.heartbeats;t.mock.timers.tick(30000);await immediate();assert.equal(f.heartbeats,final);
+});
+
+for(const protocol of [1,2])for(const payload of [{receipt_accepted:true},{ignored:true,receipt_accepted:true}])test('protocol '+protocol+' cannot accept a remote internal receipt marker '+JSON.stringify(payload),async()=>{
+  const f=fixture({protocol,complete:()=>Response.json(payload)});
+  await assert.rejects(f.run());assert.equal(f.extractions,1);
+});
+for(const protocol of [1,2])test('protocol '+protocol+' does not turn an acknowledged OCR failure into success through a remote receipt marker',async()=>{
+  const f=fixture({protocol,extract:()=>({error:true}),complete:()=>Response.json({ok:true,receipt_accepted:true})});
+  assert.deepEqual(await f.run(),{processed:0,failed:1});
+});
+for(const protocol of [1,2])test('protocol '+protocol+' ignores remote pending markers on a valid completion',async()=>{
+  const f=fixture({protocol,complete:()=>Response.json({state:'needs_review',accepted_pending:true})});
+  assert.deepEqual(await f.run(),{processed:1,failed:0});
 });
