@@ -30,7 +30,7 @@ async function fixture(t){
     './server':server,'./domain':domainUrl,
     './banking/security':new URL('../lib/banking/security.ts',import.meta.url).href,
     './invoice-fields.js':data(fields),
-    './openai-invoices/sites.js':new URL('../lib/openai-invoices/sites.js',import.meta.url).href,
+    './openai-invoices/index.js':new URL('../lib/openai-invoices/index.js',import.meta.url).href,
     './server-pdf':data('export async function serverPdfText(){const f='+reference+';f.pdfCalls++;await f.onPdf?.(f.pdfCalls);return {text:"Synthetic unreadable invoice",method:"pdf",confidence:100};}'),
     './customer-messages':data('export async function reconcileAndPrepare(){}'),
   };

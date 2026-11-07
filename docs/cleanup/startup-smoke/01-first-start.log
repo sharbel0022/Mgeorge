@@ -1,0 +1,18 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> mgeorge-fakturakoll@0.1.0 start
+> node scripts/start/index.mjs
+
+MG Fakturakoll — Node 24.22.1, npm 11.9.0
+Säker lokal .env skapad. Spara en privat säkerhetskopia av krypteringsnyckeln.
+Installerar låsta lokala beroenden med npm ci …
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+added 21 packages in 1s
+MG Fakturakoll: http://localhost:34979
+OpenAI: disabled (OPENAI_DISABLED); lokal konfiguration, ingen leverantörsverifiering
+Gmail: ej konfigurerad (valfri)
+Bank: ej konfigurerad (valfri)
+Bankgiro: källa saknas (valfri)
+Redo: http://localhost:34979 — backend, frontend och dokumentarbetare tillgängliga.
+Dokumentarbetare startas vid behov. Avsluta med Ctrl+C eller npm run stop.

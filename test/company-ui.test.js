@@ -56,3 +56,13 @@ test('Node offers remaining memberships after active revocation while keeping fi
   const switched=f.run("changeCompany('b')");await flush();const call=f.calls.find(call=>call.input==='/api/companies/active');assert.ok(call);
   call.resolve(Response.json({context:context('b',4)}));await switched;assert.equal(f.window.target,'/');
 });
+
+
+test('Node AI diagnostics are offered only to the current integration administrator',async t=>{
+ for(const role of ['owner','admin','accountant','viewer']){
+  const value=directory();value.context.role=role;value.companies[0].role=role;
+  const f=fixture(t,{directoryOverride:value});await f.run('initializeCompanyClient()');
+  f.run("state.tab='settings';state.me.role='owner';render()");
+  assert.equal(f.html().includes('data-action="ai-status"'),['owner','admin'].includes(role));
+ }
+});

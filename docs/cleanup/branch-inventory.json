@@ -1,0 +1,3659 @@
+{
+  "schema_version": 1,
+  "repository": "sharbel0022/Mgeorge",
+  "generated_at": "2026-11-07T11:16:37.782478+00:00",
+  "local_graph_started_at": "2026-11-07T11:16:37.252745+00:00",
+  "cached_remote_inventory_started_at": "2026-11-07T10:46:49.529Z",
+  "cached_remote_inventory_written_at": "2026-11-07T11:12:33.752Z",
+  "source_inventory": "/workspace/scratch/2236a42849dc/release-inventory/github-inventory.json",
+  "comparison_ref": "refs/remotes/origin/main",
+  "comparison_sha": "4c7b210a0553314c2d9ce95804b892b891f4fe36",
+  "cached_remote_main_sha": "4c7b210a0553314c2d9ce95804b892b891f4fe36",
+  "comparison_matches_cached_remote_main": true,
+  "remote_heads_refreshed_for_this_followup": false,
+  "remote_branch_count": 80,
+  "cached_open_pr_count": 0,
+  "category_counts": {
+    "unapproved experimental": 18,
+    "duplicate": 2,
+    "already integrated": 58,
+    "active": 1,
+    "no longer needed": 1
+  },
+  "disposition_counts": {
+    "hold_unverified_work": 18,
+    "deletion_candidate_after_final_checks": 59,
+    "retain_active_or_interrupted_work": 1,
+    "retain_main": 1,
+    "archive_eligible_after_verified_bundle": 1
+  },
+  "graph_ancestor_count": 62,
+  "graph_nonancestor_count": 18,
+  "graph_unknown_count": 0,
+  "conditional_deletion_candidate_count": 59,
+  "category_definitions": {
+    "already integrated": "Exact tip is an ancestor of the frozen main commit; main itself must be retained.",
+    "unique approved": "Nonancestor tip exactly matches a merged PR head; accepted by merge, with content equivalence and formal approving-review status not established.",
+    "unapproved experimental": "Nonancestor or unknown tip without verified exact-tip acceptance; classification means approval and activity are unverified, not that experimental intent is proved.",
+    "duplicate": "Exact tip equals another current branch tip. Nonancestor duplicates remain on hold.",
+    "active": "Known interrupted WIP or an open PR; retain.",
+    "no longer needed": "Conditional category for the historical recovery branch: archive eligible only after a durable bundle covering its exact head is verified."
+  },
+  "archive_evidence": {
+    "local_archive_prefix": "refs/tags/archive/mgeorge-20261107/",
+    "observed_local_tag_count": 79,
+    "remote_expected_prefix_refs_from_prior_snapshot": [],
+    "durable_bundle_or_remote_archive_verified_in_this_audit": false,
+    "prior_claims": {
+      "claimed_archived_heads": 79,
+      "claimed_planned_deletions": 77,
+      "bundle_sha256": "e06b28307bf4e67bca742719513748a8707e414c10989ac530c77d88164c83aa",
+      "archive_sha256": "6bb162b04554e5c1fc3bb8996b0150458a2a1c929ea69deaa1b68a7d3d697170",
+      "incremental_archive_sha256": "cc3a2e2f1002f09c999aed7138dab9cf767c874188236d89514435981ea7a4da"
+    }
+  },
+  "limitations": [
+    "This follow-up reads the local graph and cached GitHub JSON only. No fresh remote ref, PR, review, or status queries were performed.",
+    "Origin/main was resolved once to an immutable SHA before all comparisons.",
+    "A branch with graph-unique commits may still be semantically integrated through squash, rebase, or cherry-pick; patch equivalence was not checked.",
+    "Merged-PR acceptance is not interchangeable with a submitted GitHub APPROVED review. The cached reviews for PR63-69 were empty.",
+    "No open PR and no graph-unique commit do not establish collaborator inactivity. Candidate deletion remains conditional on unchanged refs and activity verification.",
+    "Historical recovery branch is archive eligible after exact-head bundle verification, not a permanent keep branch.",
+    "No branches or PRs were modified or deleted. Only the two requested docs/cleanup report files were written."
+  ],
+  "branches": [
+    {
+      "name": "checkpoint/gmail-0600-observation-20261106-5cd67b18",
+      "head_sha": "5cd67b18792505139234de68533516fc33067ace",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/gmail-0600-observation-20261106-5cd67b18"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "5cd67b18792505139234de68533516fc33067ace",
+          "committed_date": "2026-11-06",
+          "subject": "docs: record read-only Gmail 06:00 schedule observation"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/gmail-0700-observation-20261106-1ec960d9",
+      "head_sha": "1ec960d9de4f896f7f481bfdc0e0fc9cc47337fa",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/gmail-0700-observation-20261106-1ec960d9"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "1ec960d9de4f896f7f481bfdc0e0fc9cc47337fa",
+          "committed_date": "2026-11-06",
+          "subject": "docs: preserve nominal 07:00 Gmail run and matching-result diagnosis"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/gmail-next-run-diagnostic-20261106-0611",
+      "head_sha": "fe7195ae1d6ffeb6ac52c37131c6b062f7c9f24d",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/gmail-next-run-diagnostic-20261106-0611"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "fe7195ae1d6ffeb6ac52c37131c6b062f7c9f24d",
+          "committed_date": "2026-11-06",
+          "subject": "Record one scheduled Gmail diagnostic without changing cadence"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/ocr-analysis-recovery-20261106-0532",
+      "head_sha": "d5e9451ceff439ff7ae60799de58e8ff00971eb8",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/ocr-analysis-recovery-20261106-0532"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "d5e9451ceff439ff7ae60799de58e8ff00971eb8",
+          "committed_date": "2026-11-06",
+          "subject": "docs(quality8): preserve c5 OCR analysis during environment outage"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/ocr-capacity-diagnosis-20261106-d5ae148f",
+      "head_sha": "d5ae148f4847e87b30e2e084494e3f44765afc27",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/ocr-capacity-diagnosis-20261106-d5ae148f"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "d5ae148f4847e87b30e2e084494e3f44765afc27",
+          "committed_date": "2026-11-06",
+          "subject": "docs: diagnose ordinary cloud OCR capacity and observed run gap"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/payment-startup-recovery-20261106-053654",
+      "head_sha": "77d4fcf8a506a03ed03393a89be07f3d5e886e8d",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/payment-startup-recovery-20261106-053654"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "77d4fcf8a506a03ed03393a89be07f3d5e886e8d",
+          "committed_date": "2026-11-06",
+          "subject": "docs: preserve startup contention RED and unapplied repair after environment outage"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/pr60-cancellation-final-20261106-0648",
+      "head_sha": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+      "protected": false,
+      "category": "duplicate",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 60,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/60",
+          "head_ref": "feature/rating8-sqlite-startup-20261106",
+          "head_sha": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+          "merged_at": "2026-11-06T07:00:00Z",
+          "merge_commit_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [
+        "feature/rating8-sqlite-startup-20261106"
+      ],
+      "duplicate_canonical_branch": "feature/rating8-sqlite-startup-20261106",
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/pr60-cancellation-final-20261106-0648",
+        "refs/tags/archive/mgeorge-20261107/feature/rating8-sqlite-startup-20261106"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR.",
+        "Exact head is shared with feature/rating8-sqlite-startup-20261106."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/pr60-ci-recovery-20261106-060352",
+      "head_sha": "93b39c641a542cf8add015b63b253de2926059e5",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/pr60-ci-recovery-20261106-060352"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "93b39c641a542cf8add015b63b253de2926059e5",
+          "committed_date": "2026-11-06",
+          "subject": "docs: archive verified PR60 CI and original terminal job logs"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/pr60-final-ci-520e2271-20261106-070909",
+      "head_sha": "2bf147fd2688313128e64028ebc4300472100794",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/pr60-final-ci-520e2271-20261106-070909"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "2bf147fd2688313128e64028ebc4300472100794",
+          "committed_date": "2026-11-06",
+          "subject": "docs: archive final PR60 head520 CI and full original job logs"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/rating8-current-20261106-wave6",
+      "head_sha": "c57c694d1baf58777b23b1f4d1b21f41a947d5a7",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/rating8-current-20261106-wave6"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "c57c694d1baf58777b23b1f4d1b21f41a947d5a7",
+          "committed_date": "2026-11-06",
+          "subject": "docs: record verified main and failed native publication without raising ratings"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/rating8-interruption-20261106-0529",
+      "head_sha": "3a2184929aaf65bfa67ac7426cf8045f2cbda8a9",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/rating8-interruption-20261106-0529"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "No completed PR exactly matches this current tip; current-tip ancestry independently proves its history is integrated."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/rating8-status-20261106-0621",
+      "head_sha": "c1525814ea6e5b41ec0e4176fb30715cc5343b29",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/rating8-status-20261106-0621"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "c1525814ea6e5b41ec0e4176fb30715cc5343b29",
+          "committed_date": "2026-11-06",
+          "subject": "Update current quality evidence without changing scores or publication claims"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/startup-cancellation-fix-20261106-064156",
+      "head_sha": "165e8181e24b812901136a11b31d7b0bc21de3be",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/startup-cancellation-fix-20261106-064156"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "No completed PR exactly matches this current tip; current-tip ancestry independently proves its history is integrated."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/startup-cancellation-red-20261106-063435",
+      "head_sha": "f0e845bb87ee08d15fa96cb75879849493aeb1fd",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [
+        "fix/startup-cancellation-red-20261106-0643"
+      ],
+      "duplicate_canonical_branch": "checkpoint/startup-cancellation-red-20261106-063435",
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/startup-cancellation-red-20261106-063435",
+        "refs/tags/archive/mgeorge-20261107/fix/startup-cancellation-red-20261106-0643"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "No completed PR exactly matches this current tip; current-tip ancestry independently proves its history is integrated."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/startup-cancellation-red-f0e845bb-20261106-44c52893",
+      "head_sha": "44c5289383f23d2cc8e9f4d00f1ba2dc1297bb44",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/startup-cancellation-red-f0e845bb-20261106-44c52893"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "44c5289383f23d2cc8e9f4d00f1ba2dc1297bb44",
+          "committed_date": "2026-11-06",
+          "subject": "docs: preserve first expected startup-cancellation RED attempt"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/startup-main-ci-20261106",
+      "head_sha": "abe08e383a1838c545fba13a4cf367998900ad89",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/startup-main-ci-20261106"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "abe08e383a1838c545fba13a4cf367998900ad89",
+          "committed_date": "2026-11-06",
+          "subject": "docs: archive independently verified first main startup CI"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/startup-review-20261106",
+      "head_sha": "819bc206f7c21c0f6f8ce0a490c36fbfb4047579",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/startup-review-20261106"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "819bc206f7c21c0f6f8ce0a490c36fbfb4047579",
+          "committed_date": "2026-11-06",
+          "subject": "docs: preserve independent startup NOT READY review"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/startup-review-followup-20261106",
+      "head_sha": "955fcb98333c36e54f7e3e580f7fd70a5ae21292",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/startup-review-followup-20261106"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "955fcb98333c36e54f7e3e580f7fd70a5ae21292",
+          "committed_date": "2026-11-06",
+          "subject": "docs: preserve independent static P2 P3 follow-up review"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "checkpoint/wave5-ci-recovery-20261106-6848bdc1",
+      "head_sha": "6848bdc1fdb98c98405caca67fafd2e3a203d752",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 1,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/wave5-ci-recovery-20261106-6848bdc1"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "6848bdc1fdb98c98405caca67fafd2e3a203d752",
+          "committed_date": "2026-11-06",
+          "subject": "docs: preserve original PR59 and failed main237 CI recovery evidence"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "codex/backup-security-stabilization-20261102",
+      "head_sha": "bb4d40333e252ebd7067515cf2c9ba8e72419f7e",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 15,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/15",
+          "head_ref": "codex/backup-security-stabilization-20261102",
+          "head_sha": "bb4d40333e252ebd7067515cf2c9ba8e72419f7e",
+          "merged_at": "2026-11-02T20:13:19Z",
+          "merge_commit_sha": "def0349e965a697831cfe3f1c75c946e404f6a1e",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        15
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 15,
+        "head_sha": "bb4d40333e252ebd7067515cf2c9ba8e72419f7e",
+        "merged_at": "2026-11-02T20:13:19Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/backup-security-stabilization-20261102"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "codex/bankgiro-source-readiness-20261103",
+      "head_sha": "944fe16f864b55b3762b31ff808bded9d6e34c16",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 34,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/34",
+          "head_ref": "codex/bankgiro-source-readiness-20261103",
+          "head_sha": "944fe16f864b55b3762b31ff808bded9d6e34c16",
+          "merged_at": "2026-11-03T10:44:43Z",
+          "merge_commit_sha": "c367fcd94594db8aa892bc900a813177ec498d04",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        34
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 34,
+        "head_sha": "944fe16f864b55b3762b31ff808bded9d6e34c16",
+        "merged_at": "2026-11-03T10:44:43Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/bankgiro-source-readiness-20261103"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "codex/bankgiro-source-readiness-receipt-20261103",
+      "head_sha": "fd81177aad47e0a17341189b3f2197c05653e7e7",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 35,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/35",
+          "head_ref": "codex/bankgiro-source-readiness-receipt-20261103",
+          "head_sha": "fd81177aad47e0a17341189b3f2197c05653e7e7",
+          "merged_at": "2026-11-03T19:04:04Z",
+          "merge_commit_sha": "14a042abd37fa455d08da9dfcc096ef4f603b512",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        35
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 35,
+        "head_sha": "fd81177aad47e0a17341189b3f2197c05653e7e7",
+        "merged_at": "2026-11-03T19:04:04Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/bankgiro-source-readiness-receipt-20261103"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "codex/final-ui-quality-2026-11-02",
+      "head_sha": "72ce0daa891fccffc1d9112c3c8c45fa6901c672",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 17,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/17",
+          "head_ref": "codex/final-ui-quality-2026-11-02",
+          "head_sha": "72ce0daa891fccffc1d9112c3c8c45fa6901c672",
+          "merged_at": "2026-11-02T20:52:56Z",
+          "merge_commit_sha": "79e7aa2acf78925c23d106fa826d92c25c642579",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        17
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 17,
+        "head_sha": "72ce0daa891fccffc1d9112c3c8c45fa6901c672",
+        "merged_at": "2026-11-02T20:52:56Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/final-ui-quality-2026-11-02"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "codex/ocr-quality-20261102",
+      "head_sha": "8b87098ebd899cc6f118fcb43a5aca4dcb12db42",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 19,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/19",
+          "head_ref": "codex/ocr-quality-20261102",
+          "head_sha": "8b87098ebd899cc6f118fcb43a5aca4dcb12db42",
+          "merged_at": "2026-11-02T20:29:28Z",
+          "merge_commit_sha": "8c612353b665d89e2d45a264eacf2c533ade4bef",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        19
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 19,
+        "head_sha": "8b87098ebd899cc6f118fcb43a5aca4dcb12db42",
+        "merged_at": "2026-11-02T20:29:28Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/ocr-quality-20261102"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "codex/rating8-reliability-20261105",
+      "head_sha": "e42b05a8b78e77a3210be00da0b0231454a29233",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 48,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/48",
+          "head_ref": "codex/rating8-reliability-20261105",
+          "head_sha": "e42b05a8b78e77a3210be00da0b0231454a29233",
+          "merged_at": "2026-11-05T18:06:11Z",
+          "merge_commit_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        48
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 48,
+        "head_sha": "e42b05a8b78e77a3210be00da0b0231454a29233",
+        "merged_at": "2026-11-05T18:06:11Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/rating8-reliability-20261105"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "codex/saas-master-integration-20261104",
+      "head_sha": "0d977408d79921c15a46035540159b3cb7bdca86",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 2,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/saas-master-integration-20261104"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "0d977408d79921c15a46035540159b3cb7bdca86",
+          "committed_date": "2026-11-05",
+          "subject": "WIP: preserve interrupted company bank integration and stop checkpoint"
+        },
+        {
+          "sha": "1f4e7d42fc8505d1c99401f37a08311a3878dcd9",
+          "committed_date": "2026-11-04",
+          "subject": "docs: record provider main CI backup verification and joined contract"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "codex/seven-agent-contracts-20261102",
+      "head_sha": "75418773829e49e99bf7db64c34e8e0ba8577af2",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 22,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/22",
+          "head_ref": "codex/seven-agent-contracts-20261102",
+          "head_sha": "75418773829e49e99bf7db64c34e8e0ba8577af2",
+          "merged_at": "2026-11-02T21:49:37Z",
+          "merge_commit_sha": "b65273500c214a4e16b880e3840dac90d8bd7401",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        22
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 22,
+        "head_sha": "75418773829e49e99bf7db64c34e8e0ba8577af2",
+        "merged_at": "2026-11-02T21:49:37Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/seven-agent-contracts-20261102"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "codex/seven-agent-delivery-20261102",
+      "head_sha": "b86efe8adabc79b2feba419fbd307faaa7da390e",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 31,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/31",
+          "head_ref": "codex/seven-agent-delivery-20261102",
+          "head_sha": "b86efe8adabc79b2feba419fbd307faaa7da390e",
+          "merged_at": "2026-11-02T23:45:17Z",
+          "merge_commit_sha": "2736ce06ceae3f43dcb3bef505d10b42e4224c8c",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        31
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 31,
+        "head_sha": "b86efe8adabc79b2feba419fbd307faaa7da390e",
+        "merged_at": "2026-11-02T23:45:17Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/seven-agent-delivery-20261102"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "codex/seven-agent-final-receipt-20261102",
+      "head_sha": "00a994625ff65239777e8d40aae79e7645074966",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 24,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/24",
+          "head_ref": "codex/seven-agent-final-receipt-20261102",
+          "head_sha": "00a994625ff65239777e8d40aae79e7645074966",
+          "merged_at": "2026-11-02T22:15:28Z",
+          "merge_commit_sha": "a779b0dd8d184eaf6e6d6e636c555c967f15f3d5",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        24
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 24,
+        "head_sha": "00a994625ff65239777e8d40aae79e7645074966",
+        "merged_at": "2026-11-02T22:15:28Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/seven-agent-final-receipt-20261102"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "codex/seven-agent-final-receipt-20261103",
+      "head_sha": "668a952f83bb327bf6787f907d58995604cfce01",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 33,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/33",
+          "head_ref": "codex/seven-agent-final-receipt-20261103",
+          "head_sha": "668a952f83bb327bf6787f907d58995604cfce01",
+          "merged_at": "2026-11-03T00:21:09Z",
+          "merge_commit_sha": "d91ec6c45acc07c15b82b815ffaa305d6d213656",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        33
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 33,
+        "head_sha": "668a952f83bb327bf6787f907d58995604cfce01",
+        "merged_at": "2026-11-03T00:21:09Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/seven-agent-final-receipt-20261103"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "codex/seven-agent-integration-report-20261102",
+      "head_sha": "15f259d1ef46f28fbecf66d522ac70054cf2e6b4",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 23,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/23",
+          "head_ref": "codex/seven-agent-integration-report-20261102",
+          "head_sha": "15f259d1ef46f28fbecf66d522ac70054cf2e6b4",
+          "merged_at": "2026-11-02T22:08:56Z",
+          "merge_commit_sha": "12c9868606a0a45b31b722ddee8f897541687e64",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        23
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 23,
+        "head_sha": "15f259d1ef46f28fbecf66d522ac70054cf2e6b4",
+        "merged_at": "2026-11-02T22:08:56Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/seven-agent-integration-report-20261102"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "codex/six-pr-deployment-receipt-20261102",
+      "head_sha": "914e4ef03ac689e43f48f0bcdcc96a389ef9ac6c",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 21,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/21",
+          "head_ref": "codex/six-pr-deployment-receipt-20261102",
+          "head_sha": "914e4ef03ac689e43f48f0bcdcc96a389ef9ac6c",
+          "merged_at": "2026-11-02T21:25:13Z",
+          "merge_commit_sha": "73662187cddf9a5c504dea9bd8a1288bd929bc51",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        21
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 21,
+        "head_sha": "914e4ef03ac689e43f48f0bcdcc96a389ef9ac6c",
+        "merged_at": "2026-11-02T21:25:13Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/six-pr-deployment-receipt-20261102"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "codex/six-pr-integration-acceptance-20261102",
+      "head_sha": "a34cbf53e275d093719b8565d19093dd093a8ef3",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 20,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/20",
+          "head_ref": "codex/six-pr-integration-acceptance-20261102",
+          "head_sha": "a34cbf53e275d093719b8565d19093dd093a8ef3",
+          "merged_at": "2026-11-02T21:01:31Z",
+          "merge_commit_sha": "4d20b3ecaa5dbbbf9a5b4f75bd189c1aab51c089",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        20
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 20,
+        "head_sha": "a34cbf53e275d093719b8565d19093dd093a8ef3",
+        "merged_at": "2026-11-02T21:01:31Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/codex/six-pr-integration-acceptance-20261102"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "docs/saas-final-report-20261105",
+      "head_sha": "ed88684964f1a8969d780c5aa94ec83ca95b9c34",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 44,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/44",
+          "head_ref": "docs/saas-final-report-20261105",
+          "head_sha": "ed88684964f1a8969d780c5aa94ec83ca95b9c34",
+          "merged_at": "2026-11-05T15:52:04Z",
+          "merge_commit_sha": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        44
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 44,
+        "head_sha": "ed88684964f1a8969d780c5aa94ec83ca95b9c34",
+        "merged_at": "2026-11-05T15:52:04Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/docs/saas-final-report-20261105"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/final-95-completion",
+      "head_sha": "861e70875f96e6de8eb1f641b8b59f0b8e1c9efe",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 3,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        62
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 62,
+        "head_sha": "70dd9c5dca6981e440bec0486e43788d2ef3f6a1",
+        "merged_at": "2026-11-06T16:31:38Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": true,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/final-95-completion"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "Current tip changed from the latest merged PR head; do not infer current-tip acceptance from that older PR."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "861e70875f96e6de8eb1f641b8b59f0b8e1c9efe",
+          "committed_date": "2026-11-06",
+          "subject": "docs: record Site69 final evidence and honest 33-criterion release decision"
+        },
+        {
+          "sha": "7f45fed02237b4f07415d7e0452046df853fab4d",
+          "committed_date": "2026-11-06",
+          "subject": "docs: prove isolated synthetic restore on final main f3c8062"
+        },
+        {
+          "sha": "3a05cceabade5ca6f6548322a0880abfd01a068b",
+          "committed_date": "2026-11-06",
+          "subject": "docs: verify PR62 security CI and exact tested source tree"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "feature/final-95-recovery",
+      "head_sha": "ebbea9c67f174a6879f1e638633cc53e728282e2",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 61,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/61",
+          "head_ref": "feature/final-95-recovery",
+          "head_sha": "ebbea9c67f174a6879f1e638633cc53e728282e2",
+          "merged_at": "2026-11-06T14:48:45Z",
+          "merge_commit_sha": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        61
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 61,
+        "head_sha": "ebbea9c67f174a6879f1e638633cc53e728282e2",
+        "merged_at": "2026-11-06T14:48:45Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/final-95-recovery"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/mgeorge-automation-orchestration",
+      "head_sha": "b219d63a27c759019ccef937e0b557dfa3c03e7a",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 29,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/29",
+          "head_ref": "feature/mgeorge-automation-orchestration",
+          "head_sha": "b219d63a27c759019ccef937e0b557dfa3c03e7a",
+          "merged_at": "2026-11-02T23:45:19Z",
+          "merge_commit_sha": "b86efe8adabc79b2feba419fbd307faaa7da390e",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        29
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 29,
+        "head_sha": "b219d63a27c759019ccef937e0b557dfa3c03e7a",
+        "merged_at": "2026-11-02T23:45:19Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/mgeorge-automation-orchestration"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/mgeorge-bankgiro-auto-ingest",
+      "head_sha": "5c9b51bc12c0c7b37df07b0c8061e9b6313189f6",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 26,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/26",
+          "head_ref": "feature/mgeorge-bankgiro-auto-ingest",
+          "head_sha": "5c9b51bc12c0c7b37df07b0c8061e9b6313189f6",
+          "merged_at": "2026-11-02T23:45:19Z",
+          "merge_commit_sha": "b86efe8adabc79b2feba419fbd307faaa7da390e",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        26
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 26,
+        "head_sha": "5c9b51bc12c0c7b37df07b0c8061e9b6313189f6",
+        "merged_at": "2026-11-02T23:45:19Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/mgeorge-bankgiro-auto-ingest"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/mgeorge-invoice-reference-policy",
+      "head_sha": "5fada91427ee49d98897802eeb7a2aeede73fbf7",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 27,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/27",
+          "head_ref": "feature/mgeorge-invoice-reference-policy",
+          "head_sha": "5fada91427ee49d98897802eeb7a2aeede73fbf7",
+          "merged_at": "2026-11-02T22:55:31Z",
+          "merge_commit_sha": "70c61267e049c29b6e2fb6a5a2bb658c3b029693",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        27
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 27,
+        "head_sha": "5fada91427ee49d98897802eeb7a2aeede73fbf7",
+        "merged_at": "2026-11-02T22:55:31Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/mgeorge-invoice-reference-policy"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/mgeorge-payment-ui",
+      "head_sha": "089ac0b8585d2a0c69c3537b510d3fec5291be50",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 30,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/30",
+          "head_ref": "feature/mgeorge-payment-ui",
+          "head_sha": "089ac0b8585d2a0c69c3537b510d3fec5291be50",
+          "merged_at": "2026-11-02T23:45:18Z",
+          "merge_commit_sha": "b86efe8adabc79b2feba419fbd307faaa7da390e",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        30
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 30,
+        "head_sha": "089ac0b8585d2a0c69c3537b510d3fec5291be50",
+        "merged_at": "2026-11-02T23:45:18Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/mgeorge-payment-ui"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/mgeorge-safe-auto-reconciliation",
+      "head_sha": "58e40a21eb459e2191d7b19b458326459a09e5d6",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 28,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/28",
+          "head_ref": "feature/mgeorge-safe-auto-reconciliation",
+          "head_sha": "58e40a21eb459e2191d7b19b458326459a09e5d6",
+          "merged_at": "2026-11-02T23:45:19Z",
+          "merge_commit_sha": "b86efe8adabc79b2feba419fbd307faaa7da390e",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        28
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 28,
+        "head_sha": "58e40a21eb459e2191d7b19b458326459a09e5d6",
+        "merged_at": "2026-11-02T23:45:19Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/mgeorge-safe-auto-reconciliation"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/mgeorge-swedbank-account-evidence",
+      "head_sha": "9dcf038567102514a14774b301cfa0078274b31b",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 25,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/25",
+          "head_ref": "feature/mgeorge-swedbank-account-evidence",
+          "head_sha": "9dcf038567102514a14774b301cfa0078274b31b",
+          "merged_at": "2026-11-02T23:45:19Z",
+          "merge_commit_sha": "b86efe8adabc79b2feba419fbd307faaa7da390e",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        25
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 25,
+        "head_sha": "9dcf038567102514a14774b301cfa0078274b31b",
+        "merged_at": "2026-11-02T23:45:19Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/mgeorge-swedbank-account-evidence"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/rating8-bank-failure-diagnostic-20261106",
+      "head_sha": "501de72c079a6b41593356f027990bc24b0aac8c",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 59,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/59",
+          "head_ref": "feature/rating8-bank-failure-diagnostic-20261106",
+          "head_sha": "501de72c079a6b41593356f027990bc24b0aac8c",
+          "merged_at": "2026-11-06T04:50:48Z",
+          "merge_commit_sha": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        59
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 59,
+        "head_sha": "501de72c079a6b41593356f027990bc24b0aac8c",
+        "merged_at": "2026-11-06T04:50:48Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/rating8-bank-failure-diagnostic-20261106"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/rating8-release-wave2-20261105",
+      "head_sha": "d638f5e195711c3011816618f1899dc535c24120",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 56,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/56",
+          "head_ref": "feature/rating8-release-wave2-20261105",
+          "head_sha": "d638f5e195711c3011816618f1899dc535c24120",
+          "merged_at": "2026-11-05T22:39:49Z",
+          "merge_commit_sha": "819adee2f3848b474167eb6b15f82584caeb39af",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        56
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 56,
+        "head_sha": "d638f5e195711c3011816618f1899dc535c24120",
+        "merged_at": "2026-11-05T22:39:49Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/rating8-release-wave2-20261105"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/rating8-reviewed-geometry-retry-20261106",
+      "head_sha": "f488841afccdefba17a6b584320347581f60c3f4",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 58,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/58",
+          "head_ref": "feature/rating8-reviewed-geometry-retry-20261106",
+          "head_sha": "f488841afccdefba17a6b584320347581f60c3f4",
+          "merged_at": "2026-11-06T03:47:19Z",
+          "merge_commit_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        58
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 58,
+        "head_sha": "f488841afccdefba17a6b584320347581f60c3f4",
+        "merged_at": "2026-11-06T03:47:19Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/rating8-reviewed-geometry-retry-20261106"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/rating8-reviewed-parser-bank-diagnostics-20261105",
+      "head_sha": "c90ed82c73bb566e54cb70eec14dae4ad9848361",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 57,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/57",
+          "head_ref": "feature/rating8-reviewed-parser-bank-diagnostics-20261105",
+          "head_sha": "c90ed82c73bb566e54cb70eec14dae4ad9848361",
+          "merged_at": "2026-11-05T23:39:57Z",
+          "merge_commit_sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        57
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 57,
+        "head_sha": "c90ed82c73bb566e54cb70eec14dae4ad9848361",
+        "merged_at": "2026-11-05T23:39:57Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/rating8-reviewed-parser-bank-diagnostics-20261105"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/rating8-sqlite-startup-20261106",
+      "head_sha": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 60,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/60",
+          "head_ref": "feature/rating8-sqlite-startup-20261106",
+          "head_sha": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+          "merged_at": "2026-11-06T07:00:00Z",
+          "merge_commit_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        60
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 60,
+        "head_sha": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+        "merged_at": "2026-11-06T07:00:00Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [
+        "checkpoint/pr60-cancellation-final-20261106-0648"
+      ],
+      "duplicate_canonical_branch": "feature/rating8-sqlite-startup-20261106",
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/pr60-cancellation-final-20261106-0648",
+        "refs/tags/archive/mgeorge-20261107/feature/rating8-sqlite-startup-20261106"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/saas-bank-consent",
+      "head_sha": "2eab8683db7e4ece1292b4c1f68c500af2f7e128",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 39,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/39",
+          "head_ref": "feature/saas-bank-consent",
+          "head_sha": "2eab8683db7e4ece1292b4c1f68c500af2f7e128",
+          "merged_at": "2026-11-05T12:04:50Z",
+          "merge_commit_sha": "d6c2894c8cdb52669bf73bea64daac58701b182a",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        39
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 39,
+        "head_sha": "2eab8683db7e4ece1292b4c1f68c500af2f7e128",
+        "merged_at": "2026-11-05T12:04:50Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/saas-bank-consent"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/saas-bank-sync-reconciliation",
+      "head_sha": "6e3895218c719ad01a9382b360624d693a7a841f",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 42,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/42",
+          "head_ref": "feature/saas-bank-sync-reconciliation",
+          "head_sha": "6e3895218c719ad01a9382b360624d693a7a841f",
+          "merged_at": "2026-11-05T12:39:24Z",
+          "merge_commit_sha": "f1058371c4f68589d3f91748cf98a4ef3601e893",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        42
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 42,
+        "head_sha": "6e3895218c719ad01a9382b360624d693a7a841f",
+        "merged_at": "2026-11-05T12:39:24Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/saas-bank-sync-reconciliation"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/saas-bankgiro-enrichment",
+      "head_sha": "86730fe47aab8736c6cfb04d672c5e04a10d473d",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 41,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/41",
+          "head_ref": "feature/saas-bankgiro-enrichment",
+          "head_sha": "86730fe47aab8736c6cfb04d672c5e04a10d473d",
+          "merged_at": "2026-11-05T12:24:34Z",
+          "merge_commit_sha": "7a535446a99f17a6f771dd8660fe2a99c6b84248",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        41
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 41,
+        "head_sha": "86730fe47aab8736c6cfb04d672c5e04a10d473d",
+        "merged_at": "2026-11-05T12:24:34Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/saas-bankgiro-enrichment"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/saas-customer-onboarding-ui",
+      "head_sha": "a3b2b944428af5b4fbe31856e0f7076f3637405a",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 38,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/38",
+          "head_ref": "feature/saas-customer-onboarding-ui",
+          "head_sha": "a3b2b944428af5b4fbe31856e0f7076f3637405a",
+          "merged_at": "2026-11-05T12:55:52Z",
+          "merge_commit_sha": "512aec368aa23898f352e9f1eabf786546d5969a",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        38
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 38,
+        "head_sha": "a3b2b944428af5b4fbe31856e0f7076f3637405a",
+        "merged_at": "2026-11-05T12:55:52Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/saas-customer-onboarding-ui"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/saas-multitenant-foundation",
+      "head_sha": "1d7dc21f0d61d98c239f51eb778facd79b6a6aed",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 40,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/40",
+          "head_ref": "feature/saas-multitenant-foundation",
+          "head_sha": "1d7dc21f0d61d98c239f51eb778facd79b6a6aed",
+          "merged_at": "2026-11-04T21:18:19Z",
+          "merge_commit_sha": "f105e9cc5404d1bff3b4fe41e4e6af14d944d212",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        40
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 40,
+        "head_sha": "1d7dc21f0d61d98c239f51eb778facd79b6a6aed",
+        "merged_at": "2026-11-04T21:18:19Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/saas-multitenant-foundation"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/saas-openpayments-provider",
+      "head_sha": "bbd19a5a891ae44d05af8c59aac5e4de21292ace",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 36,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/36",
+          "head_ref": "feature/saas-openpayments-provider",
+          "head_sha": "bbd19a5a891ae44d05af8c59aac5e4de21292ace",
+          "merged_at": "2026-11-04T21:36:02Z",
+          "merge_commit_sha": "f75a293f367980cd360eca1886a2728db9c3e1f2",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        36
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 36,
+        "head_sha": "bbd19a5a891ae44d05af8c59aac5e4de21292ace",
+        "merged_at": "2026-11-04T21:36:02Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/saas-openpayments-provider"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/saas-security-acceptance",
+      "head_sha": "3215d40b559b5cb60daf068fd197054e809e5f83",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 37,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/37",
+          "head_ref": "feature/saas-security-acceptance",
+          "head_sha": "3215d40b559b5cb60daf068fd197054e809e5f83",
+          "merged_at": "2026-11-05T13:02:37Z",
+          "merge_commit_sha": "672c152242add9427c8526af8dd92431c526c8c2",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        37
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 37,
+        "head_sha": "3215d40b559b5cb60daf068fd197054e809e5f83",
+        "merged_at": "2026-11-05T13:02:37Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/saas-security-acceptance"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-bank",
+      "head_sha": "ac1abdc5469248eba212496af4a4573864908ace",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 45,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/45",
+          "head_ref": "feature/95-bank",
+          "head_sha": "ac1abdc5469248eba212496af4a4573864908ace",
+          "merged_at": "2026-11-06T14:48:47Z",
+          "merge_commit_sha": "4095e3de87c94ce9312e18844437dfb65e854cd5",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        45
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 45,
+        "head_sha": "ac1abdc5469248eba212496af4a4573864908ace",
+        "merged_at": "2026-11-06T14:48:47Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-bank"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-bank-recovery",
+      "head_sha": "9529701a11f0511c7df4beaf80cd3975c9f27e5a",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 65,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/65",
+          "head_ref": "feature/95-bank-recovery",
+          "head_sha": "9529701a11f0511c7df4beaf80cd3975c9f27e5a",
+          "merged_at": "2026-11-07T10:12:26Z",
+          "merge_commit_sha": "8dfcd8ec6d82cace254dc13942e3ab79bb7937a6",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        65
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 65,
+        "head_sha": "9529701a11f0511c7df4beaf80cd3975c9f27e5a",
+        "merged_at": "2026-11-07T10:12:26Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-bank-recovery"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-bankgiro",
+      "head_sha": "7d3bcb5ef533c39c9e23714e61709c924384ffb8",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 46,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/46",
+          "head_ref": "feature/95-bankgiro",
+          "head_sha": "7d3bcb5ef533c39c9e23714e61709c924384ffb8",
+          "merged_at": "2026-11-06T14:48:47Z",
+          "merge_commit_sha": "03f84afd61bb1020e73c17c3cde332a1b07f55a0",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        46
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 46,
+        "head_sha": "7d3bcb5ef533c39c9e23714e61709c924384ffb8",
+        "merged_at": "2026-11-06T14:48:47Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-bankgiro"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-bankgiro-reconciliation",
+      "head_sha": "7cbcba72cd114d0ff19798ee47495cb546d07bc1",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 68,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/68",
+          "head_ref": "feature/95-bankgiro-reconciliation",
+          "head_sha": "7cbcba72cd114d0ff19798ee47495cb546d07bc1",
+          "merged_at": "2026-11-07T10:12:25Z",
+          "merge_commit_sha": "124e452da65b49e03fd5dadc18c646d9f69dbbdc",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        68
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 68,
+        "head_sha": "7cbcba72cd114d0ff19798ee47495cb546d07bc1",
+        "merged_at": "2026-11-07T10:12:25Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-bankgiro-reconciliation"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-document-automation",
+      "head_sha": "b2178405a684ca2cb95cf91153071c5f7736f3cb",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 67,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/67",
+          "head_ref": "feature/95-document-automation",
+          "head_sha": "b2178405a684ca2cb95cf91153071c5f7736f3cb",
+          "merged_at": "2026-11-07T10:12:26Z",
+          "merge_commit_sha": "9b15b6c50b291fe5614cb4ff116e6e17763aef82",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        67
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 67,
+        "head_sha": "b2178405a684ca2cb95cf91153071c5f7736f3cb",
+        "merged_at": "2026-11-07T10:12:26Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-document-automation"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-document-automation-gmail",
+      "head_sha": "a15eb18df8aa6540397a8997fe5524610fc9d91c",
+      "protected": false,
+      "category": "unapproved experimental",
+      "disposition": "hold_unverified_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": false,
+      "graph_unique_commit_count": 2,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-document-automation-gmail"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Current tip has no verified exact-head approval/integration evidence and is not proven to be an ancestor of main. This category describes the evidence gap, not proven experimental intent.",
+        "No PR for this branch name appears in the cached all-PR inventory; collaborator activity remains unknown."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [
+        {
+          "sha": "a15eb18df8aa6540397a8997fe5524610fc9d91c",
+          "committed_date": "2026-11-07",
+          "subject": "fix: bound Gmail source lookups and correlate automatic run receipts"
+        },
+        {
+          "sha": "8e08e81099654bf7c3b7285183fd17448b9fa5af",
+          "committed_date": "2026-11-07",
+          "subject": "test: reproduce Gmail unbounded membership reads and missing run receipts"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "feature/95-integration",
+      "head_sha": "03f84afd61bb1020e73c17c3cde332a1b07f55a0",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 49,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/49",
+          "head_ref": "feature/95-integration",
+          "head_sha": "03f84afd61bb1020e73c17c3cde332a1b07f55a0",
+          "merged_at": "2026-11-06T14:48:47Z",
+          "merge_commit_sha": "30f93f8eb9547bf1acf816bbcacce95cf7e45339",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        49
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 49,
+        "head_sha": "03f84afd61bb1020e73c17c3cde332a1b07f55a0",
+        "merged_at": "2026-11-06T14:48:47Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-integration"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-ocr",
+      "head_sha": "eb4242f783172ac441f9092f921b04b06dc11771",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 52,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/52",
+          "head_ref": "feature/95-ocr",
+          "head_sha": "eb4242f783172ac441f9092f921b04b06dc11771",
+          "merged_at": "2026-11-06T14:48:47Z",
+          "merge_commit_sha": "4ebd3994837eb248de0a18e53a9d2d4391e23419",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        52
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 52,
+        "head_sha": "eb4242f783172ac441f9092f921b04b06dc11771",
+        "merged_at": "2026-11-06T14:48:47Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-ocr"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-openai-invoices",
+      "head_sha": "ce6fa6158c30b9fb64eac35d74f653be4ae9f568",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 64,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/64",
+          "head_ref": "feature/95-openai-invoices",
+          "head_sha": "ce6fa6158c30b9fb64eac35d74f653be4ae9f568",
+          "merged_at": "2026-11-07T10:12:26Z",
+          "merge_commit_sha": "9501bfe5e7ec84821e3597a871ee246a02c6db88",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        64
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 64,
+        "head_sha": "ce6fa6158c30b9fb64eac35d74f653be4ae9f568",
+        "merged_at": "2026-11-07T10:12:26Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-openai-invoices"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-quality",
+      "head_sha": "875876ae539f5ecba1fc39d4c213197806e245ce",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 47,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/47",
+          "head_ref": "feature/95-quality",
+          "head_sha": "875876ae539f5ecba1fc39d4c213197806e245ce",
+          "merged_at": "2026-11-06T14:48:47Z",
+          "merge_commit_sha": "eac09480371cb30a08e6c6622daee9fe8de67a8c",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        47
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 47,
+        "head_sha": "875876ae539f5ecba1fc39d4c213197806e245ce",
+        "merged_at": "2026-11-06T14:48:47Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-quality"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-reconciliation",
+      "head_sha": "0954777f10da8be9fb15daf3878c539b51801142",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 51,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/51",
+          "head_ref": "feature/95-reconciliation",
+          "head_sha": "0954777f10da8be9fb15daf3878c539b51801142",
+          "merged_at": "2026-11-06T14:48:47Z",
+          "merge_commit_sha": "17b4a893f0ca650de494dc4bf6a8ec7ccab21c5c",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        51
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 51,
+        "head_sha": "0954777f10da8be9fb15daf3878c539b51801142",
+        "merged_at": "2026-11-06T14:48:47Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-reconciliation"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-saas",
+      "head_sha": "1619c0e3a63b922c75a7f46d493d39e68075952f",
+      "protected": false,
+      "category": "active",
+      "disposition": "retain_active_or_interrupted_work",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 50,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/50",
+          "head_ref": "feature/95-saas",
+          "head_sha": "1619c0e3a63b922c75a7f46d493d39e68075952f",
+          "merged_at": "2026-11-06T14:48:47Z",
+          "merge_commit_sha": "c02d2b5866148c26a5edaa458b36d8aa93386244",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        50
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 50,
+        "head_sha": "1619c0e3a63b922c75a7f46d493d39e68075952f",
+        "merged_at": "2026-11-06T14:48:47Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-saas"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Known interrupted SaaS WIP from existing PR63 metadata; current collaborator activity is unverified."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-saas-readiness",
+      "head_sha": "c85f2375f97ea0191f9fbe64cd4190d869aebfaf",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 66,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/66",
+          "head_ref": "feature/95-saas-readiness",
+          "head_sha": "c85f2375f97ea0191f9fbe64cd4190d869aebfaf",
+          "merged_at": "2026-11-07T10:12:25Z",
+          "merge_commit_sha": "c6bb149b23e8f2a2be6228b809cab854b98738ad",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        66
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 66,
+        "head_sha": "c85f2375f97ea0191f9fbe64cd4190d869aebfaf",
+        "merged_at": "2026-11-07T10:12:25Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-saas-readiness"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-security",
+      "head_sha": "3db9f01305aa6830a4c2d1cc01970c06b91018c2",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 54,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/54",
+          "head_ref": "feature/95-security",
+          "head_sha": "3db9f01305aa6830a4c2d1cc01970c06b91018c2",
+          "merged_at": "2026-11-06T14:48:47Z",
+          "merge_commit_sha": "0ce2604de16b77bf96ff76ccedab115f61a3f9ac",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        54
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 54,
+        "head_sha": "3db9f01305aa6830a4c2d1cc01970c06b91018c2",
+        "merged_at": "2026-11-06T14:48:47Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-security"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "feature/95-ui",
+      "head_sha": "d6646dd0971650878738f81215d0cfc5c04a1da3",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 55,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/55",
+          "head_ref": "feature/95-ui",
+          "head_sha": "d6646dd0971650878738f81215d0cfc5c04a1da3",
+          "merged_at": "2026-11-06T14:48:47Z",
+          "merge_commit_sha": "ec46787c0aab582fbe387a5e19c6ad04c59d5db8",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        55
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 55,
+        "head_sha": "d6646dd0971650878738f81215d0cfc5c04a1da3",
+        "merged_at": "2026-11-06T14:48:47Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/feature/95-ui"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "fix/enable-consent-compat-20261105",
+      "head_sha": "ab941744c3ee38be7ecd4c3121b8e7496082b9ab",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 43,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/43",
+          "head_ref": "fix/enable-consent-compat-20261105",
+          "head_sha": "ab941744c3ee38be7ecd4c3121b8e7496082b9ab",
+          "merged_at": "2026-11-05T15:27:48Z",
+          "merge_commit_sha": "b2e7f4b23d26e9bf3aa84c6fdc21702562f3aa4f",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        43
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 43,
+        "head_sha": "ab941744c3ee38be7ecd4c3121b8e7496082b9ab",
+        "merged_at": "2026-11-05T15:27:48Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/fix/enable-consent-compat-20261105"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "fix/gmail-document-automation-20261102",
+      "head_sha": "d3566fdc90857517330127eef7f9d7911849e06a",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 18,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/18",
+          "head_ref": "fix/gmail-document-automation-20261102",
+          "head_sha": "d3566fdc90857517330127eef7f9d7911849e06a",
+          "merged_at": "2026-11-02T20:35:48Z",
+          "merge_commit_sha": "2bfe4e55059390deacde6b0107d6640245ff60f1",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        18
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 18,
+        "head_sha": "d3566fdc90857517330127eef7f9d7911849e06a",
+        "merged_at": "2026-11-02T20:35:48Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/fix/gmail-document-automation-20261102"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "fix/payment-0599-bankgiro-verification-20261102",
+      "head_sha": "493365c7e20cd86639ecae32ca8acfddd7aec363",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 14,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/14",
+          "head_ref": "fix/payment-0599-bankgiro-verification-20261102",
+          "head_sha": "493365c7e20cd86639ecae32ca8acfddd7aec363",
+          "merged_at": "2026-11-02T20:42:29Z",
+          "merge_commit_sha": "723b143515bac1a59ee290f6ea3881c096caf5ab",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        14
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 14,
+        "head_sha": "493365c7e20cd86639ecae32ca8acfddd7aec363",
+        "merged_at": "2026-11-02T20:42:29Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/fix/payment-0599-bankgiro-verification-20261102"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "fix/seven-agent-selected-proposal",
+      "head_sha": "dc0a05c99319c77e11876f5a0ac19cc1af39e7f2",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 32,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/32",
+          "head_ref": "fix/seven-agent-selected-proposal",
+          "head_sha": "dc0a05c99319c77e11876f5a0ac19cc1af39e7f2",
+          "merged_at": "2026-11-03T00:05:53Z",
+          "merge_commit_sha": "93312189b52fc651a3ccc659272041282b937f03",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        32
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 32,
+        "head_sha": "dc0a05c99319c77e11876f5a0ac19cc1af39e7f2",
+        "merged_at": "2026-11-03T00:05:53Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/fix/seven-agent-selected-proposal"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "fix/startup-cancellation-red-20261106-0643",
+      "head_sha": "f0e845bb87ee08d15fa96cb75879849493aeb1fd",
+      "protected": false,
+      "category": "duplicate",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [
+        "checkpoint/startup-cancellation-red-20261106-063435"
+      ],
+      "duplicate_canonical_branch": "checkpoint/startup-cancellation-red-20261106-063435",
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/checkpoint/startup-cancellation-red-20261106-063435",
+        "refs/tags/archive/mgeorge-20261107/fix/startup-cancellation-red-20261106-0643"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "No completed PR exactly matches this current tip; current-tip ancestry independently proves its history is integrated.",
+        "Exact head is shared with checkpoint/startup-cancellation-red-20261106-063435."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "fix/swedbank-sync-date-recovery",
+      "head_sha": "b5c923c6612020044063da2b07c2f0dcdcb8f482",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 16,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/16",
+          "head_ref": "fix/swedbank-sync-date-recovery",
+          "head_sha": "b5c923c6612020044063da2b07c2f0dcdcb8f482",
+          "merged_at": "2026-11-02T20:22:34Z",
+          "merge_commit_sha": "c84467967fe34bafb12206fab096cc7e443d0e25",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        16
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 16,
+        "head_sha": "b5c923c6612020044063da2b07c2f0dcdcb8f482",
+        "merged_at": "2026-11-02T20:22:34Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/fix/swedbank-sync-date-recovery"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "fix/95-decimal-reference",
+      "head_sha": "d9ca037a90ef9c9e629f62c4dcbf9cfcdeacb459",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 53,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/53",
+          "head_ref": "fix/95-decimal-reference",
+          "head_sha": "d9ca037a90ef9c9e629f62c4dcbf9cfcdeacb459",
+          "merged_at": "2026-11-06T14:48:47Z",
+          "merge_commit_sha": "6c403fd53e4f3cbf39cdd0974e00e30cc9db7168",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        53
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 53,
+        "head_sha": "d9ca037a90ef9c9e629f62c4dcbf9cfcdeacb459",
+        "merged_at": "2026-11-06T14:48:47Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/fix/95-decimal-reference"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "integration/mgeorge-final-95",
+      "head_sha": "9b15b6c50b291fe5614cb4ff116e6e17763aef82",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 63,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/63",
+          "head_ref": "integration/mgeorge-final-95",
+          "head_sha": "9b15b6c50b291fe5614cb4ff116e6e17763aef82",
+          "merged_at": "2026-11-07T10:12:24Z",
+          "merge_commit_sha": "4c7b210a0553314c2d9ce95804b892b891f4fe36",
+          "base_ref": "main"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        63
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 63,
+        "head_sha": "9b15b6c50b291fe5614cb4ff116e6e17763aef82",
+        "merged_at": "2026-11-07T10:12:24Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/integration/mgeorge-final-95"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "main",
+      "head_sha": "4c7b210a0553314c2d9ce95804b892b891f4fe36",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "retain_main",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Default integration branch; never a cleanup target."
+      ],
+      "conditions_before_deletion": [],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "recovery/main-before-final-integration-20261107",
+      "head_sha": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+      "protected": false,
+      "category": "no longer needed",
+      "disposition": "archive_eligible_after_verified_bundle",
+      "deletion_candidate": false,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [],
+      "latest_merged_pr_for_branch": null,
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/main"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Historical recovery branch is conditionally removable after its exact head is covered by a verified durable recovery bundle; it is not intrinsically a permanent branch."
+      ],
+      "conditions_before_deletion": [
+        "Verify durable bundle coverage and successful restoration of this exact head.",
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work depends on retaining this branch."
+      ],
+      "unique_commits": [],
+      "errors": []
+    },
+    {
+      "name": "review/final95-ai-guards",
+      "head_sha": "38d731c0993ad0c4708d2571a9a18a342f5eb672",
+      "protected": false,
+      "category": "already integrated",
+      "disposition": "deletion_candidate_after_final_checks",
+      "deletion_candidate": true,
+      "is_ancestor_of_origin_main": true,
+      "graph_unique_commit_count": 0,
+      "exact_tip_merged_prs": [
+        {
+          "number": 69,
+          "url": "https://github.com/sharbel0022/Mgeorge/pull/69",
+          "head_ref": "review/final95-ai-guards",
+          "head_sha": "38d731c0993ad0c4708d2571a9a18a342f5eb672",
+          "merged_at": "2026-11-06T23:57:08Z",
+          "merge_commit_sha": "a61710865a7d0108ad27aa2989c54ade98b79f64",
+          "base_ref": "integration/mgeorge-final-95"
+        }
+      ],
+      "exact_tip_other_prs": [],
+      "branch_name_prs": [
+        69
+      ],
+      "latest_merged_pr_for_branch": {
+        "number": 69,
+        "head_sha": "38d731c0993ad0c4708d2571a9a18a342f5eb672",
+        "merged_at": "2026-11-06T23:57:08Z"
+      },
+      "current_tip_differs_from_latest_merged_pr": false,
+      "open_pr_numbers": [],
+      "duplicate_head_branches": [],
+      "duplicate_canonical_branch": null,
+      "local_archive_tags_at_exact_head": [
+        "refs/tags/archive/mgeorge-20261107/review/final95-ai-guards"
+      ],
+      "durable_archive_independently_verified": false,
+      "reasons": [
+        "Exact current branch head is an ancestor of the frozen local origin/main; it has zero graph-unique commits.",
+        "Exact current head also matches a completed merged PR, and the cached inventory has no matching open PR."
+      ],
+      "conditions_before_deletion": [
+        "Refresh the remote head and confirm it still equals the recorded SHA.",
+        "Confirm no active collaborator work uses this branch; activity cannot be independently established by the cached GitHub inventory.",
+        "Retain the current main history or verified durable recovery coverage."
+      ],
+      "unique_commits": [],
+      "errors": []
+    }
+  ]
+}

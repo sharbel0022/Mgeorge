@@ -82,3 +82,7 @@ process.once('message',async data=>{
   try{process.send(result,error=>process.exit(error?1:0));}
   catch{process.exit(1);}
 });
+
+// An active OCR task must not survive its owning API process.
+process.once('disconnect',()=>process.exit(1));
+if(process.send&&!process.connected)process.exit(1);

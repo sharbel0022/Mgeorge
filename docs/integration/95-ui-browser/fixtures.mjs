@@ -123,6 +123,7 @@ export function fixtureResponse(session, method, url, body = {}) {
   }
   if (method === 'GET' && pathname === '/api/bank/history') return ok({ entries: [], next: null });
   if (method === 'GET' && pathname === '/api/customer-messages/list') return ok({ items: [] });
+  if (method === 'GET' && pathname === '/api/admin/ai-status') return ok({ status: 'disabled', code: 'OPENAI_DISABLED', model: null, fallbackModel: null, policyStatus: 'disabled', policyCode: 'OPENAI_DISABLED', liveVerified: false });
   if (method === 'GET' && pathname === '/api/gmail/status') return ok({ connected: false, send_enabled: false, review: 0, processing: { pending: 0, error: 0 } });
   if (method === 'GET' && pathname === '/api/files') return { status: 404, body: { error: 'Syntetiskt original saknas avsiktligt; inget kundoriginal används.' } };
   if (method === 'GET' && pathname === '/api/bank/status') return ok(legacyBankStatusFixture(session));

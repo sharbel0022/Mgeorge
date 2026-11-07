@@ -1,8 +1,5 @@
 import {digest} from '../banking/security.ts';
-import {invoiceAiRecoveryFallback,INVOICE_AI_RECOVERY_CODES} from './recovery.js';
-import {createD1AuditStore} from './audit-store.js';
-import {enrichInvoiceForReview} from './integration.js';
-import {extractOpenAiInvoice} from './adapter.js';
+import {invoiceAiRecoveryFallback,INVOICE_AI_RECOVERY_CODES,createD1AuditStore,enrichInvoiceForReview,extractOpenAiInvoice} from './index.js';
 import {preflightOriginal} from './preflight.js';
 
 export async function enrichSitesInvoice({database,owner,job,baseline,environment,loadBytes,adapter=extractOpenAiInvoice}){

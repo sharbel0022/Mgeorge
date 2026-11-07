@@ -1,0 +1,26 @@
+flowchart TB
+  User["Användare / webbläsare"] --> UI["React: sites/app/page.tsx och dashboard.tsx"]
+  UI --> Worker["Cloudflare Worker: sites/worker/index.ts"]
+  Worker --> Guard["ChatGPT-identitet, företagskontext och behörighet"]
+  MCP["Behöriga MCP-verktyg och externa scheman"] --> Worker
+  Guard --> API["Sites API-routes / MCP-route"]
+  API --> Gmail["Gmail-intag: gmail-service.ts"]
+  API --> Bank["Bank: banking/service.ts och provideradaptrar"]
+  API --> BG["Bankgiro: bankgiro-ingest-service.ts"]
+  Gmail --> Queue["Beständig dokumentkö: document-processing.ts"]
+  Queue --> OCR["PDF-text eller extern lokal/moln-OCR-arbetare"]
+  OCR --> AI["Valfri gemensam AI-modul: openai-invoices/index.js"]
+  AI -. "Separata godkännanden och budget" .-> OpenAI["OpenAI Responses API"]
+  AI --> Review["Originalkontroll, fakturavalidering och granskning"]
+  Bank --> Evidence["Kontobehörighet och bankoriginal"]
+  BG --> Evidence
+  Review --> Match["Avstämning och atomisk ekonomisk skrivning"]
+  Evidence --> Match
+  Match --> D1["D1: register, företagsgränser, jobb och audit"]
+  Gmail --> R2["R2: privata original och krypterade backuper"]
+  Evidence --> R2
+  D1 --> Backup["Backup-engine och isolerad återställningskontroll"]
+  R2 --> Backup
+  Secrets["Sites serverhemligheter / runtime env"] -.-> Guard
+  Secrets -.-> AI
+  Secrets -.-> Bank

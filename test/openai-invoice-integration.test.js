@@ -193,3 +193,32 @@ test('parsed VAT rate conflicts with AI row tax even when original tax and gross
  const results=await enrichNestedFacts(t,scenario);
  assertNestedConflict(results,'details.line_items');
 });
+
+test('configured fallback needs its own durable budget reservation and is replayed without provider calls',async t=>{
+ const store=fixture(t),models=[];
+ const input={baseline:baseline(),owner,documentId:'fallback-doc',sha256:sha,mime:'image/png',environment:{...environment(),OPENAI_MODEL:'gpt-6.1-sol',OPENAI_FALLBACK_MODEL:'gpt-6-luna'},store,loadOriginal:async()=>({bytes:new Uint8Array([1,2]),pageCount:1}),adapter:async args=>{models.push(args.policy.model);return args.policy.model==='gpt-6.1-sol'?{status:'fallback',issues:['api_model_unavailable'],costUnknown:false,attempts:0}:ready();}};
+ const result=await enrichInvoiceForReview(input);assert.deepEqual(models,['gpt-6.1-sol','gpt-6-luna']);assert.equal(result.ai.status,'review');assert.equal(result.ai.fallbackFromModel,'gpt-6.1-sol');
+ await enrichInvoiceForReview(input);assert.equal(models.length,2);
+});
+test('fallback is never issued after an ambiguous provider failure or when combined reservations exhaust budget',async t=>{
+ for(const ambiguous of [true,false]){
+  let calls=0;const result=await enrichInvoiceForReview({baseline:baseline(),owner,documentId:'no-fallback-'+ambiguous,sha256:sha,mime:'image/png',environment:{...environment(),OPENAI_MODEL:'gpt-6.1-sol',OPENAI_FALLBACK_MODEL:'gpt-6-luna',OPENAI_DAILY_BUDGET_USD:'0.25'},store:fixture(t),loadOriginal:async()=>({bytes:new Uint8Array([1,2]),pageCount:1}),adapter:async()=>{calls++;return{status:'fallback',issues:[ambiguous?'api_network_error':'api_model_unavailable'],costUnknown:ambiguous};}});
+  assert.equal(calls,1);assert.notEqual(result.level,'green');
+ }
+});
+
+test('a cached primary rejection cannot mark a newly executed fallback as a replay',async t=>{
+ const sql=new DatabaseSync(':memory:');sql.exec('CREATE TABLE audit_events(id TEXT PRIMARY KEY,action TEXT,details TEXT,created_at TEXT)');t.after(()=>sql.close());let date='2026-11-07T12:00:00Z',calls=0;
+ const store=createNodeAuditStore(sql,{owner,now:()=>new Date(date)});
+ const input={baseline:baseline(),owner,documentId:'late-fallback',sha256:sha,mime:'image/png',environment:{...environment(),OPENAI_MODEL:'gpt-6.1-sol',OPENAI_FALLBACK_MODEL:'gpt-6-luna',OPENAI_DAILY_BUDGET_USD:'0.25'},store,loadOriginal:async()=>({bytes:new Uint8Array([1,2]),pageCount:1}),adapter:async args=>{calls++;return args.policy.model==='gpt-6.1-sol'?{status:'fallback',issues:['api_model_unavailable'],costUnknown:false}:ready();}};
+ await enrichInvoiceForReview(input);date='2026-11-08T12:00:00Z';const next=await enrichInvoiceForReview(input);assert.equal(calls,2);assert.equal(next.ai.status,'review');assert.notEqual(next.ai.replayed,true);
+});
+
+for(const completed of [true,false])test('upgrade preserves legacy '+(completed?'receipt':'uncertain reservation')+' even when token and budget settings change',async t=>{
+ const {getInvoiceAiProfile}=await import('../sites/lib/openai-invoices/profiles.js');const {INVOICE_AI_SCHEMA,INVOICE_AI_INSTRUCTIONS}=await import('../sites/lib/openai-invoices/schema.js');
+ const hash=async text=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)))).map(n=>n.toString(16).padStart(2,'0')).join('');
+ const key=await hash(JSON.stringify(['invoice-ai-integration-2026-11-06.v1',INVOICE_AI_SCHEMA,INVOICE_AI_INSTRUCTIONS,getInvoiceAiProfile('luna-v1'),owner,sha,'image/png','5560160680','recipient']));
+ const store=fixture(t);await store.reserve({key,documentId:'historical-doc',sha256:sha,profileVersion:'invoice-ai-integration-2026-11-06.v1',reservedMicroUsd:250000,dailyBudgetMicroUsd:1000000});if(completed)await store.record(key,ready());let calls=0;
+ const result=await enrichInvoiceForReview({baseline:baseline(),owner,documentId:'new-job',sha256:sha,mime:'image/png',environment:{...environment(),OPENAI_MODEL:'gpt-6-luna',OPENAI_MAX_OUTPUT_TOKENS:'1200',OPENAI_DAILY_BUDGET_USD:'2',OPENAI_MONTHLY_BUDGET_USD:'40'},store,loadOriginal:async()=>({bytes:new Uint8Array([1,2]),pageCount:1}),adapter:async()=>{calls++;return ready();}});
+ assert.equal(calls,0);if(completed)assert.equal(result.ai.replayed,true);else assert.equal(result.ai.code,'AI_REQUEST_ALREADY_RESERVED');
+});

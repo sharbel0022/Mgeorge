@@ -1,0 +1,14 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> mgeorge-fakturakoll@0.1.0 start
+> node scripts/start/index.mjs
+
+MG Fakturakoll — Node 24.22.1, npm 11.9.0
+.env finns redan och har behållits.
+MG Fakturakoll: http://localhost:34979
+OpenAI: blocked (API_KEY_MISSING); lokal konfiguration, ingen leverantörsverifiering
+Gmail: ej konfigurerad (valfri)
+Bank: ej konfigurerad (valfri)
+Bankgiro: källa saknas (valfri)
+Redo: http://localhost:34979 — backend, frontend och dokumentarbetare tillgängliga.
+Dokumentarbetare startas vid behov. Avsluta med Ctrl+C eller npm run stop.

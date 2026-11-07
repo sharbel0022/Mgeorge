@@ -2,7 +2,9 @@ import {
   INVOICE_AI_SCHEMA, INVOICE_AI_SCHEMA_VERSION, INVOICE_AI_PROMPT_VERSION,
   INVOICE_AI_INSTRUCTIONS, INVOICE_AI_FIELD_NAMES, INVOICE_AI_LINE_FIELDS,
 } from './schema.js';
-import { getInvoiceAiProfile, invoiceAiCostMicroUsd, INVOICE_AI_POLICY_VERSION } from './profiles.js';
+import { invoiceAiCostMicroUsd, INVOICE_AI_POLICY_VERSION } from './profiles.js';
+
+import {invoiceAiPolicyProfile} from './configuration.js';
 
 const ENDPOINT = 'https://api.openai.com/v1/responses';
 const encoder = new TextEncoder();
@@ -84,7 +86,7 @@ async function prepare(args = {}) {
   if (!safeText(policy.approvalId, 200) || !validOrganization(policy.expectedCompanyOrganization)
     || !integer(policy.maxDocumentMicroUsd, 1, 100000000)
     || !integer(policy.dailyBudgetMicroUsd, policy.maxDocumentMicroUsd, 1000000000)) fail('policy_invalid');
-  const profile = getInvoiceAiProfile(policy.profileId);
+  const profile = invoiceAiPolicyProfile(policy);
   if (!profile || policy.model !== profile.model || policy.reasoningEffort !== profile.reasoningEffort) fail('profile_mismatch');
   if (!['supplier', 'recipient'].includes(args.companyRole)) fail('company_role_invalid');
   if (args.inputValidated !== true) fail('input_not_validated');
@@ -131,7 +133,7 @@ async function prepare(args = {}) {
     schemaVersion: INVOICE_AI_SCHEMA_VERSION, schema: INVOICE_AI_SCHEMA,
     promptVersion: INVOICE_AI_PROMPT_VERSION, instructions: INVOICE_AI_INSTRUCTIONS,
     expectedCompanyOrganization: policy.expectedCompanyOrganization, companyRole,
-    maxDocumentMicroUsd: policy.maxDocumentMicroUsd, dailyBudgetMicroUsd: policy.dailyBudgetMicroUsd,
+    maxDocumentMicroUsd: policy.maxDocumentMicroUsd, dailyBudgetMicroUsd: policy.dailyBudgetMicroUsd, monthlyBudgetMicroUsd: policy.monthlyBudgetMicroUsd,
   }));
   const idempotencyKey = await hash(JSON.stringify({
     owner, documentId, source, configDigest, textPages, deterministic,
@@ -294,6 +296,7 @@ function httpFailure(status, body) {
   const code = typeof body?.error?.code === 'string' ? body.error.code : '';
   const type = typeof body?.error?.type === 'string' ? body.error.type : '';
   if ([code, type].some(value => ['insufficient_quota', 'billing_hard_limit_reached', 'billing_not_active'].includes(value))) return { issue: 'api_quota_exhausted', retry: false, ambiguous: false };
+  if (status === 404 && code === 'model_not_found') return { issue: 'api_model_unavailable', retry: false, ambiguous: false };
   if (status === 401) return { issue: 'api_authentication_failed', retry: false, ambiguous: false };
   if (status === 403) return { issue: 'api_access_denied', retry: false, ambiguous: false };
   if (status === 429) return { issue: 'api_rate_limited', retry: code === 'rate_limit_exceeded', ambiguous: false };
@@ -554,7 +557,7 @@ export async function extractOpenAiInvoice(args = {}, options = {}) {
     if (apiKey.length > 4096 || !/^[\x21-\x7E]+$/.test(apiKey)) fail('api_key_invalid');
     const fetchImpl = options.fetchImpl || globalThis.fetch;
     if (typeof fetchImpl !== 'function') fail('fetch_unavailable');
-    const timeoutMs = options.timeoutMs ?? state.profile.limits.timeoutMs;
+    const timeoutMs = Math.min(options.timeoutMs ?? state.profile.limits.timeoutMs, state.profile.limits.timeoutMs);
     const retryDelayMs = options.retryDelayMs ?? state.profile.limits.retryDelayMs;
     if (!integer(timeoutMs, 1, 45000) || !integer(retryDelayMs, 0, 2000)) fail('transport_configuration_invalid');
     const deadline = Date.now() + timeoutMs;
@@ -565,7 +568,10 @@ export async function extractOpenAiInvoice(args = {}, options = {}) {
       counted = await request(ENDPOINT + '/input_tokens', common, apiKey, fetchImpl,
         deadline - Date.now(), 16384, state.idempotencyKey + '-count');
     } catch { fail('input_count_unavailable'); }
-    if (counted.status !== 200) fail('input_count_unavailable');
+    if (counted.status !== 200) {
+      const failure = httpFailure(counted.status, counted.body);
+      fail(failure.issue === 'api_model_unavailable' ? failure.issue : 'input_count_unavailable');
+    }
     if (counted.body?.object !== 'response.input_tokens' || !integer(counted.body.input_tokens, 1, 10000000)) fail('input_count_invalid');
     result.inputCountTokens = counted.body.input_tokens;
     if (result.inputCountTokens > state.profile.limits.maxInputTokens) fail('input_context_limit');

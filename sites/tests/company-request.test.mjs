@@ -196,3 +196,21 @@ test('retry MCP real company boundary denies a stale context before queue effect
  const f=await retryCompanyFixture(t),before=f.sql.prepare('SELECT * FROM document_jobs').all();
  const response=await f.retry(f.retryRequest(f.ids[0],{version:999}));assert.equal(response.status,409);assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs').all(),before);assert.deepEqual(f.reads,[]);
 });
+
+test('AI admin status is private, secret-free and restricted to current owner/admin membership',async t=>{
+ const publicAi=await import('../lib/openai-invoices/index.js');assert.equal(typeof publicAi.invoiceAiConfigurationStatus,'function','public status helper must exist');
+ const f=await fixture(t);await f.seed();Object.assign(f.env,{OPENAI_ENABLED:'true',OPENAI_MODEL:'gpt-6-luna',OPENAI_API_KEY:'SYNTHETIC_PRIVATE_KEY_NEVER_RETURN'});
+ const {server,environment}=f.moduleUrls;
+ const route=await import(compile('../app/api/admin/ai-status/route.ts',{'cloudflare:workers':environment,'@/lib/server':server,'@/lib/openai-invoices/index.js':url('../lib/openai-invoices/index.js')}));
+ const handler=f.wrap(route.GET);
+ for(const [actorId,role]of [['synthetic-admin','admin'],['synthetic-accountant','accountant'],['synthetic-viewer','viewer']])await changeCompanyMembership(f.raw,f.a,{actorId,role,status:'active'});
+ for(const actor of ['actor-a','synthetic-admin']){
+  f.user.userId=actor;const result=await handler(f.request('/api/admin/ai-status'));assert.equal(result.status,200);assert.match(result.headers.get('Cache-Control'),/private.*no-store/);const body=await result.json();assert.equal(body.status,'configured');assert.equal(body.model,'gpt-6-luna');assert.equal(body.liveVerified,false);assert.equal(body.policyStatus,'blocked');assert.equal(body.policyCode,'APPROVAL_REQUIRED');assert.doesNotMatch(JSON.stringify(body),/SYNTHETIC_PRIVATE_KEY|APPROVED|ALLOWED_OWNERS/);
+ }
+ Object.assign(f.env,{OPENAI_INVOICES_PRIVACY_APPROVED:'true',OPENAI_INVOICES_SECURITY_APPROVED:'true',OPENAI_INVOICES_COST_APPROVED:'true',OPENAI_INVOICES_APPROVAL_ID:'synthetic-admin-review',OPENAI_INVOICES_ALLOWED_OWNERS:JSON.stringify([f.a.owner]),OPENAI_INVOICES_COMPANY_ORGANIZATIONS:JSON.stringify({[f.a.owner]:'5560160680'})});
+ f.user.userId='actor-a';assert.equal((await(await handler(f.request('/api/admin/ai-status'))).json()).policyStatus,'enabled');
+ f.env.OPENAI_ENABLED='false';assert.equal((await(await handler(f.request('/api/admin/ai-status'))).json()).status,'disabled');f.env.OPENAI_ENABLED='true';
+ for(const actor of ['synthetic-accountant','synthetic-viewer']){f.user.userId=actor;const result=await handler(f.request('/api/admin/ai-status'));assert.equal(result.status,403);assert.doesNotMatch(await result.text(),/gpt-6-luna|PRIVATE_KEY/);}
+ f.user.userId='actor-a';assert.equal((await handler(f.request('/api/admin/ai-status',{companyId:'company-b'}))).status,403);
+ f.user=null;assert.equal((await handler(f.request('/api/admin/ai-status'))).status,401);
+});

@@ -560,3 +560,19 @@ test('authorization revoked by an explicit rate-limit response prevents its gene
   assert.equal(result.costMicroUsd, 0);
   assert.equal(result.reservationMicroUsd, 250000);
 });
+
+test('definitive unavailable model at token count allows governed fallback while network failure remains ambiguous',async()=>{
+ for(const status of [404,500]){
+  const result=await extractOpenAiInvoice(args(),{fetchImpl:async()=>json({error:{code:'model_not_found'}},status)});
+  assert.equal(result.issues.includes('api_model_unavailable'),status===404);assert.equal(result.attempts,0);
+ }
+});
+
+test('reviewed environment-selected custom model drives both real adapter requests and conservative pricing',async()=>{
+ const {invoiceAiPolicy}=await import('../packages/ai/index.js');
+ const custom={model:'synthetic-reviewed-model',approvalId:'review-synthetic-v1',reviewedOn:'2026-11-07',source:'https://developers.openai.com/api/docs/models/synthetic-reviewed-model',capabilities:{responses:true,structuredOutputs:true,imageInput:true,pdfInput:true,inputTokenCounting:true,reasoningEffort:'low'},limits:{maxInputTokens:32000,maxOutputTokens:2000},pricing:{inputMicroUsdPerMillionTokens:1000000,outputMicroUsdPerMillionTokens:4000000}};
+ const selected=invoiceAiPolicy({OPENAI_ENABLED:'true',OPENAI_MODEL:custom.model,OPENAI_MODEL_CONTRACT:JSON.stringify(custom),OPENAI_API_KEY:'synthetic-key',OPENAI_MAX_OUTPUT_TOKENS:'1200',OPENAI_TIMEOUT_MS:'10000',OPENAI_INVOICES_PRIVACY_APPROVED:'true',OPENAI_INVOICES_SECURITY_APPROVED:'true',OPENAI_INVOICES_COST_APPROVED:'true',OPENAI_INVOICES_APPROVAL_ID:'synthetic-review',OPENAI_INVOICES_ALLOWED_OWNERS:'["synthetic-owner"]',OPENAI_INVOICES_COMPANY_ORGANIZATIONS:'{"synthetic-owner":"5560160680"}'},'synthetic-owner');
+ assert.equal(selected.status,'enabled');const bodies=[];
+ const result=await extractOpenAiInvoice(args({policy:selected}),{fetchImpl:async(url,init)=>{const body=JSON.parse(init.body);bodies.push(body);return json(String(url).endsWith('/input_tokens')?{object:'response.input_tokens',input_tokens:1500}:response(document(),{model:custom.model}));}});
+ assert.equal(result.status,'review');assert.equal(result.model,custom.model);assert.equal(result.costMicroUsd,3500);assert.equal(bodies.length,2);assert.ok(bodies.every(body=>body.model===custom.model));assert.equal(bodies[1].max_output_tokens,1200);assert.equal(result.canAutoRegister,false);assert.equal(result.bankEvidence,false);
+});

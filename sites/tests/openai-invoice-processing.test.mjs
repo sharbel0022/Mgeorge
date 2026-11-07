@@ -46,3 +46,8 @@ test('Sites automatic registration rejects a forged green AI extraction at the w
   await assert.rejects(()=>f.api.registerProcessedInvoice(f.owner,f.id,{direction:'payable',party:'Synthetic AB',number:'SYN-1',total:12500,issued:'2026-11-01',due:'2026-12-01'}, {currency:'SEK',organization_number:'5560160680',vat_cents:2500,net_cents:10000},{automatic:true,lease:f.job.lease,sha256:f.sha}),/AI-förslaget kräver granskning/);
   assert.equal(f.invoices().length,0);
 });
+
+test('Sites actual processing honors new enable/model names without legacy enable and preserves OCR approval gate',async t=>{
+ const f=await documentOcrFixture(t,positionedInvoicePdf());Object.assign(f.env,{OPENAI_ENABLED:'true',OPENAI_MODEL:'gpt-6-luna'});
+ const result=await f.api.processDocuments(f.owner,1);assert.equal(result.processed,1);const row=f.sql.prepare('SELECT extraction FROM document_jobs WHERE owner=? AND document_id=?').get(f.owner,f.id);assert.equal(JSON.parse(row.extraction).ai?.code,'APPROVAL_REQUIRED');
+});

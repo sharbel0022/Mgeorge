@@ -323,8 +323,8 @@ async function finish(owner:string,job:Row,result:{text:string,method:string,con
   const pending=await db().prepare(`SELECT document_id FROM document_jobs WHERE owner=? AND document_id=? AND ${unrecordedLease}`).bind(owner,job.document_id,job.lease,runId).first<Row>();
   if(!pending)return {ignored:true};
   const meta=JSON.parse(source.metadata);let extraction:Row=interpretInvoice(result.text,{direction:meta.direction,direction_confident:meta.direction_confident&&!meta.forwarded,method:result.method,ocrConfidence:result.confidence,filename:meta.original_filename||'',subject:meta.subject||'',ocrEvidence:result.ocrEvidence,ocrInputSha256:job.sha256});
-  if(config.OPENAI_INVOICES_ENABLED==='true'){
-    const {enrichSitesInvoice}=await import('./openai-invoices/sites.js');
+  if((config.OPENAI_ENABLED??config.OPENAI_INVOICES_ENABLED)==='true'){
+    const {enrichSitesInvoice}=await import('./openai-invoices/index.js');
     extraction=await enrichSitesInvoice({database:db(),owner,job,baseline:extraction,environment:config,loadBytes:()=>originalBytes(owner,job,5000000)});
   }
   Object.assign(extraction,{processing:{runner:job.lease_runner||'local',sha256:job.sha256,version:'document-worker-v3',run_id:runId}});

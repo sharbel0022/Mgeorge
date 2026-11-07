@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "sourceSha": "9fc922739cb3522d34a3b9e854bc98262b6f32ba",
+  "sourceTree": "7f13f7b0810b2f39ac22658a8a8b36988da75bf0",
+  "archiveSha256": "8fefea29989f4e821aa679ff4c07e8203975624981b057a8b1621e2331854be8",
+  "node": "24.22.1",
+  "platform": "linux",
+  "checkout": "/tmp/mg-integrated-9fc9227-Kgy0wJ",
+  "syntheticOnly": true,
+  "providerRequests": false,
+  "startedAt": "2026-11-07T11:24:19.711Z",
+  "steps": [
+    {
+      "name": "clean-checkout",
+      "command": "git archive 9fc922739cb3522d34a3b9e854bc98262b6f32ba",
+      "envAbsent": true,
+      "dependenciesAbsent": true,
+      "packageLockSha256": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d"
+    },
+    {
+      "name": "first-start",
+      "command": "npm start",
+      "healthStatus": 200,
+      "frontendStatus": 200,
+      "frontendBytes": 1054,
+      "frontendSha256": "8f5777b697d87799400dd10da69790594c5012a0ba7b104c1c5c0fec04e0834b",
+      "readyDurationMs": 1649,
+      "optionalStatus": [
+        "OpenAI: disabled (OPENAI_DISABLED); lokal konfiguration, ingen leverantörsverifiering",
+        "Gmail: ej konfigurerad (valfri)",
+        "Bank: ej konfigurerad (valfri)",
+        "Bankgiro: källa saknas (valfri)"
+      ],
+      "lockedInstallObserved": true,
+      "dependenciesCreated": true,
+      "envMode": "0600",
+      "generatedKeysValid": true,
+      "keysPrinted": false
+    },
+    {
+      "name": "ctrl-c",
+      "action": "SIGINT delivered to dedicated test foreground process group",
+      "npmExit": {
+        "code": null,
+        "signal": "SIGINT"
+      },
+      "portsReleased": true
+    },
+    {
+      "name": "restart-and-stop",
+      "command": "npm start",
+      "healthStatus": 200,
+      "frontendStatus": 200,
+      "frontendBytes": 1054,
+      "frontendSha256": "8f5777b697d87799400dd10da69790594c5012a0ba7b104c1c5c0fec04e0834b",
+      "readyDurationMs": 496,
+      "optionalStatus": [
+        "OpenAI: disabled (OPENAI_DISABLED); lokal konfiguration, ingen leverantörsverifiering",
+        "Gmail: ej konfigurerad (valfri)",
+        "Bank: ej konfigurerad (valfri)",
+        "Bankgiro: källa saknas (valfri)"
+      ],
+      "stopCommand": "npm run stop",
+      "stopExit": {
+        "code": 0,
+        "signal": null
+      },
+      "launcherExit": {
+        "code": 0,
+        "signal": null
+      },
+      "portsReleased": true
+    },
+    {
+      "name": "missing-openai-key",
+      "command": "OPENAI_ENABLED=true OPENAI_MODEL=gpt-4.1-mini OPENAI_API_KEY= npm start",
+      "healthStatus": 200,
+      "frontendStatus": 200,
+      "frontendBytes": 1054,
+      "frontendSha256": "8f5777b697d87799400dd10da69790594c5012a0ba7b104c1c5c0fec04e0834b",
+      "readyDurationMs": 493,
+      "optionalStatus": [
+        "OpenAI: blocked (API_KEY_MISSING); lokal konfiguration, ingen leverantörsverifiering",
+        "Gmail: ej konfigurerad (valfri)",
+        "Bank: ej konfigurerad (valfri)",
+        "Bankgiro: källa saknas (valfri)"
+      ],
+      "stopCommand": "npm run stop",
+      "stopExit": {
+        "code": 0,
+        "signal": null
+      },
+      "launcherExit": {
+        "code": 0,
+        "signal": null
+      },
+      "portsReleased": true
+    },
+    {
+      "name": "invalid-openai-model",
+      "command": "OPENAI_ENABLED=true OPENAI_MODEL=invalid-unregistered-smoke-model OPENAI_API_KEY=<synthetic-only> npm start",
+      "healthStatus": 200,
+      "frontendStatus": 200,
+      "frontendBytes": 1054,
+      "frontendSha256": "8f5777b697d87799400dd10da69790594c5012a0ba7b104c1c5c0fec04e0834b",
+      "readyDurationMs": 497,
+      "optionalStatus": [
+        "OpenAI: blocked (MODEL_PROFILE_REQUIRED); lokal konfiguration, ingen leverantörsverifiering",
+        "Gmail: ej konfigurerad (valfri)",
+        "Bank: ej konfigurerad (valfri)",
+        "Bankgiro: källa saknas (valfri)"
+      ],
+      "stopCommand": "npm run stop",
+      "stopExit": {
+        "code": 0,
+        "signal": null
+      },
+      "launcherExit": {
+        "code": 0,
+        "signal": null
+      },
+      "portsReleased": true
+    },
+    {
+      "name": "dev-watch",
+      "command": "npm run dev",
+      "healthStatus": 200,
+      "frontendStatus": 200,
+      "frontendBytes": 1054,
+      "frontendSha256": "8f5777b697d87799400dd10da69790594c5012a0ba7b104c1c5c0fec04e0834b",
+      "readyDurationMs": 488,
+      "optionalStatus": [
+        "OpenAI: disabled (OPENAI_DISABLED); lokal konfiguration, ingen leverantörsverifiering",
+        "Gmail: ej konfigurerad (valfri)",
+        "Bank: ej konfigurerad (valfri)",
+        "Bankgiro: källa saknas (valfri)"
+      ],
+      "watchTrigger": "mtime only; source contents unchanged",
+      "readinessCount": 2,
+      "stopCommand": "npm run stop",
+      "stopExit": {
+        "code": 0,
+        "signal": null
+      },
+      "launcherExit": {
+        "code": 0,
+        "signal": null
+      },
+      "portsReleased": true
+    },
+    {
+      "name": "occupied-port",
+      "command": "npm start with synthetic listener owning app port",
+      "exit": {
+        "code": 1,
+        "signal": null
+      },
+      "listenerStillRunning": true,
+      "configurationAlternativeShown": true
+    },
+    {
+      "name": "integrity",
+      "allTrackedSourceHashesUnchanged": true,
+      "envHashUnchanged": true,
+      "allOwnedPortsReleased": true
+    }
+  ],
+  "passed": true,
+  "npm": "11.9.0",
+  "controlPort": 52505,
+  "appPort": 34979,
+  "envSha256": "3f4b26b2bbb7e8a20f30b21042d3b084d03eeb3dc799da7ae31b3b6110d07dac",
+  "finishedAt": "2026-11-07T11:24:25.830Z",
+  "evidence": {
+    "runner": "run-smoke.mjs",
+    "sourceManifest": "source-manifest.json",
+    "sha256Manifest": "sha256.json",
+    "logs": [
+      "01-first-start.log",
+      "02-restart-stop.log",
+      "02-restart.log",
+      "03-ai-missing-key-stop.log",
+      "03-ai-missing-key.log",
+      "04-ai-invalid-model-stop.log",
+      "04-ai-invalid-model.log",
+      "05-dev-stop.log",
+      "05-dev.log",
+      "06-occupied-port.log"
+    ]
+  }
+}

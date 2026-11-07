@@ -1,5 +1,5 @@
-import {nodeSaasBankRuntime} from './saas-bank-runtime.js';
-import {createNodeOpenPaymentsCompanySyncRuntime,readNodeOpenPaymentsCompanySyncStatus} from './openpayments-company-bank-sync.js';
+import {nodeSaasBankRuntime} from '../packages/bank/index.js';
+import {createNodeOpenPaymentsCompanySyncRuntime,readNodeOpenPaymentsCompanySyncStatus} from '../packages/bank/index.js';
 /**
  * MG FAKTURAKOLL – SERVER / API
  * ANSVAR: Tar emot HTTP-anrop från gränssnittet, kontrollerar session och behörighet, skickar arbetet vidare till databas- och integrationsmodulerna samt svarar med JSON. Även schemalagd synkronisering startas här.
@@ -11,33 +11,34 @@ import http from 'node:http';
 import { readFileSync } from 'node:fs';
 import { resolve, extname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import {createLoginRateLimiter} from './login-rate-limit.js';
-import {createCompanyRuntime,readCompanyDatabaseBoundary} from './company-runtime.js';
-import {assertCompanyContext,companyCacheKey} from '../sites/lib/company-contract.js';
-import { openDatabase, bankEvidenceBlocksAbsence, assertNoLegacyBankImports, audit, listInvoices, listTransactions, invoiceStatus, storeTransactions, allocate, deleteAllocation, matchingSuggestions, getSettings, saveSettings, listImports, recordImport, listDocuments, storeDocument, documentMetadata, defaultSettings, today } from './db.js';
-import { digest, token, secureEqual, sessionCookie, clearCookie, encryptObject, decryptObject, passwordHash, verifyPassword, cipherKey } from './security.js';
-import { parseBankFile, normalizeBankApiTransaction } from './importers.js';
-import {dailyBackup} from './backup.js';
-import {createNodeBankgiroIngest} from './bankgiro-ingest.js';
-import {resolveBankgiroSource} from '../sites/lib/bankgiro-source-registry.js';
-import {publicBankgiroStatus} from '../sites/lib/bankgiro-source.js';
-import {createIntegrationJobs} from './integration-jobs.js';
-import {runScheduledCompanyBankSync,isCompanyBankSyncDatabase} from './company-bank-sync.js';
-export {createNodeCompanyBankSyncRuntime,registerCompanyBankSyncRuntime,nodeCompanyBankAccountKey} from './company-bank-sync.js';
-import { isConfigured, configStatus, consentApplicationFingerprint, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
-import {ConsentError,consentDiagnostic,configureBankCompanyContext,bankCompanyContext,requestedBankConsent,consentMetadata,assertConsentContext,validatedLiveAccountDetails,companyAccountGrant,assertCorporateAccountAccess,publicConsent,validateCallbackParameters,validateEnableConsent} from './bank-consent.js';
-import {bankSyncCoverage,planBankSync,completeBankSync} from './bank-sync-state.js';
-import { gmailAccount, withGmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCode, gmailProfile, fetchGmailInvoiceDocuments, revokeGmailTokens } from './gmail.js';
-import {analyzeDocument,approveDocument} from './invoice-review.js';
-import {runDocumentProcess} from './invoice-extraction.js';
-import {runReconciliation,verifyPayer,analyzeReconciliation,reconciliationData} from './reconciliation.js';
-import {readReconciliationPreview} from './reconciliation-preview.js';
-import {discoverManualMultiple,previewManualMultiple,commitManualMultiple,readManualMultipleReceipt,decorateManualMultipleAllocations} from './manual-multiple-allocation.js';
-import {prepareMessages,listMessages,verifyContact,editMessage,rejectMessage,reviewMessage,approveAndSend} from './customer-messages.js';
-import {prepareGmailSend,hasGmailSendScope} from './gmail.js';
-import {createPaymentControl,planBankControl} from './payment-control.js';
-import {buildPaymentOverview,invoiceAnalysis} from './payment-overview.js';
-import {bankSpecificationCandidates,confirmBankSpecificationLink,revokeBankSpecificationLink,bankSpecificationPresentation,bankApiOriginal} from './bankgiro-links.js';
+import {createLoginRateLimiter} from '../packages/auth/index.js';
+import {createCompanyRuntime,readCompanyDatabaseBoundary} from '../packages/companies/index.js';
+import {assertCompanyContext,companyCacheKey} from '../packages/companies/index.js';
+import { openDatabase, bankEvidenceBlocksAbsence, assertNoLegacyBankImports, audit, listInvoices, listTransactions, invoiceStatus, storeTransactions, allocate, deleteAllocation, matchingSuggestions, getSettings, saveSettings, listImports, recordImport, listDocuments, storeDocument, documentMetadata, defaultSettings, today } from '../packages/database/index.js';
+import { digest, token, secureEqual, sessionCookie, clearCookie, encryptObject, decryptObject, passwordHash, verifyPassword, cipherKey } from '../packages/security/index.js';
+import { parseBankFile, normalizeBankApiTransaction } from '../packages/bank/index.js';
+import {dailyBackup} from '../packages/backup/index.js';
+import {createNodeBankgiroIngest} from '../packages/bankgiro/index.js';
+import {resolveBankgiroSource} from '../packages/bankgiro/index.js';
+import {publicBankgiroStatus} from '../packages/bankgiro/index.js';
+import {createIntegrationJobs} from '../packages/jobs/index.js';
+import {runScheduledCompanyBankSync,isCompanyBankSyncDatabase} from '../packages/bank/index.js';
+export {createNodeCompanyBankSyncRuntime,registerCompanyBankSyncRuntime,nodeCompanyBankAccountKey} from '../packages/bank/index.js';
+import { isConfigured, configStatus, consentApplicationFingerprint, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from '../packages/bank/index.js';
+import {ConsentError,consentDiagnostic,configureBankCompanyContext,bankCompanyContext,requestedBankConsent,consentMetadata,assertConsentContext,validatedLiveAccountDetails,companyAccountGrant,assertCorporateAccountAccess,publicConsent,validateCallbackParameters,validateEnableConsent} from '../packages/bank/index.js';
+import {bankSyncCoverage,planBankSync,completeBankSync} from '../packages/bank/index.js';
+import { gmailAccount, withGmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCode, gmailProfile, fetchGmailInvoiceDocuments, revokeGmailTokens } from '../packages/gmail/index.js';
+import {analyzeDocument,approveDocument} from '../packages/invoices/index.js';
+import {runDocumentProcess,stopDocumentProcesses} from '../packages/ocr/index.js';
+import {invoiceAiConfigurationStatus,invoiceAiPolicy} from '../packages/ai/index.js';
+import {runReconciliation,verifyPayer,analyzeReconciliation,reconciliationData} from '../packages/reconciliation/index.js';
+import {readReconciliationPreview} from '../packages/reconciliation/index.js';
+import {discoverManualMultiple,previewManualMultiple,commitManualMultiple,readManualMultipleReceipt,decorateManualMultipleAllocations} from '../packages/reconciliation/index.js';
+import {prepareMessages,listMessages,verifyContact,editMessage,rejectMessage,reviewMessage,approveAndSend} from '../packages/messages/index.js';
+import {prepareGmailSend,hasGmailSendScope} from '../packages/gmail/index.js';
+import {createPaymentControl,planBankControl} from '../packages/payments/index.js';
+import {buildPaymentOverview,invoiceAnalysis} from '../packages/payments/index.js';
+import {bankSpecificationCandidates,confirmBankSpecificationLink,revokeBankSpecificationLink,bankSpecificationPresentation,bankApiOriginal} from '../packages/bankgiro/index.js';
 
 function assertLegacyBankRuntime(){if(isCompanyBankSyncDatabase(db))throw Object.assign(bad(409,'Företagets bankhämtning och avstämning kräver den registrerade företagsanslutningen.'),{code:'company_sync_required'});}
 function reconcileAndPrepare(){assertLegacyBankRuntime();const suggestions=runReconciliation(db);prepareMessages(db);return suggestions;}
@@ -612,6 +613,7 @@ function companySelector(req,url){
  return {companyId,contextVersion:version===undefined?undefined:Number(version)};
 }
 function companyAction(method,path){
+ if(path==='/api/admin/ai-status')return 'manage_integrations';
  if(/^\/api\/companies\/[^/]+\/bank\//.test(path))return method==='GET'&&!path.endsWith('/callback')?'read':'manage_integrations';
  if(method==='GET'&&!['/api/bank/callback','/api/gmail/callback'].includes(path))return 'read';
  if(path==='/api/settings')return 'manage_company';
@@ -645,7 +647,7 @@ async function route(req,res){
   const hostname=new URL('http://'+req.headers.host).hostname;
   if(!(check.secure?[new URL(check.origin).hostname]:['localhost','127.0.0.1','[::1]']).includes(hostname))throw bad(403,'Ogiltig värd för MG Fakturakoll');
   const url=new URL(req.url,check.origin);const path=url.pathname;
-  if(path==='/api/health'&&req.method==='GET')return json(res,200,{ok:true,app:'Mgeorge Fakturakoll'});
+  if(path==='/api/health'&&req.method==='GET')return json(res,200,{ok:true,app:'Mgeorge Fakturakoll',...(process.env.MG_LAUNCH_MANAGED==='1'&&process.env.MG_LAUNCH_TOKEN&&secureEqual(String(req.headers['x-mg-launch-token']||''),process.env.MG_LAUNCH_TOKEN)?{launchToken:process.env.MG_LAUNCH_TOKEN}:{})});
   if(!path.startsWith('/api/'))return serveStatic(req,res,path);
   const callback=(['/api/bank/callback','/api/gmail/callback'].includes(path)||/^\/api\/companies\/[^/]+\/bank\/callback$/.test(path))&&req.method==='GET';
   if(!callback&&((req.headers.origin&&req.headers.origin!==check.origin)||req.headers['sec-fetch-site']==='cross-site'))throw bad(403,'Begäran måste komma från MG:s egen hemsida');
@@ -691,6 +693,10 @@ async function route(req,res){
   return companyRuntime.run(context,()=>withGmailAccount(companyMailbox(context),()=>{companyRuntime.assert(req.companyAction);return companyRoute(req,res,url,path);}),{actorId:req.actorId,authorize:()=>assertSessionIdentity(req)});
 }
 async function companyRoute(req,res,url,path){
+  if(path==='/api/admin/ai-status'&&req.method==='GET'){
+    const policy=invoiceAiPolicy(process.env,req.companyContext?.storageOwner||'node:legacy');
+    return json(res,200,{...invoiceAiConfigurationStatus(process.env),policyStatus:policy.status,policyCode:policy.code??null});
+  }
   const saas=/^\/api\/companies\/([^/]+)\/bank(?:\/(.*))?$/.exec(path);
   if(saas){
     if(!req.companyContext||decodeURIComponent(saas[1])!==req.companyContext.companyId)throw new ConsentError('COMPANY_ACCESS_DENIED',403);
@@ -1169,4 +1175,23 @@ if(process.env.NODE_ENV!=='test'){
   schedulerTimer=setInterval(()=>{scheduledBackup();runScheduledBankgiro().catch(()=>{schedulerState.last_error='Bankgirohämtningen behöver kontrolleras';});runScheduledSync().catch(()=>{schedulerState.last_error='Automatisk hämtning kunde inte slutföras';});},60000);schedulerTimer.unref();
 }
 server.on('close',()=>{if(schedulerTimer)clearInterval(schedulerTimer);companyRuntime.close();});
+// IPC ownership survives reloads and detects an unexpectedly lost launcher.
+// Direct server invocations retain signal support without a launcher dependency.
+let shuttingDown=false;
+async function shutdownServer(){
+  if(shuttingDown)return;shuttingDown=true;
+  if(schedulerTimer)clearInterval(schedulerTimer);
+  const force=setTimeout(()=>process.exit(1),6000);force.unref();
+  await stopDocumentProcesses();
+  server.close(()=>{clearTimeout(force);process.exit(0);});
+  server.closeIdleConnections();
+}
+if(process.env.NODE_ENV!=='test'){
+  process.once('SIGINT',shutdownServer);process.once('SIGTERM',shutdownServer);
+  if(process.env.MG_LAUNCH_MANAGED==='1'&&process.send){
+    process.on('message',message=>{if(message==='shutdown')void shutdownServer();});
+    process.once('disconnect',shutdownServer);
+    if(!process.connected)void shutdownServer();
+  }
+}
 export {server,db,companyRuntime};

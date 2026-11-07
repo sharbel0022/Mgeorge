@@ -1,0 +1,16 @@
+{
+  "01-first-start.log": "9607263855b7396f5c822d733cac62c3136b33ea23d18ea47a5ebdd03fffbe4c",
+  "02-restart-stop.log": "e0bae35f9e4bb533bed777bb915b07aed36fa5f6f9d00d44c9e456e84dc0b09b",
+  "02-restart.log": "305017e5f56c4ce725eb368d27029a71e6d813249b66acd8ab910bf8b12fa3a0",
+  "03-ai-missing-key-stop.log": "e0bae35f9e4bb533bed777bb915b07aed36fa5f6f9d00d44c9e456e84dc0b09b",
+  "03-ai-missing-key.log": "846acc6dc38e6513419fd103d68b71bbdab5306118bb43719fff7e97b31d9d59",
+  "04-ai-invalid-model-stop.log": "e0bae35f9e4bb533bed777bb915b07aed36fa5f6f9d00d44c9e456e84dc0b09b",
+  "04-ai-invalid-model.log": "487036e28674abbe16958e98dea3046d7e420e8a61371a54267f6739c14b54cc",
+  "05-dev-stop.log": "e0bae35f9e4bb533bed777bb915b07aed36fa5f6f9d00d44c9e456e84dc0b09b",
+  "05-dev.log": "00758fec34c68415783d1180d1bf13bc6fc4c9b86c465a4848f8a10a6b042887",
+  "06-occupied-port.log": "01bf2d683ba1bbf0bfa44e1cecde3200e5793bbdee5670a0940f3890e1e67726",
+  "README.md": "df7552a6e6658c70fff4e0d5a7832581f34ef076a324353a33e8d1d51db1407a",
+  "run-smoke.mjs": "e48f5cbd8cd3f37e4ef543d1de3c5f9c97810bd8a684e55c04ece150c6c863e3",
+  "source-manifest.json": "39d397d25d5b16679499569c568e333656cb39fb99fb32f733e1d922deb32c0c",
+  "summary.json": "6f7af7b37a13029c459fd8beaccdd96947ead4e6cc2011f562ec3d5a6bb5b715"
+}

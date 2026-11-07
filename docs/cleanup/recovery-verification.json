@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-11-07T11:20:21.951470+00:00",
+  "file": "mgeorge-recovery-20261107.bundle",
+  "size_bytes": 58098464,
+  "sha256": "e3bfd64561c912498fd676f107a8bb5b5c6e9198b155d627c6bffeef96fa7eb2",
+  "bundle_verify": true,
+  "independent_bare_clone_fsck": true,
+  "recorded_remote_branch_heads_covered": 80,
+  "bundle_ref_count": 169,
+  "durable_user_artifact_saved": true,
+  "remote_deletions_performed": false
+}

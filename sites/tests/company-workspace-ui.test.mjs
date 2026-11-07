@@ -72,3 +72,11 @@ test('same-company directory refresh preserves the workspace value and callback 
   assert.equal(f.tree.props.value,initial);assert.equal(f.tree.props.value.switchCompany,initial.switchCompany);
   assert.ok(f.find(node=>node.props?.['data-company-private']));
 });
+
+
+test('integration diagnostics permission follows the current company role',async t=>{
+ for(const role of ['owner','admin','accountant','viewer']){
+  const f=await fixture(t),value=directory();value.context.role=role;value.companies[0].role=role;
+  await f.respond(0,200,value);assert.equal(f.tree.props.value.canManageIntegrations,['owner','admin'].includes(role));f.dispose();
+ }
+});

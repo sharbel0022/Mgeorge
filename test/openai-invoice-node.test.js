@@ -52,3 +52,10 @@ test('AI invoice references are excluded from original-derived payment evidence'
   const original=invoiceReferenceOriginal(extraction);
   assert.equal(original.invoice_number,undefined);assert.equal(original.reference,undefined);
 });
+
+test('Node actual document interpretation honors new enable/model names before guarded OCR enrichment',async t=>{
+ const {analyzeDocument}=await import('../src/invoice-review.js');const f=fixture(t);
+ const names=['OPENAI_ENABLED','OPENAI_MODEL','OPENAI_INVOICES_ENABLED','OPENAI_INVOICES_PRIVACY_APPROVED'];const previous=Object.fromEntries(names.map(n=>[n,process.env[n]]));t.after(()=>{for(const n of names)if(previous[n]===undefined)delete process.env[n];else process.env[n]=previous[n];});
+ process.env.OPENAI_ENABLED='true';process.env.OPENAI_MODEL='gpt-6-luna';delete process.env.OPENAI_INVOICES_ENABLED;process.env.OPENAI_INVOICES_PRIVACY_APPROVED='false';
+ const result=await analyzeDocument(f.database,f.row.id,{extract:async()=>interpretInvoice('',{direction:'supplier'})});assert.equal(result.ai?.code,'APPROVAL_REQUIRED');
+});
