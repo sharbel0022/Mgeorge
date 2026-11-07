@@ -212,7 +212,7 @@ try {
   receipt.runnerErrors.push(String(error).slice(0, 2000));
 } finally {
   receipt.runnerErrors.push(...await closeBrowserResources({ browser, server }));
-  receipt.passed = receipt.results.length === 31 && receipt.results.every(item => item.passed && item.assetsVerified === true) && receipt.runnerErrors.length === 0 && receipt.browserErrors.length === 0 && receipt.externalRequests.length === 0 && receipt.forbiddenRequests.length === 0 && browserAssetsComplete(receipt.assetChecks);
+  receipt.passed = receipt.results.length === 32 && receipt.results.every(item => item.passed && item.assetsVerified === true) && receipt.runnerErrors.length === 0 && receipt.browserErrors.length === 0 && receipt.externalRequests.length === 0 && receipt.forbiddenRequests.length === 0 && browserAssetsComplete(receipt.assetChecks);
   writeJson(join(output, 'dashboard-results.json'), receipt);
   console.log(JSON.stringify({ passed: receipt.passed, tests: receipt.results.length, failures: receipt.results.filter(item => !item.passed).map(item => item.name) }));
 }
