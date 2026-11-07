@@ -33,11 +33,11 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p "$RUNNER_TEMP/branch-cleanup"
-          node --test test/branch-cleanup.test.js | tee "$RUNNER_TEMP/branch-cleanup/focused-tests.tap"
+          node --test --test-reporter=tap test/branch-cleanup.test.js test/release-finalizer.test.js | tee "$RUNNER_TEMP/branch-cleanup/focused-tests.tap"
       - name: Archive and process the exact manifest
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: node scripts/release/branch-cleanup.mjs --manifest docs/cleanup/deletion-request.json --output "$RUNNER_TEMP/branch-cleanup" --execute
+        run: node --import ./scripts/release/github-read-transport.mjs scripts/release/branch-cleanup.mjs --manifest docs/cleanup/deletion-request.json --output "$RUNNER_TEMP/branch-cleanup" --execute
       - name: Preserve results and verified recovery bundle
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

@@ -8,7 +8,7 @@ const REPO = 'sharbel0022/Mgeorge', BRANCH = 'release/cleanup-approved-20261107'
 const WORKFLOW = '.github/workflows/branch-cleanup.yml', JOB = 'Finalize archived execution branch';
 const UPLOAD = 'Upload execution recovery before deletion', SCRIPT = 'scripts/release/finalize-cleanup-branch.mjs';
 const SHA = /^[a-f0-9]{40}$/, DIGEST = /^[a-f0-9]{64}$/, MAX_ARCHIVE = 256 * 1024 * 1024;
-const ALLOWED = new Set([WORKFLOW, SCRIPT, 'test/release-finalizer.test.js', 'docs/cleanup/deletion-request.json']);
+const ALLOWED = new Set([WORKFLOW, SCRIPT, 'test/release-finalizer.test.js', 'docs/cleanup/deletion-request.json', 'scripts/release/github-read-transport.mjs']);
 const fail = (code, message) => { throw Object.assign(new Error(message), { code }); };
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const save = (file, value) => writeFileSync(file, JSON.stringify(value, null, 2) + '\n');
@@ -23,7 +23,7 @@ const git = (cwd, args, optional = false) => command(cwd, 'git', ['--no-replace-
 const normalizeRemote = url => url.replace(/^git@github\.com:/, 'https://github.com/').replace(/\.git\/?$/, '').replace(/\/$/, '');
 
 export function createFinalizationApi(token = process.env.GITHUB_TOKEN) {
-  const headers = { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'mgeorge-release-finalizer' };
+  const headers = { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'mgeorge-release-finalizer', Connection: 'close' };
   async function request(route, redirect = 'error') {
     if (!token) fail('API_UNAVAILABLE', 'The normal Actions token is required.');
     return fetch(`https://api.github.com/repos/${REPO}/${route}`, { headers, redirect, signal: AbortSignal.timeout(60_000) });
@@ -143,7 +143,7 @@ export async function runFinalization({ cwd = process.cwd(), request, context = 
     }
     if (git(cwd, ['merge-base', '--is-ancestor', request.expectedMain, context.sha], true).status !== 0) fail('SOURCE_BASE_MISMATCH', 'The execution commit must descend from approved main.');
     const changedPaths = git(cwd, ['diff', '--name-only', '--no-renames', request.expectedMain, context.sha]).output.split('\n').filter(Boolean);
-    if (changedPaths.some(file => !ALLOWED.has(file))) fail('PRODUCT_CHANGE', 'The release commit contains changes outside its four operational paths.');
+    if (changedPaths.some(file => !ALLOWED.has(file))) fail('PRODUCT_CHANGE', 'The release commit contains changes outside its five operational paths.');
     if (git(cwd, ['hash-object', '--no-filters', fileURLToPath(import.meta.url)]).output !== git(cwd, ['rev-parse', `${context.sha}:${SCRIPT}`]).output) fail('SOURCE_SCRIPT_MISMATCH', 'Running finalizer differs from the archived execution commit.');
     const sourceRequest = git(cwd, ['show', `${context.sha}:docs/cleanup/deletion-request.json`]).output;
     if (JSON.stringify(JSON.parse(sourceRequest)) !== JSON.stringify(request)) fail('REQUEST_MISMATCH', 'Request differs from the immutable execution commit.');

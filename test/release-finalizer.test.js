@@ -1,12 +1,14 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { once } from 'node:events';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
 const script = new URL('../scripts/release/finalize-cleanup-branch.mjs', import.meta.url);
+const transport = new URL('../scripts/release/github-read-transport.mjs', import.meta.url);
 const branch = 'release/cleanup-approved-20261107';
 const jobName = 'Finalize archived execution branch';
 const uploadName = 'Upload execution recovery before deletion';
@@ -14,7 +16,7 @@ const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const sh = value => "'" + value.replaceAll("'", "'\\''") + "'";
 const git = (cwd, ...args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 
-function fixture(t, { productChange = false } = {}) {
+function fixture(t, { productChange = false, transportChange = false } = {}) {
   const dir = mkdtempSync(path.join(tmpdir(), 'mgeorge-finalizer-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   const seed = path.join(dir, 'seed'), remote = path.join(dir, 'remote.git'), cwd = path.join(dir, 'checkout');
@@ -34,6 +36,7 @@ function fixture(t, { productChange = false } = {}) {
   mkdirSync(path.join(seed, 'docs/cleanup'), { recursive: true });
   writeFileSync(path.join(seed, 'docs/cleanup/deletion-request.json'), JSON.stringify(request, null, 2) + '\n');
   writeFileSync(path.join(seed, 'scripts/release/finalize-cleanup-branch.mjs'), existsSync(script) ? readFileSync(script) : 'not implemented');
+  if (transportChange) writeFileSync(path.join(seed, 'scripts/release/github-read-transport.mjs'), readFileSync(transport));
   if (productChange) writeFileSync(path.join(seed, 'app.txt'), 'unapproved product change\n');
   git(seed, 'add', '.'); git(seed, 'commit', '-m', 'Temporary reviewed execution payload');
   const head = git(seed, 'rev-parse', 'HEAD');
@@ -230,5 +233,178 @@ test('exact deletion lease preserves concurrent work after the last read', async
   writeFileSync(path.join(f.cwd, '.git/hooks/pre-push'), `#!/bin/sh\nwhile read localref localsha remoteref remotesha; do\n  if test "$remoteref" = refs/heads/${branch}; then\n    git --git-dir=${sh(f.remote)} update-ref "$remoteref" ${sh(f.moved)} || exit 1\n  fi\ndone\n`, { mode: 0o755 });
   assert.equal((await run(f, { phase: 'delete', ...uploaded })).status, 'retained');
   assert.equal(f.ref(branch), f.moved);
+  assert.equal(f.ref('main'), f.main);
+});
+
+const apiRoot = 'https://api.github.com/repos/sharbel0022/Mgeorge/';
+
+test('transport scopes GET connection closure and preserves all supplied request options', async () => {
+  const { createGitHubReadTransport } = await import(transport);
+  const calls = [], response = new Response('{}');
+  const wrapped = createGitHubReadTransport(function (...args) { calls.push({ receiver: this, args }); return Promise.resolve(response); });
+  const controller = new AbortController(), headers = new Headers({ Authorization: 'Bearer synthetic-token', Accept: 'application/json' });
+  const inherited = { signal: controller.signal, redirect: 'manual', cache: 'no-store' };
+  const init = Object.assign(Object.create(inherited), { method: 'get', headers });
+  const receiver = {}, url = new URL(apiRoot + 'branches/main');
+  assert.equal(await wrapped.call(receiver, url, init), response);
+  const call = calls[0], options = call.args[1];
+  assert.equal(call.receiver, receiver);
+  assert.equal(call.args[0], url);
+  assert.equal(options.signal, controller.signal);
+  assert.equal(options.redirect, 'manual');
+  assert.equal(options.cache, 'no-store');
+  assert.equal(options.method, 'get');
+  assert.equal(options.headers.get('authorization'), 'Bearer synthetic-token');
+  assert.equal(options.headers.get('accept'), 'application/json');
+  assert.equal(options.headers.get('connection'), 'close');
+  assert.equal(headers.has('connection'), false);
+  assert.equal(init.headers, headers);
+  assert.equal(calls.length, 1);
+});
+
+test('transport honors Request headers and explicit init-header precedence without replacing its signal', async () => {
+  const { createGitHubReadTransport } = await import(transport);
+  const calls = [], wrapped = createGitHubReadTransport((...args) => { calls.push(args); return Promise.resolve(new Response('{}')); });
+  const controller = new AbortController();
+  const request = new Request(apiRoot + 'pulls?state=open', { headers: { Authorization: 'Bearer request-token', 'X-Request': 'kept' }, signal: controller.signal, redirect: 'error' });
+  await wrapped(request);
+  assert.equal(calls[0][0], request);
+  assert.equal(calls[0][1].headers.get('authorization'), 'Bearer request-token');
+  assert.equal(calls[0][1].headers.get('x-request'), 'kept');
+  assert.equal(calls[0][1].headers.get('connection'), 'close');
+  assert.equal(calls[0][1].signal, undefined, 'The original Request continues to supply its exact signal');
+  assert.equal(request.redirect, 'error');
+  assert.equal(request.headers.has('connection'), false);
+  const override = { headers: [['Authorization', 'Bearer override-token']] };
+  await wrapped(request, override);
+  assert.equal(calls[1][1].headers.get('authorization'), 'Bearer override-token');
+  assert.equal(calls[1][1].headers.has('x-request'), false);
+  assert.deepEqual(override.headers, [['Authorization', 'Bearer override-token']]);
+});
+
+test('transport passes every other origin, repository and method through unchanged', async () => {
+  const { createGitHubReadTransport } = await import(transport);
+  const calls = [], wrapped = createGitHubReadTransport((...args) => { calls.push(args); return Promise.resolve(new Response('{}')); });
+  const cases = [
+    ['https://storage.example.invalid/private.zip', {}],
+    ['https://api.github.com.evil.invalid/repos/sharbel0022/Mgeorge/branches/main', {}],
+    ['http://api.github.com/repos/sharbel0022/Mgeorge/branches/main', {}],
+    ['https://api.github.com:444/repos/sharbel0022/Mgeorge/branches/main', {}],
+    ['https://user:password@api.github.com/repos/sharbel0022/Mgeorge/branches/main', {}],
+    ['https://api.github.com/repos/sharbel0022/Mgeorge-other/branches/main', {}],
+    ['https://api.github.com/repos/elsewhere/Mgeorge/branches/main', {}],
+    ['https://api.github.com/repos/sharbel0022/Mgeorge', {}],
+    [apiRoot + 'git/refs', { method: 'POST', body: 'synthetic body' }],
+    [apiRoot + 'branches/main', { method: 'HEAD' }],
+    [new Request(apiRoot + 'git/refs', { method: 'POST', body: 'synthetic body' }), undefined],
+    [new Request(apiRoot + 'branches/main'), { method: 'DELETE' }],
+  ];
+  for (const args of cases) {
+    await wrapped(...args);
+    const received = calls.at(-1);
+    assert.equal(received[0], args[0]);
+    assert.equal(received[1], args[1]);
+    assert.equal(received.length, args.length);
+  }
+  assert.equal(calls.length, cases.length);
+});
+
+test('transport propagates the same failure once and emits only sanitized endpoint and error codes', async () => {
+  const { createGitHubReadTransport } = await import(transport);
+  const diagnostics = [];
+  let calls = 0;
+  const failure = Object.assign(new TypeError('secret raw message'), { cause: Object.assign(new Error('secret cause'), { code: 'UND_ERR_SOCKET' }) });
+  const wrapped = createGitHubReadTransport(async () => { calls++; throw failure; }, row => diagnostics.push(row));
+  await assert.rejects(wrapped(apiRoot + 'branches/sensitive-branch?token=secret-query', { headers: { Authorization: 'Bearer secret-token' }, redirect: 'error' }), error => error === failure);
+  assert.equal(calls, 1, 'Transport failures are never retried');
+  assert.equal(diagnostics.length, 1);
+  assert.equal(diagnostics[0].endpoint, '/repos/sharbel0022/Mgeorge/branches/[ref]');
+  assert.equal(diagnostics[0].causeCode, 'UND_ERR_SOCKET');
+  assert.doesNotMatch(JSON.stringify(diagnostics), /secret|sensitive|authorization|headers|body/i);
+  const abort = Object.assign(new Error('secret abort reason'), { code: 'ABORT_ERR', cause: { code: 'SECRET_DIAGNOSTIC' } });
+  const aborted = createGitHubReadTransport(async () => { throw abort; }, row => diagnostics.push(row));
+  await assert.rejects(aborted(apiRoot + 'branches/main'), error => error === abort);
+  assert.equal(diagnostics[1].code, 'ABORT_ERR');
+  assert.equal(diagnostics[1].causeCode, 'UNKNOWN');
+  assert.doesNotMatch(JSON.stringify(diagnostics), /SECRET_DIAGNOSTIC/);
+  const brokenLogger = createGitHubReadTransport(async () => { throw failure; }, () => { throw new Error('logger failed'); });
+  await assert.rejects(brokenLogger(apiRoot + 'branches/main'), error => error === failure);
+  const denied = new Response('denied', { status: 403 });
+  let deniedCalls = 0;
+  const noRetry = createGitHubReadTransport(async () => { deniedCalls++; return denied; });
+  assert.equal(await noRetry(apiRoot + 'branches/main'), denied);
+  assert.equal(deniedCalls, 1);
+});
+
+test('transport survives three warm GETs and a synchronous pause after the server closes idle sockets', { timeout: 20_000 }, async t => {
+  const { createGitHubReadTransport, originalFetch } = await import(transport);
+  const serverCode = [
+    "import http from 'node:http';",
+    "let sequence = 0; const sockets = new WeakMap();",
+    "const server = http.createServer((request, response) => {",
+    "  response.setHeader('content-type', 'application/json');",
+    "  response.setHeader('keep-alive', 'timeout=4');",
+    "  response.end(JSON.stringify({ socketId: sockets.get(request.socket), connection: request.headers.connection }));",
+    "});",
+    "server.keepAliveTimeout = 4000; server.keepAliveTimeoutBuffer = 0;",
+    "server.on('connection', socket => sockets.set(socket, ++sequence));",
+    "server.listen(0, '127.0.0.1', () => process.send({ port: server.address().port }));",
+    "process.on('disconnect', () => process.exit(0));",
+  ].join('\n');
+  const child = spawn(process.execPath, ['--input-type=module', '-e', serverCode], { env: { PATH: process.env.PATH }, stdio: ['ignore', 'ignore', 'pipe', 'ipc'] });
+  t.after(async () => {
+    if (child.exitCode === null && child.signalCode === null) {
+      const stopped = once(child, 'exit', { signal: AbortSignal.timeout(2000) }).catch(() => child.kill('SIGKILL'));
+      child.kill('SIGTERM'); await stopped;
+    }
+  });
+  const [{ port }] = await once(child, 'message', { signal: AbortSignal.timeout(5000) });
+  const local = 'http://127.0.0.1:' + port;
+  const wrapped = createGitHubReadTransport((input, options) => {
+    assert.equal(input, apiRoot + 'branches/main');
+    return originalFetch(local, options);
+  });
+  const get = async () => (await wrapped(apiRoot + 'branches/main', { redirect: 'error', signal: AbortSignal.timeout(3000) })).json();
+  const warm = [];
+  for (let i = 0; i < 3; i++) warm.push(await get());
+  const blocked = spawnSync(process.execPath, ['-e', 'setTimeout(() => {}, 5000)'], { timeout: 7000, env: { PATH: process.env.PATH } });
+  assert.equal(blocked.status, 0);
+  const after = await get();
+  assert.deepEqual([...warm, after].map(row => row.socketId), [1, 2, 3, 4]);
+  assert.ok([...warm, after].every(row => row.connection === 'close'));
+});
+
+test('finalizer closes GitHub GET connections without forwarding authorization to artifact storage', async t => {
+  const { createFinalizationApi } = await import(script);
+  const calls = [];
+  t.mock.method(globalThis, 'fetch', async (input, options) => {
+    calls.push({ url: String(input), options });
+    if (String(input).endsWith('/zip')) return new Response(null, { status: 302, headers: { Location: 'https://storage.example.invalid/recovery.zip?signature=synthetic' } });
+    if (String(input).startsWith('https://storage.')) return new Response('verified recovery');
+    return new Response('{"name":"main"}', { headers: { 'Content-Type': 'application/json' } });
+  });
+  const api = createFinalizationApi('synthetic-actions-token');
+  assert.deepEqual(await api.get('branches/main'), { name: 'main' });
+  assert.equal((await api.downloadArtifact(17)).toString(), 'verified recovery');
+  assert.equal(calls.length, 3);
+  for (const call of calls.slice(0, 2)) {
+    const headers = new Headers(call.options.headers);
+    assert.equal(headers.get('authorization'), 'Bearer synthetic-actions-token');
+    assert.equal(headers.get('connection'), 'close');
+    assert.ok(call.options.signal instanceof AbortSignal);
+  }
+  assert.equal(calls[0].options.redirect, 'error');
+  assert.equal(calls[1].options.redirect, 'manual');
+  assert.equal(calls[2].options.redirect, 'error');
+  assert.equal(calls[2].options.headers, undefined);
+  assert.ok(calls[2].options.signal instanceof AbortSignal);
+});
+
+test('the single new transport path is permitted in the archived operational payload', async t => {
+  const f = fixture(t, { transportChange: true });
+  const report = await run(f, { phase: 'check' });
+  assert.equal(report.status, 'ready', JSON.stringify(report));
+  assert.ok(report.changedPaths.includes('scripts/release/github-read-transport.mjs'));
+  assert.equal(f.ref(branch), f.head);
   assert.equal(f.ref('main'), f.main);
 });
