@@ -49,3 +49,86 @@ jobs:
             ${{ runner.temp }}/branch-cleanup/*.tap
           if-no-files-found: error
           retention-days: 90
+
+  finalize:
+    name: Finalize archived execution branch
+    needs: cleanup
+    if: github.repository == 'sharbel0022/Mgeorge' && github.ref == 'refs/heads/release/cleanup-approved-20261107' && needs.cleanup.result == 'success' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pull-requests: read
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24.22.1'
+      - name: Read explicit terminal request
+        id: request
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/release-finalizer"
+          cp scripts/release/finalize-cleanup-branch.mjs "$RUNNER_TEMP/release-finalizer/finalize.mjs"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const file = 'docs/cleanup/deletion-request.json';
+          const request = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : null;
+          const enabled = request?.execute === true && request?.finalizeExecutionBranch === true;
+          if (enabled && !/^[a-f0-9]{40}$/.test(request.expectedMain || '')) throw new Error('Exact approved main is required');
+          fs.writeFileSync(process.env.RUNNER_TEMP + '/release-finalizer/request.json', JSON.stringify(request, null, 2) + '\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `enabled=${enabled}\nmain=${enabled ? request.expectedMain : ''}\n`);
+          NODE
+      - name: Exercise isolated terminal-finalization contracts
+        if: steps.request.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test test/release-finalizer.test.js | tee "$RUNNER_TEMP/release-finalizer/focused-tests.tap"
+      - name: Check out exact approved main without changing Actions context
+        if: steps.request.outputs.enabled == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.request.outputs.main }}
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Archive and independently restore the exact execution head
+        if: steps.request.outputs.enabled == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node "$RUNNER_TEMP/release-finalizer/finalize.mjs" --phase prepare --manifest "$RUNNER_TEMP/release-finalizer/request.json" --output "$RUNNER_TEMP/release-finalizer"
+      - name: Upload execution recovery before deletion
+        id: recovery
+        if: steps.request.outputs.enabled == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: execution-recovery-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/release-finalizer/execution-recovery.bundle
+            ${{ runner.temp }}/release-finalizer/execution-recovery.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - name: Verify uploaded recovery and finalize the fixed execution ref
+        if: steps.request.outputs.enabled == 'true' && steps.recovery.outcome == 'success'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RECOVERY_ARTIFACT_ID: ${{ steps.recovery.outputs.artifact-id }}
+          RECOVERY_ARTIFACT_DIGEST: ${{ steps.recovery.outputs.artifact-digest }}
+        run: node "$RUNNER_TEMP/release-finalizer/finalize.mjs" --phase delete --manifest "$RUNNER_TEMP/release-finalizer/request.json" --output "$RUNNER_TEMP/release-finalizer" --artifact-id "$RECOVERY_ARTIFACT_ID" --artifact-digest "$RECOVERY_ARTIFACT_DIGEST"
+      - name: Preserve terminal results and remaining refs
+        if: always() && steps.request.outputs.enabled == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: execution-finalization-result-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/release-finalizer/finalization-*.json
+            ${{ runner.temp }}/release-finalizer/remaining-refs.json
+            ${{ runner.temp }}/release-finalizer/focused-tests.tap
+          if-no-files-found: error
+          retention-days: 90
