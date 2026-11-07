@@ -18,10 +18,14 @@ function reservation(input,ctx){
     typeof input.profileVersion!=='string'||!/^[A-Za-z0-9._:-]{1,100}$/.test(input.profileVersion)||
     !Number.isSafeInteger(input.reservedMicroUsd)||input.reservedMicroUsd<1||input.reservedMicroUsd>10_000_000||
     !Number.isSafeInteger(input.dailyBudgetMicroUsd)||input.dailyBudgetMicroUsd<1||input.dailyBudgetMicroUsd>100_000_000)fail();
+  if(input.aliasKey!==undefined&&!hash(input.aliasKey))fail();
+  const monthlyBudgetMicroUsd=input.monthlyBudgetMicroUsd??1000000000;
+  if(!Number.isSafeInteger(monthlyBudgetMicroUsd)||monthlyBudgetMicroUsd<input.dailyBudgetMicroUsd||monthlyBudgetMicroUsd>1000000000)fail();
   const date=ctx.now();if(!(date instanceof Date)||!Number.isFinite(date.getTime()))fail();
   const at=date.toISOString(),day=at.slice(0,10),end=new Date(date.getTime());end.setUTCDate(end.getUTCDate()+1);
-  const value={schemaVersion:1,owner:ctx.owner,key:input.key,documentId:input.documentId,sha256:input.sha256,profileVersion:input.profileVersion,reservedMicroUsd:input.reservedMicroUsd,day};
-  return {id:'invoice-ai-reserve:'+input.key,at,start:day+'T00:00:00.000Z',end:end.toISOString().slice(0,10)+'T00:00:00.000Z',encoded:json(value)};
+  const value={schemaVersion:1,owner:ctx.owner,key:input.key,documentId:input.documentId,sha256:input.sha256,profileVersion:input.profileVersion,reservedMicroUsd:input.reservedMicroUsd,day,monthlyBudgetMicroUsd};
+  const monthStart=at.slice(0,7)+'-01T00:00:00.000Z',monthEnd=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+1,1)).toISOString();
+  return {aliasId:'invoice-ai-reserve:'+(input.aliasKey??input.key),monthlyBudgetMicroUsd,monthStart,monthEnd,id:'invoice-ai-reserve:'+input.key,at,start:day+'T00:00:00.000Z',end:end.toISOString().slice(0,10)+'T00:00:00.000Z',encoded:json(value)};
 }
 function cached(row,key,owner,column){
   if(!row)return null;
@@ -46,11 +50,11 @@ export function createNodeAuditStore(database,options){
     async reserve(input){
       const r=reservation(input,ctx);await ctx.authorize();
       const changed=database.prepare(
-        'INSERT INTO audit_events(id,action,details,created_at) SELECT ?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM audit_events WHERE id=?) AND COALESCE((SELECT '+sumExpression(column)+' FROM audit_events WHERE action=? AND created_at>=? AND created_at<?),0)+?<=?'
-      ).run(r.id,RESERVATION,r.encoded,r.at,r.id,input.dailyBudgetMicroUsd+1,input.dailyBudgetMicroUsd+1,RESERVATION,r.start,r.end,input.reservedMicroUsd,input.dailyBudgetMicroUsd);
+        'INSERT INTO audit_events(id,action,details,created_at) SELECT ?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM audit_events WHERE id IN (?,?)) AND COALESCE((SELECT '+sumExpression(column)+' FROM audit_events WHERE action=? AND created_at>=? AND created_at<?),0)+?<=? AND COALESCE((SELECT '+sumExpression(column)+' FROM audit_events WHERE action=? AND created_at>=? AND created_at<?),0)+?<=?'
+      ).run(r.id,RESERVATION,r.encoded,r.at,r.id,r.aliasId,input.dailyBudgetMicroUsd+1,input.dailyBudgetMicroUsd+1,RESERVATION,r.start,r.end,input.reservedMicroUsd,input.dailyBudgetMicroUsd,r.monthlyBudgetMicroUsd+1,r.monthlyBudgetMicroUsd+1,RESERVATION,r.monthStart,r.monthEnd,input.reservedMicroUsd,r.monthlyBudgetMicroUsd);
       await ctx.authorize();
       if(Number(changed.changes)===1)return {status:'reserved'};
-      const exists=database.prepare('SELECT details FROM audit_events WHERE id=? AND action=?').get(r.id,RESERVATION);
+      const exists=database.prepare('SELECT details FROM audit_events WHERE id IN (?,?) AND action=?').get(r.id,r.aliasId,RESERVATION);
       if(exists){try{if(JSON.parse(exists.details).owner!==ctx.owner)throw Error();}catch{throw Error('AI_RECEIPT_INVALID');}}
       return {status:exists?'existing':'budget_exhausted'};
     },
@@ -75,11 +79,11 @@ export function createD1AuditStore(database,options){
     async reserve(input){
       const r=reservation(input,ctx);await ctx.authorize();
       const changed=await database.prepare(
-        'INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,0,?,?,? WHERE NOT EXISTS(SELECT 1 FROM audit_events WHERE owner=? AND id=?) AND COALESCE((SELECT '+sumExpression(column)+' FROM audit_events WHERE owner=? AND action=? AND created_at>=? AND created_at<?),0)+?<=?'
-      ).bind(r.id,ctx.owner,RESERVATION,r.encoded,r.at,ctx.owner,r.id,input.dailyBudgetMicroUsd+1,input.dailyBudgetMicroUsd+1,ctx.owner,RESERVATION,r.start,r.end,input.reservedMicroUsd,input.dailyBudgetMicroUsd).run();
+        'INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,0,?,?,? WHERE NOT EXISTS(SELECT 1 FROM audit_events WHERE owner=? AND id IN (?,?)) AND COALESCE((SELECT '+sumExpression(column)+' FROM audit_events WHERE owner=? AND action=? AND created_at>=? AND created_at<?),0)+?<=? AND COALESCE((SELECT '+sumExpression(column)+' FROM audit_events WHERE owner=? AND action=? AND created_at>=? AND created_at<?),0)+?<=?'
+      ).bind(r.id,ctx.owner,RESERVATION,r.encoded,r.at,ctx.owner,r.id,r.aliasId,input.dailyBudgetMicroUsd+1,input.dailyBudgetMicroUsd+1,ctx.owner,RESERVATION,r.start,r.end,input.reservedMicroUsd,input.dailyBudgetMicroUsd,r.monthlyBudgetMicroUsd+1,r.monthlyBudgetMicroUsd+1,ctx.owner,RESERVATION,r.monthStart,r.monthEnd,input.reservedMicroUsd,r.monthlyBudgetMicroUsd).run();
       await ctx.authorize();
       if(Number(changed.meta?.changes)===1)return {status:'reserved'};
-      const exists=await database.prepare('SELECT id FROM audit_events WHERE owner=? AND id=? AND action=?').bind(ctx.owner,r.id,RESERVATION).first();
+      const exists=await database.prepare('SELECT id FROM audit_events WHERE owner=? AND id IN (?,?) AND action=?').bind(ctx.owner,r.id,r.aliasId,RESERVATION).first();
       return {status:exists?'existing':'budget_exhausted'};
     },
     async record(key,result){

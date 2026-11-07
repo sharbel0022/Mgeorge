@@ -1,6 +1,6 @@
 import {assertCompanyContext,assertCompanyPermission,companyDataBoundary,COMPANY_ROLES} from './company-contract.js';
 import {openPaymentsTokenFenceStatement} from './banking/openpayments/token-coordinator-fence.js';
-import {readD1InvoiceAiRecoveryStatus} from './openai-invoices/recovery.js';
+import {readD1InvoiceAiRecoveryStatus} from './openai-invoices/index.js';
 
 // Every financial/automation table with an owner column. A migration regression
 // compares this manifest with the actual SQLite schema and its write triggers.

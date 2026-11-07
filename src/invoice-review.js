@@ -41,7 +41,7 @@ export async function analyzeDocument(db,id,{extract=extractInvoice,authorize=()
   if(!intactOriginal(doc)||!intactOriginal(current)||current.fingerprint!==doc.fingerprint){
     extraction={...interpretInvoice('',metadata),level:'red',issues:['Originalunderlaget kunde inte integritetskontrolleras. Kontrollera originalet före ny tolkning.']};
   }else extraction.processing={...extraction.processing,sha256:doc.fingerprint};
-  if(process.env.OPENAI_INVOICES_ENABLED==='true'&&intactOriginal(current)&&current.fingerprint===doc.fingerprint){
+  if((process.env.OPENAI_ENABLED??process.env.OPENAI_INVOICES_ENABLED)==='true'&&intactOriginal(current)&&current.fingerprint===doc.fingerprint){
     const {enrichNodeInvoice}=await import('./openai-invoice-integration.js');
     extraction=await enrichNodeInvoice(db,current,extraction,{authorize});
     authorize();

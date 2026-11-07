@@ -1,11 +1,11 @@
-import {getInvoiceAiProfile} from './profiles.js';
+import {INVOICE_AI_POLICY_VERSION,INVOICE_AI_PROFILES} from './profiles.js';
+import {resolveInvoiceAiConfiguration,reviewedInvoiceAiProfile} from './configuration.js';
+export {invoiceAiConfigurationStatus} from './configuration.js';
 import {INVOICE_AI_SCHEMA,INVOICE_AI_INSTRUCTIONS} from './schema.js';
 
-const PROFILE_VERSION='invoice-ai-integration-2026-11-06.v1';
-const PROFILES=Object.freeze({'luna-v1':Object.freeze({model:'gpt-6-luna',reasoningEffort:'low'}),'sol-v1':Object.freeze({model:'gpt-6.1-sol',reasoningEffort:'low'})});
+const PROFILE_VERSION=INVOICE_AI_POLICY_VERSION;
 const REVIEW='AI-förslag behöver kontrolleras mot originalet före registrering.';
 const hash=async value=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))).map(b=>b.toString(16).padStart(2,'0')).join('');
-const integer=(value,fallback,max)=>{const n=value===undefined||value===''?fallback:Number(value);return Number.isSafeInteger(n)&&n>0&&n<=max?n:null;};
 const parse=value=>{try{return JSON.parse(value);}catch{return null;}};
 const organization=value=>typeof value==='string'?value.replace(/[- ]/g,''):'';
 function validOrganization(value){
@@ -14,18 +14,19 @@ function validOrganization(value){
 
 /** All live consent comes from server configuration, never document metadata. */
 export function invoiceAiPolicy(environment={},owner=''){
- if(environment.OPENAI_INVOICES_ENABLED!=='true')return {status:'disabled'};
  const blocked=code=>({status:'blocked',code});
+ const enabled=environment.OPENAI_ENABLED??environment.OPENAI_INVOICES_ENABLED??'false';
+ if(enabled==='false')return {status:'disabled'};
+ if(enabled!=='true')return blocked('ENABLED_INVALID');
  if(['PRIVACY','SECURITY','COST'].some(name=>environment['OPENAI_INVOICES_'+name+'_APPROVED']!=='true'))return blocked('APPROVAL_REQUIRED');
  if(typeof environment.OPENAI_INVOICES_APPROVAL_ID!=='string'||!/^[-A-Za-z0-9._:/]{3,120}$/.test(environment.OPENAI_INVOICES_APPROVAL_ID))return blocked('APPROVAL_REQUIRED');
  const owners=parse(environment.OPENAI_INVOICES_ALLOWED_OWNERS),orgs=parse(environment.OPENAI_INVOICES_COMPANY_ORGANIZATIONS);
  if(!Array.isArray(owners)||owners.length>100||!owners.every(o=>typeof o==='string'&&o.length>0&&o.length<=200)||!owners.includes(owner))return blocked('OWNER_NOT_APPROVED');
  if(!orgs||typeof orgs!=='object'||Array.isArray(orgs)||!Object.hasOwn(orgs,owner)||!validOrganization(orgs[owner]))return blocked('COMPANY_IDENTITY_REQUIRED');
- if(typeof environment.OPENAI_API_KEY!=='string'||!environment.OPENAI_API_KEY.trim())return blocked('API_KEY_MISSING');
- const profile=Object.hasOwn(PROFILES,environment.OPENAI_INVOICES_PROFILE)?PROFILES[environment.OPENAI_INVOICES_PROFILE]:null;if(!profile)return blocked('MODEL_PROFILE_REQUIRED');
- const maxDocumentMicroUsd=integer(environment.OPENAI_INVOICES_MAX_DOCUMENT_MICRO_USD,250000,10_000_000),dailyBudgetMicroUsd=integer(environment.OPENAI_INVOICES_DAILY_BUDGET_MICRO_USD,2_000_000,100_000_000);
- if(!maxDocumentMicroUsd||!dailyBudgetMicroUsd||maxDocumentMicroUsd>dailyBudgetMicroUsd)return blocked('BUDGET_INVALID');
- return {status:'enabled',owner,approvalId:environment.OPENAI_INVOICES_APPROVAL_ID,profileId:environment.OPENAI_INVOICES_PROFILE,version:PROFILE_VERSION,model:profile.model,reasoningEffort:profile.reasoningEffort,expectedCompanyOrganization:organization(orgs[owner]),maxDocumentMicroUsd,dailyBudgetMicroUsd};
+ const config=resolveInvoiceAiConfiguration(environment);
+ if(config.status!=='configured')return config;
+ const profile=config.profile;
+ return {status:'enabled',owner,approvalId:environment.OPENAI_INVOICES_APPROVAL_ID,profileId:profile.id,profile,modelContract:config.customContract,fallbackProfile:config.fallbackProfile,fallbackContract:config.fallbackContract,version:PROFILE_VERSION,model:profile.model,reasoningEffort:profile.reasoningEffort,expectedCompanyOrganization:organization(orgs[owner]),maxDocumentMicroUsd:config.maxDocumentMicroUsd,dailyBudgetMicroUsd:config.dailyBudgetMicroUsd,monthlyBudgetMicroUsd:config.monthlyBudgetMicroUsd};
 }
 function note(baseline,code,status='fallback'){
  return {...baseline,ai:{version:PROFILE_VERSION,status,code,requiresHumanReview:true,bankEvidence:false}};
@@ -157,23 +158,41 @@ export async function enrichInvoiceForReview({baseline,owner,documentId,sha256,m
  await authorize();
  const companyRole=baseline.fields?.direction?.value==='customer'?'supplier':'recipient';
  const mergeContext={companyRole,expectedCompanyOrganization:policy.expectedCompanyOrganization};
- const key=await hash(JSON.stringify([PROFILE_VERSION,INVOICE_AI_SCHEMA,INVOICE_AI_INSTRUCTIONS,getInvoiceAiProfile(policy.profileId),owner,sha256,mime,policy.expectedCompanyOrganization,companyRole]));
+ const merge=async result=>{
+  // Only a definitive provider model-not-found rejection permits switching.
+  // Timeout, unknown accounting, refusal and transport failures retain OCR.
+  if(policy.fallbackProfile&&policy.fallbackProfile.model!==policy.model&&result?.status==='fallback'&&result.costUnknown===false&&result.issues?.includes('api_model_unavailable')){
+   const fallback=await enrichInvoiceForReview({baseline,owner,documentId,sha256,mime,store,loadOriginal,authorize,adapter,environment:{...environment,OPENAI_MODEL:policy.fallbackProfile.model,OPENAI_MODEL_CONTRACT:JSON.stringify(policy.fallbackContract),OPENAI_FALLBACK_MODEL:''}});
+   if(fallback.ai)fallback.ai={...fallback.ai,fallbackFromModel:policy.model};
+   return fallback;
+  }
+  return mergeInvoiceSuggestion(baseline,result,mergeContext);
+ };
+ // Billing identity is the exact model and original context, never its review,
+ // prices, limits or built-in/custom representation. Reprocessing needs a
+ // separate governed migration; changing an attestation cannot authorize it.
+ const key=await hash(JSON.stringify(['invoice-ai-original-model-v1',owner,sha256,mime,policy.expectedCompanyOrganization,companyRole,policy.model]));
+ // Read and atomically fence the old profile-based identity as well. Resolve
+ // by exact model so the historical built-in key wins in either representation.
+ const reviewedProfile=Object.values(INVOICE_AI_PROFILES).find(profile=>profile.model===policy.model)||reviewedInvoiceAiProfile(policy.modelContract,policy.model);
+ const aliasKey=await hash(JSON.stringify([PROFILE_VERSION,INVOICE_AI_SCHEMA,INVOICE_AI_INSTRUCTIONS,reviewedProfile,owner,sha256,mime,policy.expectedCompanyOrganization,companyRole]));
+ const load=async()=>await store.load(key)||await store.load(aliasKey);
  let previous;
- try{previous=await store.load(key);}catch{return note(baseline,'AI_STORE_UNAVAILABLE');}
+ try{previous=await load();}catch{return note(baseline,'AI_STORE_UNAVAILABLE');}
  await authorize();
- if(previous){const result=mergeInvoiceSuggestion(baseline,previous,mergeContext);result.ai={...result.ai,replayed:true};return result;}
+ if(previous){const result=await merge(previous);if(!result.ai?.fallbackFromModel)result.ai={...result.ai,replayed:true};return result;}
  let original;
  try{original=await loadOriginal();}catch{return note(baseline,'ORIGINAL_PREFLIGHT_FAILED');}
  await authorize();
  if(!(original?.bytes instanceof Uint8Array)||!Number.isSafeInteger(original.pageCount)||original.pageCount<1||original.pageCount>10)return note(baseline,'ORIGINAL_PREFLIGHT_FAILED');
  let reserved;
- try{reserved=await store.reserve({key,documentId,sha256,profileVersion:PROFILE_VERSION,reservedMicroUsd:policy.maxDocumentMicroUsd,dailyBudgetMicroUsd:policy.dailyBudgetMicroUsd});}
+ try{reserved=await store.reserve({key,aliasKey,documentId,sha256,profileVersion:PROFILE_VERSION,reservedMicroUsd:policy.maxDocumentMicroUsd,dailyBudgetMicroUsd:policy.dailyBudgetMicroUsd,monthlyBudgetMicroUsd:policy.monthlyBudgetMicroUsd});}
  catch{return note(baseline,'AI_STORE_UNAVAILABLE');}
  await authorize();
  if(reserved.status!=='reserved'){
   if(reserved.status==='existing'){
-   try{previous=await store.load(key);}catch{}
-   if(previous){const result=mergeInvoiceSuggestion(baseline,previous,mergeContext);result.ai={...result.ai,replayed:true};return result;}
+   try{previous=await load();}catch{}
+   if(previous){const result=await merge(previous);if(!result.ai?.fallbackFromModel)result.ai={...result.ai,replayed:true};return result;}
   }
   return note(baseline,reserved.status==='budget_exhausted'?'AI_DAILY_BUDGET_EXHAUSTED':'AI_REQUEST_ALREADY_RESERVED');
  }
@@ -186,5 +205,5 @@ export async function enrichInvoiceForReview({baseline,owner,documentId,sha256,m
  try{if(!await store.record(key,result))return note(baseline,'AI_RECEIPT_NOT_SAVED');}
  catch{return note(baseline,'AI_RECEIPT_NOT_SAVED');}
  await authorize();
- return mergeInvoiceSuggestion(baseline,result,mergeContext);
+ return merge(result);
 }

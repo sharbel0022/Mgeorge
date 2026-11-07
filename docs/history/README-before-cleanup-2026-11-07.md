@@ -1,0 +1,151 @@
+# Historisk README – före kodstädningen 2026-11-07
+
+Detta är en bevarad historisk version av rotens README. Versionsnummer, testantal och driftsstatus nedan är tidsbundna till äldre leveranser. Börja i [aktuell README](../../README.md).
+
+---
+
+# MG Fakturakoll – M.George Vitvaror AB
+
+Ett svenskt system för kundfakturor, leverantörsfakturor, originalunderlag och bankavstämning. Sites har ett svartvitt gränssnitt med samma navigation på dator och mobil. En ny installation innehåller inga exempeltransaktioner.
+
+**Ny kod för granskning — bankbevis och återhämtning:** Striktare CSV/camt/API-kontroller, serververifierad filproveniens, atomisk avstämning, beständiga Node-jobblås och Gmail-väntetider samt skydd mot fördröjda backupkörningar. Arbetet publicerar ingenting och ändrar inga produktionsscheman. Se [leverans, tester och exakt extern bankblockering](../../docs/BANK-EVIDENCE-SAFETY-DELIVERY.md), [plan](../../PLAN.md) och [verifierad progress](../../PROGRESS.md).
+
+Repositoryt innehåller nu både den fristående Node-versionen i `src/` och den fullständiga publicerade Sites-källan i `sites/`. De har separata databaser. GitHub-push publicerar inte automatiskt till Sites; publicering sker i samma befintliga Sites-projekt och flyttar inga företagsuppgifter.
+
+## Mgeorge V2 aktuell leverans
+
+**V3 för granskning:** Ny banklista med separat bankbetalare, fakturakund och fakturaförslag, förstärkt ISO-import och en moln-OCR-körning för skannade fakturor. Moln-OCR använder den befintliga svenska motorn och kräver efter godkänd produktionssättning ingen påslagen dator. Ändringen aktiverar inga produktionsjobb. Läs [V3-leveransen och produktionsstegen](../../docs/V3-DELIVERY.md), [bankunderlag och avtal](../../docs/V3-BANK-EVIDENCE.md) och [moln-OCR](../../docs/V3-CLOUD-OCR-RUNNER.md).
+
+**Automatik och backup, version 28:** Bank- och Gmail-molnschemana är nu aktiverade. Daglig krypterad molnbackup körs 02:15 svensk tid; den första kopian med 37 original är kontrolläst och verifierad. Lokal Node-backup är också konfigurerad. Läs [schema, testbevis, nyckelhantering och återställning](../../docs/AUTOMATION-BACKUP.md).
+
+**Sites version 27** är publicerad. Referenskandidater från bankfält, detaljsvar, CSV och camt får källspårning, med bevarade original och spärr mot motstridiga referenser eller felaktig uttrycklig OCR. Fem huvudområden ger direkt åtkomst till kundfakturor, leverantörsfakturor, bank och granskning. Node har krypterad, återställningskontrollerad och valbar daglig backup. **238 Node-tester och 277 Sites-tester** passerar; båda beroendegranskningarna rapporterar noll kända sårbarheter.
+
+Läs [felanalys och funktionsstatus](../../docs/V2-DELIVERY.md), [användning och konfiguration](../../docs/V2-OPERATIONS.md), [arkitektur och UI-bilder](../../docs/V2-ARCHITECTURE.md) och [publiceringsbevis](../../docs/V2-PUBLICATION.md). Äldre avsnitt nedan beskriver historiska leveranser. Saknad bank-OCR kräver fortfarande individuell betalningsspecifikation; publicering aktiverar inte pausade scheman.
+
+## Enkel ekonomiöversikt – ny källkodsleverans
+
+Sites-källan innehåller nu fyra tydliga ekonomisammanfattningar, en renare undantagskö, dokumentklassificering, bevarad referensproveniens och ett skrivskyddat jämförelseläge för avstämning. Beloppslikhet ersätter aldrig bankunderlag. GitHub-ändringen är inte i sig en Sites-publicering eller aktivering av nya scheman. Läs [implementation, verifiering och återstående produktionssteg](../../docs/ECONOMY-OVERVIEW-IMPLEMENTATION.md).
+
+## Bankgiro – Sites version 24
+
+**Uppdatering, Sites version 26:** Betalningsvyn visar nu fakturanummer som uttryckligen märkta förslag även när bankens OCR saknas. Sökningen läser korrekt de inbäddade värdena i hämtade Gmail-underlag. Bankens separata detalj-API kontrolleras när en samlingspost öppnas; svaret bevaras utan automatisk bokning. **228 Sites-tester** passerar. Se [uppföljningen om OCR och fakturanummer](../../docs/BANKGIRO-REFERENCE-FOLLOWUP.md).
+
+Bankgiroimport med förhandsgranskning, sparat original, kontroll av konto/datum/identifierare/totalsumma, spärr av osäkra specifikationer och automatisk avstämning när både fakturareferens och kund stämmer. 0599 behåller nollan; avsändarens Bankgiro/Avinummer hålls separat från bankreferens och OCR. Saknade fakturor söks i Gmail med befintliga medgivanden och begränsningar. Kundmejl skickas aldrig av importen.
+
+**209 Sites-tester** och **209 Node-tester** passerar, inklusive syntetiska betalningar, originalkontroll, ägaråtkomst och sessionsbortfall. TypeScript och produktionsbygge är godkända. Företagets verkliga Bankgiroexport återstår att verifiera. Se [leveransrapporten](../../docs/BANKGIRO-DELIVERY.md) och [format- och driftinformationen](../../sites/BANKGIRO.md).
+
+Sites-källan utvecklas separat med `cd sites`, `npm run install:ci`, `npm run check`, `npm test` och `npm run build`. CI kontrollerar båda implementationerna. `.env`, lokala databaser, originalfiler och krypteringsnycklar ingår inte i Git.
+
+## Sites – aktuell svartvit granskningsyta
+
+**Version 23** är publicerad på den befintliga Sites-adressen med fem huvudområden, gemensam sökning och granskning med underlaget på samma sida. Samlingsposters bankreferenstext visas separat från kundens OCR. 181 syntetiska tester passerar; produktionsvyn är verifierad utan ändrade betalningar eller kundutskick. Se [leverans och verifiering](../../docs/SITES-MONOCHROME-REVIEW.md).
+
+## MG Fakturakoll 2.0 – Sites som produktionssystem
+
+Sites version 21 är publicerad och kontrollerad på den befintliga adressen. Node-versionen och Sites använder samma fem huvudområden och betalningsflöde med separata databaser. Se [slutrapport, tester, migreringar och verklig produktionskontroll](../../docs/MG-FAKTURAKOLL-2-LEVERANS.md).
+
+## Ny arbetsyta: en betalningskontroll
+
+Översiktens **Kontrollera alla betalningar** samordnar Gmail, dokumenttolkning, bankhämtning, avstämning och mejlutkast. Sparad stegstatus visar även ofullständiga körningar. **Att granska** samlar beslut, och fakturadetaljen visar original, betalningar och mejl tillsammans. Kortköp och lön ligger separat från kundinbetalningar. Inga mejl skickas av huvudknappen.
+
+Funktionen gäller Node-versionen i detta repository, **inte en automatisk uppdatering av ChatGPT Sites**. Läs [genomförande, säkerhet och Sites-avgränsning](../../docs/ONE-CLICK-PAYMENT-CONTROL.md). Befintliga anslutningar, automatiseringsval och manuellt godkännande av kundmejl bevaras.
+
+## Kom igång lokalt
+
+Kräver **Node.js 22.13 eller senare**, med inbyggda `node:sqlite`. Installera låsta beroenden med `npm ci`. Node-gränssnittet kräver inget byggsteg. PDF.js, Canvas och Tesseract används för lokal dokumenttolkning.
+
+```bash
+git clone https://github.com/sharbel0022/Mgeorge.git
+cd Mgeorge
+npm ci
+npm run setup
+npm start
+```
+
+Öppna `http://localhost:3000`. Appen öppnas direkt utan lösenord eller inloggningssida. Kommandot skapar en Git-ignorerad `.env` med krypteringsnycklar för anslutningarna. En befintlig `.env` behålls. Om en databas finns men konfigurationen saknas avbryts skapandet för att skydda installationens ursprungliga krypteringsnyckel.
+
+`npm start` läser `.env` och kör `src/server.js`. `npm run dev` använder samma konfiguration och startar om servern vid kodändringar. Du kan också skapa `.env` manuellt från `.env.example` och starta med `node --env-file=.env src/server.js`.
+
+Servern lyssnar endast på `127.0.0.1`. Lokalt används den utan appinloggning. En webbläsarsession skyddar returflöden från Google och banken. För HTTPS-drift bakom en betrodd reverse proxy krävs `MG_ADMIN_PASSWORD` med minst 16 tecken; alla företags-API:er kräver då administratörsinloggning. Proxy ska bevara den konfigurerade domänens Host, terminera HTTPS och skydda den lokala anslutningen. Befintliga fakturor och underlag behålls. Bevara `BANK_DATA_KEY`: utan den kan befintliga bank- och Gmail-anslutningar inte dekrypteras.
+
+## Funktioner i denna version
+
+- Översikt med verkliga saldon, anslutningsstatus, bankhändelser och granskningsbehov.
+- Kund- och leverantörsfakturor med sökning, filter, förfallodatum, OCR/referens, moms, Bankgiro, originalunderlag och betalningshistorik.
+- Tydlig skillnad mellan **Ej avstämd**, verifierat **Obetald**, **Delvis betald**, **Betald** och **Förfallen**. Förfallodatumet kontrolleras också separat för fakturor som ännu inte är avstämda.
+- CSV-, camt.053- och camt.054-import med förhandsgranskning, bekräftelse, originalfil, dubblettkontroll och importhistorik.
+- Matchningsförslag utifrån riktning, OCR/fakturareferens, belopp och betalare. Användaren granskar och godkänner; ett förslag registrerar aldrig en betalning automatiskt.
+- Delbetalningar, fördelning av en bankhändelse på flera fakturor, undantag med motivering och spårbart återtagande av matchningar.
+- Kreditfakturor med omvänd förväntad betalningsriktning och avdrag i sammanställningar. Återbetalningar kan matchas; automatisk kvittning mellan kredit- och debetfakturor ingår inte.
+- Uppladdning och bevarande av PDF, PNG, JPEG och WebP, högst 15 MB per fil. Original hämtas direkt från den lokala arbetsytan.
+- Läsanslutning till Swedbank via Enable Banking och Gmail via Google OAuth, efter extern aktivering och godkända medgivanden.
+- Företagsinställningar, anslutningshantering, granskningshistorik och JSON-export av registerdata.
+- Valbar återkommande hämtning var 15, 30 eller 60 minut, var fjärde timme eller dagligen. Bankhämtning är manuell från början. Gmail har separat intervall på 15 minuter efter anslutning, vilket kan ändras eller stängas av i Inställningar.
+
+## Anslut bank och Gmail
+
+**Swedbank:** En tidigare delad PEM betraktas som komprometterad och får inte användas. Återkalla den hos Enable Banking och registrera ett nytt certifikat först. Ange `ENABLE_BANKING_APPLICATION_ID`, `ENABLE_BANKING_ENVIRONMENT=SANDBOX` eller `PRODUCTION` och exakt en serverkälla för nyckeln: `ENABLE_BANKING_PRIVATE_KEY_FILE` utanför repositoryt eller `ENABLE_BANKING_PRIVATE_KEY` i skyddad miljö. Produktion kräver dessutom HTTPS och `ENABLE_BANKING_KEY_ROTATED=true`, vilket administratören endast får sätta efter genomförd rotation. Flaggan ersätter inte återkallningen hos leverantören.
+
+Registrera exakt `APP_ORIGIN` följt av `/api/bank/callback`. Backend kontrollerar den verkliga applikationens miljö, aktivering, AIS, Sverige och returadress innan bankflödet startas. Öppna **Bank → Koppla banken**, godkänn hos Swedbank och välj företagets SEK-konto. Medgivandet lagras krypterat; kontovalet startar hämtning av de senaste 30 kalenderdagarna. Hämtningen kan misslyckas separat utan att en lyckad import påstås. Du kan förnya, uppdatera och koppla från banken i samma vy. Riktiga konton kräver godkänd produktionsåtkomst, avtal och verkligt bankmedgivande. Se [bankguiden](../../docs/SWEDBANK.md) och [jämförelsen med Sites](../../docs/SWEDBANK-SITES-COMPARISON.md).
+
+**Gmail:** Aktivera Gmail API i företagets Google Cloud-projekt, skapa en OAuth-webbklient och registrera `APP_ORIGIN` följt av `/api/gmail/callback`. Ange `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` och `GMAIL_ACCOUNT=mg.vitvaror@gmail.com`. Starta om servern och välj **Import → Koppla Gmail**. Se [Gmail-guiden](../../docs/GMAIL.md) för hela flödet.
+
+Gmail hämtar PDF- och bildbilagor från mottagna, arkiverade och skickade mejl. Dokumenten tolkas med PDF.js och lokal svensk OCR vid behov. Original, fältvärden, källbelägg och säkerhetsnivå bevaras. Granska originalet bredvid uppgifterna och godkänn eller avvisa. Okända motparter och OCR-resultat kräver granskning. Valbar automatisk registrering gäller endast gröna textfakturor från redan kända motparter; säkra betalningar kan därefter matchas automatiskt enligt den konservativa avvikelsemotorn. Se [tolkning och granskning](../../docs/INVOICE-EXTRACTION.md).
+
+Schemalagd hämtning kräver att **Node-servern är igång**, att integrationerna är konfigurerade och att medgivandena gäller. Jobb körs på servern utan att webbläsaren behöver vara öppen. Endast entydiga betalningar med verifierat bankunderlag, kundidentitet och exakt referens avstäms automatiskt. Kundmejl kräver alltid uttryckligt administratörsgodkännande. Riktiga Google- och bankflöden behöver verifieras med företagets behöriga konton; automatiska tester använder kontrollerade API-svar.
+
+## Bankfiler och Bankgiro
+
+Bankimporten stöder SEK och högst 1 000 bokförda händelser per fil. Andra valutor stoppas så att belopp aldrig felaktigt etiketteras som kronor. CSV-format varierar mellan banker; kontrollera alltid förhandsgranskningen och verifiera ett verkligt, anonymiserat kontoutdrag före drift.
+
+En samlad Bankgiroinsättning utan fullständig betalningsspecifikation behålls **en gång** och kan inte matchas som om den gällde en enda faktura. Status är **Betalardetaljer saknas – importera betalningsspecifikation.** Importera en camt.054-specifikation med betalarnas belopp och referenser och välj det sparade maskerade bankkontot i importen. Om en komplett specifikation kan identifieras som samma samlingspost ersätts eller kompletteras den i avstämningen med revisionshistorik. Olika kontoalias eller saknade bankreferenser kräver manuell kontroll. Beloppslikhet ensam är inte betalningsbevis.
+
+## Tester
+
+```bash
+npm run check
+npm test
+```
+
+Syntaxkontrollen omfattar server, integrationer, gränssnitt, startskript och tester. Testerna skapar tillfälliga databaser och använder inte företagets `.env` eller riktiga externa konton. De verifierar bland annat direkt lokal åtkomst/origin-skydd, fakturastatus, riktning, delbetalningar, dubbletter, samlade Bankgiroposter, import, originalunderlag och Gmail-adaptern.
+
+## Data och drift
+
+Installationen är en **arbetsyta för ett företag och en administratör**. Lokal åtkomst bygger på operativsystemets behörighet; HTTPS-drift kräver administratörslösenord och säkra sessionscookies. Separata användarkonton, roller och flera företag ingår inte. Använd inte en gemensam databas för flera verksamheter. Bankanslutningar har explicit ägare; oinloggade sessioner och andra huvudmän nekas företagsdata.
+
+OAuth-token och bankens anslutningsuppgifter krypteras med AES-256-GCM på servern. Fakturor, bankfiler och registerdata ligger i en privat SQLite-databas och är inte separat krypterade på disk av applikationen. Skydda lagringsplatsen och ordna driftövervakning, HTTPS och backup före publik drift. `.env`, privata nycklar, SQLite-filer, originalfakturor, kundregister och bankutdrag får aldrig läggas i det offentliga repositoryt.
+
+JSON-exporten innehåller registerdata och dokumentmetadata; den är **inte en fullständig säkerhetskopia** av originalfiler eller anslutningshemligheter. För en enkel konsekvent backup: stoppa servern och säkerhetskopiera databasen samt `.env` och privata integrationsnycklar till en skyddad plats. Återställ och kontrollera kopian innan du förlitar dig på rutinen. Automatisk backup, retention och återställning måste ordnas i driftmiljön.
+
+## Projektstruktur
+
+```text
+public/               Svenskt webbgränssnitt
+src/server.js         HTTP API, sessioner, dokument, anslutningar och bakgrundshämtning
+src/db.js             SQLite, migreringar, status, matchningsförslag och historik
+src/importers.js      CSV och ISO 20022 camt.053/.054
+src/bank.js           Enable Banking AIS-adapter
+src/gmail.js          Google OAuth och Gmail-hämtning
+src/security.js       Lösenord, sessionscookies och kryptering
+scripts/setup.mjs     Lokal engångskonfiguration utan att skriva över befintliga filer
+test/                 Kontrollerade enhets- och API-tester
+docs/                 Arkitektur och integrationsguide
+```
+
+Se [arkitekturen](../../docs/ARCHITECTURE.md) för datamodell, API och tekniska avgränsningar.
+
+## Offentliga informationssidor
+
+[Integritetspolicy](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/integritetspolicy) och [användarvillkor](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/anvandarvillkor) är publicerade som läsbara utkast på den befintliga Siten. Dokumenten behöver fortfarande granskas och kompletteras för företagets verkliga drift. Se [publicerings- och synkroniseringsguiden](../../docs/SITES-LEGAL.md).
+
+## Betalningsavstämning och kundmeddelanden
+
+Sites har nu en beständig dokumentkö för PDF-text och lokal Windows-OCR. Se [driftguiden för automatisk dokumenthantering](../../docs/SITES-DOCUMENT-AUTOMATION.md). OCR-datorn behöver vara på, vaken och inloggad; kundmejl kräver fortfarande ditt godkännande.
+
+Fliken **Kundmeddelanden** visar verifierade betalningar, kvarstående saldo, avvikelse, originalfaktura och ett redigerbart svenskt mejlutkast. Verifiera kundadressen mot ett faktiskt underlag. Öppna och läs varje aktuell mejlversion; efter redigering måste den nya versionen granskas. **Avvisa** stoppar utkastet; **Godkänn och skicka** kräver ett uttryckligt godkännande och separat Gmail-medgivande för utskick.
+
+Saknad/fel OCR, annan betalare, möjliga dubletter och fördelning på flera fakturor kräver granskning. En ny betalning stoppar äldre utkast. Vid Gmail-timeout låses utskicket som oklart och skickas aldrig om automatiskt. Schemaläggaren hämtar, avstämmer och förbereder utkast men kan inte skicka mejl.
+
+Se [leveransrapport och exakt fillista](../../docs/RECONCILIATION-CUSTOMER-MESSAGES.md) för funktioner, testresultat, API, Google-/bankaktivering och separat arbete för ChatGPT Sites.
+
+Samma avstämnings- och granskningsflöde är separat publicerat i **Sites version 16**, med verifierad Gmail-anslutning och utskicksbehörighet. Se [Sites-rapporten](../../docs/SITES-CUSTOMER-MESSAGES.md) för patch, testresultat, Google-aktivering och skillnaden i OCR-körning.

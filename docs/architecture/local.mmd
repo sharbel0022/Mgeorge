@@ -1,0 +1,14 @@
+flowchart TB
+  Start["npm start / npm run dev"] --> Launcher["scripts/start: setup, portkontroll och processägarskap"]
+  Launcher --> Entry["apps/api/index.js"]
+  Entry --> Server["src/server.js: HTTP, session och företagsgräns"]
+  Browser["Webbläsare på localhost:3000"] --> Server
+  Server --> Web["public/index.html och public/app.js"]
+  Server --> Domains["packages: bank, Gmail, fakturor, betalningar och avstämning"]
+  Domains --> OCR["src/invoice-extraction.js → invoice-worker.js"]
+  OCR --> AI["packages/ai: gemensam valfri AI med godkännanden"]
+  Domains --> DB["SQLite: kontrollkatalog och separata företagsdatabaser"]
+  DB --> Backup["packages/backup: lokal krypterad backup"]
+  Env["Privat .env / processmiljö"] -.-> Launcher
+  Env -.-> AI
+  Launcher -. "Autentiserad kontroll och begränsad avstängning" .-> Server

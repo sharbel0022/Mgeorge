@@ -1,8 +1,5 @@
 import {digest} from './security.js';
-import {createNodeAuditStore} from '../sites/lib/openai-invoices/audit-store.js';
-import {enrichInvoiceForReview} from '../sites/lib/openai-invoices/integration.js';
-import {extractOpenAiInvoice} from '../sites/lib/openai-invoices/adapter.js';
-import {readNodeInvoiceAiRecoveryStatus,invoiceAiRecoveryFallback,INVOICE_AI_RECOVERY_CODES} from '../sites/lib/openai-invoices/recovery.js';
+import {createNodeAuditStore,enrichInvoiceForReview,extractOpenAiInvoice,readNodeInvoiceAiRecoveryStatus,invoiceAiRecoveryFallback,INVOICE_AI_RECOVERY_CODES} from '../packages/ai/index.js';
 
 /** Only called by the server; browser input cannot supply policy, owner or key. */
 export async function enrichNodeInvoice(db,document,baseline,{authorize=()=>{},environment=process.env,adapter=extractOpenAiInvoice}={}){

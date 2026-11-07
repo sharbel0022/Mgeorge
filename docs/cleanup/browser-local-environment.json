@@ -1,0 +1,41 @@
+{
+  "kind": "local-browser-environment-attempt",
+  "source": {
+    "commit": "a6411a2a2ad2f3eca6f7e66bc9efd8ddf5550d5c",
+    "tree": "3f859cb0716b7a00f8a7adacf3c07f1f8d74b409",
+    "branch": "integration/mgeorge-cleanup-20261107",
+    "workingTreeDirty": true,
+    "contentSha256": "1dd8738548f927def0532a65bb861da0ee44e4e088f37beb0bbfd3e90e26a16f",
+    "fileCount": 2881
+  },
+  "status": "BLOCKED_BY_ENVIRONMENT",
+  "passed": false,
+  "sourceChangedDuringRun": false,
+  "reason": "Chromium process_singleton_posix.cc socket() failed: Operation not permitted; no browser execution permitted by this container. Bundles built; no app pass claimed. Final Chromium acceptance must run in GitHub CI.",
+  "steps": [
+    {
+      "name": "bundle",
+      "passed": true
+    },
+    {
+      "name": "chromium",
+      "passed": false
+    },
+    {
+      "name": "workspace-bundle",
+      "passed": true
+    },
+    {
+      "name": "workspace-chromium",
+      "passed": false
+    },
+    {
+      "name": "dashboard-bundle",
+      "passed": true
+    },
+    {
+      "name": "dashboard-chromium",
+      "passed": false
+    }
+  ]
+}

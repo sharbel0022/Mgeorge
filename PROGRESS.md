@@ -1,3 +1,11 @@
+## 2026-11-07 — modulär kodstädning och lokal launcher
+
+Arbetet utgår från den färskt verifierade huvudgrenen `4c7b210a0553314c2d9ce95804b892b891f4fe36`. PR63–69 är redan sammanslagna. Ny kandidat lägger till tydliga domäningångar, gemensam konfigurerbar AI-kärna, säkra start-/stoppkommandon, administrativ AI-status och svenska arkitekturguider. Befintliga ekonomiska regler, företagsgränser, original och audit flyttas inte genom omskrivning.
+
+Oberoende granskning identifierade tre uppstartsbrister (installerarens ägarskap, HTTP-deadline och dotenv-sökvägar) samt ett AI-reservationsfel vid ändrade granskningsmetadata. Varje fel har en fryst beteendereproduktion och riktad rättning. Slutlig samlad CI och remoteåtgärder ska läsas i leveransens acceptansunderlag; en delsvits godkännande räknas inte som main-/produktionsacceptans.
+
+[Arkitektur](docs/architecture/README.md) · [Startguide](docs/operations/local-start.md) · [AI-konfiguration](docs/integrations/openai.md) · [Acceptans](docs/cleanup/ACCEPTANCE.md) · [Alla 33 kriterier](docs/cleanup/33-assessment.md). Betygen är oförändrade: **258,5/330**, 27/33 minst 8. Bankåteranslutning, Bankgirokälla, verklig modellåtkomst och bakgrundsscheman behåller sina separata krav.
+
 ## 2026-11-06 — Agent 5: säkerhet, återställning och releasegrindar
 
 [PR 66](https://github.com/sharbel0022/Mgeorge/pull/66), `feature/95-saas-readiness`, utgår från verifierad main `f3c80629d4856c2f8ecbb1ed81be391a13ac6be8`. [Leveransrapport](docs/saas-readiness/README.md), [frysta verifieringsresultat](docs/saas-readiness/verification-results.md) och [riskregister](docs/saas-readiness/risk-register.md) beskriver den avgränsade säkerhetsleveransen.

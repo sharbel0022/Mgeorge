@@ -111,6 +111,14 @@ try {
       }
     }, { view });
   }
+  await run('administrator sees optional AI status without activating a provider', 390, async page => {
+    const section = page.locator('.connection-setting').filter({ has: page.getByText('OpenAI', { exact: true }) });
+    await section.getByRole('status').getByText('Avstängt', { exact: true }).waitFor();
+    assert.ok((await section.innerText()).includes('Befintlig OCR används.'));
+    await section.getByRole('button', { name: 'Hämta AI-status igen' }).click();
+    await section.getByRole('status').getByText('Avstängt', { exact: true }).waitFor();
+  }, { view: 'settings' });
+
   await run('global reference search uses native keyboard and restores stable focus', 1440, async page => {
     const input = page.getByRole('searchbox', { name: 'Sök i arbetsytan', exact: true });
     await input.fill('0000599');

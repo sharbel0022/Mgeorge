@@ -8,9 +8,9 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "setup": "node scripts/setup.mjs",
-    "start": "node --env-file=.env src/server.js",
-    "dev": "node --env-file=.env --watch src/server.js",
+    "setup": "node scripts/setup/index.mjs",
+    "start": "node scripts/start/index.mjs",
+    "dev": "node scripts/start/index.mjs --dev",
     "test": "node --test test/*.test.js",
     "test:isolated": "node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 test/*.test.js",
     "check": "node scripts/check.mjs",
@@ -18,7 +18,10 @@
     "quality:sites": "node scripts/quality/run.mjs sites",
     "quality:bridge": "node scripts/quality/run.mjs bridge",
     "quality:performance": "node scripts/quality/run.mjs performance",
-    "quality:browser": "node scripts/quality/run.mjs browser"
+    "quality:browser": "node scripts/quality/run.mjs browser",
+    "doctor": "node scripts/doctor/index.mjs",
+    "stop": "node scripts/stop/index.mjs",
+    "build": "node scripts/start/build.mjs"
   },
   "dependencies": {
     "@noble/hashes": "2.4.0",

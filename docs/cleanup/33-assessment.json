@@ -1,0 +1,353 @@
+{
+  "schema": "mgeorge-cleanup-33-v1",
+  "assessed_at": "2026-11-07T11:15:49.104571+00:00",
+  "status": "CONSERVATIVE_SCORES_PRESERVED_RELEASE_VERIFICATION_SEPARATE",
+  "baseline": "docs/completion/final-33-assessment.json",
+  "aggregate": {
+    "sum": 258.5,
+    "maximum": 330,
+    "average": 7.833333333333333,
+    "at_least_8": 27,
+    "below_8_ids": [
+      6,
+      10,
+      11,
+      15,
+      16,
+      28
+    ]
+  },
+  "scope": "Domänmoduler, säker env-konfiguration, lokal launcher och dokumentation. Färska driftobservationer finns i production-baseline.json. Inget nytt optiskt facit, bankmedgivande, Bankgirokälla, verifierad Gmail-kadens eller kund-AI-anrop skapas av kodändringarna.",
+  "rows": [
+    {
+      "id": 1,
+      "area": "Design",
+      "criterion": "Läsbara huvudvyer, tydlig informationshierarki och fungerande fel-/tomlägen; visuell kontroll av berörda vyer.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-1",
+      "remaining_risks": "CI:s 77 browserfall använder syntetiska API:er. Den publicerade desktopkontrollen är avgränsad; ingen ny skärmläsar- eller fysisk mobilcertifiering."
+    },
+    {
+      "id": 2,
+      "area": "Startsida",
+      "criterion": "Sammanfattningar motsvarar källdata; okänd och föråldrad status visas korrekt.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-2",
+      "remaining_risks": "Det är en jämförelse av visade totaler och begränsade databasfält. Två långa värden trunkerades; hela kundregistret har inte bytehashats."
+    },
+    {
+      "id": 3,
+      "area": "Navigation",
+      "criterion": "Centrala arbetsflöden kan nås och lämnas med tangentbord och tydliga länkar.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-3",
+      "remaining_risks": "En konkret autentiserad tangentbordsresa är observerad; samtliga möjliga användarresor och hjälpmedel är inte prövade."
+    },
+    {
+      "id": 4,
+      "area": "Mobil",
+      "criterion": "Berörda huvudflöden fungerar vid 320, 390, 768, 1024 och 1440 px utan blockerande överlapp.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-4",
+      "remaining_risks": "Ingen faktisk mobilproduktionsviewport, fysisk telefon eller autentiserad mobilbankresa påstås."
+    },
+    {
+      "id": 5,
+      "area": "Sök/filter",
+      "criterion": "Kombinerade filter, svenska belopp/datum, referenser och tomträffar fungerar på båda implementationerna; relevanta prestandamätningar.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-5",
+      "remaining_risks": "Det nya företagsbenchmarkets p95 mäter synkförsök, inte sökning eller verklig UI-latens."
+    },
+    {
+      "id": 6,
+      "area": "Minimal manuell hantering",
+      "criterion": "Säkra normalfall går igenom den avsedda kön; avvikelser har konkreta granskningsskäl och återupptagning; verklig köprogress observeras.",
+      "score": 6.5,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-6",
+      "remaining_risks": "En ny normalfaktura är ännu inte visad hela vägen till säker registrering. 408 av 409 granskningsunderlag saknar verifierad motpart; anledningar överlappar. OCR-recall och granskningstryck är interna produktbegränsningar."
+    },
+    {
+      "id": 7,
+      "area": "Kundfakturor",
+      "criterion": "Skapa, kontrollera och visa fakturor utan felaktiga betalstatusar eller ägarblandning.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-7",
+      "remaining_risks": "Arbetsytans stora payload trunkerades; ingen ny fullständig attest av alla fakturor eller en verklig flerföretagsbankresa följer av jämförelsen."
+    },
+    {
+      "id": 8,
+      "area": "Leverantörsfakturor",
+      "criterion": "Belopp, datum, motpart och original bevaras med samma gränser och kontroller som kundflödet.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-8",
+      "remaining_risks": "Omärkta leverantörshuvuden och organisationsnummer återfinns fortfarande otillräckligt i den kända OCR-mängden."
+    },
+    {
+      "id": 9,
+      "area": "PDF",
+      "criterion": "Text- och bild-PDF hanteras, sid-/storleksgränser gäller och trasiga dokument stoppas begripligt.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-9",
+      "remaining_risks": "Bild-PDF delar optikens begränsningar i 10. Det första nya oberoende provet använder rasterbilder, inte ett separat PDF- eller uppladdningsacceptansprov."
+    },
+    {
+      "id": 10,
+      "area": "Bild-OCR",
+      "criterion": "Fryst representativ rasterkorpus samt separata hållna fall; minst 85 % återfunna obligatoriska fält och minst 98 % fältprecision, utan felaktigt grönt ekonomiskt kritiskt fall. Redovisa även dokumentnivå och svåra fall.",
+      "score": 6.5,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-10",
+      "remaining_risks": "Första kohorten har ogiltiga organisationsnummer, EUR-dokument och fyra oförklarade workeravbrott. Den andra giltiga SEK-kohorten missar 46/108 bildfält trots att alla workers slutfördes. Små syntetiska mängder med olika populationer och nämnare får inte slås ihop eller beskrivas som verklig driftkvalitet. Noll false green med noll gröna ger inget positivt urval för att bedöma säkra automatiska resultat."
+    },
+    {
+      "id": 11,
+      "area": "Gmail",
+      "criterion": "Aktuell lyckad hämtning, återförsök/dubblettskydd och synligt genomfört schema; inga mejl skickas av bakgrundsflödet.",
+      "score": 7.5,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-11",
+      "remaining_risks": "Kriteriet kräver uttryckligen synligt genomfört schema. Klarlagd prompt, heartbeat och manuell körning räcker inte."
+    },
+    {
+      "id": 12,
+      "area": "Automatisk registrering",
+      "criterion": "Endast verifierad motpart och grön tolkning; atomär idempotens och återhämtning efter förlorat svar.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-12",
+      "remaining_risks": "Säkra registreringsvillkor och faktisk genomströmning är olika mått; den senare begränsningen ligger även i 6 och 10."
+    },
+    {
+      "id": 13,
+      "area": "Dubbletter",
+      "criterion": "Samma original eller betalning kan inte dubbelräknas vid omkörning eller samtidighet.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-13",
+      "remaining_risks": "Lokalt SQLite-benchmark med syntetisk provider prövar inte distribuerad produktionslast eller hela kundregistret. Node-versionerna och omkörningarna är överlappande."
+    },
+    {
+      "id": 14,
+      "area": "Dokumentgranskning",
+      "criterion": "Original och osäkerhet kan granskas; korrigering påverkar rätt dokument och lämnar spår.",
+      "score": 8.5,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-14",
+      "remaining_risks": "Ett faktiskt R2-avbrott mot kundoriginal har inte återskapats i drift. Den publicerade återhämtningslogiken styrks av isolerade fel-/gränsfall."
+    },
+    {
+      "id": 15,
+      "area": "Swedbank",
+      "criterion": "Aktuell godkänd anslutning och verifierad läsning av rätt valt konto; utgångna/återkallade medgivanden stoppas.",
+      "score": 6.5,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-15",
+      "remaining_risks": "Faktisk bank-/providerauktorisation, SCA och separat konto-/företagsbindning behövs. Alla fyra Open Payments SaaS-runtimeposter saknas. Befintliga Enable Banking-hemlighetsplatshållare bevisar inte giltighet; inget faktiskt certifikat har provats och avvisats. [PROVIDER]"
+    },
+    {
+      "id": 16,
+      "area": "Automatisk bankhämtning",
+      "criterion": "Aktuell genomförd körning med befintligt samtycke, hållbara återförsök och korrekt nästa tid.",
+      "score": 6.5,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-16",
+      "remaining_risks": "Verkligt medgivande blockerar hämtning; därefter behövs separat observerad automatisk körning och nästa tid."
+    },
+    {
+      "id": 17,
+      "area": "Bankgiro-import",
+      "criterion": "Stödda originalformat bevaras och tolkas spårbart; manuell import och automatisk källa redovisas separat.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-17",
+      "remaining_risks": "Bankgiroprodukt/avtal, faktisk källa, auktoriseringskvitto, rätt konto och bankprofil måste styrkas. Open Payments SaaS-runtime är inte konfigurerad i Site; CAMT/SFTP är inte aktiverat. [PROVIDER]"
+    },
+    {
+      "id": 18,
+      "area": "Verklig betalare",
+      "criterion": "Källtyp och bevisnivå syns, korrekt betalare visas när bankunderlaget har den, saknad uppgift hålls okänd; verkligt underlag verifieras utan antaganden.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-18",
+      "remaining_risks": "Rapportens angivna betalare är en observation i ett original, inte bevis för aktuell bankäkthet, kontoauktorisation eller rapport–AIS-relation."
+    },
+    {
+      "id": 19,
+      "area": "Verklig OCR/referens",
+      "criterion": "Bankens explicit angivna referens bevaras skild från förslag och fakturanummer; verkligt original verifieras.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-19",
+      "remaining_risks": "Beloppet 625 SEK och liknande referens bevisar inte en gemensam insättning eller fakturabetalning."
+    },
+    {
+      "id": 20,
+      "area": "Automatisk matchning",
+      "criterion": "Representativ separat acceptanskorpus med noll falskt säkra kopplingar, tydliga orsaker till avstående och atomärt idempotent resultat.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-20",
+      "remaining_risks": "Syntetiska falskt-säker-kontroller mäter inte verklig falskmatchningsfrekvens. Giltiga verifierade indata är en förutsättning."
+    },
+    {
+      "id": 21,
+      "area": "Delbetalning",
+      "criterion": "Exakta heltalsören, korrekt restbelopp, återtag och samtidighetskontroller.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-21",
+      "remaining_risks": "Isolerat saldo-orakel certifierar inte varje gammal kundallokering eller godtycklig påfyllning av ett befintligt par."
+    },
+    {
+      "id": 22,
+      "area": "Överbetalning",
+      "criterion": "Överskott särskiljs och kan inte automatiskt fördelas utan giltig grund.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-22",
+      "remaining_risks": "Ett återstående belopp ger ingen automatisk rätt att omfördela eller återbetala pengar."
+    },
+    {
+      "id": 23,
+      "area": "Flera fakturor per betalning",
+      "criterion": "Verifierade explicita fördelningar fungerar; tvetydiga delmängdssummor avstår; summor och samtidighet är säkra.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-23",
+      "remaining_risks": "125+500=625 i syntetiskt underlag bevisar inte den verkliga insättningsrelationen. D1 och R2 är inte en enda atomär transaktion."
+    },
+    {
+      "id": 24,
+      "area": "Historik",
+      "criterion": "Källor och ändringar kan följas utan att förväxla tidigare och aktuella fakta.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-24",
+      "remaining_risks": "En tidigare registrerad relation eller hash är inte aktuell bankbehörighet eller bevis för ett saknat original."
+    },
+    {
+      "id": 25,
+      "area": "Betalstatus",
+      "criterion": "Status beräknas från giltiga allokeringar och tillgängliga bankfakta; inaktuella resultat markeras.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-25",
+      "remaining_risks": "Registrerat saldo, föreslagen koppling och bankverifierade fakta är olika statusar. Den begränsade jämförelsen är ingen generell omverifiering av alla betalningar."
+    },
+    {
+      "id": 26,
+      "area": "Kontrollera alla betalningar",
+      "criterion": "Begränsad, återupptagbar körning med korrekt sammanfattning och felhantering.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-26",
+      "remaining_risks": "Betalningskontroll avslutar inte automatiskt en separat Gmail-efterkontroll. Trasiga warnings ska fortsatt visas som okänd kontrollstatus."
+    },
+    {
+      "id": 27,
+      "area": "Mejlförslag",
+      "criterion": "Korrekt underlag och förhandsgranskning; uttryckligt godkännande krävs före sändning.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-27",
+      "remaining_risks": "Syntetisk sändningsspärr bevisar inte faktisk mejlleverans eller att alla mottagaruppgifter är korrekta."
+    },
+    {
+      "id": 28,
+      "area": "Schemaläggning",
+      "criterion": "Befintliga scheman fungerar och minst en faktisk körning observeras; överlapp, paus och sen körning hanteras; ingen grön status från enbart konfiguration.",
+      "score": 6.5,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-28",
+      "remaining_risks": "workflow_run efter CI är automatisk exekvering men bevisar varken cron-periodicitet eller Gmail-timdispatch. Den kvarvarande dispatch-/driftintegrationen är inte ett BankID- eller bankavtalsberoende."
+    },
+    {
+      "id": 29,
+      "area": "Backup",
+      "criterion": "Aktuell krypterad backup är fullständigt kontrolläst; filantal, originalhashar och slutförandetid redovisas.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-29",
+      "remaining_risks": "Beviset gäller snapshotens frysta manifest, inte en aktuell fullinventering efter senare importer. Ingen ny snapshot eller uppmätt produktions-RPO påstås; extern reservkopia/nyckelåtkomst är inte verifierad."
+    },
+    {
+      "id": 30,
+      "area": "Säkerhet",
+      "criterion": "Ägar-/företagsgränser, sekretess, godkännanden och ekonomisk integritet bevaras; relevanta negativa tester och beroendegranskning.",
+      "score": 8.5,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-30",
+      "remaining_risks": "Ingen allmän extern SQL-endpoint eller produktionsläcka har konstaterats. Schemaexistens bevisar inte godkänd bankprodukt, mTLS eller företagsbehörighet. Ingen full extern pentest/GDPR-/kommersiell SaaS-attest."
+    },
+    {
+      "id": 31,
+      "area": "Katastrofåterställning",
+      "criterion": "Isolerad återställningsövning med faktisk backup-/restore-kod, mätt RPO/RTO och kontroller av original, register, betalningar, korruption och fel ägare. Ingen återställning över produktion.",
+      "score": 8.5,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-31",
+      "remaining_risks": "RPO 15 min är simulerat. Lokal tid utesluter operatör, molnnedladdning, nyckelåtkomst och aktivering; ingen exklusiv global resursmiljö garanterades. Kundens produktionsbackup återställdes inte."
+    },
+    {
+      "id": 32,
+      "area": "Kod/tester",
+      "criterion": "Berörda regressioner, oberoende granskning och fulla obligatoriska CI-grindar på exakt levererad kod.",
+      "score": 9,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-32",
+      "remaining_risks": "Node-versioner och säkerhets-/fokusdelmängder överlappar. Täckning gäller laddad kod. Åtta moderate utvecklingsfynd kvarstår. Den senare workerfixens fulla PR-/main-CI är PENDING, inte ett löfte som räknas som grönt."
+    },
+    {
+      "id": 33,
+      "area": "Verklig produktionsverifiering",
+      "criterion": "Levererad version kopplas till exakt källträd; bank/Gmail/OCR/backup har relevanta aktuella observationer och ekonomiska skydd jämförs före/efter.",
+      "score": 8,
+      "delta": 0,
+      "assessment": "Oförändrat numeriskt betyg; tidigare evidens bevaras i referensen. Denna städning är ingen ny produktionsacceptans.",
+      "prior_evidence": "docs/completion/final-33-assessment.json#row-33",
+      "remaining_risks": "Detta är avgränsad produktionsverifiering, inte full DB-/originalhashning, fysisk mobil, fungerande bankkoppling eller kommersiell flerföretagsacceptans. Senare Nodefix/OCR-kohort bedöms separat."
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 import {createContext,useContext,useCallback,useEffect,useMemo,useRef,useState,type ReactNode} from 'react';
 import {createCompanyClient,installCompanyClientSurface,type CompanyClient,type CompanyClientSnapshot} from '@/lib/company-client.js';
 
-const WorkspaceContext = createContext<{ activeCompanyId: string | null; switchCompany: (id: string) => Promise<void> } | null>(null);
+const WorkspaceContext = createContext<{ activeCompanyId: string | null; canManageIntegrations: boolean; switchCompany: (id: string) => Promise<void> } | null>(null);
 export function useCompanyWorkspace() { return useContext(WorkspaceContext); }
 
 const roles={owner:'Ägare',admin:'Administratör',accountant:'Redovisning',viewer:'Läsbehörighet'};
@@ -32,7 +32,8 @@ export default function CompanyWorkspace({children}:{children:ReactNode}){
   // company. Keep this value stable so child forms are not reset by their own
   // requests. Switching still unmounts the entire private subtree below.
   const activeCompanyId=snapshot?.activeCompanyId??null;
-  const workspace=useMemo(()=>({activeCompanyId,switchCompany}),[activeCompanyId,switchCompany]);
+  const canManageIntegrations=snapshot?.status==='legacy'||snapshot?.status==='ready'&&['owner','admin'].includes(snapshot.context?.role??'');
+  const workspace=useMemo(()=>({activeCompanyId,canManageIntegrations,switchCompany}),[activeCompanyId,canManageIntegrations,switchCompany]);
   if(!snapshot||snapshot.status==='pending'||snapshot.status==='switching'||snapshot.status==='blocked')return <main className="company-access-status" role={snapshot?.status==='blocked'?'alert':'status'} aria-live="polite">
     <h1>{snapshot?.status==='blocked'?'Företagsåtkomsten behöver kontrolleras':snapshot?.status==='switching'?'Byter företag…':'Kontrollerar företagsåtkomst…'}</h1>
     {snapshot?.status==='blocked'&&<><p>{snapshot.error}</p><button className="btn" type="button" onClick={()=>window.location.reload()}>Läs in sidan igen</button></>}

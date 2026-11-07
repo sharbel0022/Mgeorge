@@ -293,6 +293,15 @@ export function validateInvoiceValues(v){
   if(v.organization_number&&!validOrganization(v.organization_number))issues.push('Ogiltigt organisationsnummer.');
   return issues;
 }
+const documentProcesses=new Set();
+export async function stopDocumentProcesses(){
+  await Promise.all([...documentProcesses].map(worker=>new Promise(resolve=>{
+    if(worker.exitCode!==null||worker.signalCode!==null)return resolve();
+    const force=setTimeout(()=>worker.kill('SIGKILL'),1500);force.unref();
+    worker.once('exit',()=>{clearTimeout(force);resolve();});
+    worker.kill('SIGTERM');
+  })));
+}
 let active=0;
 export async function runDocumentProcess(bytes,mime_type,preview=false){
   if(active>=2)throw Object.assign(new Error('Dokumenttolkning pågår. Försök igen om en stund.'),{status:429});
@@ -311,6 +320,7 @@ export async function runDocumentProcess(bytes,mime_type,preview=false){
       const stop=()=>{try{worker?.kill();}catch{}};
       try{worker=fork(new URL('./invoice-worker.js',import.meta.url),[],{serialization:'advanced',stdio:['ignore','ignore','ignore','ipc'],execArgv:['--max-old-space-size=256'],env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot,TEMP:process.env.TEMP},windowsHide:true});}
       catch{fail('DOCUMENT_WORKER_START_FAILED');return;}
+      documentProcesses.add(worker);worker.once('exit',()=>documentProcesses.delete(worker));
       timer=setTimeout(()=>{timedOut=true;fail('DOCUMENT_WORKER_TIMEOUT');stop();},90000);
       worker.once('message',value=>{receivedMessage=true;finish(null,value);});
       worker.once('error',()=>{fail('DOCUMENT_WORKER_PROCESS_FAILED');stop();});
