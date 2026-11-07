@@ -1,0 +1,26 @@
+✔ Node preserves actual debtor role, exact raw name and indexed XML path (7.658937ms)
+✔ Node separates COID organisation numbers, customer identifiers and BIC (3.770209ms)
+✔ Node preserves repeated IDs and blocks contradictory organisation identity (0.899555ms)
+✔ Node retains postal address and never substitutes ultimate debtor or creditor (1.624376ms)
+✔ Sites preserves actual debtor role, exact raw name and indexed XML path (2.453135ms)
+✔ Sites separates COID organisation numbers, customer identifiers and BIC (2.868071ms)
+✔ Sites preserves repeated IDs and blocks contradictory organisation identity (0.511971ms)
+✔ Sites retains postal address and never substitutes ultimate debtor or creditor (1.321811ms)
+✔ API debtor evidence keeps scheme and raw name without treating customer ID as organisation number (0.974177ms)
+✔ both CSV importers preserve payer raw field, multiple typed reference columns and zeros (2.227566ms)
+✔ identifier source positions include skipped fields and malformed competing COID stays a conflict (0.182635ms)
+✔ payer conflicts cannot fall back to name and auto-match a bank payment (2.432934ms)
+✔ mixed direct and wrapped ISO payer identities fail closed (1.167259ms)
+✔ a stronger reversal reason survives a conflicting payer, including inheritance (0.296537ms)
+✔ typed payer evidence survives SQLite and changed customer IDs retain a durable conflict (22.084937ms)
+✔ multiple bank identifiers compare as sets on identical replay (0.293523ms)
+✔ foreign or unscoped national company ID cannot override an unrelated invoice customer (0.479202ms)
+✔ a payer conflict inherited from a completed bank aggregate remains a hard financial hold (0.149195ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 190.039968

@@ -1,0 +1,48 @@
+✔ Node imports original CSV once, preserves reference/account and survives lost response replay (37.066828ms)
+✔ Node missing account and XLSX remain review-only with exact original (91.835555ms)
+✔ Node replay reuses manual same-SHA import and refuses foreign owned original (17.849241ms)
+✔ Node rejects changed retained bytes and expired lease before economic writes (31.343015ms)
+✔ Node source endpoints require administrator auth, accept no owner, and stay disabled (196.626619ms)
+✔ Node original CAMT single, multi-payment and aggregate keep original evidence and never allocate (67.476978ms)
+✔ Node shared queue uses actual SQLite sink and persists receipt across restart (39.173567ms)
+✔ Node lease fencing rolls back original import and payments if lease expires at commit (28.332674ms)
+✔ Node queue schema initialization is safe when reopening the same database (20.769341ms)
+✔ Node binds imports to persisted job and current authorization identity (25.158403ms)
+✔ Node queue marks malformed retained originals terminal BLOCKED (23.604831ms)
+✔ Node commit guard rejects a changed queued original identity atomically (20.20512ms)
+✔ Node commit guard honors local source revocation and generation replacement (46.738654ms)
+✔ Node queue replays a renamed same-format original after an ambiguous committed import (27.853753ms)
+✔ Node rejects a retained original relabeled as a different file format (15.401453ms)
+✔ Node production commit rejects registration revision, company binding and stored expiry races atomically (51.443172ms)
+✔ Node import commit binds the persisted queued authority as well as the current source (17.342948ms)
+✔ Node source rejects an explicitly different recipient in retained csv (15.791651ms)
+✔ Node source rejects an explicitly different recipient in retained xml (16.395902ms)
+✔ Node source rejects an explicitly different recipient in retained xlsx (28.612276ms)
+✔ Node source retains exact bytes and permits matching formatted recipient in csv (18.782137ms)
+✔ Node source retains exact bytes and permits matching formatted recipient in xml (18.510487ms)
+✔ Node source retains exact bytes and permits matching formatted recipient in xlsx (31.976829ms)
+✔ Node hash replay rechecks the current recipient authority before adopting an earlier import (23.256828ms)
+✔ CAMT preserves explicit Bankgiro account strings, payer, reference and amount (10.755243ms)
+✔ CAMT debit account roles preserve the owned and counterparty Bankgiro separately (1.333359ms)
+✔ CAMT lookalike or unrelated account schemes never become Bankgiro evidence (4.183894ms)
+✔ CAMT account scheme choices are unambiguous and scalar (7.34145ms)
+✔ CAMT transaction codes cannot substitute for an explicit Bankgiro account scheme (0.774547ms)
+✔ CAMT mixed payer identifier schemes cannot become organization evidence (3.792995ms)
+✔ V4 explicit generic ISO versions and canonical containers preserve actual references (9.342224ms)
+✔ V4 missing, foreign and unknown namespaces cannot become bank evidence (1.388131ms)
+✔ V4 mixed report types and unknown financial wrappers stop the complete file (2.634008ms)
+✔ V4 references outside the supported remittance path cannot acquire a false field source (1.814944ms)
+✔ V4 detail reversals, corrections and unknown extensions require separate review (1.651959ms)
+✔ V4 ambiguous individual amounts and mixed date/account/payer choices fail closed (4.659079ms)
+✔ V4 batch counts, currency, direction and local totals are validated together (2.882422ms)
+✔ V4 BOOK, booking date, value date and original SEK are mandatory facts (0.842549ms)
+✔ V4 malformed XML cannot silently alter a bank payer or reference (1.262122ms)
+✔ V4 an invalid UTF-8 XML original is never retried as a different encoding (1.576165ms)
+ℹ tests 40
+ℹ suites 0
+ℹ pass 40
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1403.832582

@@ -40,6 +40,14 @@ Den granskade produktionskällan `090ae0a4ef9f2fe7ce6dd8b282622f93d9e21939` pass
 
 Inga verkliga bank-/provider-API-anrop, betalningar, produktionsskrivningar, publiceringar eller statusåterställningar utfördes. Inga numeriska kvalitetsbetyg höjs; verklig bankacceptans och kommersiell aktivering är inte styrkta.
 
+## 2026-11-06 — Agent 4: Bankgirooriginal och avstämning, PR 68
+
+På `feature/95-bankgiro-reconciliation` från verifierad main `f3c80629`. [Leveransrapport och exakta kvarstående beroenden](docs/integration/bankgiro-reconciliation-2026-11-06.md), [sanerat läskvitto](docs/integration/evidence/bankgiro-reconciliation-2026-11-06.json), [native RED/GREEN med fil-/logghashar](docs/integration/evidence/bankgiro-reconciliation-2026-11-06/local-verification.json), [PR 68 och aktuell full CI](https://github.com/sharbel0022/Mgeorge/pull/68).
+
+Exakta CAMT-kontoscheman och betalaridentifierare, bevarade Node-Bankgirofält, mottagarkontroll före import/återanvändning, källbunden hashreplay samt aktuella registreringsfält och databasens klocka före Sites-allokering. Native RED: 8 Node- och 17 Sites-fel i avsedda assertioner. Native GREEN: 40+127 regressions-/integritetsfall samt 18+5 befintliga betalarfall, totalt190 pass med0fail/skip/cancel/todo; Sites verifierade typkontroll passerar. Fulla slutliga CI-resultat och oberoende granskning hör till PR:ens aktuella head; äldre grönt ersätter dem inte.
+
+Läsande källa22:59:29UTC: **DISABLED / SOURCE_NOT_CONFIGURED**, inga källkvitton eller köjobb. Verklig0599/625,00SEK vid22:43UTC: intakt rapportoriginal och namn/referens finns, men kontobehörighet, samma insättning och registrerad fakturarelation är otillräckliga; automaticEligible=false och0allokeringar. Syntetiska prov intygar inte bankbevis. Inga produktionsallokeringar, original-/fakturamutationer, bankaktivering, schemabyte, merge till main eller deployment görs i denna leverans.
+
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 
 PR 61 är normalt mergad till `24390ef7e8cf6b2274c57804dc9c2d74d362ab12`. Full PR-kvalitet, separat säkerhetsacceptans och separat main-CI är gröna för samma källträd. Site **68** publicerades från exakt motsvarande Sites-träd och är avgränsat kontrollerad efter release. [Releasekvitto](docs/completion/release-site68.md).

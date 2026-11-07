@@ -136,3 +136,17 @@ test('unrepresentable positive retry advice cannot schedule an early retry',asyn
   const retry=retryAt({retryAfter:advice},1,start);assert.equal(retry,8640000000000000);assert.ok(Number.isFinite(Date.parse(new Date(retry).toISOString())));
  }
 });
+
+
+for(const [field,value] of [
+ ['sourceId','different-source'],['scopeId','different-scope'],
+ ['authorizationGeneration','different-generation'],['registrationBinding','different-registration']
+])test('same-byte queue replay requires current validation after '+field+' changes',async t=>{
+ const f=fixture(t);await f.ingest.run('owner');
+ const prior=f.sql.prepare("SELECT * FROM bankgiro_ingest_jobs WHERE status='REVIEW'").get();
+ assert.ok(prior);
+ const job={id:'new-delivery',owner:prior.owner,sha256:prior.sha256,sourceId:prior.source_id,scopeId:prior.scope_id,authorizationGeneration:prior.authorization_generation,registrationBinding:prior.registration_binding};
+ assert.equal((await f.store.duplicate(job)).id,prior.id,'the same authority may reuse its prior receipt');
+ assert.equal(await f.store.duplicate({...job,[field]:value}),null,'a hash alone must not grant another source authority');
+ assert.equal(f.sql.prepare('SELECT count(*) n FROM imported').get().n,1);
+});

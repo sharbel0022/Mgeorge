@@ -1,0 +1,172 @@
+✔ Node imports original CSV once, preserves reference/account and survives lost response replay (42.478236ms)
+✔ Node missing account and XLSX remain review-only with exact original (94.806816ms)
+✔ Node replay reuses manual same-SHA import and refuses foreign owned original (19.092093ms)
+✔ Node rejects changed retained bytes and expired lease before economic writes (35.718733ms)
+✔ Node source endpoints require administrator auth, accept no owner, and stay disabled (184.338091ms)
+✔ Node original CAMT single, multi-payment and aggregate keep original evidence and never allocate (60.097211ms)
+✔ Node shared queue uses actual SQLite sink and persists receipt across restart (27.563016ms)
+✔ Node lease fencing rolls back original import and payments if lease expires at commit (17.726477ms)
+✔ Node queue schema initialization is safe when reopening the same database (16.90583ms)
+✔ Node binds imports to persisted job and current authorization identity (16.160948ms)
+✔ Node queue marks malformed retained originals terminal BLOCKED (20.222787ms)
+✔ Node commit guard rejects a changed queued original identity atomically (18.216073ms)
+✔ Node commit guard honors local source revocation and generation replacement (32.548016ms)
+✔ Node queue replays a renamed same-format original after an ambiguous committed import (30.03435ms)
+✔ Node rejects a retained original relabeled as a different file format (18.336816ms)
+✔ Node production commit rejects registration revision, company binding and stored expiry races atomically (47.296487ms)
+✔ Node import commit binds the persisted queued authority as well as the current source (16.827682ms)
+✖ Node source rejects an explicitly different recipient in retained csv (16.579049ms)
+✖ Node source rejects an explicitly different recipient in retained xml (16.074347ms)
+✖ Node source rejects an explicitly different recipient in retained xlsx (27.049383ms)
+✔ Node source retains exact bytes and permits matching formatted recipient in csv (17.226734ms)
+✔ Node source retains exact bytes and permits matching formatted recipient in xml (17.919357ms)
+✔ Node source retains exact bytes and permits matching formatted recipient in xlsx (23.967729ms)
+✖ Node hash replay rechecks the current recipient authority before adopting an earlier import (16.835894ms)
+✖ CAMT preserves explicit Bankgiro account strings, payer, reference and amount (7.647691ms)
+✖ CAMT debit account roles preserve the owned and counterparty Bankgiro separately (0.997533ms)
+✔ CAMT lookalike or unrelated account schemes never become Bankgiro evidence (3.188504ms)
+✖ CAMT account scheme choices are unambiguous and scalar (0.853135ms)
+✔ CAMT transaction codes cannot substitute for an explicit Bankgiro account scheme (1.754052ms)
+✖ CAMT mixed payer identifier schemes cannot become organization evidence (1.877659ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 22
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1104.760272
+
+✖ failing tests:
+
+test at test/bankgiro-ingest.test.js:165:42
+✖ Node source rejects an explicitly different recipient in retained csv (16.579049ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/test/bankgiro-ingest.test.js:169:3)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'ACCOUNT_MISMATCH' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at test/bankgiro-ingest.test.js:165:42
+✖ Node source rejects an explicitly different recipient in retained xml (16.074347ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/test/bankgiro-ingest.test.js:169:3)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'ACCOUNT_MISMATCH' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at test/bankgiro-ingest.test.js:165:42
+✖ Node source rejects an explicitly different recipient in retained xlsx (27.049383ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/test/bankgiro-ingest.test.js:169:3)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'ACCOUNT_MISMATCH' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at test/bankgiro-ingest.test.js:183:1
+✖ Node hash replay rechecks the current recipient authority before adopting an earlier import (16.835894ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/test/bankgiro-ingest.test.js:189:3)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'ACCOUNT_MISMATCH' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at sites/tests/helpers/camt-bankgiro.mjs:17:2
+✖ CAMT preserves explicit Bankgiro account strings, payer, reference and amount (7.647691ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  '' !== '0012345'
+  
+      at TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/helpers/camt-bankgiro.mjs:23:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '',
+    expected: '0012345',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/helpers/camt-bankgiro.mjs:31:2
+✖ CAMT debit account roles preserve the owned and counterparty Bankgiro separately (0.997533ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  '' !== '0000599'
+  
+      at TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/helpers/camt-bankgiro.mjs:33:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '',
+    expected: '0000599',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/helpers/camt-bankgiro.mjs:46:2
+✖ CAMT account scheme choices are unambiguous and scalar (0.853135ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/helpers/camt-bankgiro.mjs:57:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /tvetyd|kontoschema|XML/i,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at sites/tests/helpers/camt-bankgiro.mjs:68:2
+✖ CAMT mixed payer identifier schemes cannot become organization evidence (1.877659ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///home/agent/mgeorge-bankgiro-95-restored/sites/tests/helpers/camt-bankgiro.mjs:80:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /tvetyd|schema|XML/i,
+    operator: 'throws',
+    diff: 'simple'
+  }
