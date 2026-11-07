@@ -1,0 +1,189 @@
+{
+  "schema": "mgeorge-agent6-focused-verification-v1",
+  "recorded_at": "2026-11-07T00:02:32Z",
+  "runtime": "Node v24.22.1",
+  "dependency_mode": "Linked existing dependencies with byte-identical root and Sites lockfiles; diagnosis only, not a clean full release gate",
+  "source_mode": "Named staged Git integration trees, before final documentation and workflow cleanup; untracked dependency symlinks existed and are not committed",
+  "root_lock_sha256": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d",
+  "sites_lock_sha256": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0",
+  "network_guard": "scripts/saas-test-isolation.mjs with env -i NODE_ENV=test",
+  "full_final_ci": "REQUIRED_SEPARATELY_ON_FINAL_CHECKOUT",
+  "results": [
+    {
+      "file": "gmail-ocr-node-57.tap.gz",
+      "raw_sha256": "90f1f16e4cf05e21f565235b06841b635875635c84da4b4f75fd1d01d8400d6b",
+      "compressed_sha256": "9d27b6e51aacabaab16507c21fa670ccd5b19caff530f4619119dda512f93a1b",
+      "tracked_tree_sha": "d845fd082d46dffbcd28c11c3108cdf58ec1504d",
+      "exit_code": 0,
+      "scope": "Gmail/OCR Node merge focus",
+      "totals": {
+        "tests": 87,
+        "pass": 87,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "file": "gmail-ocr-sites-57.tap.gz",
+      "raw_sha256": "55f17ac2c539cef0f43002d57350dfcb334e54f426bd31f062b05dfbd290d0b9",
+      "compressed_sha256": "4d86fba192782b7bb206ab8dcaa04960caea3a136766e8996f13881fa9036f95",
+      "tracked_tree_sha": "d845fd082d46dffbcd28c11c3108cdf58ec1504d",
+      "exit_code": 0,
+      "scope": "Gmail/OCR Sites merge focus",
+      "totals": {
+        "tests": 172,
+        "pass": 172,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "file": "combined-ai-worker-approval-red.tap.gz",
+      "raw_sha256": "bef2ec51035be2caf41ca0bb9f4a620bdd655155b7fb2ea3c26761e84dc2cd28",
+      "compressed_sha256": "79823bfa0462fe69c4fda3c210a36dbe46646271da4a5b2fb6a611a9cb39fdc3",
+      "tracked_tree_sha": "1c85468553e8ad01460fe3b4abd8d5c6ad53a133",
+      "exit_code": 1,
+      "scope": "Reproduced dynamic-import mapping gap in the test fixture, not a production module-resolution defect",
+      "totals": {
+        "tests": 1,
+        "pass": 0,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "file": "combined-ai-worker-green.tap.gz",
+      "raw_sha256": "71b678b41f8daba825caf65ba6f0cbc6b8264b0419fd203224db2fa30d954dfd",
+      "compressed_sha256": "560bd968bf7718b661c0addbb8208ce0c9b30dd7271f8d49c46c44b34495b5f6",
+      "tracked_tree_sha": "5ab04e052480330fa152609d642d56196b6b250b",
+      "exit_code": 0,
+      "scope": "Actual worker and AI approval gate after fixture mapping",
+      "totals": {
+        "tests": 45,
+        "pass": 45,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "file": "combined-ai-nested-green.tap.gz",
+      "raw_sha256": "7b9667d302bbb71c872f68b7aceaa8ada6d5097e21d430fb71109414c5d1c352",
+      "compressed_sha256": "9a4fddd6ebbf56d6144399b42280402d51cf5c6d6733e5790583909ce6b61470",
+      "tracked_tree_sha": "5ab04e052480330fa152609d642d56196b6b250b",
+      "exit_code": 0,
+      "scope": "Nested AI party and line conflicts",
+      "totals": {
+        "tests": 22,
+        "pass": 22,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "file": "combined-ai69-worker.tap.gz",
+      "raw_sha256": "1a8c0e1569c818c207f521ab9714ed6c1bde55331e88f158ea0fb33ee134fc0f",
+      "compressed_sha256": "3f69b5fe4679899ec9624f799a29b1cf29fa3beac7f537d05cc1cdf1eadff394",
+      "tracked_tree_sha": "ac225372f1312d2ff32ebb06a26351a777e787f6",
+      "exit_code": 0,
+      "scope": "Independent AI guards combined with final worker protocol",
+      "totals": {
+        "tests": 65,
+        "pass": 65,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "file": "bank-security-scope-red.tap.gz",
+      "raw_sha256": "8583c41d19c2949a79e9651f2b52190741fbfe18afdb9803e872a6b5f77c4f01",
+      "compressed_sha256": "daea9e3aaa9dd4f993f7a91cf24a8fa07405897fef600647f61185c510188d35",
+      "tracked_tree_sha": "4f2d4c2579501badb998e339d246492bdf8f11c0",
+      "exit_code": 1,
+      "scope": "Actual acceptance runner lost bank tests after centralized-scope merge",
+      "totals": {
+        "tests": 1,
+        "pass": 0,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "file": "bank-security-scope-green.tap.gz",
+      "raw_sha256": "6d492ae49e5cc7758cf191604bc102e71e8023acb1273b562b027111020f3baa",
+      "compressed_sha256": "ba0a554d89ef9ca5b39a993e07f0f4bd3f5275e3efe5c93f99e746e6ce165ff2",
+      "tracked_tree_sha": "aadba68e39cd39ae8b83088c3559e5974e3d179a",
+      "exit_code": 0,
+      "scope": "Retained bank test scope plus session/company boundaries",
+      "totals": {
+        "tests": 40,
+        "pass": 40,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "file": "bank-sites-combined-green.tap.gz",
+      "raw_sha256": "7a60a0f1b379c4a00b1f7af56cd7b5480d1e9feb6a07eaace9b1567ecf987e23",
+      "compressed_sha256": "52d91f5dd77a034582eb38976be6d98dda9b4240bd498904933f38f20b695965",
+      "tracked_tree_sha": "aadba68e39cd39ae8b83088c3559e5974e3d179a",
+      "exit_code": 0,
+      "scope": "Sites bank consent and recovery with all preceding integrations",
+      "totals": {
+        "tests": 390,
+        "pass": 390,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "file": "bankgiro-combined-green.tap.gz",
+      "raw_sha256": "92072abe51a6f0ab888d3d30b2c7047ed2f9af678778fc3985c2720cab843c28",
+      "compressed_sha256": "94dc50b7b659887427087edd86d239c37de809ba0a2ca1c3360ef4586798beb5",
+      "tracked_tree_sha": "e0a75bc949fdd9be49877d2213f6940df1af91aa",
+      "exit_code": 0,
+      "scope": "Bankgiro CAMT, financial fence and company storage",
+      "totals": {
+        "tests": 37,
+        "pass": 37,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "file": "gmail-final-protocol-green.tap.gz",
+      "raw_sha256": "53ce9d02a8a2ea293af1f1ff1a149f280c7773b8e53d90827cef1b6f7052fa52",
+      "compressed_sha256": "5e12bc5dd903830781a37636fe5552bf317a5af68bd99b7b402e6bb790cefeaf",
+      "tracked_tree_sha": "2294450a4a0b89222ad9435aa26d3b36e45f25dd",
+      "exit_code": 0,
+      "scope": "Actual legacy and receipt-v2 lost acknowledgement paths",
+      "totals": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    }
+  ]
+}

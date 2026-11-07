@@ -1,70 +1,67 @@
 # MG Fakturakoll — slutlig integration och releasegrindar
 
-Uppdaterad: 2026-11-06 22:59:55 UTC. **Beslut tills vidare: NOT APPROVED för den begärda 9,5-releasen. Målet 314/330 är inte styrkt.**
+Källinventering och integration uppdaterad 2026-11-07 00:02 UTC. **Den begärda 9,5-releasen är inte godkänd. Målet 314/330 är inte styrkt.** Detta dokument fryser underlaget före den kombinerade slutkörningen; aktuella slutresultat och exakt slut-SHA redovisas i [PR63](https://github.com/sharbel0022/Mgeorge/pull/63) och Agent 6:s slutrapport.
 
-## Verifierad bas
+## Verifierad bas och publicerad produkt
 
-Main är `f3c80629d4856c2f8ecbb1ed81be391a13ac6be8`, rottree `c1912a91e44ecaca7095dcaca1201c3904df87d7`, Sites-tree `c2feb372a4c0ef121ffe594784684957c14ddac1`. Publicerad produkt är **Site 69**, native commit `1df8cb96eda374f2506c81aa776263388ddb666a`, lyckad driftsättning, miljörevision 10. Ingen ny produktversion har publicerats av detta integrationsarbete.
+Main är `f3c80629d4856c2f8ecbb1ed81be391a13ac6be8`, tree `c1912a91e44ecaca7095dcaca1201c3904df87d7`. Publicerat är fortfarande **Site 69**, native commit `1df8cb96eda374f2506c81aa776263388ddb666a`, miljörevision 10. Integrationsarbetet har inte skrivit produktionsdata, ändrat medgivanden eller publicerat en ny produktversion.
 
-## Leveranser och granskning
+## Sammanförda leveranser
 
-Den första inventeringen 22:45 UTC föregick publiceringen av de fem nya grenarna. Alla finns nu. Den tidigare observationen ligger kvar i Git-historiken; den ska inte läsas som aktuell frånvaro.
-
-| Agent | PR | Gren | Aktuell integrationsstatus |
+| Ordning | Leverans | Granskad head | Integration |
 | --- | --- | --- | --- |
-| 1 | [64](https://github.com/sharbel0022/Mgeorge/pull/64) | `feature/95-openai-invoices` | Testfall/plan; produktimplementation ännu inte granskad |
-| 2 | [67](https://github.com/sharbel0022/Mgeorge/pull/67) | `feature/95-document-automation` | Klientprotokoll publicerat; server och full acceptans pågår |
-| 3 | [65](https://github.com/sharbel0022/Mgeorge/pull/65) | `feature/95-bank-recovery` | Kodgranskning och CI pågår |
-| 4 | [68](https://github.com/sharbel0022/Mgeorge/pull/68) | `feature/95-bankgiro-reconciliation` | Testfall/plan; produktimplementation ännu inte granskad |
-| 5 | [66](https://github.com/sharbel0022/Mgeorge/pull/66) | `feature/95-saas-readiness` | Kodgranskning och CI pågår |
+| 1 | [PR66, SaaS och säkerhet](https://github.com/sharbel0022/Mgeorge/pull/66) | `c85f2375` | `c6bb149b` |
+| 2 | [PR67, Gmail/OCR](https://github.com/sharbel0022/Mgeorge/pull/67) | `b2178405` | Produkt från `57abcd8` i `b9081cf`; sista testdeltat ingår i denna slutkandidat |
+| 3 | [PR64, OpenAI](https://github.com/sharbel0022/Mgeorge/pull/64) | `ce6fa615` | `7a2fb40c` |
+| 3a | [PR69, oberoende AI-rättningar](https://github.com/sharbel0022/Mgeorge/pull/69) | `38d731c0` | `a6171086` |
+| 4 | [PR65, bankåterhämtning](https://github.com/sharbel0022/Mgeorge/pull/65) | `9529701a` | `8dfcd8ec` |
+| 5 | [PR68, Bankgiro/avstämning](https://github.com/sharbel0022/Mgeorge/pull/68) | `7cbcba72` | `124e452d` |
 
-**Ingen av dessa fem PR:er är ännu integrerad.** Alla nio äldre 95-grenar är redan förfäder till main. Historiska PR61 och PR62 ligger redan i main/Site69 och räknas inte som nya integrationer. [Exakta SHA, beroenden och granskningsdimensioner](integration-matrix.json).
+Alla nya produktändringar är sammanförda i integrationsgrenen, inte i main. De nio äldre 95-grenarna var redan förfäder till bas-main och räknas inte som nya integrationer. [Exakta SHA, beroenden och granskningsdimensioner](integration-matrix.json).
 
-Integrationsordning: gemensam säkerhet/företagsisolering → Gmail/OCR-kö → OpenAI → bank → Bankgiro/avstämning → full SaaS-acceptans. Särskilt granskas originalens SHA-256, worker lease/run/kvitto, aktuellt medgivande, mottagare/källbehörighet, kostnadsreservation och återställning utan återaktivering av gamla behörigheter.
+## Faktiska granskningsfynd
 
-## Färsk normal CI på oförändrad produktbas
+- AI måste återkontrollera behörighet före varje providerrequest och avstå från ny debitering efter ett accepterat dokumentkvitto. Tvetydiga genereringsfel får inte automatiskt skickas igen. Kostnadsredovisningen måste bevara okänd kostnad vid oväntat cacheutnyttjande.
+- Ett återställt kostnadsregister får inte återanvända gamla budgetar. Ny snäv läskapabilitet genom befintliga företagsgränser blockerar AI både under återställning och efter bankens återhämtning. Förlust av redan obligatoriska centrala kontrolltabeller blockerar också AI. Ingen funktion häver AI-spärren.
+- Gmail/OCR:s riktiga worker och AI-tolkning behövde en gemensam regression. Den reproducerade ett saknat dynamiskt modulalias i testfixturen. Efter rättning verifieras att aktiverad AI utan godkännanden inte kontaktar provider och att förlorad kvittens återhämtas med exakt ett sparat resultat.
+- Bankgrenens två nya säkerhetsfiler riskerade att falla bort vid SaaS-grenens centralisering. Testet mot den verkliga säkerhetskörningens kvitto gick först rött; båda filerna finns nu i det gemensamma omfånget och regressionen passerar.
+- Sista Gmail-teständringen skiljer korrekt mellan legacy och receipt-v2. Legacy måste fortfarande rapportera osäker leverans. V2 får räkna ett matchat varaktigt kvitto. Båda kräver ett enda completion-anrop och oförändrade original/historik.
 
-[Ordinarie kvalitetskörning 42307160013](https://github.com/sharbel0022/Mgeorge/actions/runs/42307160013) är klar och godkänd. Head `70d2f74c1aa8f1a994658d0cd6cc7c573be72e7d`; GitHubs testade PR-checkout `30ad8ecfb56c98371ff7bc8e34495b9f1f0f73cf`. Endast fem dokument skilde detta head från main.
+[Oberoende granskning och begränsningar](reviews/agent6-final-integration.md). [Elva bevarade lokala fokusloggar med SHA-256, verkliga RED/GREEN och exakta källträd](evidence/agent6-review/verification.json). Fokusresultat överlappar fullsviter och ska inte summeras som unika scenarier.
 
-| Grind | Färskt resultat |
-| --- | --- |
-| Node 22.23.4 | 3 012/3 012; inga fel, avbrott, överhopp eller TODO |
-| Node 24.22.1 | 3 012/3 012; inga fel, avbrott, överhopp eller TODO |
-| Sites | 5 820/5 820; verifierade installationer, typer, audits och produktionsbygge godkända |
-| Bankgiro SFTP bridge | 47/47; installation, syntax och audits godkända |
-| Chromium | Syntetisk acceptans godkänd; detaljkvittot finns i CI-artifakten |
-| 1/10/100 företag | Syntetisk korrekthet/prestanda godkänd; latensdetaljer finns i CI-artifakten |
-| Separat säkerhetsacceptans | [42307159929](https://github.com/sharbel0022/Mgeorge/actions/runs/42307159929): 377 Node + 1 225 Sites; överlappar fullsviterna |
+## Slutlig CI måste avse samma källa
 
-[Råa resultat sammanfattade med artefakternas SHA-256 och storlekar](ci-baseline-fresh.json). Dessa körningar verifierar basprodukten; de godkänner inte nya agentändringar som ännu inte ingår.
+Obligatoriskt på den frysta PR-kandidaten:
 
-Den separata workflowen `final95-recovery.yml` kör samma befintliga återställningsmotor med **430 syntetiska original / 185 567 855 byte**, isolerad SQLite, temporära nycklar och nätverksspärr för testprocessen. Den kör på varje PR/main-kandidat, behåller exakt checkout och rått återställningskvitto samt avvisar förändrad källkod. Första körningens resultat är ännu inte känt i detta dokumentationscommit. Detta är ett syntetiskt återställningsprov, aldrig produktionsåterställning.
+1. Payment control: Node 22 och 24, full Sites med typer/produktionsbygge, Bankgiro bridge, Chromium samt 1/10/100 företag.
+2. SaaS security acceptance: både säkerhetsjobbet och **full_synthetic_recovery**, inklusive råbevisverifiering mot den faktiska checkout-SHA:n.
+3. SaaS readiness: nyckelfiler på Node 22/24 samt sessioner, migreringar och återställningsproveniens.
+4. OpenAI invoice checks: riktiga adapter-/integrationskontrakt och faktiskt optiskt utvecklingsprov. Ej tillgängliga live-AI-armar måste stå som ej mätta.
 
-### Bevarade fel och verifieringsbegränsningar
+Den tidiga extra `final95-recovery.yml` tas bort eftersom PR66 nu kör den fullständigare 430-originalsövningen med 22 negativa kontroller och strikt proveniens i ordinarie säkerhetsworkflow. Den tidiga lyckade körningen [42308817867](https://github.com/sharbel0022/Mgeorge/actions/runs/42308817867) är historiskt bevis, inte slutkandidatens kvitto.
 
-Det nya lokala Node-försöket passerade syntax/audits men fick optiska workerfel, en fil med SIGKILL och slutligen exit 137. Kvittot blev ofullständigt och miljön blev otillgänglig. Grundorsaken är inte fastställd. De nya rena CI-resultaten är ytterligare belägg; de raderar inte det avbrutna försöket. [Avbrottsrecord](local-interruption.json).
+GitHubs PR-CI checkar ut en merge-ref. Rapportera både PR-head och den faktiska checkouten, och verifiera identiskt filträd. Kontrollera noll fail/cancel/skip/TODO, rena/oförändrade källmanifest och artefakthashar. Tidigare gröna PR-körningar ersätter inte den slutliga kombinationen. Main saknar branch protection och repository rulesets vid denna observation; grön CI är inte mekaniskt tvingande mergepolicy.
 
-Ny visuell produktionskontroll blockerades av browseranslutningen. En direkt läsning av arbetsytans databastabell trunkerade dess stora payload; den kan därför **inte** styrka fullständigt oförändrade fakturor, bankhändelser och allokeringar. [Begränsning för ekonomisk före/efter-kontroll](financial-comparison-limit.json). Inga produktionsskrivningar har utförts av integrationsagenten.
+## Färsk produktion och verklig acceptans
 
-## Produktionsobservationer
+[Sanerad observation 23:59 UTC](production-observation-2026-11-06T2359Z.json):
 
-- Gmail är anslutet: 427 granskningsdokument, 47 väntar på OCR, 4 på PDF; 66 accepterade dokument i terminalt jobbstatus under föregående 24 timmar. Köstatus vid observationen: 0 aktiva, 0 utgångna leases, 0 uttömda försök, 0 fel.
-- Schemalagd moln-OCR [42304814299](https://github.com/sharbel0022/Mgeorge/actions/runs/42304814299), exact main ovan, avslutades 22:29 UTC med 6 behandlade och 0 fel. Detta styrker den körningen, inte OCR-precision eller jämn 15-minuterstakt.
-- Gmails separata externa schemadispatch är fortfarande obekräftad. Automationens `no_update` räcker varken som lyckat anrop eller bevis på uteblivet anrop.
-- Swedbank: `connected=false`, `reauth_required`, `BANK_RECONNECT_REQUIRED`, `syncAllowed=false`. Inget bankanrop gjordes av denna granskning.
-- Bankgiro: `DISABLED / SOURCE_NOT_CONFIGURED`, auktorisation `UNKNOWN`, inga intagsjobb. Ingen behörighet eller beviskedja har fabricerats.
-- Senast verifierad riktig backup: 430/430 original, 185 567 855 byte, `manifest_pass` kl. 00:48:58.086 UTC. Senare importer ingår inte i detta frysta manifest.
-- Miljörevision 10 har 18 konfigurerade nyckelnamn. Hemliga värden maskeras av verktyget; null är inte belägg för saknad hemlighet. Inga OpenAI- eller SaaS Open Payments-nyckelnamn finns i denna observation.
+- Gmail är anslutet, senaste lyckade fetch 22:28:06 UTC. Kö: 427 granskningsdokument, 47 väntar OCR och 4 PDF. 54 accepterade dokument under det senaste rullande dygnet; 0 aktiva, utgångna, uttömda eller felande jobb. Det förändrade dygnsantalet jämfört med tidigare observation är inte belägg för förlorade dokument.
+- OCR:s senaste lyckade completion är 22:29 UTC. Vid 23:59 visas workern inte som nyligen aktiv. `background_ready=false`, `external_schedule_verified=false`, `ocr_worker_unavailable=true`.
+- Ett verkligt schemalagt OCR-jobb [42304814299](https://github.com/sharbel0022/Mgeorge/actions/runs/42304814299) på bas-main gav 6 behandlade, 0 fel. Det styrker den körningen, inte regelbunden 15-minuterstakt eller extraktionsprecision. Gmail-automationens `no_update` saknar separat dispatchbevis.
+- Swedbank: `connected=false`, `reauth_required`, `syncAllowed=false`, `BANK_RECONNECT_REQUIRED`. Sista sparade lyckade synk 2026-11-05 08:05 UTC. Inget bankanrop har gjorts av integrationsagenten.
+- Bankgiro: `DISABLED / SOURCE_NOT_CONFIGURED`, behörighet `UNKNOWN`, 0 jobb. **0599 / 625,00 SEK är fortsatt overifierad** som verklig rapport–konto–fakturarelation.
+- Riktig backup har 430/430 original, 185 567 855 byte och verifierat manifest 2026-11-06 00:48:58 UTC. Senare importer ingår inte i manifestet. Detta är inte ett nytt produktionsrestoreprov.
+- Publik utloggad startsida inspekterades visuellt cirka 23:27 UTC: läsbar navigation, inloggningskrav, dolda belopp och inaktiva ekonomiska åtgärder. Autentiserad och responsiv produktions-UI är inte nyverifierad. En stor ekonomisk databasrespons trunkerades; fullständig ekonomisk före/efter-kontroll är [NOT_VERIFIED](financial-comparison-limit.json).
 
-[Sanerad produktionsobservation](production-observation.json). OpenAI-modellåtkomst, livebenchmark och ny oberoende optisk acceptans är ännu inte verifierade. Tidigare dokumenterad poäng **258,5/330 = 7,83/10** höjs inte av enbart fler tester.
+## AI, OCR och betyg
 
-## Kvarvarande releasegrindar
+AI är avstängd som standard och kräver servernyckel, betrott företag, allowlist samt sekretess-, säkerhets- och kostnadsgodkännande. Profilerna anger `gpt-6-luna` och `gpt-6.1-sol`; faktisk projektåtkomst, livekostnad och liveprecision är inte verifierade. Återställd miljö förblir AI-spärrad tills kostnadsavstämning och uttrycklig återacceptans har ordnats.
 
-1. Granska och integrera färdiga Agent 1–5-leveranser på exakta SHA; testförst-commits är inte färdiga leveranser.
-2. Kör samtliga suites, säkerhet, migrationsprov, backup/restore, Chromium, 1/10/100 företag, AI/OCR-mätningar och driftscenarier på fryst slutversion.
-3. Verifiera ordinarie PR-CI och därefter ordinarie main-CI för rätt mergad commit.
-4. Säkerställ aktuell backup, verifierbar rollback, GitHub/native-källparitet och tillgänglig publiceringsmiljö.
-5. Kontrollera publicerad API/UI och ekonomiska invariants; redovisa verklig bank/Bankgiro separat.
-6. Slutför alla 33 kriterier med historiska och nya kod-, test- och produktionsbevis samt kvarstående risk.
+Det faktiskt körda utvecklingsprovet på den tidigare granskade AI-kandidaten omfattade 4 syntetiska dokument: **46 TP, 0 FP, 6 FN av 52 förväntade fält**, precision 100 %, recall 88,46 %, kompletta dokument 1/4, granskning 4/4. Setet är tidigare använt och inte oberoende accepterat. AI-armarna mättes inte. Slutkandidatens workflow ska upprepa mätningen och redovisa sitt eget utfall. Den historiska oberoende 12-dokumentsmätningen (62/108 fält, recall 57,41 %) är en annan population och får inte blandas med utvecklingsprovet.
 
-Saknat bankavtal/medgivande är en extern blockerare. Ofärdiga agentleveranser, AI/OCR-kvalitet, schemabevis och verifieringsmiljö är egna grindar och får inte döljas bakom bankstatusen.
+**Senaste konservativa produktbedömning: 258,5/330 = 7,83/10.** Inga nya poäng tilldelas för fler fixturetester eller opublicerade ändringar. En full 33-punktsbedömning med slutlig CI hör till slutrapporten.
+
+## Nästa releasebeslut
+
+Godkänn inte den begärda releasen enbart för att integrationen kompilerar och fixturetester passerar. Verifiera oberoende AI/OCR-acceptans, Gmail-dispatch och driftskadens, giltigt bankmedgivande och avtalad Bankgiro-källa, faktisk flerföretagsdrift, aktuell backup/rollback samt full ekonomisk jämförelse före och efter en eventuell kontrollerad publicering. Main-merge, main-CI och ny Sites-version återstår tills dessa releasevillkor kan styrkas.

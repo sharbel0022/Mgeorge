@@ -14,6 +14,8 @@ Det tidigare produktionsbetyget ändras inte. Publik Node-drift med en enda admi
 
 [PR 67](https://github.com/sharbel0022/Mgeorge/pull/67) bygger på verifierad main f3c80629d4856c2f8ecbb1ed81be391a13ac6be8. Kandidaten ger bounded Gmail-deduplicering och korrelerbara schemakvitton, OCR-heartbeats/receipt-protokoll, återhämtning från tidiga avbrott, separata felklasser och ändliga återförsök. [Leveransrapport](docs/automation/document-automation-reliability.md), [kontrakt och återhämtningsplan](docs/automation/recovery-runbook.md), [färska driftobservationer](docs/automation/observations-2026-11-06.json).
 
+Full CI på den föregående kandidaten 57abcd8 fann ett äldre kvittoassertionsfall: Sites 5869/5870, övriga kvalitets-/säkerhetsjobb och Sites-bygge godkända. Testet täcker nu både strikt legacy-felhantering och verifierad receipt-v2-framgång, med 2/2 fokustester och oförändrade original-/dubblettassertioner. Ingen produktionskod ändrades i den korrigeringen; slutlig full CI krävs på aktuellt PR-head.
+
 Sammanfogad lokal fokuskontroll: Node 223/223 och Sites 341/341, 0 fail/cancel/skip/TODO. Rena fullständiga kvalitets-/säkerhetsgrindar på slutlig PR-kandidat redovisas i PR:s check-kvitton; tidigare kandidatjobb ersätter inte aktuell verifiering. Oberoende granskning reproducerade och ledde till rättningar av falska klientmarkörer, transient heartbeat-förlust, förlorad recovery-CAS och strömlimit.
 
 Status 23:18 UTC: 427 granskning, 47 OCR, 4 PDF, 60 färdiga i framflyttat 24-timmarsfönster. Ett faktiskt OCR-schemajobb 22:27 gav 6/0 på main, men regelbunden kvartskörning är inte styrkt. Gmail 23:00 gav åter no_update utan nytt automatiskt appkvitto. Ingen produktion eller verkliga scheman ändrades; ingen massbearbetning eller deployment genomfördes. AI-modelladaptern är orörd.
@@ -1129,3 +1131,9 @@ Aktuell separat fixture-CUA täckte fem bredder, stabil inmatning och dialogfoku
 [Full rapport](docs/SAAS-MULTITENANT-BANKID-FINAL-REPORT.md) · [Matris](docs/saas/INTEGRATION-MATRIX.md). Slutlig inventering f75→b2e7:219 filer=75 ändrade+144 tillagda/0 raderade; alla sju PR43-filer ingår redan i dessa219. Alla 33 kvalitetspoäng ligger kvar på255/330=7,73/10.
 
 Färsk läsande OCR-kontroll **2026-11-05T15:39:02Z** hittade ingen nyare schemalagd körning bland API-listans senaste15. Senaste observerade är [42013301104](https://github.com/sharbel0022/Mgeorge/actions/runs/42013301104), jobb127197454985, headf75; faktisk logg10:45:30.6420193Z gav **processed0, failed0**, schedule success. Detta verifierar varken bearbetning av ett verkligt dokument eller den nya b2e7-körkoden. Ingen workflowdispatch utfördes. [Sanerat OCR-kvitto](docs/saas/evidence/2026-11-05/final-ocr-observation.json).
+
+## 2026-11-07 — Agent 6: samlad kandidat före slutlig CI
+
+Agent 1–5:s granskade leveranser och den oberoende AI-rättningen i PR69 finns nu i `integration/mgeorge-final-95`. Sammanföringen bevarar båda sidors sakliga historik och banktesternas explicita säkerhetsscope. Verkliga RED/GREEN och källträd finns i [integrationsgranskningen](docs/final95/reviews/agent6-final-integration.md). Den frysta slutkandidatens fulla normala CI måste fortfarande verifieras; tidigare enskilda PR-resultat räcker inte. [Aktuell matris och releasegrindar](docs/final95/README.md).
+
+Publicerat är fortfarande Site 69 på tidigare main. Ingen produktion har skrivits eller publicerats av Agent 6. Senaste konservativa bedömning 258,5/330 = 7,83/10 höjs inte. Swedbank kräver återanslutning, Bankgiro-källa saknas, live-AI och oberoende optisk acceptans är ej styrkta, och Gmail/OCR-bakgrunden behöver uppmärksamhet. Slutligt bevisbaserat beslut och exakta CI-kvitton redovisas i PR63 och slutrapporten.
