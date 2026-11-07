@@ -1,3 +1,49 @@
+## 2026-11-06 — Agent 5: säkerhet, återställning och releasegrindar
+
+[PR 66](https://github.com/sharbel0022/Mgeorge/pull/66), `feature/95-saas-readiness`, utgår från verifierad main `f3c80629d4856c2f8ecbb1ed81be391a13ac6be8`. [Leveransrapport](docs/saas-readiness/README.md), [frysta verifieringsresultat](docs/saas-readiness/verification-results.md) och [riskregister](docs/saas-readiness/risk-register.md) beskriver den avgränsade säkerhetsleveransen.
+
+Reproducerade brister är rättade i privat nyckelfil, dubbla sessionscookies, företagsbyte utan förväntad version och återställningens proveniens. Ny separat verifierare binder sparade releasekvitton till källa, scope, hashvärden och fullständigt resultat; åtta ytterligare kvittomotprov upptäcktes genom oberoende granskning och går från RED till GREEN.
+
+Fryst kandidat `d2cad86a`, faktiskt testad PR-merge `bad0a67b`, har 112/112 fokusfall, 14/14 nyckelfilsfall på vardera Node 22/24, samlad säkerhetsacceptans 481/481 Node + 1 244/1 244 Sites samt full Node-kvalitet 3 113/3 113 i båda versionerna. Dessa sviter överlappar. Full slutstatus för aktuell PR-head ska läsas i PR:ns egna kvalitets-/säkerhetsjobb.
+
+[Återställningsövningen](docs/saas-readiness/backup-recovery.md) verifierade 430 syntetiska original/185 567 855 byte, 27 tabeller och 22 negativa kontroller; isolerad restore och acceptans tog 3 080,262 ms. Ett separat prov återställde parsebara syntetiska PDF/PNG/CSV/XML/XLSX byteidentiskt. Simulerad RPO är 15 minuter och motsvarar inte en verifierad produktionskadens. Migrationstest bevarar ekonomisk data och originalmetadata efter upgrade/adoption/omstart och avvisar äldre obundna skrivningar.
+
+Det tidigare produktionsbetyget ändras inte. Publik Node-drift med en enda administratörsidentitet får inte marknadsföras som fleranvändar-SaaS. Verklig identitetsingress, branch enforcement, nyckelhantering, backup/RPO/RTO, dataskydd och kommersiella bankavtal behöver separat acceptans. [Integrationsöverlämningen](docs/saas-readiness/integration-handoff.md) anger de två serverhunkarna och övriga gemensamma gränser. Ingen produktionsrelease eller verklig dataändring ingår i denna PR.
+
+## 2026-11-06 — Agent 2: Gmail/OCR-kandidat i PR 67
+
+[PR 67](https://github.com/sharbel0022/Mgeorge/pull/67) bygger på verifierad main f3c80629d4856c2f8ecbb1ed81be391a13ac6be8. Kandidaten ger bounded Gmail-deduplicering och korrelerbara schemakvitton, OCR-heartbeats/receipt-protokoll, återhämtning från tidiga avbrott, separata felklasser och ändliga återförsök. [Leveransrapport](docs/automation/document-automation-reliability.md), [kontrakt och återhämtningsplan](docs/automation/recovery-runbook.md), [färska driftobservationer](docs/automation/observations-2026-11-06.json).
+
+Full CI på den föregående kandidaten 57abcd8 fann ett äldre kvittoassertionsfall: Sites 5869/5870, övriga kvalitets-/säkerhetsjobb och Sites-bygge godkända. Testet täcker nu både strikt legacy-felhantering och verifierad receipt-v2-framgång, med 2/2 fokustester och oförändrade original-/dubblettassertioner. Ingen produktionskod ändrades i den korrigeringen; slutlig full CI krävs på aktuellt PR-head.
+
+Sammanfogad lokal fokuskontroll: Node 223/223 och Sites 341/341, 0 fail/cancel/skip/TODO. Rena fullständiga kvalitets-/säkerhetsgrindar på slutlig PR-kandidat redovisas i PR:s check-kvitton; tidigare kandidatjobb ersätter inte aktuell verifiering. Oberoende granskning reproducerade och ledde till rättningar av falska klientmarkörer, transient heartbeat-förlust, förlorad recovery-CAS och strömlimit.
+
+Status 23:18 UTC: 427 granskning, 47 OCR, 4 PDF, 60 färdiga i framflyttat 24-timmarsfönster. Ett faktiskt OCR-schemajobb 22:27 gav 6/0 på main, men regelbunden kvartskörning är inte styrkt. Gmail 23:00 gav åter no_update utan nytt automatiskt appkvitto. Ingen produktion eller verkliga scheman ändrades; ingen massbearbetning eller deployment genomfördes. AI-modelladaptern är orörd.
+
+**Poäng oförändrade:** senaste konservativa bedömning 258,5/330 = 7,83/10. Berörda områden 6, 9–14, 24, 28, 30, 32–33 får nya syntetiska bevis, inte en automatisk höjning eller nytt produktionsgodkännande.
+
+## 2026-11-06 — OpenAI-kandidaten ger inga nya kvalitetspoäng utan oberoende mätning
+
+[PR 64](https://github.com/sharbel0022/Mgeorge/pull/64) tillför skyddad AI-tolkning och reproducerbar modellutvärdering. Den konservativa poängbedömningen **258,5/330 = 7,83/10** ändras inte. Enhets-/integrationstester för schema, ekonomi, företagsspärrar, kostnad och återförsök visar andra egenskaper än verklig optisk extraktionsprecision.
+
+Projektets API-modelltillgång, faktureringskrediter, OpenAI-latens/kostnad per faktura och oberoende fyrarmsjämförelse är **NOT_VERIFIED / NOT_MEASURED**. Ingen förbättring i recall, precision, kompletta fakturor eller granskningsbehov tillgodoräknas. Historiska oberoende OCR-prov och utvecklingsreplayer nedan behåller sina ursprungliga populationer och begränsningar. AI för kunddokument förblir avstängd och alla AI-förslag kräver granskning.
+
+## 2026-11-06 — PR 65: bankrättningar verifierade, verklig åtkomst fortsatt spärrad
+
+Branch `feature/95-bank-recovery` utgår från verifierad main `f3c80629d4856c2f8ecbb1ed81be391a13ac6be8`. [PR 65](https://github.com/sharbel0022/Mgeorge/pull/65) rättar tre reproducerbara fel: historisk flowkontext som blockerade Sites-status, saknad beständig återanslutningsspärr vid Node-kontoval och en fångad Node-mTLS-transport som inte kontrollerade senare avstängning.
+
+Den granskade produktionskällan `090ae0a4ef9f2fe7ce6dd8b282622f93d9e21939` passerade full [kvalitets-CI](https://github.com/sharbel0022/Mgeorge/actions/runs/42308985247): Node 22 och 24 vardera **3 025/3 025**, Sites **5 827/5 827** inklusive typkontroll och produktionsbygge, brygga **47/47**, Chromium och 1/10/100-företagsprestanda. Separat [säkerhetsacceptans](https://github.com/sharbel0022/Mgeorge/actions/runs/42308985277) gav **396/396 Node och 1 232/1 232 Sites**. Noll fail/cancel/skip/TODO i TAP-sviterna; överlappande antal summeras inte. Oberoende kodgranskning fann inget blockerande fel. Slutlig dokumentationsrevision behåller kod-/testblobbarna och dess egna jobbutfall redovisas i PR.
+
+[Bankrapport](docs/bank-recovery/README.md), [driftobservationer](docs/bank-recovery/observations.json), [verifieringskvitto](docs/bank-recovery/verification.json) och [råa RED-felutdrag](docs/bank-recovery/red-observed.json) skiljer syntetiskt godkänt från verklig åtkomst. Ursprunglig kontoscope-incident är belagd, men dess exakta felande predikat saknas. Färsk lokal status **23:06 UTC** är fortsatt `connected=false`, `reauth_required`, `BANK_RECONNECT_REQUIRED`. Cachad Enable-registrering har äldre callback; aktuell providerregistrering, bankens användar-/kontobehörighet, betrodd företagsattest, Open Payments-produktionskonfiguration och faktisk mTLS/SCA måste verifieras separat.
+
+Inga verkliga bank-/provider-API-anrop, betalningar, produktionsskrivningar, publiceringar eller statusåterställningar utfördes. Inga numeriska kvalitetsbetyg höjs; verklig bankacceptans och kommersiell aktivering är inte styrkta.
+
+## 2026-11-06 — Bankgiro, oförändrad produktionsbedömning
+
+[PR 68](https://github.com/sharbel0022/Mgeorge/pull/68) härdar originalproveniens, exakta bank-/betalarfält, behörighetsbunden replay och sista kontrollen före finansiell skrivning i Node/Sites. [Full omfattning, källor och testkvitton](docs/integration/bankgiro-reconciliation-2026-11-06.md). Native regressioner har verifierad RED/GREEN: 190 fokuserade fall passerar samt Sites typkontroll. Den aktuella PR-revisionens obligatoriska fulla CI och oberoende granskning redovisas i PR:en.
+
+Berörda områden är Bankgirointegration, betalningsmatchning, originalintegritet, åtkomstkontroll, idempotens, revisionsspår och manuell granskning. Samtliga tidigare kriteriepoäng och totalen **258,5/330 = 7,83/10** lämnas oförändrade. Verklig källa är `SOURCE_NOT_CONFIGURED`; 0599/625,00SEK är inte bankverifierad och har inga allokeringar. Ingen aktiv källa, leverantörscertifiering eller produktionsberoende9,5-nivå följer av tester.
+
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 
 PR 61 är normalt mergad till `24390ef7e8cf6b2274c57804dc9c2d74d362ab12`. Full PR-kvalitet, separat säkerhetsacceptans och separat main-CI är gröna för samma källträd. Site **68** publicerades från exakt motsvarande Sites-träd och är avgränsat kontrollerad efter release. [Releasekvitto](docs/completion/release-site68.md).
@@ -1330,3 +1376,9 @@ Aktuell separat fixture-CUA täckte fem bredder, stabil inmatning och dialogfoku
 Källor: [samlad rapport](docs/SAAS-MULTITENANT-BANKID-FINAL-REPORT.md), [grindkvitto](docs/saas/evidence/2026-11-05/bank-compat-gates.json), [incident](docs/saas/evidence/2026-11-05/bank-incident.json) och [oberoende granskning](docs/saas/evidence/2026-11-05/bank-compat-independent-review.md). Alla 33 numeriska poäng är oförändrade.
 
 Färsk läsande OCR-kontroll **2026-11-05T15:39:02Z** hittade ingen nyare schemalagd körning bland API-listans senaste15. Senaste observerade är [42013301104](https://github.com/sharbel0022/Mgeorge/actions/runs/42013301104), jobb127197454985, headf75; faktisk logg10:45:30.6420193Z gav **processed0, failed0**, schedule success. Detta verifierar varken bearbetning av ett verkligt dokument eller den nya b2e7-körkoden. Ingen workflowdispatch utfördes. [Sanerat OCR-kvitto](docs/saas/evidence/2026-11-05/final-ocr-observation.json).
+
+## 2026-11-07 — Agent 6: samlad kandidat före slutlig CI
+
+Agent 1–5:s granskade leveranser och den oberoende AI-rättningen i PR69 finns nu i `integration/mgeorge-final-95`. Sammanföringen bevarar båda sidors sakliga historik och banktesternas explicita säkerhetsscope. Verkliga RED/GREEN och källträd finns i [integrationsgranskningen](docs/final95/reviews/agent6-final-integration.md). Den frysta slutkandidatens fulla normala CI måste fortfarande verifieras; tidigare enskilda PR-resultat räcker inte. [Aktuell matris och releasegrindar](docs/final95/README.md).
+
+Publicerat är fortfarande Site 69 på tidigare main. Ingen produktion har skrivits eller publicerats av Agent 6. Senaste konservativa bedömning 258,5/330 = 7,83/10 höjs inte. Swedbank kräver återanslutning, Bankgiro-källa saknas, live-AI och oberoende optisk acceptans är ej styrkta, och Gmail/OCR-bakgrunden behöver uppmärksamhet. Slutligt bevisbaserat beslut och exakta CI-kvitton redovisas i PR63 och slutrapporten.

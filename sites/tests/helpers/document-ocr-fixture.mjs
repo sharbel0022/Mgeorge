@@ -4,6 +4,7 @@ import {createHash} from 'node:crypto';
 import ts from 'typescript';
 import {dataModule,invoiceParserUrl,libUrl} from './invoice-module-loader.mjs';
 import {layoutContext} from '../../../test/helpers/pdf-layout-ocr.mjs';
+import {createCompanyDatabase} from '../../lib/company-storage.js';
 
 class D1{
   constructor(sql){this.sql=sql;}
@@ -15,11 +16,13 @@ export async function documentOcrFixture(t,bytes,metadata={}){
   for(const name of readdirSync(new URL('../../drizzle',import.meta.url)).filter(name=>name.endsWith('.sql')).sort())sql.exec(readFileSync(new URL('../../drizzle/'+name,import.meta.url),'utf8'));
   const owner='synthetic-layout-owner',id=crypto.randomUUID(),key='__layout_'+id.replaceAll('-',''),sha=createHash('sha256').update(bytes).digest('hex');
   const f={sql,db:new D1(sql),owner,id,sha,bytes:Buffer.from(bytes),env:{DOCUMENT_AUTOMATION_ENABLED:'true',DOCUMENT_OWNER_EMAIL:'owner@example.test'}};
+  const recoveryDb=createCompanyDatabase(f.db,()=>({kind:'legacy',owner,actorId:owner,action:'read',context:null}));
+  f.db.invoiceAiRecoveryStatus=()=>recoveryDb.invoiceAiRecoveryStatus();
   f.env.BUCKET={get:async path=>path===owner+'/'+id?{size:f.bytes.length,arrayBuffer:async()=>Uint8Array.from(f.bytes).buffer}:null};
   globalThis[key]=f;t.after(()=>{delete globalThis[key];sql.close();});
   const ref='globalThis['+JSON.stringify(key)+']',domain=libUrl('domain.ts');
   const server=dataModule(`import {emptyState} from ${JSON.stringify(domain)};const f=${ref};export async function companyWorkerIdentity(){return null;}export async function companyWorkerConfigured(){return null;}export const db=()=>f.db;export const identity=async()=>({userId:f.owner,email:'owner@example.test'});export const response=(body,status=200)=>Response.json(body,{status});export async function readWorkspace(owner){const row=f.sql.prepare('SELECT revision,payload FROM workspaces WHERE owner=?').get(owner);return row?{revision:row.revision,state:JSON.parse(row.payload)}:{revision:0,state:emptyState()};}`);
-  const imports={'cloudflare:workers':dataModule(`export const env=${ref}.env;`),'./server':server,'./domain':domain,'./banking/security':libUrl('banking/security.ts'),'./invoice-fields.js':invoiceParserUrl(),'./server-pdf':libUrl('server-pdf.ts'),'./customer-messages':dataModule('export async function reconcileAndPrepare(){}')};
+  const imports={'cloudflare:workers':dataModule(`export const env=${ref}.env;`),'./server':server,'./domain':domain,'./banking/security':libUrl('banking/security.ts'),'./invoice-fields.js':invoiceParserUrl(),'./server-pdf':libUrl('server-pdf.ts'),'./openai-invoices/sites.js':libUrl('openai-invoices/sites.js'),'./customer-messages':dataModule('export async function reconcileAndPrepare(){}')};
   let source=ts.transpileModule(readFileSync(new URL('../../lib/document-processing.ts',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
   for(const [name,url]of Object.entries(imports))for(const quote of ["'",'"'])source=source.replaceAll(quote+name+quote,JSON.stringify(url));
   f.api=await import(dataModule(source));

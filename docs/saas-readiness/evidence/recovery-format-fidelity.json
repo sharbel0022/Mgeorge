@@ -1,0 +1,42 @@
+{
+  "headCommit": "d2cad86a65237ae7a7bbaf2e1d8bc72de847d111",
+  "sourceCommit": "bad0a67b1e61c562c420f4e53f391c136c07e662",
+  "runId": 42309880196,
+  "jobId": 128208396548,
+  "kind": "synthetic_recovery_format_fidelity",
+  "productionRestoreTested": false,
+  "formats": [
+    {
+      "format": "PDF",
+      "bytes": 947,
+      "sha256": "abc37b2d3380763487bb93b669d0c0ac84191573e4cae77104fd6d3b262c38db",
+      "parserAcceptedBeforeAndAfter": true
+    },
+    {
+      "format": "PNG",
+      "bytes": 101995,
+      "sha256": "b689ad57e3ed02dc127c76b976e795b54c2a61a8b3a7a3255527752e12dea2df",
+      "parserAcceptedBeforeAndAfter": true
+    },
+    {
+      "format": "CSV",
+      "bytes": 218,
+      "sha256": "b9454d21d15792d7d8de2d9fe523181193ceef8b72737348aa9bed2c853b3683",
+      "parserAcceptedBeforeAndAfter": true
+    },
+    {
+      "format": "XML",
+      "bytes": 776,
+      "sha256": "2ea4d8982036567e340cb120b74db2616e345807477a585a6d523ace497b332f",
+      "parserAcceptedBeforeAndAfter": true
+    },
+    {
+      "format": "XLSX",
+      "bytes": 9891,
+      "sha256": "af0fbc7d422f146ed179603bd6fd3f71ba5bcfafb28af4dff3f56d5134866705",
+      "parserAcceptedBeforeAndAfter": true
+    }
+  ],
+  "sourceUnchanged": true,
+  "financialReferencesPreserved": true
+}

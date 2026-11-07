@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { documentOcrFixture } from './helpers/document-ocr-fixture.mjs';
 import { runSitesOcr } from '../../src/sites-ocr-pull.js';
 
-test('OCR client recovery after a lost committed completion keeps exactly one SQLite extraction and unchanged original', async t => {
+for (const protocol of ['legacy', 'receipt-v2']) test(`OCR ${protocol} recovery after a lost committed completion keeps exactly one SQLite extraction and unchanged original`, async t => {
   // Explicit extractor fixture: this tests durable protocol recovery, not optical accuracy.
   const bytes = Buffer.from('synthetic document bytes for lost OCR acknowledgment');
   const f = await documentOcrFixture(t, bytes);
@@ -28,6 +28,11 @@ test('OCR client recovery after a lost committed completion keeps exactly one SQ
     const action = url.pathname.split('/').pop();
     calls.push(action);
     const response = await f.api.workerAction(new Request(input, init), action);
+    if (action === 'lease' && protocol === 'legacy') {
+      const body = await response.json();
+      if (body.job) { delete body.job.protocol; delete body.job.run_id; delete body.job.lease_until; }
+      return Response.json(body, {status: response.status});
+    }
     if (action === 'complete' && loseResponse) {
       completionBody = JSON.parse(init.body);
       assert.equal(response.status, 200);
@@ -47,7 +52,14 @@ test('OCR client recovery after a lost committed completion keeps exactly one SQ
       return { text, method: 'ocr', confidence: 90 };
     },
   });
-  await assert.rejects(run(), /site_unavailable/, 'an unacknowledged completion cannot be counted as a client success');
+  if (protocol === 'legacy') {
+    await assert.rejects(run(), /site_unavailable/, 'an unacknowledged legacy completion cannot be counted as a client success');
+    assert.equal(calls.filter(action => action === 'receipt').length, 0);
+  } else {
+    assert.deepEqual(await run(), {processed: 1, failed: 0}, 'a matching durable receipt resolves the lost acknowledgement');
+    assert.equal(calls.filter(action => action === 'receipt').length, 1);
+  }
+  assert.equal(calls.filter(action => action === 'complete').length, 1, 'an accepted result is never resubmitted');
   const history = f.sql.prepare('SELECT * FROM document_extractions ORDER BY id').all();
   assert.equal(history.length, 1);
   const extraction = JSON.parse(history[0].result);

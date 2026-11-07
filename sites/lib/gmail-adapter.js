@@ -195,14 +195,14 @@ function attachmentMime(part){
 }
 // This collects potential originals for human review, never records a debt or a payment.
 // It deliberately does not claim OCR: scans and PDF fields must be reviewed in the UI.
-/** @param {any} tokens @param {{query?:string,after?:string,maxMessages?:number,knownIds?:string[],rejectedIds?:string[],pageToken?:string,account?:string}} options */
-export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMessages=50,knownIds=[],rejectedIds=[],pageToken='',account=undefined}={}){
+/** @param {any} tokens @param {{query?:string,after?:string,maxMessages?:number,knownIds?:string[],rejectedIds?:string[],lookupSources?:(sourceIds:string[])=>Promise<{knownIds:string[],rejectedIds:string[]}>|{knownIds:string[],rejectedIds:string[]},pageToken?:string,account?:string}} options */
+export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMessages=50,knownIds=[],rejectedIds=[],lookupSources=undefined,pageToken='',account=undefined}={}){
   const expected=gmailAccount(account);
   requireConfig();
   if(!Number.isInteger(maxMessages)||maxMessages<1||maxMessages>100)throw fail('Välj mellan 1 och 100 mejl per hämtning.','invalid_limit',400);
   if(typeof query!=='string'||query.length>1000)throw fail('Gmail-sökningen är för lång.','invalid_query',400);
   if(typeof pageToken!=='string'||pageToken.length>4096)throw fail('Ogiltig sidmarkör för Gmail.','invalid_pagination',400);
-  if(!Array.isArray(knownIds)||!Array.isArray(rejectedIds))throw fail('Ogiltiga importreferenser.','invalid_sources',400);
+  if(!Array.isArray(knownIds)||!Array.isArray(rejectedIds)||lookupSources!==undefined&&typeof lookupSources!=='function')throw fail('Ogiltiga importreferenser.','invalid_sources',400);
   let afterTime;
   if(after){
     if(!/^\d{4}-\d{2}-\d{2}$/.test(after))throw fail('Ogiltigt startdatum för Gmail.','invalid_date',400);
@@ -254,8 +254,8 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
       let metadataWarned=false;
       const warnMetadata=()=>{if(!metadataWarned){warnings.push({source_id:null,message_id:item.id,code:'message_metadata_invalid',message:'Mejlets metadata är ofullständiga. Originalet kräver granskning.'});metadataWarned=true;}};
       if(missingMetadata.length)warnMetadata();
-      let found=false;
-      for(const part of supported){
+      let found=false,lookupEnd=0;
+      for(const [partIndex,part] of supported.entries()){
         if(Date.now()>deadline){truncated=true;next_page_token=cursor;break;}
         if(part._headers_valid&&isInlineDecoration(part)){skipped++;continue;}
         const original_filename=typeof part.filename==='string'?mimeText(part.filename).slice(0,240):'';
@@ -264,6 +264,25 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
         if(!original_filename){missing_fields.push('original_filename');warnMetadata();}
         found=true;
         const source_id=`gmail:${expected}:${item.id}:${part._part}`;
+        // Read only encountered references. A message has at most 500 parts;
+        // each lookup uses at most 50 IDs and retains the existing resume cursor.
+        if(lookupSources&&partIndex>=lookupEnd){
+          lookupEnd=Math.min(partIndex+50,supported.length);
+          const ids=[...new Set(supported.slice(partIndex,lookupEnd)
+            .filter(candidate=>!(candidate._headers_valid&&isInlineDecoration(candidate)))
+            .map(candidate=>`gmail:${expected}:${item.id}:${candidate._part}`)
+            .filter(id=>!known.has(id)&&!rejected.has(id)))];
+          if(ids.length){
+            const matches=await lookupSources(ids),requested=new Set(ids);
+            if(!matches||!Array.isArray(matches.knownIds)||!Array.isArray(matches.rejectedIds)||
+              matches.knownIds.length>ids.length||matches.rejectedIds.length>ids.length||
+              [...matches.knownIds,...matches.rejectedIds].some(id=>typeof id!=='string'||!requested.has(id)))
+              throw fail('Importreferenserna kunde inte kontrolleras. Försök igen.','invalid_sources',502);
+            for(const id of matches.knownIds)known.add(id);
+            for(const id of matches.rejectedIds)rejected.add(id);
+          }
+          if(Date.now()>deadline){truncated=true;next_page_token=cursor;break;}
+        }
         if(known.has(source_id)){duplicate++;continue;}
         if(rejected.has(source_id)){skipped++;continue;}
         // Invalid parts count toward the same work budget as valid files. Persisting

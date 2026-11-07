@@ -14,11 +14,12 @@ app.db.prepare('INSERT INTO company_bank_sync_scopes(company_id,owner,evidence_i
 app.db.prepare('UPDATE app_settings SET data=? WHERE id=1').run(JSON.stringify({sync_interval_minutes:60,gmail_sync_interval_minutes:60}));
 app.db.prepare('INSERT INTO gmail_connections(id,email,encrypted_tokens) VALUES(?,?,?)').run('gmail','mg.vitvaror@gmail.com',encryptObject({access_token:'synthetic',refresh_token:'synthetic-refresh',expires_at:Date.now()+3600000,scope:'https://www.googleapis.com/auth/gmail.readonly'}));
 const originalFetch=globalThis.fetch;
-let messageReads=0;
+let messageReads=0,invoiceFixture=null;
 globalThis.fetch=async input=>{
  const path=new URL(input).pathname;
  if(path.endsWith('/profile'))return Response.json({emailAddress:'mg.vitvaror@gmail.com'});
- if(path.endsWith('/messages')){messageReads++;return Response.json({messages:[]});}
+ if(path.endsWith('/messages')){messageReads++;return Response.json({messages:invoiceFixture?[{id:invoiceFixture.id}]:[]});}
+ if(invoiceFixture&&path.endsWith('/messages/'+invoiceFixture.id))return Response.json(invoiceFixture);
  throw Error('Unexpected synthetic provider endpoint');
 };
 test.after(async()=>{globalThis.fetch=originalFetch;if(app.server.listening)await new Promise(resolve=>app.server.close(resolve));app.companyRuntime.close();app.db.close();rmSync(directory,{recursive:true,force:true});});
@@ -43,4 +44,29 @@ test('manual Gmail completion is not relabelled as failure by blocked legacy rec
  assert.equal(messageReads,before+1);
  assert.equal(app.db.prepare("SELECT job_state FROM integration_jobs WHERE name='gmail'").get().job_state,'succeeded');
  assert.equal(app.db.prepare('SELECT count(*) n FROM allocations').get().n,0);
+});
+
+test('Node Gmail membership reads only encountered IDs and retains known and rejected sources',async t=>{
+ const {storeDocument}=await import('../src/db.js'),account='mg.vitvaror@gmail.com';
+ app.db.prepare('DELETE FROM integration_jobs').run();
+ app.db.prepare("UPDATE gmail_connections SET last_synced='',status='connected'").run();
+ const stored=storeDocument(app.db,{name:'synthetic.pdf',mime_type:'application/pdf',bytes:Buffer.from('%PDF-synthetic-retained-original'),source:'gmail',source_id:'gmail:'+account+':synthetic:known'});
+ app.db.prepare("UPDATE documents SET status='registered' WHERE id=?").run(stored.id);
+ const insert=app.db.prepare('INSERT INTO gmail_rejected_sources(source_id,reason) VALUES(?,?)');
+ for(let index=0;index<1500;index++)insert.run('historical-'+index,'synthetic');
+ insert.run('gmail:'+account+':synthetic:rejected','synthetic');
+ invoiceFixture={id:'synthetic',labelIds:['INBOX'],internalDate:String(Date.now()),payload:{headers:[{name:'Subject',value:'Synthetic document'},{name:'From',value:'supplier@example.test'},{name:'To',value:account}],parts:['known','rejected'].map(partId=>({partId,filename:'synthetic.pdf',mimeType:'application/pdf',body:{attachmentId:'must-not-download'}}))}};
+ t.after(()=>{invoiceFixture=null;delete app.db.prepare;});
+ const prepare=app.db.prepare,queries=[];
+ app.db.prepare=query=>{
+   if(/SELECT source_id(?:,| FROM)/.test(query)&&/FROM (document_sources|gmail_rejected_sources)/.test(query)){
+     assert.match(query,/source_id IN \(/,'Node sync must not load all previous source IDs');queries.push(query);
+   }
+   return prepare(query);
+ };
+ await app.runScheduledSync();
+ assert.ok(queries.length>=1&&queries.length<=2);
+ assert.equal(app.db.prepare('SELECT COUNT(*) n FROM documents').get().n,1);
+ assert.equal(app.db.prepare('SELECT COUNT(*) n FROM gmail_rejected_sources').get().n,1501);
+ assert.equal(app.db.prepare("SELECT job_state FROM integration_jobs WHERE name='gmail'").get().job_state,'succeeded');
 });

@@ -153,3 +153,42 @@ test('Node production commit rejects registration revision, company binding and 
  }finally{f.db.close();}}
 });
 test('Node import commit binds the persisted queued authority as well as the current source',async()=>{const f=fixture();try{const input=await retained(f);input.authorization.registrationBinding='authority';input.authorization.configurationRevision=1;input.job.registrationBinding='authority';f.db.prepare('UPDATE bankgiro_ingest_sources SET registration_revision=1,registration_binding=?,authorization_valid_until=?').run('authority',Date.now()+60000);f.db.prepare('UPDATE bankgiro_ingest_jobs SET registration_binding=?').run('authority');f.db.exec("CREATE TRIGGER queued_binding_race AFTER INSERT ON import_jobs BEGIN UPDATE bankgiro_ingest_jobs SET registration_binding='other-authority'; END");await assert.rejects(()=>f.sink.importReport(input),{code:'IDENTITY_CONFLICT'});assert.equal(f.db.prepare('SELECT count(*) n FROM bank_transactions').get().n,0);}finally{f.db.close();}});
+
+
+// Synthetic authority regression: an intact hash cannot authorize another
+// recipient Bankgiro. These calls only use the isolated fixture database.
+const scopedRecipientBytes=(format,recipient)=>{
+ if(format==='csv')return Buffer.from('Datum;Belopp;Betalare;Referens;Valuta;Konto;Bankgiro\n2026-10-26;625,00;Synthetic Payer;0599;SEK;'+account+';'+recipient);
+ if(format==='xlsx')return makeBankgiroXLSX({currency:'SEK',account,recipientBankgiro:recipient,date:'2026-10-26',sequence:'83',payments:[{party:'Synthetic Payer',reference:'0599',payerBankgiro:'987-6543',amount:62500}]});
+ return Buffer.from(camt(1).toString().replaceAll('300.00','625.00').replace('<Ref>0590</Ref>','<Ref>0599</Ref>').replace('</RltdPties>','<CdtrAcct><Id><Othr><Id>'+recipient+'</Id><SchmeNm><Prtry>BGNR</Prtry></SchmeNm></Othr></Id></CdtrAcct></RltdPties>'));
+};
+for(const format of ['csv','xml','xlsx'])test('Node source rejects an explicitly different recipient in retained '+format,async()=>{
+ const f=fixture(),bytes=scopedRecipientBytes(format,'076-5432');
+ try{
+  const input=await retained(f,bytes,'Synthetic.'+format);input.authorization.bankgiro='0123456';
+  await assert.rejects(()=>f.sink.importReport(input),{code:'ACCOUNT_MISMATCH'});
+  assert.equal(digest(f.db.prepare('SELECT content FROM documents WHERE id=?').get(input.documentId).content),digest(bytes));
+  for(const table of ['import_jobs','bank_transactions','allocations','invoices'])assert.equal(f.db.prepare('SELECT count(*) n FROM '+table).get().n,0,table);
+ }finally{f.db.close();}
+});
+for(const format of ['csv','xml','xlsx'])test('Node source retains exact bytes and permits matching formatted recipient in '+format,async()=>{
+ const f=fixture(),bytes=scopedRecipientBytes(format,'012-3456');
+ try{
+  const input=await retained(f,bytes,'Synthetic.'+format);input.authorization.bankgiro='0123456';
+  const result=await f.sink.importReport(input);assert.equal(result.status,format==='xlsx'?'REVIEW':'IMPORTED');
+  assert.equal(digest(f.db.prepare('SELECT content FROM documents WHERE id=?').get(input.documentId).content),digest(bytes));
+  assert.equal(f.db.prepare('SELECT count(*) n FROM allocations').get().n,0);
+ }finally{f.db.close();}
+});
+test('Node hash replay rechecks the current recipient authority before adopting an earlier import',async()=>{
+ const f=fixture();
+ try{
+  const input=await retained(f,scopedRecipientBytes('csv','012-3456'),'Synthetic.csv');input.authorization.bankgiro='0123456';
+  const first=await f.sink.importReport(input),before=f.db.prepare('SELECT * FROM bank_transactions').all();
+  assert.equal(first.status,'IMPORTED');
+  await assert.rejects(()=>f.sink.importReport({...input,authorization:{...input.authorization,bankgiro:'0765432'}}),{code:'ACCOUNT_MISMATCH'});
+  assert.deepEqual(f.db.prepare('SELECT * FROM bank_transactions').all(),before);
+  assert.equal(f.db.prepare('SELECT count(*) n FROM import_jobs').get().n,1);
+  assert.equal(f.db.prepare('SELECT count(*) n FROM allocations').get().n,0);
+ }finally{f.db.close();}
+});

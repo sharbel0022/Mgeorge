@@ -113,7 +113,14 @@ async function readBody(req,{authenticated=true,maxBytes=22_000_000}={}){
   if(authenticated&&!req.allowCompanySelection&&body&&typeof body==='object'&&['companyId','company_id','tenantId','storageOwner'].some(key=>Object.hasOwn(body,key)))throw bad(400,'Företagskontext väljs i företagsväljaren, inte i affärsdata.');
   return body;
 }
-function cookies(req){return Object.fromEntries((req.headers.cookie||'').split(';').filter(x=>x.includes('=')).map(x=>{const i=x.indexOf('=');let value='';try{value=decodeURIComponent(x.slice(i+1).trim());}catch{}return [x.slice(0,i).trim(),value];}));}
+function cookies(req){
+ const pairs=(req.headers.cookie||'').split(';').filter(x=>x.includes('=')).map(x=>{const i=x.indexOf('=');let value='';try{value=decodeURIComponent(x.slice(i+1).trim());}catch{}return [x.slice(0,i).trim(),value];});
+ const parsed=Object.fromEntries(pairs);
+ // Cookie headers carry no path/domain. Multiple session cookies are ambiguous,
+ // including repeated or differently encoded copies of the same credential.
+ if(pairs.filter(([name])=>name==='mg_session').length!==1)delete parsed.mg_session;
+ return parsed;
+}
 // Local OS access represents one company administrator. HTTPS requires login.
 // HTTPS sessions are persisted only after successful administrator login.
 /** Skapar eller återanvänder webbläsarsessionen som binder OAuth- och bankreturer till rätt användare. Detta är inte samma sak som bankens egen inloggning. */
@@ -259,10 +266,14 @@ async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=
   const startedAt=connection.sync_started_at||new Date().toISOString();
   let currentTokens;
   try{
-    const knownIds=db.prepare('SELECT source_id FROM document_sources').all().map(x=>x.source_id);
-    const rejectedIds=db.prepare('SELECT source_id FROM gmail_rejected_sources').all().map(x=>x.source_id);
     currentTokens=decryptObject(connection.encrypted_tokens);
-    const result=await fetchGmailInvoiceDocuments(currentTokens,{after:connection.last_synced?.slice(0,10)||undefined,knownIds,rejectedIds,maxMessages:50,pageToken:connection.page_token||'',authorize:()=>{authorize();lease.renew();}});
+    const result=await fetchGmailInvoiceDocuments(currentTokens,{after:connection.last_synced?.slice(0,10)||undefined,lookupSources:sourceIds=>{
+      // The runtime database proxy preserves the active company's boundary.
+      authorize();lease.assert();
+      const placeholders=sourceIds.map(()=>'?').join(',');
+      const rows=db.prepare(`SELECT source_id,'known' kind FROM document_sources WHERE source_id IN (${placeholders}) UNION ALL SELECT source_id,'rejected' kind FROM gmail_rejected_sources WHERE source_id IN (${placeholders})`).all(...sourceIds,...sourceIds);
+      return {knownIds:rows.filter(row=>row.kind==='known').map(row=>row.source_id),rejectedIds:rows.filter(row=>row.kind==='rejected').map(row=>row.source_id)};
+    },maxMessages:50,pageToken:connection.page_token||'',authorize:()=>{authorize();lease.renew();}});
     let imported=0,duplicate=result.duplicate||0;
     // Originals, token rotation and the checkpoint share the lease-fenced write.
     lease.write(()=>{
@@ -669,7 +680,7 @@ async function route(req,res){
   if(path==='/api/companies'&&req.method==='GET'){assertSessionIdentity(req);return json(res,200,companyRuntime.listCompanies(req.actorId));}
   if(path==='/api/companies/active'&&req.method==='POST'){
    req.allowCompanySelection=true;const body=await readBody(req);
-   if(!body||Array.isArray(body)||typeof body!=='object'||Object.keys(body).some(key=>!['companyId','contextVersion'].includes(key)))throw bad(400,'Ogiltigt företagsval.');
+   if(!body||Array.isArray(body)||typeof body!=='object'||Object.keys(body).some(key=>!['companyId','contextVersion'].includes(key))||!Number.isSafeInteger(body.contextVersion)||body.contextVersion<1)throw bad(400,'Ogiltigt företagsval.');
    const context=companyRuntime.selectActiveCompany({actorId:req.actorId,companyId:body.companyId,contextVersion:body.contextVersion});
    return json(res,200,{context});
   }
@@ -1074,9 +1085,11 @@ async function companyRoute(req,res,url,path){
     catch(e){if(e.status===401&&!e.providerStatus)throw e;return json(res,200,{imported:0,duplicate:0,initial_sync_error:e.message});}
     }catch(e){
       assertSessionStillAuthorized(req);
+      const consent=consentDiagnostic(e);
+      const renewal=e.code==='renewal_required'||['BANK_CONSENT_EXPIRED','BANK_CONSENT_INVALID','BANK_ACCOUNT_SCOPE_INVALID','BANK_TRANSACTION_SCOPE_REQUIRED','CORPORATE_AUTHORIZATION_REQUIRED'].includes(consent?.code);
       bankLeases.get(connection.id).write(()=>{
       if(e.status===429||e.code==='bank_unavailable'&&e.status===503&&Number.isFinite(e.retryAfter)&&e.retryAfter>0)db.prepare('UPDATE bank_connections SET retry_after=?,last_error=? WHERE id=?').run(Date.now()+Math.max(60,e.retryAfter||60)*1000,'Bankhämtningen behöver vänta till nästa tillåtna försök.',connection.id);
-      if(e.code==='renewal_required')db.prepare("UPDATE bank_connections SET status='renewal_required',last_error=? WHERE id=?").run('Bankanslutningen behöver förnyas – koppla igen',connection.id);
+      if(renewal)db.prepare("UPDATE bank_connections SET status='renewal_required',last_error=? WHERE id=?").run(consent?.message??'Bankanslutningen behöver förnyas – koppla igen',connection.id);
       });
       throw e;
     }finally{bankSyncing.delete(connection.id);}

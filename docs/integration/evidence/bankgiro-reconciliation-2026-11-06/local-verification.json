@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-06T23:22:06.290844+00:00",
+  "environment": {
+    "node": "v24.22.1",
+    "os": "Linux",
+    "dependencies": "Physical installed trees copied after all three package-lock files exactly matched the verified base. Verified tool integrity gate passed. This is not a new clean npm installation.",
+    "isolation": "NODE_ENV=test; scripts/saas-test-isolation.mjs; synthetic inputs and per-test databases only."
+  },
+  "red": {
+    "baselineCommit": "5066e6b76b4ac3ae0a70089dafe07448995d9aaa",
+    "additionalTestFile": "sites/tests/helpers/camt-bankgiro.mjs",
+    "additionalTestSha256": "3a2d22b8e0af04f7b53801c0f2fee5d55e8a8095fc0db600dda6081343462419",
+    "nodeLog": "red-node.log",
+    "sitesLog": "red-sites.log"
+  },
+  "green": {
+    "baselineCommit": "c449978ecedde7241afe309802b804803a49f4bb",
+    "modifiedFiles": [
+      "sites/lib/camt-payer.js",
+      "sites/tests/helpers/camt-bankgiro.mjs"
+    ],
+    "productSha256": {
+      "sites/lib/bankgiro-ingest-service.ts": "fb4f14ff051cc22531a0038bcb4926f1ac3c7e3c10c019689753272d84b06263",
+      "sites/lib/bankgiro-ingest-store.js": "580d3925b12e9bc193da2b0cdc32c97fa020b50a87a1ef1f40ad906fa0a713b3",
+      "sites/lib/bankgiro-parser.js": "2285616e3052b6c6be8c4d13514b786a772af7ec8318c9697161c8cb6f42c80a",
+      "sites/lib/bankgiro-source.js": "c89cd3a457e8269c843032554f0f005aa6c483b3531b883b5a47f23dffdad131",
+      "sites/lib/camt-payer.js": "7b051fe0811838cba74c785c926f2ffd448e0b8cc5b271d62d61f837905a86a1",
+      "sites/lib/reconciliation-evidence.ts": "a066ea41e5ffc1b32d387a0a338f0d27f2af92adebb77b20f263f17f9534d1d1",
+      "src/bankgiro-ingest.js": "50f010930ef2726455f87ff1fddef45189d18fb968006ff556392b0bb1ec7763",
+      "src/importers.js": "4b55a8208631803e014be09959ef4aa3dfcde43336b0f7723a5187bbc029c374"
+    },
+    "testSha256": {
+      "test/bankgiro-ingest.test.js": "46bc4dbe683f01aa46b2089d045ce312ecf307b91502020efc3b52ca442b717a",
+      "test/camt-bankgiro.test.js": "6075dd9bf6260995887c659432b71dd2344be2e38d9476c9598c94c1bbd63ad3",
+      "sites/tests/bankgiro-ingest-service.test.mjs": "ffc4996c4c474dbc2ebe6fc7faa78db5a68dc30b3acc1c33c44af24dbeafdb4e",
+      "sites/tests/bankgiro-ingest.test.mjs": "154d9dd978055a96ecc11234a3f46effefe88372dbc0abd13baf2ed3ab43b435",
+      "sites/tests/camt-bankgiro.test.mjs": "60b372c1cb8c730f596df15edc117ff35c70d6137e4b885c9d3b3abb5924bc42",
+      "sites/tests/helpers/camt-bankgiro.mjs": "3a2d22b8e0af04f7b53801c0f2fee5d55e8a8095fc0db600dda6081343462419",
+      "sites/tests/reconciliation-0599-evidence.test.mjs": "395dccacd9d3ead17fe1be1bf3c2388fb26218fc3738e639a052d0ad861f0827"
+    },
+    "lockSha256": {
+      "package-lock.json": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d",
+      "sites/package-lock.json": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0",
+      "bridge/bankgiro/package-lock.json": "543131a8a7d217ac6b84c4f2e5db4d53f94115204b19f7ee4a875b2b36964b6f"
+    },
+    "nodeLog": "green-node.log",
+    "sitesLog": "green-sites.log",
+    "typecheckLog": "sites-check.log",
+    "typecheckExitCode": 0
+  },
+  "logs": {
+    "green-payer-sites.log": {
+      "bytes": 738,
+      "sha256": "022a7f9ee7aa4bf3822213d9ac7fdd181c1bf9d7a9c696622ca795c74fbcad57",
+      "tests": 5,
+      "pass": 5,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "green-payer-node.log": {
+      "bytes": 1834,
+      "sha256": "ede7924ff671624a161afe88993ecab1021c5444cba5f23942c07538fa9bfe91",
+      "tests": 18,
+      "pass": 18,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "green-node.log": {
+      "bytes": 3942,
+      "sha256": "77e295af34541c51b4fdf276d34326e8ab274eaa3fd3b48c8cf5153b47f83e32",
+      "tests": 40,
+      "pass": 40,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "green-sites.log": {
+      "bytes": 12490,
+      "sha256": "611c442f8e32a0ece1a0a8636881a3cd9dc793c5707a99a7ea1511a7d4e025a5",
+      "tests": 127,
+      "pass": 127,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sites-check.log": {
+      "bytes": 186,
+      "sha256": "de3f553dc64c9cb80274a231dd42a62d946c447d2b17e0ee76d6b6f386f3cd3c"
+    },
+    "red-sites.log": {
+      "bytes": 29171,
+      "sha256": "af407debbb8f36e5021458ea67ffce3cc05d13918cf7468ef036d0064f28c9b0",
+      "tests": 116,
+      "pass": 99,
+      "fail": 17,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "red-node.log": {
+      "bytes": 9063,
+      "sha256": "cf2aec1c90d87a8bb91773c692a3257b1cf51771a5f905610c69fff7d47b80f4",
+      "tests": 30,
+      "pass": 22,
+      "fail": 8,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "productionFinancialWrites": 0,
+  "bankSourceAcceptance": false,
+  "fullCi": "The current PR68 head checks and PR verification table are authoritative for the clean full suites; focused runs are overlapping subsets."
+}

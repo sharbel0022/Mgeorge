@@ -1,0 +1,213 @@
+{
+  "schema": "mgeorge-final95-production-observation-v2",
+  "observed_at": "2026-11-06 23:59:52 UTC",
+  "source": "Read-only MG Fakturakoll status APIs; no bank/provider request",
+  "published_sites_version": 69,
+  "github_main": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "native_commit": "1df8cb96eda374f2506c81aa776263388ddb666a",
+  "production_writes_by_integration_agent": false,
+  "gmail": {
+    "configured": true,
+    "connection": {
+      "status": "connected",
+      "last_attempt": "2026-11-06T22:27:52.993Z",
+      "sync_failures": 0,
+      "blocked": false
+    },
+    "last_successful_fetch": "2026-11-06T22:28:06.718Z",
+    "processing": {
+      "enabled": true,
+      "auto_register": true,
+      "cloud_worker_last_seen": "2026-11-06T22:28:55.882Z",
+      "cloud_worker_recent": false,
+      "cloud_last_completed": "2026-11-06T22:29:00.180Z",
+      "counts": {
+        "needs_review": 427,
+        "queued": 4,
+        "registered": 2,
+        "waiting_ocr": 47
+      },
+      "registered_source_count": 5,
+      "aftercheck_pending": 0,
+      "review_reasons": {
+        "basis": "stored_extraction",
+        "total": 427,
+        "analyzed": 427,
+        "limit": 500,
+        "truncated": false,
+        "counts": {
+          "uninterpreted": 0,
+          "missing_invoice_number": 156,
+          "missing_party": 213,
+          "missing_dates": 253,
+          "missing_organization": 322,
+          "missing_amount": 162,
+          "missing_vat_or_net": 219,
+          "unverified_counterparty": 426,
+          "possible_duplicate": 0,
+          "arithmetic_conflict": 12,
+          "identity_conflict": 18,
+          "table_incomplete": 0,
+          "interrupted_after_extraction": 0,
+          "low_confidence": 363,
+          "other_review": 0
+        }
+      },
+      "queue_health": {
+        "basis": "current_jobs",
+        "observed_at": "2026-11-06T23:59:54.713Z",
+        "pending": 51,
+        "ready_pdf": 4,
+        "ready_ocr": 47,
+        "deferred": 0,
+        "active": 0,
+        "expired_leases": 0,
+        "exhausted": 0,
+        "failed": 0,
+        "oldest_pending_at": "2026-10-27T23:57:23.782Z",
+        "next_retry_at": null,
+        "ocr_worker_unavailable": true
+      },
+      "throughput": {
+        "basis": "accepted_extractions_with_terminal_job",
+        "window_start": "2026-11-05T23:59:54.713Z",
+        "window_end": "2026-11-06T23:59:54.713Z",
+        "completed_documents": 54
+      }
+    },
+    "sync_health": {
+      "state": "recent",
+      "reason": "En lyckad Gmail-hämtning har verifierats nyligen.",
+      "interval_minutes": 60,
+      "stale_after_minutes": 120,
+      "schedule_verified": false
+    },
+    "schedule_observation": {
+      "last_invoked_at": "2026-11-06T16:26:56.945Z",
+      "last_completed_at": "2026-11-06T16:27:14.016Z",
+      "last_outcome": "completed",
+      "source": "system_entrypoint",
+      "external_schedule_verified": false
+    },
+    "background_ready": false,
+    "background_health": {
+      "state": "needs_attention",
+      "reasons": [
+        "external_schedule_unverified",
+        "ocr_worker_unavailable"
+      ]
+    }
+  },
+  "bank": {
+    "enabled": true,
+    "connected": false,
+    "intervalHours": 6,
+    "connectionStatus": "reauth_required",
+    "requiresReauthentication": true,
+    "statusEvidence": "stored_connection",
+    "syncAllowed": false,
+    "blockedReason": "BANK_RECONNECT_REQUIRED",
+    "nextAction": "reconnect",
+    "diagnostic": null,
+    "lastSyncedAt": "2026-11-05T08:05:14.646Z",
+    "lastAttemptAt": "2026-11-05T14:04:35.832Z",
+    "nextAttemptAt": null,
+    "lastError": "Bankhändelserna kunde inte hämtas. Försök igen.",
+    "blocked": false,
+    "failures": 1,
+    "postprocessWarning": null,
+    "metadataWarning": null
+  },
+  "bankgiro": {
+    "enabled": false,
+    "sourceId": null,
+    "mode": null,
+    "state": "DISABLED",
+    "reason": "SOURCE_NOT_CONFIGURED",
+    "nextPollAt": null,
+    "missingReportIds": [],
+    "lastError": null,
+    "authorization": {
+      "status": "UNKNOWN",
+      "verifiedAt": null,
+      "validUntil": null
+    },
+    "lastSuccessAt": null,
+    "lastFailureAt": null,
+    "lastFailureCode": null,
+    "counts": {
+      "PENDING": 0,
+      "RETRY": 0,
+      "IMPORTED": 0,
+      "REVIEW": 0,
+      "DUPLICATE": 0,
+      "BLOCKED": 0
+    },
+    "jobs": []
+  },
+  "backup": {
+    "enabled": true,
+    "latest": {
+      "id": "768fde9a-27a2-4b85-b85a-278239ec4aea",
+      "day": "2026-11-06",
+      "status": "complete",
+      "files": 430,
+      "copied": 430,
+      "bytes": 185567855,
+      "created_at": "2026-11-05T23:03:21.104Z",
+      "verified_at": "2026-11-06T00:48:58.086Z",
+      "verified_files": 430,
+      "verified_bytes": 185567855,
+      "verification_started_at": "2026-11-06T00:45:07.487Z",
+      "verification_scope": "manifest_pass",
+      "api_evidence": {
+        "version": "retained-api-receipts-v1",
+        "scope": "retained_json_checksums",
+        "records_checked": 19,
+        "records_without_receipt": 112
+      },
+      "error": null,
+      "attempts": 0
+    },
+    "last_verified": {
+      "id": "768fde9a-27a2-4b85-b85a-278239ec4aea",
+      "day": "2026-11-06",
+      "status": "complete",
+      "files": 430,
+      "copied": 430,
+      "bytes": 185567855,
+      "created_at": "2026-11-05T23:03:21.104Z",
+      "verified_at": "2026-11-06T00:48:58.086Z",
+      "verified_files": 430,
+      "verified_bytes": 185567855,
+      "verification_started_at": "2026-11-06T00:45:07.487Z",
+      "verification_scope": "manifest_pass",
+      "api_evidence": {
+        "version": "retained-api-receipts-v1",
+        "scope": "retained_json_checksums",
+        "records_checked": 19,
+        "records_without_receipt": 112
+      },
+      "error": null,
+      "attempts": 0
+    }
+  },
+  "browser": {
+    "scope": "Unauthenticated public desktop page",
+    "result": "Readable navigation and login notice; financial values hidden; search/payment controls disabled; no blocking desktop overlap observed.",
+    "authenticated_ui": "NOT_VERIFIED",
+    "responsive_production_ui": "NOT_VERIFIED",
+    "observed_at_approximate": "2026-11-06 23:27 UTC"
+  },
+  "financial_comparison": {
+    "result": "NOT_VERIFIED",
+    "reason": "The workspace data response was truncated; absence of integration-agent production writes is not a complete financial before/after comparison.",
+    "reference": "financial-comparison-limit.json"
+  },
+  "repository_controls": {
+    "main_protected": false,
+    "repository_rulesets": [],
+    "scope": "Read-only branch/ruleset metadata; administration changes not attempted.",
+    "recorded_at": "2026-11-07T00:02:32Z"
+  }
+}

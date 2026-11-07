@@ -1,0 +1,22 @@
+✔ a verified private regular file signs and reports only non-secret readiness (3.933139ms)
+✔ a key shared with another OS principal (644) is rejected (0.644141ms)
+✔ a key shared with another OS principal (640) is rejected (0.349397ms)
+✔ a key shared with another OS principal (620) is rejected (0.400604ms)
+✔ a key shared with another OS principal (604) is rejected (0.401175ms)
+✔ a key shared with another OS principal (666) is rejected (0.316517ms)
+✔ a key selected through a symbolic link is rejected (0.521306ms)
+✔ a symbolic-link parent cannot hide the key-file location (0.475797ms)
+✔ oversized PEM data is rejected even when its initial private key is valid (0.58365ms)
+✔ invalid UTF-8 cannot be discarded after an otherwise valid PEM (0.566204ms)
+✔ a directory is not a private-key file (0.282285ms)
+✔ changing permissions during the descriptor read invalidates the key (1.06781ms)
+✔ a replacement key changes the consent generation and leaves the old file unchanged (25.285796ms)
+✔ protected runtime PEM remains available without any file-based ACL claim (0.749921ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 93.389335

@@ -1,4 +1,5 @@
 import {AsyncLocalStorage} from 'node:async_hooks';
+import {readNodeInvoiceAiRecoveryStatus} from '../sites/lib/openai-invoices/recovery.js';
 import {DatabaseSync} from 'node:sqlite';
 import {randomUUID} from 'node:crypto';
 import {readFileSync,mkdirSync,existsSync,realpathSync,lstatSync} from 'node:fs';
@@ -208,6 +209,19 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
    if(Object.hasOwn(_target,key))return Reflect.get(_target,key);
    if(key==='companyContext')return storage.getStore()?.context??null;
    if(key==='canWrite')return !storage.getStore()?.context||hasCompanyPermission(storage.getStore().context.role,'write');
+   if(key==='invoiceAiRecoveryStatus'){
+    const {scope,bundle}=capture();assertScope(scope,'read');
+    // Fixed read-only capability: no SQL, selector, control row or token is
+    // accepted or exposed. Its closure cannot escape the captured request.
+    return ()=>{
+     if(storage.getStore()!==scope||closed)throw fail('company_context_mismatch');
+     assertScope(scope,'read');
+     const control=readNodeInvoiceAiRecoveryStatus(controlDb,{requireControl:true});
+     const local=bundle.db===controlDb?null:readNodeInvoiceAiRecoveryStatus(bundle.db);
+     assertScope(scope,'read');
+     return control||local;
+    };
+   }
    if(key==='releaseIntegrationLease'){
     const {scope,bundle}=capture();assertScope(scope,'write');
     // A revoked operation may release only its exact fenced infrastructure

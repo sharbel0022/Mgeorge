@@ -1,5 +1,5 @@
 import {extractPaymentReferences} from './payment-references.js';
-import {camtPayerEvidence} from './camt-payer.js';
+import {camtPayerEvidence,camtBankgiroAccount} from './camt-payer.js';
 import {csvPayerEvidence} from './payer-evidence.js';
 import {parseBankgiroXLSX} from './bankgiro-xlsx.js';
 import {readOpenPaymentsBankgiroCapture} from './bankgiro-openpayments-capture.js';
@@ -52,8 +52,7 @@ export function parseBankgiroXML(text,name='Bankgiro.xml'){
     if(referenceParts.length>20||references.join('; ').length>300)throw Error('För många eller för långa betalningsreferenser. Granska bankoriginalet.');
     const id=stable(value(tx,'Refs','AcctSvcrRef'))||stable(value(tx,'Refs','TxId'));
     const own=path(tx,'RltdPties',sign>0?'CdtrAcct':'DbtrAcct'),other=path(tx,'RltdPties',sign>0?'DbtrAcct':'CdtrAcct');
-    const bg=acct=>/BGNR|BANKGIRO/i.test(value(acct,'Id','Othr','SchmeNm','Prtry')||value(acct,'Id','Othr','SchmeNm','Cd'))?value(acct,'Id','Othr','Id'):'';
-    return {...base,payerEvidence,key:`${key}-${n}`,parentKey:details.length>1?key:undefined,amount:a?cents(a.text.trim())*sign:amount,party:payerEvidence.name?.value||'',referenceParts,referenceEvidence,payerReference:stable(payerReference),bankReference:id||parentReference,externalId:id?`transaction:${id}`:'',kind:'payment',recipientBankgiro:bg(own),payerBankgiro:bg(other),payerAccount:maskedAccount(other),remittanceMessage:children(path(tx,'RmtInf'),'Ustrd').map(x=>x.text.trim()).join('\n'),organizationNumber:payerEvidence.organizationNumber,specification:true};
+    return {...base,payerEvidence,key:`${key}-${n}`,parentKey:details.length>1?key:undefined,amount:a?cents(a.text.trim())*sign:amount,party:payerEvidence.name?.value||'',referenceParts,referenceEvidence,payerReference:stable(payerReference),bankReference:id||parentReference,externalId:id?`transaction:${id}`:'',kind:'payment',recipientBankgiro:camtBankgiroAccount(own),payerBankgiro:camtBankgiroAccount(other),payerAccount:maskedAccount(other),remittanceMessage:children(path(tx,'RmtInf'),'Ustrd').map(x=>x.text.trim()).join('\n'),organizationNumber:payerEvidence.organizationNumber,specification:true};
    });
    if(parsed.reduce((n,r)=>n+r.amount,0)!==amount)throw Error('Specifikationen är ofullständig: summan av betalningarna stämmer inte med insättningen.');
    if(details.length>1)rows.push(base);rows.push(...parsed);

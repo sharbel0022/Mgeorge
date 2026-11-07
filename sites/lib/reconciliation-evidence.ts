@@ -174,19 +174,24 @@ function financialSourceIds(before:State,after:State){
  return relatedTransactions(after,ids);
 }
 const changedSource=()=>Object.assign(Error('Rapportkällans leveransunderlag ändrades under kontrollen. Inga nya betalningskopplingar sparades. Kör kontrollen igen.'),{code:'BANKGIRO_SOURCE_CHANGED',status:409,safe:true});
-const sourceFields=['owner','source_id','scope_id','authorization_generation','authorization_status','cursor','missing_report_ids','next_poll_at','attempts','last_error','updated_at'];
-const jobFields=['id','owner','source_id','scope_id','report_id','sha256','filename','available_at','authorization_generation','document_id','status','attempts','next_attempt_at','last_error','import_id','payment_count','created_at','updated_at'];
+const sourceFields=['owner','source_id','scope_id','authorization_generation','authorization_status','cursor','missing_report_ids','next_poll_at','attempts','last_error','updated_at','registration_revision','registration_binding','authorization_verified_at','authorization_valid_until'];
+const jobFields=['id','owner','source_id','scope_id','report_id','sha256','filename','available_at','authorization_generation','document_id','status','attempts','next_attempt_at','last_error','import_id','payment_count','created_at','updated_at','registration_binding'];
 /** Each predicate and its identity census run inside the allocation's D1 batch.
  * The census detects a newly appended conflicting hash as well as row changes. */
 export function paymentSourceSnapshotFences(database:D1Database,owner:string,revision:number,snapshots:unknown[]){
  return snapshots.map(value=>{
-  const snapshot=value as {documentId:string;importId:string;jobs:Record<string,any>[];sources:Record<string,any>[]},clauses:string[]=[],values:unknown[]=[];
+  const snapshot=value as {documentId:string;importId:string;issue:string;jobs:Record<string,any>[];sources:Record<string,any>[]},clauses:string[]=[],values:unknown[]=[];
   const jobScope=['document_id=?','import_id=?'];values.push(owner,snapshot.documentId,snapshot.importId);
   const identities=new Map(snapshot.jobs.map(job=>[JSON.stringify([job.source_id,job.scope_id,job.report_id]),job]));
   for(const job of identities.values()){jobScope.push('(source_id=? AND scope_id=? AND report_id=?)');values.push(job.source_id,job.scope_id,job.report_id);}
   clauses.push(`(SELECT COUNT(*) FROM bankgiro_ingest_jobs WHERE owner=? AND (${jobScope.join(' OR ')}))=?`);values.push(snapshot.jobs.length);
   for(const job of snapshot.jobs){clauses.push(`EXISTS(SELECT 1 FROM bankgiro_ingest_jobs WHERE ${jobFields.map(field=>field+' IS ?').join(' AND ')})`);values.push(...jobFields.map(field=>job[field]??null));}
-  for(const source of snapshot.sources){clauses.push(`EXISTS(SELECT 1 FROM bankgiro_ingest_sources WHERE ${sourceFields.map(field=>field+' IS ?').join(' AND ')})`);values.push(...sourceFields.map(field=>source[field]??null));}
+  for(const source of snapshot.sources){
+   // Already-held manual evidence keeps its explicit exception. A clean source
+   // must remain current at execution, including expiry with no row mutation.
+   const current=snapshot.issue===''&&Number(source.registration_revision)>0?" AND authorization_verified_at>0 AND authorization_verified_at<=unixepoch('subsec')*1000 AND authorization_valid_until>unixepoch('subsec')*1000":'';
+   clauses.push(`EXISTS(SELECT 1 FROM bankgiro_ingest_sources WHERE ${sourceFields.map(field=>field+' IS ?').join(' AND ')}${current})`);values.push(...sourceFields.map(field=>source[field]??null));
+  }
   // Keep each bounded fence below D1's parameter limit; a large conflicting
   // identity requires review instead of an incomplete financial check.
   if(values.length+2>100)throw changedSource();

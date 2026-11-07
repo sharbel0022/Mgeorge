@@ -194,7 +194,8 @@ export function invoiceReferenceContext(db){
 }
 export function invoiceReferenceOriginal(extraction){
   if(!extraction||typeof extraction!=='object'||Array.isArray(extraction))return [];
-  return {invoice_number:extraction.fields?.invoice_number?.value,reference:extraction.fields?.reference?.value,issuer_name:extraction.details?.supplier?.name};
+  const originalValue=key=>extraction.fields?.[key]?.provenance?.kind==='openai_document_claim'?undefined:extraction.fields?.[key]?.value;
+  return {invoice_number:originalValue('invoice_number'),reference:originalValue('reference'),issuer_name:extraction.details?.supplier?.name};
 }
 export function invoiceReferenceProjection(invoice,context,originals=[]){
   const decisions=[resolveInvoiceReference(invoice,context),...originals.map(original=>resolveInvoiceReference({...invoice,original},context))];

@@ -1,0 +1,78 @@
+name: Final95 AI guard review
+on:
+  push:
+    branches: ['review/final95-ai-guards']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: final95-ai-guards-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  TZ: UTC
+  NODE_ENV: test
+  OPENAI_API_KEY: ''
+  OPENAI_ADMIN_KEY: ''
+  OPENAI_PROJECT_ID: ''
+  OPENAI_INVOICES_ENABLED: 'false'
+
+jobs:
+  guards:
+    name: Synthetic AI boundary regressions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24.22.1'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            sites/package-lock.json
+      - name: Locked synthetic-test dependencies
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm --prefix sites run install:ci
+      - name: Record source and run independent behavior regressions
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/ai-guards"
+          node --input-type=module -e 'import fs from "node:fs"; fs.writeFileSync(process.env.RUNNER_TEMP+"/ai-guards/source.json",JSON.stringify({sha:process.env.GITHUB_SHA,ref:process.env.GITHUB_REF,runId:process.env.GITHUB_RUN_ID,node:process.version,scope:"synthetic provider, real SQLite and processing; no live AI request"},null,2)+"\n")'
+          cd sites
+          set +e
+          node --import ../scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap tests/openai-invoice-guards-review.test.mjs > "$RUNNER_TEMP/ai-guards/regressions.tap" 2>&1
+          result=$?
+          set -e
+          cat "$RUNNER_TEMP/ai-guards/regressions.tap"
+          echo "$result" > "$RUNNER_TEMP/ai-guards/exit-code.txt"
+          exit "$result"
+      - name: Existing Node AI and company boundary contracts
+        shell: bash
+        run: |
+          set -o pipefail
+          node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap test/openai-invoice*.test.js test/company-boundary.test.js | tee "$RUNNER_TEMP/ai-guards/node-related.tap"
+      - name: Existing Sites AI and company storage contracts
+        shell: bash
+        working-directory: sites
+        run: |
+          set -o pipefail
+          node --import ../scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap tests/openai-invoice-preflight.test.mjs tests/openai-invoice-processing.test.mjs tests/company-storage.test.mjs | tee "$RUNNER_TEMP/ai-guards/sites-related.tap"
+      - name: Sites type contracts
+        shell: bash
+        run: |
+          set -o pipefail
+          npm --prefix sites run check | tee "$RUNNER_TEMP/ai-guards/sites-types.log"
+      - name: Retain exact-source RED or GREEN evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ai-guard-review-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/ai-guards
+          if-no-files-found: error
+          retention-days: 30

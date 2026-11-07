@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Redacted read-only source and required 0599 regression observations. No customer originals or bank authentication receipts are published.",
+  "repository": "sharbel0022/Mgeorge",
+  "baseCommit": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "observations": {
+    "source": {
+      "observedAt": "2026-11-06 22:59:29 UTC",
+      "operation": "bankgiro_source_status",
+      "changed": false,
+      "enabled": false,
+      "sourceId": null,
+      "state": "DISABLED",
+      "reason": "SOURCE_NOT_CONFIGURED",
+      "authorization": {
+        "status": "UNKNOWN",
+        "verifiedAt": null,
+        "validUntil": null
+      },
+      "lastSuccessAt": null,
+      "counts": {
+        "PENDING": 0,
+        "RETRY": 0,
+        "IMPORTED": 0,
+        "REVIEW": 0,
+        "DUPLICATE": 0,
+        "BLOCKED": 0
+      }
+    },
+    "payment": {
+      "checkedAt": "2026-11-06T22:43:03.970Z",
+      "operation": "payment_evidence",
+      "changed": false,
+      "snapshotCurrent": true,
+      "complete": true,
+      "reference": "0599",
+      "amountCents": 62500,
+      "currency": "SEK",
+      "formalOcrPresent": false,
+      "bankReportedPayerPresent": true,
+      "automaticEligible": false,
+      "countedEconomically": false,
+      "bookedInvoiceCount": 0,
+      "allocationCount": 0,
+      "steps": [
+        {
+          "id": "received",
+          "status": "review",
+          "rule": "received-bank-record-v1"
+        },
+        {
+          "id": "report",
+          "status": "passed",
+          "rule": "retained-report-v1"
+        },
+        {
+          "id": "original",
+          "status": "passed",
+          "rule": "owned-original-sha256-and-replay-v1"
+        },
+        {
+          "id": "account",
+          "status": "blocked",
+          "rule": "active-owned-selected-sek-account-v1"
+        },
+        {
+          "id": "deposit",
+          "status": "missing",
+          "rule": "stable-bank-identity-or-explicit-source-review-v1"
+        },
+        {
+          "id": "payer",
+          "status": "passed",
+          "rule": "preserved-bank-payer-v1"
+        },
+        {
+          "id": "reference",
+          "status": "passed",
+          "rule": "typed-preserved-reference-v1"
+        },
+        {
+          "id": "invoice",
+          "status": "review",
+          "rule": "registered-invoice-and-owned-original-v1"
+        },
+        {
+          "id": "customer",
+          "status": "review",
+          "rule": "evidence-reconciliation-2026-11-05.1"
+        },
+        {
+          "id": "amount",
+          "status": "missing",
+          "rule": "integer-ore-recorded-balance-v1"
+        },
+        {
+          "id": "reconciliation",
+          "status": "blocked",
+          "rule": "evidence-reconciliation-2026-11-05.1"
+        }
+      ]
+    },
+    "retainedOriginal": {
+      "checkedAt": "2026-11-06T22:43:03.632Z",
+      "operation": "retained_report_evidence",
+      "changed": false,
+      "snapshotCurrent": true,
+      "complete": true,
+      "integrity": "passed",
+      "sha256MatchesRetainedImport": true,
+      "verificationScope": "retained_history_only",
+      "bankAuthenticityVerified": false,
+      "invoiceRelationshipVerified": false,
+      "imports": 1,
+      "observations": 1,
+      "sourceReceipts": 0,
+      "allocations": 0,
+      "sourceLinks": 0
+    }
+  },
+  "safety": {
+    "productionAllocationsCreated": 0,
+    "productionOriginalsModified": 0,
+    "productionInvoicesModified": 0,
+    "sourceActivated": false,
+    "deployed": false
+  },
+  "interpretation": [
+    "Original byte integrity is established only for the retained history at the stated read time.",
+    "A payer name and generic reference are present; neither establishes bank authenticity or the invoice/customer relationship.",
+    "Synthetic fixtures and source-code/CI verification cannot satisfy the external supplier acceptance gate."
+  ]
+}

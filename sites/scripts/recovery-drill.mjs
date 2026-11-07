@@ -34,6 +34,7 @@ export async function runSyntheticRecoveryDrill(options={}){
   f=createSyntheticFixture(documentCount,totalOriginalBytes);
   // Freeze the expected rows and SHA-256 values independently of the backup.
   const expectedTables=census(f),expectedOriginals=f.documents.map(document=>({id:document.id,size:document.bytes.length,sha256:sha(document.bytes)}));
+  const censusHashes={tableCensusSha256:sha(JSON.stringify(expectedTables)),originalCensusSha256:sha(JSON.stringify(expectedOriginals))};
   const backupStarted=performance.now();let steps=1;
   assert.equal((await backupStep(f.db,f.bucket,owner,key,at,2,{companyBoundary:boundary})).copied,2);
   const frozenSnapshot=f.row().snapshot_key;
@@ -53,11 +54,15 @@ export async function runSyntheticRecoveryDrill(options={}){
   assert.equal(f.row().snapshot_key,frozenSnapshot);
   const backupMilliseconds=milliseconds(backupStarted),sourceFingerprint=objectFingerprint(f.objects),writes=f.puts.length;
   const bundleDirectory=join(folder,'bundle'),outputParent=join(folder,'restore');mkdirSync(bundleDirectory,{mode:0o700});mkdirSync(outputParent,{mode:0o700});
-  const exportStarted=performance.now();
+  const exportStarted=performance.now(),sourceFiles={};
   await exportBackupBundle(f.bucket,f.row(),key,owner,async(path,bytes)=>{
    const destination=join(bundleDirectory,path);mkdirSync(dirname(destination),{recursive:true,mode:0o700});writeFileSync(destination,bytes,{flag:'wx',mode:0o600});
+   if(path==='bundle.json'||path==='manifest.bin'||path==='objects/snapshot.bin')sourceFiles[path==='objects/snapshot.bin'?'snapshot.bin':path]=sha(bytes);
   },{expectedCompanyBoundary:boundary});
   const exportMilliseconds=milliseconds(exportStarted);
+  // Retain authenticated identity and ciphertext hashes before restore creates
+  // any receipt or output. Restored files never supply their own expectations.
+  const provenance={backupId:f.row().id,companyBoundary:structuredClone(boundary),snapshotSha256:f.row().snapshot_hash,sourceFiles};
   const diskSource={async get(path){return new Uint8Array(readFileSync(join(bundleDirectory,path)));},async list(){return['bundle.json','manifest.bin',...readdirSync(join(bundleDirectory,'objects')).map(name=>'objects/'+name)];}};
   const verified=await verifyRecoveryBundle(diskSource,key,owner,f.row().id,{expectedCompanyBoundary:boundary});
   assert.equal(verified.snapshot.createdAt,at.toISOString());
@@ -77,7 +82,7 @@ export async function runSyntheticRecoveryDrill(options={}){
   // Start RTO only when the independently exported encrypted bundle is locally
   // available. It ends after SQLite, tenant, ledger and original acceptance.
   const restoreStarted=performance.now(),restored=await restoreBackupIsolated(restoreArgs);
-  const acceptanceArgs={directory:restored.directory,owner,tables:expectedTables,originals:expectedOriginals,incidentAt,recoveryPointAt:verified.snapshot.createdAt};
+  const acceptanceArgs={directory:restored.directory,owner,tables:expectedTables,originals:expectedOriginals,incidentAt,recoveryPointAt:verified.snapshot.createdAt,provenance};
   const accepted=acceptIsolatedRecovery(acceptanceArgs),restoreAndAcceptanceMilliseconds=milliseconds(restoreStarted);
   assert.equal(accepted.ledger.invoices,2);assert.equal(accepted.ledger.invoiceCents,75000);assert.equal(accepted.ledger.allocatedCents,62500);
   const objectives={isolatedRtoMilliseconds:60000,simulatedRpoMilliseconds:900000};
@@ -96,9 +101,32 @@ export async function runSyntheticRecoveryDrill(options={}){
   rejectAcceptance('foreign_owner_row',()=>{const db=new DatabaseSync(databasePath);try{db.prepare('UPDATE evidence_audit_events SET owner=?').run('another-synthetic-owner');}finally{db.close();}updateReceipt();});
   rejectAcceptance('reactivated_application_issuer',()=>{const db=new DatabaseSync(databasePath);try{db.exec('UPDATE evidence_company_application_token_control SET recovery_required=0');}finally{db.close();}updateReceipt();});
   rejectAcceptance('retained_application_token',()=>{const db=new DatabaseSync(databasePath);try{db.prepare('INSERT INTO evidence_company_application_tokens(family_key,config_hash,token_ciphertext,token_version,expires_at) VALUES(?,?,?,?,?)').run('a'.repeat(64),'b'.repeat(64),'synthetic-ciphertext','synthetic-version',4102444800000);}finally{db.close();}updateReceipt();});
+  for(const [label,change]of [
+   ['altered_receipt_backup_id',receipt=>{receipt.backupId='ffffffff-ffff-4fff-8fff-ffffffffffff';}],
+   ['altered_receipt_company',receipt=>{receipt.companyBoundary={...receipt.companyBoundary,companyId:'another-synthetic-company'};}],
+   ['altered_receipt_snapshot_hash',receipt=>{receipt.snapshotSha256='0'.repeat(64);}],
+   ['altered_receipt_format',receipt=>{receipt.format='untrusted-restore-format';}],
+   ['altered_receipt_transforms',receipt=>{receipt.transforms=[];}],
+  ])rejectAcceptance(label,()=>{const receipt=JSON.parse(receiptBytes);change(receipt);writeFileSync(receiptPath,JSON.stringify(receipt));});
+  for(const [filename,label]of [['bundle.json','altered_source_header'],['manifest.bin','altered_source_manifest'],['snapshot.bin','altered_source_snapshot']]){
+   const path=join(restored.directory,'source',filename),retained=readFileSync(path),changed=Buffer.from(retained);changed[changed.length-1]^=1;
+   try{rejectAcceptance(label,()=>writeFileSync(path,changed));}finally{writeFileSync(path,retained);}
+  }
+  const retainedSnapshotPath=join(restored.directory,'source','snapshot.bin'),retainedSnapshot=readFileSync(retainedSnapshotPath);
+  try{rejectAcceptance('missing_source_snapshot',()=>rmSync(retainedSnapshotPath));}finally{writeFileSync(retainedSnapshotPath,retainedSnapshot,{flag:'wx',mode:0o600});}
+  const extraSourcePath=join(restored.directory,'source','unexpected.bin');
+  try{rejectAcceptance('extra_source_file',()=>writeFileSync(extraSourcePath,'synthetic foreign evidence',{flag:'wx',mode:0o600}));}finally{rmSync(extraSourcePath,{force:true});}
+  for(const [label,change]of [
+   ['altered_financial_reference',state=>{state.allocations[0].transactionId='unallocated';}],
+   ['altered_revoked_bankgiro_reference',state=>{state.bankgiroLinks[0].documentId=state.invoices[0].documentId;}],
+  ])rejectAcceptance(label,()=>{
+   const db=new DatabaseSync(databasePath);
+   try{const state=JSON.parse(db.prepare('SELECT payload FROM evidence_workspaces').get().payload);change(state);db.prepare('UPDATE evidence_workspaces SET payload=?').run(JSON.stringify(state));}finally{db.close();}
+   updateReceipt();
+  });
   acceptIsolatedRecovery(acceptanceArgs);
   assert.equal(sourceDatabaseFingerprint(f),sourceRowsAfterIncident);assert.equal(objectFingerprint(f.objects),sourceFingerprint);assert.equal(f.puts.length,writes);
-  return{format:'MG-Sites-synthetic-recovery-drill-1',scope:'synthetic-isolated-evidence-only',productionRestoreTested:false,startedAt,completedAt:new Date().toISOString(),runtime:{node:process.version,platform:process.platform,architecture:process.arch},accepted:true,objectives,timing:{backupAndResumeMilliseconds:backupMilliseconds,exportMilliseconds,restoreAndAcceptanceMilliseconds,totalDrillMilliseconds:milliseconds(started),rtoIncludes:['authenticated bundle validation','fresh SQLite evidence database','original write and readback','independent row, owner, ledger and SHA-256 acceptance'],rtoExcludes:['operator response','cloud download or regional outage','key custody or access recovery','production application activation']},simulatedRecovery:{clock:'synthetic scenario, not a production measurement',recoveryPointAt:verified.snapshot.createdAt,postSnapshotWriteAt:'2026-11-05T12:05:00.000Z',incidentAt,rpoMilliseconds:accepted.rpoMilliseconds,postSnapshotWritesExcluded:changed.invoices.length-accepted.ledger.invoices},resume:{interruptionObserved:true,snapshotPreserved:true,steps,attempts:f.row().attempts},tables:accepted.tables,originals:accepted.originals,ledger:accepted.ledger,rejectionChecks,sourceUnchanged:true,otherOwnerExcluded:accepted.otherOwnerExcluded,authorizationAndTransientRowsAbsent:accepted.authorizationAndTransientRowsAbsent,workerLeasesInvalidated:accepted.workerLeasesInvalidated,applicationTokenRecoveryBlocked:accepted.applicationTokenRecoveryBlocked};
+  return{format:'MG-Sites-synthetic-recovery-drill-1',scope:'synthetic-isolated-evidence-only',productionRestoreTested:false,startedAt,completedAt:new Date().toISOString(),runtime:{node:process.version,platform:process.platform,architecture:process.arch},accepted:true,objectives,timing:{backupAndResumeMilliseconds:backupMilliseconds,exportMilliseconds,restoreAndAcceptanceMilliseconds,totalDrillMilliseconds:milliseconds(started),rtoIncludes:['authenticated bundle validation','fresh SQLite evidence database','original write and readback','independent row, owner, ledger and SHA-256 acceptance'],rtoExcludes:['operator response','cloud download or regional outage','key custody or access recovery','production application activation']},simulatedRecovery:{clock:'synthetic scenario, not a production measurement',recoveryPointAt:verified.snapshot.createdAt,postSnapshotWriteAt:'2026-11-05T12:05:00.000Z',incidentAt,rpoMilliseconds:accepted.rpoMilliseconds,postSnapshotWritesExcluded:changed.invoices.length-accepted.ledger.invoices},resume:{interruptionObserved:true,snapshotPreserved:true,steps,attempts:f.row().attempts},tables:accepted.tables,originals:accepted.originals,ledger:accepted.ledger,provenance:{...provenance,...censusHashes},sourceProvenanceVerified:accepted.sourceProvenanceVerified,rejectionChecks,sourceUnchanged:true,otherOwnerExcluded:accepted.otherOwnerExcluded,authorizationAndTransientRowsAbsent:accepted.authorizationAndTransientRowsAbsent,workerLeasesInvalidated:accepted.workerLeasesInvalidated,applicationTokenRecoveryBlocked:accepted.applicationTokenRecoveryBlocked};
  }finally{f?.sql.close();rmSync(folder,{recursive:true,force:true});}
 }
 

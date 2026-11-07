@@ -1,0 +1,272 @@
+{
+  "schema": "mgeorge-final95-integration-matrix-v1",
+  "recorded_at": "2026-11-07T00:02:32Z",
+  "base_sha": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "new_deliveries": [
+    {
+      "agent": 1,
+      "scope": "OpenAI invoice intelligence",
+      "branch": "feature/95-openai-invoices",
+      "remote_sha": "ce6fa6158c30b9fb64eac35d74f653be4ae9f568",
+      "pull_request": 64,
+      "review": "APPROVED_FOR_INTEGRATION",
+      "integrated": true,
+      "reason": "Actual source and test evidence reviewed; full combined final CI and production acceptance remain separate gates.",
+      "initial_observation": "Absent from GitHub at initial inventory; subsequently published during this review.",
+      "draft": true,
+      "integration_commit": "7a2fb40c713ef6b7ddd9396add0c4a70a20101fb"
+    },
+    {
+      "agent": 2,
+      "scope": "Gmail/OCR automation",
+      "branch": "feature/95-document-automation",
+      "remote_sha": "b2178405a684ca2cb95cf91153071c5f7736f3cb",
+      "pull_request": 67,
+      "review": "APPROVED_FOR_INTEGRATION",
+      "integrated": true,
+      "reason": "Actual source and test evidence reviewed; full combined final CI and production acceptance remain separate gates.",
+      "initial_observation": "Absent from GitHub at initial inventory; subsequently published during this review.",
+      "draft": true,
+      "integration_commit": "b9081cf20780fbad2a844096192502740187ae7a",
+      "final_test_amendment": "b2178405 is included as an additional parent of the final candidate containing this manifest; product code already integrated from57abcd8. Legacy and receipt-v2 assertions both retained."
+    },
+    {
+      "agent": 3,
+      "scope": "Real bank recovery",
+      "branch": "feature/95-bank-recovery",
+      "remote_sha": "9529701a11f0511c7df4beaf80cd3975c9f27e5a",
+      "pull_request": 65,
+      "review": "APPROVED_FOR_INTEGRATION",
+      "integrated": true,
+      "reason": "Actual source and test evidence reviewed; full combined final CI and production acceptance remain separate gates.",
+      "initial_observation": "Absent from GitHub at initial inventory; subsequently published during this review.",
+      "draft": false,
+      "integration_commit": "8dfcd8ec6d82cace254dc13942e3ab79bb7937a6"
+    },
+    {
+      "agent": 4,
+      "scope": "Bankgiro reconciliation",
+      "branch": "feature/95-bankgiro-reconciliation",
+      "remote_sha": "7cbcba72cd114d0ff19798ee47495cb546d07bc1",
+      "pull_request": 68,
+      "review": "APPROVED_FOR_INTEGRATION",
+      "integrated": true,
+      "reason": "Actual source and test evidence reviewed; full combined final CI and production acceptance remain separate gates.",
+      "initial_observation": "Absent from GitHub at initial inventory; subsequently published during this review.",
+      "draft": false,
+      "integration_commit": "124e452da65b49e03fd5dadc18c646d9f69dbbdc"
+    },
+    {
+      "agent": 5,
+      "scope": "SaaS security and recovery",
+      "branch": "feature/95-saas-readiness",
+      "remote_sha": "c85f2375f97ea0191f9fbe64cd4190d869aebfaf",
+      "pull_request": 66,
+      "review": "APPROVED_FOR_INTEGRATION",
+      "integrated": true,
+      "reason": "Actual source and test evidence reviewed; full combined final CI and production acceptance remain separate gates.",
+      "initial_observation": "Absent from GitHub at initial inventory; subsequently published during this review.",
+      "draft": false,
+      "integration_commit": "c6bb149b23e8f2a2be6228b809cab854b98738ad"
+    }
+  ],
+  "previous_deliveries": [
+    {
+      "branch": "feature/95-bank",
+      "sha": "ac1abdc5469248eba212496af4a4573864908ace",
+      "associated_pr": 45,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-bankgiro",
+      "sha": "7d3bcb5ef533c39c9e23714e61709c924384ffb8",
+      "associated_pr": 46,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-quality",
+      "sha": "875876ae539f5ecba1fc39d4c213197806e245ce",
+      "associated_pr": 47,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-integration",
+      "sha": "03f84afd61bb1020e73c17c3cde332a1b07f55a0",
+      "associated_pr": 49,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-saas",
+      "sha": "1619c0e3a63b922c75a7f46d493d39e68075952f",
+      "associated_pr": 50,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-reconciliation",
+      "sha": "0954777f10da8be9fb15daf3878c539b51801142",
+      "associated_pr": 51,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-ocr",
+      "sha": "eb4242f783172ac441f9092f921b04b06dc11771",
+      "associated_pr": 52,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-security",
+      "sha": "3db9f01305aa6830a4c2d1cc01970c06b91018c2",
+      "associated_pr": 54,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    },
+    {
+      "branch": "feature/95-ui",
+      "sha": "d6646dd0971650878738f81215d0cfc5c04a1da3",
+      "associated_pr": 55,
+      "ancestor_of_main": true,
+      "proof": "Fresh local git merge-base --is-ancestor on fetched origin refs; already integrated historically, not newly merged by Agent6."
+    }
+  ],
+  "initial_inventory_recorded_at": "2026-11-06 22:45:41 UTC",
+  "review_scope": [
+    "functionality",
+    "backward compatibility",
+    "security",
+    "data integrity",
+    "regression",
+    "test coverage",
+    "tenant isolation",
+    "cost controls",
+    "operational stability"
+  ],
+  "integration_order": [
+    {
+      "order": 1,
+      "scope": "shared security/tenant/token contracts",
+      "pr": 66
+    },
+    {
+      "order": 2,
+      "scope": "Gmail/OCR queue/receipts",
+      "pr": 67
+    },
+    {
+      "order": 3,
+      "scope": "OpenAI interpretation",
+      "pr": 64
+    },
+    {
+      "order": 4,
+      "scope": "bank connection/recovery",
+      "pr": 65
+    },
+    {
+      "order": 5,
+      "scope": "Bankgiro and reconciliation",
+      "pr": 68
+    },
+    {
+      "order": 6,
+      "scope": "complete SaaS integration and release acceptance",
+      "pr": 63
+    }
+  ],
+  "shared_contracts": [
+    {
+      "contract": "company owner, membership, role and storage boundary",
+      "consumers": [
+        64,
+        65,
+        66,
+        67,
+        68
+      ],
+      "invariant": "No client/provider/AI data may select a different owner or bypass current company authority."
+    },
+    {
+      "contract": "original bytes and SHA-256",
+      "consumers": [
+        64,
+        67,
+        68
+      ],
+      "invariant": "AI/OCR proposals never replace retained originals. Accepted extraction and report evidence bind to retained bytes."
+    },
+    {
+      "contract": "worker lease/run/receipt",
+      "consumers": [
+        64,
+        67
+      ],
+      "invariant": "No duplicate extraction/payment or recycled authority after an accepted receipt, lease replacement or restore."
+    },
+    {
+      "contract": "provider consent/account scope and secret admission",
+      "consumers": [
+        65,
+        66,
+        68
+      ],
+      "invariant": "A status fallback must not weaken callback, token or synchronization authorization; missing entitlement stays blocked."
+    },
+    {
+      "contract": "financial evidence and allocations",
+      "consumers": [
+        64,
+        65,
+        67,
+        68
+      ],
+      "invariant": "OCR/AI text and coincident amount/date are not verified bank evidence; reconciliation remains deterministic and reversible."
+    },
+    {
+      "contract": "backup/restore authorization barriers",
+      "consumers": [
+        66,
+        67,
+        68
+      ],
+      "invariant": "Restore original ledger evidence without reactivating credentials, tenant grants or old leases."
+    }
+  ],
+  "final_combined_ci": "PENDING_FOR_THE_COMMIT_CONTAINING_THIS_MANIFEST",
+  "published_version": 69,
+  "independent_review_delivery": {
+    "pull_request": 69,
+    "branch": "review/final95-ai-guards",
+    "head_sha": "38d731c0993ad0c4708d2571a9a18a342f5eb672",
+    "integration_commit": "a61710865a7d0108ad27aa2989c54ade98b79f64",
+    "review": "APPROVED_FOR_INTEGRATION",
+    "ci_run": 42314974203,
+    "results": {
+      "guards": 20,
+      "node_related": 113,
+      "sites_related": 26,
+      "typecheck": "PASS"
+    },
+    "production_acceptance": "NOT_VERIFIED"
+  },
+  "integration_fixes": [
+    {
+      "problem": "Combined worker test fixture could not resolve the dynamically imported AI module when AI was enabled without approvals.",
+      "kind": "test fixture integration",
+      "test": "sites/tests/document-worker-protocol.test.mjs",
+      "evidence": "evidence/agent6-review/verification.json"
+    },
+    {
+      "problem": "PR65 inline security additions conflict with PR66 centralized security scope.",
+      "kind": "release gate coverage",
+      "test": "test/saas-security-runner.test.js",
+      "fix": "Retain consent-reconnect-95 and openpayments-runtime-disable in scripts/lib/saas-security-scope.mjs",
+      "evidence": "evidence/agent6-review/verification.json"
+    }
+  ]
+}

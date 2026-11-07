@@ -1,0 +1,89 @@
+name: SaaS readiness regressions
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/bank.js'
+      - 'src/private-key-file.js'
+      - 'test/security-*.test.js'
+      - 'test/company-selection-version.test.js'
+      - 'src/server.js'
+      - 'sites/scripts/lib/recovery-acceptance.mjs'
+      - 'sites/tests/recovery-acceptance-provenance.test.mjs'
+      - '.github/workflows/saas-readiness.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: saas-readiness-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  private_key_boundary:
+    name: Private key admission Node ${{ matrix.node }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22.23.4', '24.22.1']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Exercise key-file security using ephemeral credentials
+        env:
+          NODE_ENV: test
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/private-key-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/private-key-evidence/source-commit.txt"
+          node --import ./scripts/saas-test-isolation.mjs --test --test-reporter=tap --test-concurrency=1 test/security-private-key-file.test.js | tee "$RUNNER_TEMP/private-key-evidence/tests.tap"
+      - name: Retain regression results including failures
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: private-key-${{ matrix.node }}-${{ github.sha }}
+          path: ${{ runner.temp }}/private-key-evidence
+          if-no-files-found: error
+          retention-days: 14
+
+  request_and_recovery_boundaries:
+    name: Session and recovery provenance regressions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24.22.1'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install locked synthetic-test dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Exercise actual HTTP sessions and isolated recovery evidence
+        env:
+          NODE_ENV: test
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/readiness-boundary-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/readiness-boundary-evidence/source-commit.txt"
+          node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-reporter=tap --test-concurrency=1 test/security-session-ambiguity.test.js test/security-session-allocation.test.js test/company-selection-version.test.js test/saas-release-evidence.test.js sites/tests/recovery-acceptance-provenance.test.mjs sites/tests/recovery-drill.test.mjs sites/tests/saas-migration-rollback.test.mjs sites/tests/company-sync-scale.test.mjs | tee "$RUNNER_TEMP/readiness-boundary-evidence/tests.tap"
+      - name: Retain boundary results including failures
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: readiness-boundaries-${{ github.sha }}
+          path: ${{ runner.temp }}/readiness-boundary-evidence
+          if-no-files-found: error
+          retention-days: 14

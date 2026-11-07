@@ -1,0 +1,164 @@
+{
+  "schema": "mgeorge-final95-ci-v1",
+  "recorded_at": "2026-11-06 22:59:55 UTC",
+  "scope": "fresh ordinary GitHub PR CI; baseline product unchanged",
+  "branch": "integration/mgeorge-final-95",
+  "head_sha": "70d2f74c1aa8f1a994658d0cd6cc7c573be72e7d",
+  "base_sha": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "checkout_sha": "30ad8ecfb56c98371ff7bc8e34495b9f1f0f73cf",
+  "quality_run": 42307160013,
+  "security_run": 42307159929,
+  "jobs": [
+    {
+      "name": "Bankgiro SFTP integration",
+      "id": 128199281771,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Chromium synthetic onboarding acceptance",
+      "id": 128199282132,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Node 24.22.1",
+      "id": 128199282139,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Synthetic 1, 10 and 100 company performance",
+      "id": 128199282150,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Sites types, tests and production build",
+      "id": 128199282209,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Node 22.23.4",
+      "id": 128199282332,
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "totals": {
+    "node22": {
+      "tests": 3012,
+      "pass": 3012,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "node24": {
+      "tests": 3012,
+      "pass": 3012,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sites": {
+      "tests": 5820,
+      "pass": 5820,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "bridge": {
+      "tests": 47,
+      "pass": 47,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "security": {
+      "node": 377,
+      "sites": 1225,
+      "fail": 0,
+      "note": "Subset checks overlap full suites; do not sum as independent new product cases."
+    },
+    "browser": {
+      "passed": true,
+      "detailed_counts_retrieved": false
+    },
+    "companies": {
+      "passed": true,
+      "sizes": [
+        1,
+        10,
+        100
+      ],
+      "detailed_latency_retrieved": false
+    }
+  },
+  "verification": [
+    "Read all six job conclusions",
+    "Read raw logs for both Node versions, Sites, bridge, browser and performance",
+    "Read security raw log with Node/Sites counts",
+    "Sites clean installs, integrity mitigation, types, production/all audits and build passed"
+  ],
+  "limits": [
+    "Not a verification of PR64–68 code, which is not yet integrated",
+    "Artifacts retained by GitHub but not yet decompressed in this unavailable local executor",
+    "Production UI not reverified in this turn",
+    "No new live OpenAI model benchmark or blind OCR acceptance"
+  ],
+  "artifacts": [
+    {
+      "id": 13547645455,
+      "name": "quality-node-22.23.4-30ad8ecfb56c98371ff7bc8e34495b9f1f0f73cf-1",
+      "size_in_bytes": 614163,
+      "digest": "sha256:4dd33aab70313ade70650df99f047266420ad73288784db5679985eb57224619",
+      "expired": false,
+      "head_sha": "70d2f74c1aa8f1a994658d0cd6cc7c573be72e7d"
+    },
+    {
+      "id": 13547445238,
+      "name": "quality-browser-30ad8ecfb56c98371ff7bc8e34495b9f1f0f73cf-1",
+      "size_in_bytes": 5341834,
+      "digest": "sha256:0d7e395354e0100c04165db66802be20f9342f86fb05202d65e7132e411f9f6f",
+      "expired": false,
+      "head_sha": "70d2f74c1aa8f1a994658d0cd6cc7c573be72e7d"
+    },
+    {
+      "id": 13546976255,
+      "name": "quality-bridge-30ad8ecfb56c98371ff7bc8e34495b9f1f0f73cf-1",
+      "size_in_bytes": 268828,
+      "digest": "sha256:f15d0755dec0e991d94650f9dac9c7b117f8a02d8ecf134ec7a3dfa32d32673b",
+      "expired": false,
+      "head_sha": "70d2f74c1aa8f1a994658d0cd6cc7c573be72e7d"
+    },
+    {
+      "id": 13546664320,
+      "name": "quality-sites-30ad8ecfb56c98371ff7bc8e34495b9f1f0f73cf-1",
+      "size_in_bytes": 753332,
+      "digest": "sha256:62fc2744865b7e7a0d8b3eb41553eb59ba6bd5b255bef3f25324e4e3a4b45ac7",
+      "expired": false,
+      "head_sha": "70d2f74c1aa8f1a994658d0cd6cc7c573be72e7d"
+    },
+    {
+      "id": 13546003880,
+      "name": "quality-node-24.22.1-30ad8ecfb56c98371ff7bc8e34495b9f1f0f73cf-1",
+      "size_in_bytes": 617301,
+      "digest": "sha256:8458db8c4411e770511f08ef20afac6009025dd01ec98819ab0f4dba8ffd0395",
+      "expired": false,
+      "head_sha": "70d2f74c1aa8f1a994658d0cd6cc7c573be72e7d"
+    },
+    {
+      "id": 13545759380,
+      "name": "quality-performance-30ad8ecfb56c98371ff7bc8e34495b9f1f0f73cf-1",
+      "size_in_bytes": 135613,
+      "digest": "sha256:dc12059c9506ff37e42bd36f542ea50a05f89bb7093737457f16405d72fd6739",
+      "expired": false,
+      "head_sha": "70d2f74c1aa8f1a994658d0cd6cc7c573be72e7d"
+    }
+  ]
+}

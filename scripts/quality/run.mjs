@@ -57,6 +57,14 @@ async function suite(name, cwd, directory, suffix, coverageIncludes) {
   const step = await runTestSuite({ name, root, cwd, files, output: join(output, 'tests'), coverage: true, coverageIncludes, timeoutMs: 30 * 60_000, testTimeoutMs: 180_000 });
   step.artifactDirectory = 'tests'; report.steps.push(step); save();
   console.log(`[quality:${profile}] ${name}: ${step.passed ? 'PASS' : 'FAIL'} ${JSON.stringify(step.totals)}`);
+  if(!step.passed){
+    for(const failure of step.failures??[])console.error('[quality:'+profile+'] failed test: '+failure);
+    const tap=join(output,'tests','tests.tap');
+    if(existsSync(tap)){
+      const text=readFileSync(tap,'utf8'),blocks=text.match(/(?:^|\n)not ok [\s\S]*?(?=\n(?:ok |not ok |1\.\.|# Subtest:)|$)/g)||[];
+      for(const block of blocks.slice(0,12))console.error(block.slice(0,16000));
+    }
+  }
 }
 
 try {

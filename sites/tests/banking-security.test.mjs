@@ -1587,6 +1587,79 @@ test('lost callback is reported expired from stored flow state without a bank re
   assert.equal(f.calls.length, before);
 });
 
+
+for (const role of ['viewer', 'accountant']) test('bank-recovery: ' + role + ' can read status after an earlier authorization start', async t => {
+  const f = await fixture(t, 'PRODUCTION', { companyContext: true }); reconnectCompanyContext(f);
+  await f.start();
+  f.companyContext.role = role;
+  f.companyContext.membershipVersion = 2;
+  const flows = f.sql.prepare('SELECT * FROM bank_auth_flows').all(), calls = f.calls.length;
+  const visible = await (await f.service.status(new Request(origin + '/api/bank/status'))).json();
+  assert.equal(visible.company.canManageBank, false);
+  assert.equal(visible.connection, null);
+  assert.equal(visible.consentFlow.status, 'expired');
+  assert.equal(visible.consentFlow.reason, 'CONSENT_RESTART_REQUIRED');
+  assert.equal(visible.consentFlow.id, null);
+  assert.equal(visible.consentFlow.connectionId, null);
+  assert.deepEqual(f.sql.prepare('SELECT * FROM bank_auth_flows').all(), flows);
+  assert.equal(f.calls.length, calls, 'status must remain a local read');
+  assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=failed');
+  assert.equal(f.calls.filter(call => call.name === 'createSession').length, 0);
+  await assert.rejects(f.start(), error => error.code === 'COMPANY_ACCESS_DENIED');
+});
+
+for (const contextKind of ['malformed', 'foreign', 'old membership']) test('bank-recovery: ' + contextKind + ' retained flow cannot hide safe connection status', async t => {
+  const f = await fixture(t, 'PRODUCTION', { companyContext: true }); reconnectCompanyContext(f);
+  await f.seedApp(); await f.seedConnection(); await f.start({ renewConnectionId: f.connection().id });
+  const flow = f.sql.prepare('SELECT * FROM bank_auth_flows').get(), context = JSON.parse(flow.context_json);
+  const invalid = contextKind === 'malformed' ? '{invalid' : JSON.stringify({ ...context,
+    ...(contextKind === 'foreign' ? { companyId: 'synthetic-foreign-company' } : { membershipVersion: '0' }) });
+  f.sql.prepare("UPDATE bank_auth_flows SET context_json=?,connection_id='synthetic-foreign-connection'").run(invalid);
+  const connection = { ...f.connection() }, flows = f.sql.prepare('SELECT * FROM bank_auth_flows').all(), calls = f.calls.length;
+  const visible = await (await f.service.status(new Request(origin + '/api/bank/status'))).json();
+  assert.equal(visible.connection.status, 'connected');
+  assert.equal(visible.consentFlow.status, 'expired');
+  assert.equal(visible.consentFlow.reason, 'CONSENT_RESTART_REQUIRED');
+  assert.equal(visible.consentFlow.id, null);
+  assert.equal(visible.consentFlow.connectionId, null);
+  assert.doesNotMatch(JSON.stringify(visible), /synthetic-foreign/);
+  assert.deepEqual({ ...f.connection() }, connection);
+  assert.deepEqual(f.sql.prepare('SELECT * FROM bank_auth_flows').all(), flows);
+  assert.equal(f.calls.length, calls);
+  assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=failed');
+  assert.equal(f.calls.filter(call => call.name === 'createSession').length, 0);
+});
+
+test('bank-recovery: invalid pending flow expiry is reported as expired without a provider read', async t => {
+  const f = await fixture(t); await f.start();
+  f.sql.prepare("UPDATE bank_auth_flows SET expires_at='invalid-expiry'").run();
+  const before = f.calls.length, flows = f.sql.prepare('SELECT * FROM bank_auth_flows').all();
+  const visible = await (await f.service.status(new Request(origin + '/api/bank/status'))).json();
+  assert.equal(visible.consentFlow.status, 'expired');
+  assert.equal(visible.consentFlow.reason, 'CALLBACK_NOT_RECEIVED');
+  assert.equal(f.calls.length, before);
+  assert.deepEqual(f.sql.prepare('SELECT * FROM bank_auth_flows').all(), flows);
+  assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=failed');
+  assert.equal(f.calls.filter(call => call.name === 'createSession').length, 0);
+});
+
+test('bank-recovery: stale completed flow identifiers are not projected into the current company context', async t => {
+  const f = await fixture(t); await f.start();
+  const original = f.sql.prepare('SELECT * FROM bank_auth_flows').get();
+  f.sql.prepare("UPDATE bank_auth_flows SET status='completed',context_json=?,connection_id='synthetic-foreign-connection'")
+    .run(JSON.stringify({ ...JSON.parse(original.context_json), companyId: 'synthetic-foreign-company' }));
+  const flows = f.sql.prepare('SELECT * FROM bank_auth_flows').all(), calls = f.calls.length;
+  const visible = await (await f.service.status(new Request(origin + '/api/bank/status'))).json();
+  assert.equal(visible.consentFlow.status, 'expired');
+  assert.equal(visible.consentFlow.reason, 'CONSENT_RESTART_REQUIRED');
+  assert.equal(visible.consentFlow.id, null);
+  assert.equal(visible.consentFlow.connectionId, null);
+  assert.doesNotMatch(JSON.stringify(visible), /synthetic-foreign/);
+  assert.equal(visible.connection, null);
+  assert.equal(f.calls.length, calls);
+  assert.deepEqual(f.sql.prepare('SELECT * FROM bank_auth_flows').all(), flows);
+});
+
 test('renewal cancellation preserves the existing connection and accepted renewal replaces it once', async t => {
   const f = await fixture(t); companyAuthority(f); await f.seedApp(); const id = await f.seedConnection();
   const before = { ...f.connection() };

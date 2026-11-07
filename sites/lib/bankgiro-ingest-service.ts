@@ -6,13 +6,13 @@ import {parseSpecificationBytes,readOpenPaymentsBankgiroCapture,assertOpenPaymen
 import {assertPaymentOriginal,writePaymentState} from './reconciliation-evidence';
 import {createBankgiroIngest} from './bankgiro-ingest.js';
 import {createBankgiroIngestStore} from './bankgiro-ingest-store.js';
-import {publicBankgiroStatus} from './bankgiro-source.js';
+import {publicBankgiroStatus,assertBankgiroReportRecipient} from './bankgiro-source.js';
 import {resolveBankgiroSource} from './bankgiro-source-registry.js';
 
 type Lease={owner:string;token:string;until:number;assert():Promise<void>;fence():D1PreparedStatement;write(statements:D1PreparedStatement[]):Promise<unknown>};
 type Report={reportId:string;filename:string;sha256:string};
 type Job=Report&{registrationBinding?:string;id:string;owner:string;sourceId:string;scopeId:string;documentId:string;authorizationGeneration:string};
-type Authorization={registrationBinding?:string;configurationRevision?:number;status:string;owner:string;sourceId:string;scopeId:string;generation:string;validUntil:string;evidenceId:string};
+type Authorization={bankgiro?:string;registrationBinding?:string;configurationRevision?:number;status:string;owner:string;sourceId:string;scopeId:string;generation:string;validUntil:string;evidenceId:string};
 type ImportInput={owner:string;job:Job;documentId:string;authorization:Authorization;lease:Lease};
 type Outcome={status:'IMPORTED'|'REVIEW'|'DUPLICATE';importId?:string;paymentCount:number;reasonCode?:string};
 type CompanySinkGuard={companyId:string;owner:string;assert():Promise<void>;fences():D1PreparedStatement[]};
@@ -148,6 +148,7 @@ export function createSitesBankgiroSink({companyGuard}:{companyGuard?:CompanySin
    return originalFailure(failure);
   }
   if(command.hash!==job.sha256||command.name!==original.filename)throw error('HASH_MISMATCH','Originalets identitet ändrades under kontrollen.');
+  assertBankgiroReportRecipient(input.authorization,command.rows.map(row=>row.recipientBankgiro));
   await lease.assert();checkAuthorization(input);
   const previous=old.state.imports.filter(record=>record.hash===job.sha256||record.documentId===documentId),paymentCount=command.rows.filter((row:{kind:string})=>row.kind!=='batch').length;
   await assertCurrentAuthorization(input);

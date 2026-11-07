@@ -1,5 +1,5 @@
 import {extractPaymentReferences} from './payment-references.js';
-import {camtPayerEvidence} from '../sites/lib/camt-payer.js';
+import {camtPayerEvidence,camtBankgiroAccount} from '../sites/lib/camt-payer.js';
 import {apiPayerEvidence,csvPayerEvidence} from '../sites/lib/payer-evidence.js';
 import {parseBankgiroXLSX} from '../sites/lib/bankgiro-xlsx.js';
 import {readCamtDocument as xmlTree,xmlChildren as children,xmlPath as path,xmlValue as value,camtRemittanceNodes,camtAmount as amountNode,camtDate,camtReportEvidence,validateCamtBatches,decodeCamtBytes} from '../sites/lib/camt-xml.js';
@@ -189,10 +189,11 @@ export function parseCAMT(xml,account='Swedbank'){
       if(details.length===1&&cents!==total)throw new Error('Betalningsbeloppet stämmer inte med bankpostens totalbelopp');
       const detailDirection=value(detail,'CdtDbtInd');if(detailDirection&&detailDirection!==direction)throw new Error('Motstridiga betalningsriktningar i XML-filen');
       const party=sign>0?'Dbtr':'Cdtr';
+      const bankgiro=camtBankgiroAccount(path(detail,'RltdPties',sign>0?'CdtrAcct':'DbtrAcct')),payer_bankgiro=camtBankgiroAccount(path(detail,'RltdPties',party+'Acct'));
       const payer_evidence=camtPayerEvidence(detail,sign>0),payer=payer_evidence.name?.value||'';
       const ref=reference(detail),specific=detailIds[index];
       const id=specific||(details.length===1?parentReference:'');
-      items.push({...common,payer_evidence,payer_organization_number:payer_evidence.organizationNumber,reference_evidence:referenceEvidence(detail),amount_cents:cents*sign,payer,reference:ref,bank_reference:id,description:description||value(detail,'AddtlTxInf'),...(payer_evidence.conflict?{needs_review:1,review_reason:payer_evidence.warnings.join(' ')}:{}),...(parentReference&&id!==parentReference?{parent_bank_reference:parentReference}:{})});
+      items.push({...common,bankgiro,payer_bankgiro,payer_evidence,payer_organization_number:payer_evidence.organizationNumber,reference_evidence:referenceEvidence(detail),amount_cents:cents*sign,payer,reference:ref,bank_reference:id,description:description||value(detail,'AddtlTxInf'),...(payer_evidence.conflict?{needs_review:1,review_reason:payer_evidence.warnings.join(' ')}:{}),...(parentReference&&id!==parentReference?{parent_bank_reference:parentReference}:{})});
     }
   }
   return validateItems(items);
